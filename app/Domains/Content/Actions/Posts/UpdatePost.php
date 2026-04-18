@@ -23,7 +23,7 @@ final class UpdatePost
                 'excerpt' => $data['excerpt'] ?? $post->excerpt,
                 'featured_image' => $data['featured_image'] ?? $post->featured_image,
                 'category_id' => $data['category_id'] ?? $post->category_id,
-                'seo_metadata' => $data['seo_metadata'] ?? $post->seo_metadata,
+                'seo_metadata' => $data['seo_metadata'] ?? $post->seo_metadata ?? [],
                 'is_published' => $data['is_published'] ?? $post->is_published,
                 'is_featured' => $data['is_featured'] ?? $post->is_featured,
             ];

@@ -104,19 +104,23 @@ new #[Title('Edit Post')] class extends Component
             'slug' => 'required|string|max:255',
             'excerpt' => 'nullable|string',
             'categoryId' => 'nullable|exists:categories,id',
+            'isPublished' => 'boolean',
+            'isFeatured' => 'boolean',
         ]);
 
         // Create revision before saving
-        $createRevision = new CreateRevision();
+        $createRevision = app(CreateRevision::class);
         $createRevision->execute($this->post, auth()->user(), 'Auto-saved before update');
 
-        $action = new UpdatePost();
+        $action = app(UpdatePost::class);
         $this->post = $action->execute($this->post, [
             'title' => $this->title,
             'slug' => $this->slug,
             'excerpt' => $this->excerpt,
             'category_id' => $this->categoryId,
-            'seo_metadata' => $this->post->seo_metadata,
+            'is_published' => $this->isPublished,
+            'is_featured' => $this->isFeatured,
+            'seo_metadata' => $this->post->seo_metadata ?? [],
         ]);
 
         // Sync tags
@@ -128,7 +132,7 @@ new #[Title('Edit Post')] class extends Component
 
     public function publish(): void
     {
-        $action = new PublishPost();
+        $action = app(PublishPost::class);
         $this->post = $action->execute($this->post);
         $this->isPublished = true;
         $this->publishedAt = now()->format('Y-m-d\TH:i');
@@ -144,12 +148,8 @@ new #[Title('Edit Post')] class extends Component
             return;
         }
 
-        $action = new AddBlock();
-        $block = $action->execute($this->post, [
-            'type' => $type,
-            'content' => $blockType::defaultData(),
-            'sort_order' => count($this->blocks),
-        ]);
+        $action = app(AddBlock::class);
+        $block = $action->execute($this->post, $type);
 
         $this->blocks[] = [
             'id' => $block->id,
@@ -198,7 +198,7 @@ new #[Title('Edit Post')] class extends Component
             'blockFormData' => 'array',
         ]);
 
-        $action = new UpdateBlock();
+        $action = app(UpdateBlock::class);
         $updatedBlock = $action->execute(
             $this->post->contentBlocks()->find($this->editingBlockId),
             $this->blockFormData
@@ -229,7 +229,7 @@ new #[Title('Edit Post')] class extends Component
             return;
         }
 
-        $action = new RemoveBlock();
+        $action = app(RemoveBlock::class);
         $action->execute($block);
 
         $this->blocks = collect($this->blocks)->filter(fn ($b) => $b['id'] !== $blockId)->values()->toArray();
@@ -248,7 +248,7 @@ new #[Title('Edit Post')] class extends Component
             return;
         }
 
-        $action = new DuplicateBlock();
+        $action = app(DuplicateBlock::class);
         $newBlock = $action->execute($block);
 
         // Insert after the original block
@@ -289,7 +289,7 @@ new #[Title('Edit Post')] class extends Component
         $this->reorderBlocksInternal();
 
         // Update database order
-        $action = new ReorderBlocks();
+        $action = app(ReorderBlocks::class);
         $action->execute($this->post, $orderedIds);
 
         Flux::toast('Blocks reordered.');

@@ -17,6 +17,7 @@ use Illuminate\Validation\Rules\Password;
 
 use App\Domains\Content\Models\Post;
 use App\Domains\Content\Policies\PostPolicy;
+use App\Domains\Content\Observers\PostObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,8 +48,14 @@ class AppServiceProvider extends ServiceProvider
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
         Blade::anonymousComponentPath(resource_path('views/components/blog'), 'blog');
 
-        // Register policies
+        // Register policies and observers
         Gate::policy(Post::class, PostPolicy::class);
+        Post::observe(PostObserver::class);
+
+        // Grant Super Admin all permissions
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('Super Admin') ? true : null;
+        });
 
         // Share company settings globally (with fallback for when database doesn't exist yet)
         try {

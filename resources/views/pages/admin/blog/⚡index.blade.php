@@ -40,6 +40,19 @@ new #[Title('Blog Posts')] class extends Component
         Flux::toast('Post deleted successfully.');
     }
 
+    public function togglePublished(int $postId): void
+    {
+        $post = Post::findOrFail($postId);
+        $this->authorize('update', $post);
+
+        $post->update([
+            'is_published' => ! $post->is_published,
+            'published_at' => (! $post->is_published && ! $post->published_at) ? now() : $post->published_at,
+        ]);
+
+        Flux::toast($post->is_published ? 'Post published.' : 'Post moved to drafts.');
+    }
+
     public function duplicatePost(int $postId): void
     {
         $this->authorize('create', Post::class);
@@ -52,7 +65,9 @@ new #[Title('Blog Posts')] class extends Component
 
     public function getPostsProperty()
     {
-        return Cache::flexible("admin.posts.list.{$this->search}.{$this->status}.{$this->category_id}.{$this->sort}." . $this->getPage(), [30, 60], function () {
+        $version = Cache::get('admin.posts.list.version', 1);
+
+        return Cache::flexible("admin.posts.list.v{$version}.{$this->search}.{$this->status}.{$this->category_id}.{$this->sort}." . $this->getPage(), [30, 60], function () {
             return Post::query()
                 ->with(['author', 'category'])
                 ->when($this->search, function ($query) {
@@ -173,7 +188,7 @@ new #[Title('Blog Posts')] class extends Component
                                     <td class="px-6 py-4">
                                         {{ $post->author?->name ?? 'Unknown' }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 cursor-pointer" wire:click="togglePublished({{ $post->id }})">
                                         @if($post->is_published && $post->published_at <= now())
                                             <flux:badge variant="success" size="sm">{{ __('Published') }}</flux:badge>
                                         @else

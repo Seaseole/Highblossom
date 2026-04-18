@@ -22,7 +22,7 @@ new #[Title('Post Revisions')] class extends Component
 
     public function getRevisionsProperty()
     {
-        return $this->post->revisions()->latest()->paginate(20);
+        return $this->post->revisions()->with('user')->latest()->paginate(20);
     }
 
     public function compare(int $revisionId): void

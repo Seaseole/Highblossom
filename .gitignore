@@ -21,3 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+.windsurf/plans/polish-toaster-animation-603725.md
+.windsurf/plans/fix-post-saving-issue-603725.md
+.windsurf/plans/install-spatie-permissions-603725.md
