@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+    --font-headline: 'Cabinet Grotesk', sans-serif;
+    --font-body: 'Geist', sans-serif;
+
+    --color-primary: #73081d;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #932432;
+    --color-on-primary-container: #ffaaac;
+    --color-secondary: #894d50;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #fdb0b1;
+    --color-on-secondary-container: #794043;
+    --color-tertiary: #373838;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #4e4f4f;
+    --color-on-tertiary-container: #c1c1c1;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #fff8f7;
+    --color-on-background: #241919;
+    --color-surface: #fff8f7;
+    --color-on-surface: #241919;
+    --color-surface-variant: #f3dddd;
+    --color-on-surface-variant: #574142;
+    --color-outline: #8b7171;
+    --color-outline-variant: #debfbf;
+    --color-inverse-surface: #3a2d2d;
+    --color-inverse-on-surface: #ffedec;
+    --color-inverse-primary: #ffb3b4;
+    --color-surface-bright: #fff8f7;
+    --color-surface-dim: #ebd5d5;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f2f4f7;
+    --color-surface-container: #ffe9e8;
+    --color-surface-container-high: #f9e3e3;
+    --color-surface-container-highest: #f3dddd;
+
+    --color-accent: #73081d;
+    --color-accent-content: #ffffff;
+    --color-accent-foreground: #ffffff;
+
+    --color-primary-fixed: #ffdada;
+    --color-on-primary-fixed: #40000b;
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+        --color-background: #1a1a1a;
+        --color-surface: #242424;
+        --color-surface-container: #2a2a2a;
+        --color-surface-container-low: #1f1f1f;
+        --color-surface-container-high: #303030;
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
+/* SortableJS Visual Editor Styles */
+.sortable-ghost {
+    opacity: 0.4;
+    background: var(--color-surface-container-high);
+    border: 2px dashed var(--color-outline);
+}
+
+.sortable-chosen {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle {
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
