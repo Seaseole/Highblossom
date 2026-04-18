@@ -6,9 +6,10 @@ use App\Domains\Content\Actions\Posts\CalculateReadingTime;
 use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\PostView;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new #[Title('Blog Post')] class extends Component
+new #[Title('Blog Post'), Layout('layouts.site')] class extends Component
 {
     public Post $post;
 
@@ -50,7 +51,8 @@ new #[Title('Blog Post')] class extends Component
     }
 }; ?>
 
-<flux:main :title="$post->title">
+<div>
+<x-layouts::site :title="$post->title">
     <!-- Header -->
     <header class="relative pt-32 pb-16 overflow-hidden bg-[#0A0A0F]">
         <div class="max-w-4xl mx-auto px-6 lg:px-8 relative z-10">
@@ -215,4 +217,5 @@ new #[Title('Blog Post')] class extends Component
             </div>
         </section>
     @endif
-</flux:main>
+</x-layouts::site>
+</div>

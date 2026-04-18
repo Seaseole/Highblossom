@@ -5,10 +5,11 @@ declare(strict_types=1);
 use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Tag;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Title('Tag')] class extends Component
+new #[Title('Tag'), Layout('layouts.site')] class extends Component
 {
     use WithPagination;
 
@@ -29,7 +30,8 @@ new #[Title('Tag')] class extends Component
     }
 }; ?>
 
-<flux:main :title="'#' . $tag->name . ' - Blog'">
+<div>
+<x-layouts::site :title="'#' . $tag->name . ' - Blog'">
     <!-- Header -->
     <header class="relative pt-32 pb-20 overflow-hidden bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8 relative z-10">
@@ -119,4 +121,5 @@ new #[Title('Tag')] class extends Component
             @endif
         </div>
     </section>
-</flux:main>
+</x-layouts::site>
+</div>

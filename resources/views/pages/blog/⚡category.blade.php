@@ -5,10 +5,11 @@ declare(strict_types=1);
 use App\Domains\Content\Models\Category;
 use App\Domains\Content\Models\Post;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Title('Category')] class extends Component
+new #[Title('Category'), Layout('layouts.site')] class extends Component
 {
     use WithPagination;
 
@@ -30,7 +31,8 @@ new #[Title('Category')] class extends Component
     }
 }; ?>
 
-<flux:main :title="$category->name . ' - Blog'">
+<div>
+<x-layouts::site :title="$category->name . ' - Blog'">
     <!-- Header -->
     <header class="relative pt-32 pb-20 overflow-hidden bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8 relative z-10">
@@ -114,4 +116,5 @@ new #[Title('Category')] class extends Component
             @endif
         </div>
     </section>
-</flux:main>
+</x-layouts::site>
+</div>

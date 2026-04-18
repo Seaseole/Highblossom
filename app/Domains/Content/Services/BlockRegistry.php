@@ -8,13 +8,12 @@ use App\Domains\Content\Contracts\BlockTypeInterface;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
 final class BlockRegistry
 {
-    private ?Collection $blocks = null;
+    private $blocks = null;
 
     public function __construct(
         private readonly CacheRepository $cache,
@@ -24,14 +23,16 @@ final class BlockRegistry
     /**
      * Get all registered block types.
      *
-     * @return Collection<BlockTypeInterface>
+     * @return Collection<string>
      */
     public function all(): Collection
     {
         if ($this->blocks === null) {
-            $this->blocks = $this->cache->rememberForever('content.block_types', function () {
-                return $this->discoverBlocks();
+            $cached = $this->cache->rememberForever('content.block_types', function () {
+                return $this->discoverBlocks()->toArray();
             });
+
+            $this->blocks = collect($cached);
         }
 
         return $this->blocks;
@@ -42,15 +43,15 @@ final class BlockRegistry
      */
     public function groupedByCategory(): Collection
     {
-        return $this->all()->groupBy(fn (BlockTypeInterface $block) => $block::category());
+        return $this->all()->groupBy(fn (string $className) => $className::category());
     }
 
     /**
      * Find a block type by its ID.
      */
-    public function find(string $id): ?BlockTypeInterface
+    public function find(string $id): ?string
     {
-        return $this->all()->first(fn (BlockTypeInterface $block) => $block::id() === $id);
+        return $this->all()->first(fn (string $className) => $className::id() === $id);
     }
 
     /**

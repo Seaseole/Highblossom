@@ -8,8 +8,9 @@ use App\Domains\Content\Models\Tag;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
-new #[Title('Blog')] class extends Component
+new #[Title('Blog'), Layout('layouts.site')] class extends Component
 {
     use WithPagination;
 
@@ -70,7 +71,8 @@ new #[Title('Blog')] class extends Component
     }
 }; ?>
 
-<flux:main title="{{ $this->category ? ($this->getCategories()->firstWhere('slug', $this->category)?->name . ' - Blog') : ($this->tag ? ($this->getTags()->firstWhere('slug', $this->tag)?->name . ' - Blog') : 'Blog') }}">
+<div>
+<x-layouts::site title="{{ $this->category ? ($this->getCategories()->firstWhere('slug', $this->category)?->name . ' - Blog') : ($this->tag ? ($this->getTags()->firstWhere('slug', $this->tag)?->name . ' - Blog') : 'Blog') }}">
     <!-- Header -->
     <header class="relative pt-32 pb-20 bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
@@ -338,4 +340,5 @@ new #[Title('Blog')] class extends Component
             </div>
         </section>
     @endif
-</flux:main>
+</x-layouts::site>
+</div>

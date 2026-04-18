@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
+        Blade::anonymousComponentPath(resource_path('views/components/blog'), 'blog');
 
         // Register policies
         Gate::policy(Post::class, PostPolicy::class);
