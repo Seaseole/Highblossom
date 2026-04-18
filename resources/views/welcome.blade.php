@@ -50,7 +50,7 @@
 
         {{-- Trust Bar --}}
         <div class="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-[#0A0A0F]/50 backdrop-blur-sm">
-            <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
+            <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                     <div class="text-center md:text-left">
                         <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">22+</div>

@@ -437,10 +437,10 @@ select:focus[data-flux-control] {
 
 /* Glass Card System */
 .glass-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(18, 18, 24, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card-hover {
@@ -448,8 +448,8 @@ select:focus[data-flux-control] {
 }
 
 .glass-card-hover:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(18, 18, 24, 0.95);
+    border-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-4px);
 }
 
@@ -457,7 +457,7 @@ select:focus[data-flux-control] {
 .btn-premium {
     background: #DC2626;
     color: white;
-    padding: 0.875rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
@@ -468,6 +468,12 @@ select:focus[data-flux-control] {
     gap: 0.5rem;
     border: none;
     cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .btn-premium {
+        padding: 0.875rem 2rem;
+    }
 }
 
 .btn-premium:hover {
@@ -484,7 +490,7 @@ select:focus[data-flux-control] {
     background: transparent;
     color: #FAFAFA;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.875rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
@@ -494,6 +500,12 @@ select:focus[data-flux-control] {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .btn-ghost {
+        padding: 0.875rem 2rem;
+    }
 }
 
 .btn-ghost:hover {
