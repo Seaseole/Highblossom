@@ -22,7 +22,7 @@
 
     <style>
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: #16161d;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
