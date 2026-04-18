@@ -52,35 +52,43 @@ new #[Title('Blog Post')] class extends Component
 
 <flux:main :title="$post->title">
     <!-- Header -->
-    <header class="relative pt-20 pb-16 overflow-hidden bg-surface">
-        <div class="max-w-4xl mx-auto px-8 relative z-10">
-            <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-6 text-sm font-medium">
-                <span class="material-symbols-outlined text-base">arrow_back</span>
-                {{ __('Back to Blog') }}
+    <header class="relative pt-32 pb-16 overflow-hidden bg-[#0A0A0F]">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8 relative z-10">
+            <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 text-[#71717A] hover:text-[#DC2626] transition-colors mb-6 text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Blog
             </a>
 
             @if($post->category)
-                <a href="{{ route('blog.category', $post->category) }}" class="inline-block py-1.5 px-4 rounded-full bg-primary/10 text-primary text-sm font-semibold tracking-wide mb-6 hover:bg-primary/15 transition-colors">
+                <a href="{{ route('blog.category', $post->category) }}" class="inline-block py-1.5 px-4 rounded-full bg-[#DC2626]/10 text-[#DC2626] text-sm font-semibold tracking-wide mb-6 hover:bg-[#DC2626]/20 transition-colors">
                     {{ $post->category->name }}
                 </a>
             @endif
 
-            <h1 class="text-4xl md:text-5xl font-headline font-semibold text-on-surface tracking-tight leading-[0.95] mb-6 text-wrap-balance">
+            <h1 class="text-4xl md:text-5xl font-headline font-bold text-[#FAFAFA] tracking-tight leading-tight mb-6">
                 {{ $post->title }}
             </h1>
 
-            <div class="flex flex-wrap items-center gap-5 text-sm text-on-surface-variant">
+            <div class="flex flex-wrap items-center gap-5 text-sm text-[#71717A]">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 0;">person</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
                     <span>{{ $post->author?->name ?? 'Team' }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                     <span>{{ $post->published_at?->format('F j, Y') }}</span>
                 </div>
                 @if($post->reading_time_minutes)
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 0;">schedule</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                         <span>{{ $post->reading_time_minutes }} min read</span>
                     </div>
                 @endif
@@ -89,7 +97,7 @@ new #[Title('Blog Post')] class extends Component
             @if($post->tags->isNotEmpty())
                 <div class="mt-6 flex flex-wrap gap-2">
                     @foreach($post->tags as $tag)
-                        <a href="{{ route('blog.tag', $tag) }}" class="text-sm text-on-surface-variant hover:text-primary transition-colors">
+                        <a href="{{ route('blog.tag', $tag) }}" class="text-sm text-[#71717A] hover:text-[#DC2626] transition-colors">
                             #{{ $tag->name }}
                         </a>
                     @endforeach
@@ -98,16 +106,16 @@ new #[Title('Blog Post')] class extends Component
         </div>
 
         <!-- Ambient decoration -->
-        <div class="absolute top-0 left-0 -z-10 w-1/3 h-full opacity-20 pointer-events-none">
-            <div class="absolute top-1/3 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-0 left-0 -z-10 w-1/3 h-full opacity-30 pointer-events-none">
+            <div class="absolute top-1/3 left-1/4 w-64 h-64 bg-[#DC2626]/10 rounded-full blur-3xl"></div>
         </div>
     </header>
 
     <!-- Featured Image -->
     @if($post->featured_image)
-        <section class="bg-surface pb-12">
-            <div class="max-w-5xl mx-auto px-8">
-                <div class="rounded-2xl overflow-hidden shadow-xl shadow-primary/5">
+        <section class="bg-[#0A0A0F] pb-12">
+            <div class="max-w-5xl mx-auto px-6 lg:px-8">
+                <div class="rounded-2xl overflow-hidden">
                     <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-auto object-cover">
                 </div>
             </div>
@@ -115,10 +123,10 @@ new #[Title('Blog Post')] class extends Component
     @endif
 
     <!-- Content -->
-    <article class="py-12 bg-surface">
-        <div class="max-w-4xl mx-auto px-8">
+    <article class="py-12 bg-[#0A0A0F]">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
             <!-- Content Blocks -->
-            <div class="space-y-8">
+            <div class="space-y-8 text-[#A1A1AA] leading-relaxed">
                 @foreach($post->contentBlocks as $block)
                     @php
                         $blockRegistry = app(\App\Domains\Content\Services\BlockRegistry::class);
@@ -136,14 +144,16 @@ new #[Title('Blog Post')] class extends Component
 
             <!-- Tags -->
             @if($post->tags->isNotEmpty())
-                <div class="mt-16 pt-8 border-t border-outline-variant/20">
-                    <h3 class="font-headline font-semibold text-on-surface mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">sell</span>
-                        {{ __('Tags') }}
+                <div class="mt-16 pt-8 border-t border-white/10">
+                    <h3 class="font-headline font-bold text-[#FAFAFA] mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        Tags
                     </h3>
                     <div class="flex flex-wrap gap-2">
                         @foreach($post->tags as $tag)
-                            <a href="{{ route('blog.tag', $tag) }}" class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-surface-container-low text-on-surface-variant hover:text-primary hover:bg-primary/5 border border-outline-variant/10">
+                            <a href="{{ route('blog.tag', $tag) }}" class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 glass-card text-[#A1A1AA] hover:text-[#DC2626] hover:bg-[#DC2626]/10">
                                 {{ $tag->name }}
                             </a>
                         @endforeach
@@ -153,21 +163,21 @@ new #[Title('Blog Post')] class extends Component
 
             <!-- Author Bio -->
             @if($post->author)
-                <div class="mt-12 glass-card p-8 rounded-2xl border border-white/30 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.15)]">
+                <div class="mt-12 glass-card p-8 rounded-2xl">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-on-primary font-headline font-bold text-xl">
+                        <div class="w-14 h-14 rounded-full bg-[#DC2626] flex items-center justify-center text-white font-headline font-bold text-xl">
                             {{ strtoupper(substr($post->author->name, 0, 1)) }}
                         </div>
                         <div>
-                            <h3 class="font-headline font-semibold text-on-surface text-lg">{{ $post->author->name }}</h3>
-                            <p class="text-sm text-on-surface-variant">{{ __('Author') }}</p>
+                            <h3 class="font-headline font-bold text-[#FAFAFA] text-lg">{{ $post->author->name }}</h3>
+                            <p class="text-sm text-[#71717A]">Author</p>
                         </div>
                     </div>
                 </div>
             @endif
 
             <!-- Social Share -->
-            <div class="mt-8 pt-8 border-t border-outline-variant/10">
+            <div class="mt-8 pt-8 border-t border-white/10">
                 <x-blog::social-share :post="$post" />
             </div>
         </div>
@@ -175,27 +185,29 @@ new #[Title('Blog Post')] class extends Component
 
     <!-- Related Posts -->
     @if($this->relatedPosts->isNotEmpty())
-        <section class="py-20 bg-surface-container-low border-t border-outline-variant/10">
-            <div class="max-w-7xl mx-auto px-8">
-                <h3 class="text-2xl font-headline font-semibold text-on-surface mb-10 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
-                    {{ __('Related Posts') }}
+        <section class="py-20 bg-[#121218] border-t border-white/5">
+            <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
+                <h3 class="text-2xl font-headline font-bold text-[#FAFAFA] mb-10 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    Related Posts
                 </h3>
                 <div class="grid md:grid-cols-3 gap-6">
                     @foreach($this->relatedPosts as $related)
-                        <article class="group flex flex-col bg-surface rounded-2xl overflow-hidden border border-outline-variant/10 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                        <article class="group flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300">
                             @if($related->featured_image)
                                 <a href="{{ route('blog.show', $related) }}" class="block aspect-[16/10] overflow-hidden">
-                                    <img src="{{ $related->featured_image }}" alt="" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                                    <img src="{{ $related->featured_image }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </a>
                             @endif
                             <div class="flex-1 p-6">
-                                <h4 class="font-headline font-semibold text-on-surface mb-2 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                                <h4 class="font-headline font-bold text-[#FAFAFA] mb-2 leading-snug group-hover:text-[#DC2626] transition-colors line-clamp-2">
                                     <a href="{{ route('blog.show', $related) }}">
                                         {{ $related->title }}
                                     </a>
                                 </h4>
-                                <p class="text-xs text-on-surface-variant">{{ $related->published_at?->format('M j, Y') }}</p>
+                                <p class="text-xs text-[#71717A]">{{ $related->published_at?->format('M j, Y') }}</p>
                             </div>
                         </article>
                     @endforeach

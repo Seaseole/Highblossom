@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -46,13 +47,13 @@
         }
     </style>
 </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed antialiased">
+<body class="bg-[#0A0A0F] text-[#FAFAFA] font-body selection:bg-[#DC2626] selection:text-white antialiased">
     @include('partials.site-nav')
-    
-    <main class="pt-24">
+
+    <main>
         {{ $slot }}
     </main>
-    
+
     @include('partials.site-footer')
     @include('partials.whatsapp-fab')
 
