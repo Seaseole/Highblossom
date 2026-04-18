@@ -14,7 +14,7 @@
         </div>
 
         {{-- Hero Content --}}
-        <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8 pt-32 pb-20">
+        <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8 pt-32 pb-48 md:pb-40">
             <div class="max-w-3xl">
                 {{-- Trust Badge --}}
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 animate-fade-up">
@@ -49,7 +49,7 @@
         </div>
 
         {{-- Trust Bar --}}
-        <div class="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-[#0A0A0F]/50 backdrop-blur-sm">
+        <div class="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-[#0A0A0F]/50 backdrop-blur-sm py-4 md:py-6">
             <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                     <div class="text-center md:text-left">
