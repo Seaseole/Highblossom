@@ -80,7 +80,7 @@
                                 </div>
                                 <h3 class="font-headline font-bold text-on-surface mb-2">Highblossom PTY LTD</h3>
                                 <p class="text-on-surface-variant text-sm mb-4">Plot 123, Main Road<br>Broadhurst, Gaborone<br>Botswana</p>
-                                <a href="https://maps.google.com/?q=-24.6282,25.9231" target="_blank" class="text-primary font-bold text-sm hover:underline inline-flex items-center gap-1">
+                                <a href="https://maps.google.com/?q=8V7P+C6C, Nyamambisi, Gaborone" target="_blank" class="text-primary font-bold text-sm hover:underline inline-flex items-center gap-1">
                                     Get Directions
                                     <span class="material-symbols-outlined text-sm">open_in_new</span>
                                 </a>
