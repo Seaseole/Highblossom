@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Seo\Actions;
 
-use App\Domains\Content\Models\Page;
-use App\Domains\Content\Models\Service;
-use App\Domains\Content\Models\SeoStaticRoute;
-use App\Domains\Seo\Contracts\HasSeoInterface;
+use App\Domains\Seo\Models\SeoStaticRoute;
 use Illuminate\Support\Collection;
 
 final readonly class BuildSitemap
@@ -44,34 +41,6 @@ final readonly class BuildSitemap
                 'changefreq' => $route->changefreq ?? 'monthly',
                 'priority' => number_format($route->priority ?? 0.5, 1),
             ]);
-        });
-
-        // Dynamic pages
-        Page::where('is_published', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now())
-            ->get()
-            ->each(function (Page $page) use ($urls) {
-                if ($page instanceof HasSeoInterface && $page->shouldIndex()) {
-                    $urls->push([
-                        'loc' => route('pages.show', $page->slug),
-                        'lastmod' => $page->getLastModified()?->format('Y-m-d'),
-                        'changefreq' => $page->getSitemapChangefreq(),
-                        'priority' => number_format($page->getSitemapPriority(), 1),
-                    ]);
-                }
-            });
-
-        // Services
-        Service::where('is_active', true)->get()->each(function (Service $service) use ($urls) {
-            if ($service instanceof HasSeoInterface && $service->shouldIndex()) {
-                $urls->push([
-                    'loc' => $this->baseUrl . '/services/' . $service->slug,
-                    'lastmod' => $service->getLastModified()?->format('Y-m-d'),
-                    'changefreq' => $service->getSitemapChangefreq(),
-                    'priority' => number_format($service->getSitemapPriority(), 1),
-                ]);
-            }
         });
 
         return $urls;

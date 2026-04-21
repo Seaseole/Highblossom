@@ -6,6 +6,10 @@
 ])
 
 @php
+$features = is_array($features) ? $features : [];
+@endphp
+
+@php
 $gridClass = match($columns) {
     '2' => 'grid-cols-1 md:grid-cols-2',
     '4' => 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',

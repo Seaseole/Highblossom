@@ -21,7 +21,7 @@
                 <!-- Main Form -->
                 <div class="lg:col-span-2">
                     <div class="glass-card rounded-2xl p-8 md:p-12">
-                        <form action="{{ route('quote') }}" method="POST" class="space-y-10">
+                        <form action="{{ route('quote.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
                             @csrf
 
                             <!-- Personal Information -->
@@ -121,29 +121,25 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-[#A1A1AA] mb-3">Glass Type *</label>
-                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        @foreach(['windscreen' => 'Windscreen', 'side_window' => 'Side Window', 'rear_window' => 'Rear Window', 'quarter' => 'Quarter Glass', 'machinery' => 'Machinery', 'other' => 'Other'] as $value => $label)
-                                        <label class="relative">
-                                            <input type="radio" name="glass_type" value="{{ $value }}" class="peer sr-only">
-                                            <div class="glass-card rounded-xl p-4 cursor-pointer hover:bg-white/[0.06] peer-checked:bg-[#DC2626]/10 peer-checked:border-[#DC2626]/30 transition-all">
-                                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $label }}</div>
-                                            </div>
-                                        </label>
-                                        @endforeach
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="glass_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">Glass Type *</label>
+                                        <select id="glass_type_id" name="glass_type_id" required class="form-input-premium">
+                                            <option value="">Select glass type</option>
+                                            @foreach($glassTypes as $glassType)
+                                            <option value="{{ $glassType->id }}">{{ $glassType->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label for="service_type" class="block text-sm font-medium text-[#A1A1AA] mb-2">Service Type *</label>
-                                    <select id="service_type" name="service_type" required class="form-input-premium">
-                                        <option value="">Select service</option>
-                                        <option value="replacement">Full Replacement</option>
-                                        <option value="repair">Chip Repair</option>
-                                        <option value="inspection">Inspection</option>
-                                        <option value="emergency">Emergency</option>
-                                    </select>
+                                    <div>
+                                        <label for="service_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">Service Type *</label>
+                                        <select id="service_type_id" name="service_type_id" required class="form-input-premium">
+                                            <option value="">Select service</option>
+                                            @foreach($serviceTypes as $serviceType)
+                                            <option value="{{ $serviceType->id }}">{{ $serviceType->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
@@ -162,19 +158,27 @@
                                 </div>
 
                                 <div class="mb-6">
-                                    <label for="message" class="block text-sm font-medium text-[#A1A1AA] mb-2">Description</label>
-                                    <textarea id="message" name="message" rows="4"
-                                        class="form-input-premium resize-none"
-                                        placeholder="Describe your glass needs, damage details, or any specific requirements..."></textarea>
+                                    <h3 class="text-lg font-medium text-[#FAFAFA] mb-2">Visual Assessment</h3>
+                                    <p class="text-sm text-[#71717A] mb-4">Upload a photo of the damage for a more accurate quote.</p>
+                                    <div class="mt-4 flex justify-center rounded-lg border border-dashed border-white/20 px-6 py-10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                        <div class="text-center">
+                                            <svg class="mx-auto h-12 w-12 text-[#DC2626]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.69a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <div class="mt-4 flex text-sm leading-6 text-[#A1A1AA]">
+                                                <label for="file-upload" class="relative cursor-pointer rounded-md font-semibold text-[#DC2626] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#DC2626] focus-within:ring-offset-2 hover:text-[#EF4444]">
+                                                    <span>Click to upload or drag and drop</span>
+                                                    <input id="file-upload" name="image" type="file" accept="image/*" class="sr-only">
+                                                </label>
+                                            </div>
+                                            <p class="text-xs leading-5 text-[#71717A]">PNG, JPG up to 10MB</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="mobile_service" class="sr-only peer">
-                                    <div class="w-5 h-5 rounded border border-white/20 bg-white/5 flex items-center justify-center peer-checked:bg-[#DC2626] peer-checked:border-[#DC2626] transition-all">
-                                        <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </div>
+                                    <input type="checkbox" name="mobile_service" value="1"
+                                        class="w-5 h-5 rounded border border-white/20 bg-white/5 text-[#DC2626] focus:ring-[#DC2626] focus:ring-offset-0 focus:ring-offset-gray-900 transition-all cursor-pointer accent-[#DC2626]">
                                     <span class="text-[#A1A1AA] text-sm group-hover:text-[#FAFAFA] transition-colors">Request mobile service (we come to you)</span>
                                 </label>
                             </div>
@@ -234,11 +238,11 @@
                         <div class="glass-card rounded-2xl p-6">
                             <h3 class="text-lg font-bold text-[#FAFAFA] font-headline mb-4">Prefer to Call?</h3>
                             <p class="text-[#A1A1AA] text-sm mb-4">Speak directly with our team for immediate assistance.</p>
-                            <a href="tel:{{ $primaryPhone->phone_number }}" class="flex items-center gap-3 text-[#DC2626] font-semibold hover:underline">
+                            <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="flex items-center gap-3 text-[#DC2626] font-semibold hover:underline">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                 </svg>
-                                {{ $primaryPhone->formatted_number }}
+                                {{ $primaryPhone }}
                             </a>
                         </div>
                         @endif
@@ -253,7 +257,7 @@
                                 Broken glass can't wait. Our emergency team is available around the clock.
                             </p>
                             @if($primaryPhone)
-                            <a href="tel:{{ $primaryPhone->phone_number }}" class="btn-premium w-full text-sm py-3">
+                            <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="btn-premium w-full text-sm py-3">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                 </svg>

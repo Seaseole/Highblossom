@@ -6,7 +6,7 @@ namespace App\Domains\Seo\Services;
 
 use App\Domains\Seo\Contracts\HasSeoInterface;
 use App\Domains\Seo\DataTransferObjects\SeoMetadata;
-use App\Domains\Content\Models\SeoStaticRoute;
+use App\Domains\Seo\Models\SeoStaticRoute;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 

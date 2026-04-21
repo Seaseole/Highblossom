@@ -1,152 +1,127 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <div class="grid min-h-screen w-full lg:grid-cols-[auto_1fr]">
-            <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-                <flux:sidebar.collapse class="lg:hidden" />
-            </flux:sidebar.header>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    @include('partials.head')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="min-h-screen bg-gray-100" x-data="{ sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true', mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false">
+    <div class="flex min-h-screen">
+        <!-- Mobile Menu Button -->
+        <button @click="mobileMenuOpen = true" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded shadow hover:bg-gray-50 transition-colors">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                    {{ __('Dashboard') }}
-                </flux:sidebar.item>
+        <!-- Mobile Overlay -->
+        <div x-show="mobileMenuOpen" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="mobileMenuOpen = false" class="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40" style="display: none;"></div>
 
-                <flux:sidebar.group heading="{{ __('Bookings') }}" expandable :expanded="request()->routeIs('admin.bookings.*') || request()->routeIs('admin.inspections.*') || request()->routeIs('admin.absences.*')">
-                    <flux:sidebar.item icon="calendar" :href="route('admin.bookings.index')" :current="request()->routeIs('admin.bookings.*')" wire:navigate>
-                        {{ __('Manage Bookings') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="check-circle" :href="route('admin.inspections.index')" :current="request()->routeIs('admin.inspections.*')" wire:navigate>
-                        {{ __('Inspections') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="users" :href="route('admin.absences.index')" :current="request()->routeIs('admin.absences.*')" wire:navigate>
-                        {{ __('Staff Absences') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
+        <!-- Sidebar -->
+        <aside :class="sidebarCollapsed ? 'w-20' : 'w-64'" class="hidden lg:flex bg-white shadow-lg flex-shrink-0 flex-col transition-all duration-300 ease-in-out" x-cloak>
+            <!-- Logo -->
+            <div class="p-4 border-b flex items-center justify-between">
+                <h1 class="text-xl font-bold text-gray-800 whitespace-nowrap" x-show="!sidebarCollapsed">Highblossom Admin</h1>
+                <button @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('sidebarCollapsed', sidebarCollapsed)" class="p-1 rounded hover:bg-gray-100 transition-colors flex-shrink-0">
+                    <svg :class="sidebarCollapsed ? 'rotate-180' : ''" class="w-5 h-5 text-gray-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
 
-                <flux:sidebar.group heading="{{ __('Content') }}" expandable :expanded="request()->routeIs('admin.pages.*') || request()->routeIs('admin.blog.*') || request()->routeIs('admin.testimonials.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.gallery.*')">
-                    <flux:sidebar.item icon="document-text" :href="route('admin.pages.index')" :current="request()->routeIs('admin.pages.*')" wire:navigate>
-                        {{ __('Pages') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="newspaper" :href="route('admin.blog.index')" :current="request()->routeIs('admin.blog.*')" wire:navigate>
-                        {{ __('Blog') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="chat-bubble-left-right" :href="route('admin.testimonials.index')" :current="request()->routeIs('admin.testimonials.*')" wire:navigate>
-                        {{ __('Testimonials') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="wrench" :href="route('admin.services.index')" :current="request()->routeIs('admin.services.*')" wire:navigate>
-                        {{ __('Services') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="photo" :href="route('admin.gallery.index')" :current="request()->routeIs('admin.gallery.*')" wire:navigate>
-                        {{ __('Gallery') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
+            <!-- Navigation -->
+            <nav class="p-4 flex-1 overflow-y-auto">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('dashboard') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Dashboard' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Dashboard</span>
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Users' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Users</span>
+                </a>
+                <a href="{{ route('admin.roles.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Roles' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Roles</span>
+                </a>
+                <a href="{{ route('admin.seo.static-routes') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.seo.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'SEO' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">SEO</span>
+                </a>
+                <a href="{{ route('admin.media-library.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.media-library.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Media Library' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Media Library</span>
+                </a>
+            </nav>
 
-                <flux:sidebar.group heading="{{ __('Contact') }}" expandable :expanded="request()->routeIs('admin.contact-numbers.*') || request()->routeIs('admin.contact-messages.*')">
-                    <flux:sidebar.item icon="phone" :href="route('admin.contact-numbers.index')" :current="request()->routeIs('admin.contact-numbers.*')" wire:navigate>
-                        {{ __('Numbers') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="inbox" :href="route('admin.contact-messages.index')" :current="request()->routeIs('admin.contact-messages.*')" wire:navigate>
-                        {{ __('Messages') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
+            <!-- Logout -->
+            <div class="p-4 border-t">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-3 w-full py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700 transition-colors group" :title="sidebarCollapsed ? 'Logout' : ''">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
 
-                <flux:sidebar.group heading="{{ __('Settings') }}" expandable :expanded="request()->routeIs('admin.settings.*') || request()->routeIs('admin.seo.*')">
-                    <flux:sidebar.item icon="building-office" :href="route('admin.settings.company')" :current="request()->routeIs('admin.settings.company')" wire:navigate>
-                        {{ __('Company') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="envelope" :href="route('admin.settings.smtp')" :current="request()->routeIs('admin.settings.smtp')" wire:navigate>
-                        {{ __('SMTP') }}
-                    </flux:sidebar.item>
-                    <flux:sidebar.item icon="globe-alt" :href="route('admin.seo.static-routes')" :current="request()->routeIs('admin.seo.*')" wire:navigate>
-                        {{ __('SEO') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
+        <!-- Mobile Sidebar -->
+        <aside x-show="mobileMenuOpen" x-transition:enter="transition-transform ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition-transform ease-in duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="lg:hidden fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col z-50" style="display: none;">
+            <!-- Logo -->
+            <div class="p-4 border-b flex items-center justify-between">
+                <h1 class="text-xl font-bold text-gray-800">Highblossom Admin</h1>
+                <button @click="mobileMenuOpen = false" class="p-1 rounded hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
-            <flux:spacer />
+            <!-- Navigation -->
+            <nav class="p-4 flex-1 overflow-y-auto">
+                <a href="{{ route('dashboard') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('dashboard') ? 'bg-gray-200' : '' }}">
+                    Dashboard
+                </a>
+                <a href="{{ route('admin.users.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-gray-200' : '' }}">
+                    Users
+                </a>
+                <a href="{{ route('admin.roles.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-gray-200' : '' }}">
+                    Roles
+                </a>
+                <a href="{{ route('admin.seo.static-routes') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.seo.*') ? 'bg-gray-200' : '' }}">
+                    SEO
+                </a>
+                <a href="{{ route('admin.media-library.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.media-library.*') ? 'bg-gray-200' : '' }}">
+                    Media Library
+                </a>
+            </nav>
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
+            <!-- Logout -->
+            <div class="p-4 border-t">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </aside>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
-
-            <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
-        </flux:sidebar>
-
-        <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-
-            <flux:spacer />
-
-            <flux:dropdown position="top" align="end">
-                <flux:profile
-                    :initials="auth()->user()->initials()"
-                    icon-trailing="chevron-down"
-                />
-
-                <flux:menu>
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                                <flux:avatar
-                                    :name="auth()->user()->name"
-                                    :initials="auth()->user()->initials()"
-                                />
-
-                                <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
-                                    <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
-                                </div>
-                            </div>
-                        </div>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                            {{ __('Settings') }}
-                        </flux:menu.item>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item
-                            as="button"
-                            type="submit"
-                            icon="arrow-right-start-on-rectangle"
-                            class="w-full cursor-pointer"
-                            data-test="logout-button"
-                        >
-                            {{ __('Log out') }}
-                        </flux:menu.item>
-                    </form>
-                </flux:menu>
-            </flux:dropdown>
-        </flux:header>
-
-        {{ $slot }}
-
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
-
-        @fluxScripts
-        </div>
-    </body>
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
 </html>

@@ -1,0 +1,103 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Custom overrides for Highblossom branding */
+:root {
+    --adminlte-primary: #73081d;
+    --adminlte-secondary: #894d50;
+    --adminlte-success: #28a745;
+    --adminlte-info: #17a2b8;
+    --adminlte-warning: #ffc107;
+    --adminlte-danger: #dc3545;
+}
+
+/* Custom button styling */
+.btn-primary {
+    background-color: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
+}
+
+.btn-primary:hover {
+    background-color: #5a0617;
+    border-color: #5a0617;
+}
+
+/* Rich Text Editor Styles */
+[contenteditable].empty::before {
+    content: attr(data-placeholder);
+    color: #71717A;
+    pointer-events: none;
+}
+
+[contenteditable] {
+    outline: none;
+}
+
+[contenteditable]:focus {
+    box-shadow: 0 0 0 2px #DC2626;
+}
+
+[contenteditable] h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #FAFAFA;
+}
+
+[contenteditable] h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #FAFAFA;
+}
+
+[contenteditable] p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+[contenteditable] ul, [contenteditable] ol {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+}
+
+[contenteditable] ul {
+    list-style-type: disc;
+}
+
+[contenteditable] ol {
+    list-style-type: decimal;
+}
+
+[contenteditable] li {
+    margin-bottom: 0.25rem;
+}
+
+[contenteditable] blockquote {
+    border-left: 3px solid #DC2626;
+    padding-left: 1rem;
+    margin: 0.75rem 0;
+    font-style: italic;
+    color: #A1A1AA;
+}
+
+[contenteditable] a {
+    color: #DC2626;
+    text-decoration: underline;
+}
+
+[contenteditable] b, [contenteditable] strong {
+    font-weight: 600;
+    color: #FAFAFA;
+}
+
+[contenteditable] i, [contenteditable] em {
+    font-style: italic;
+}
+
+[contenteditable] s, [contenteditable] strike, [contenteditable] del {
+    text-decoration: line-through;
+}
+
+[contenteditable] u {
+    text-decoration: underline;
+}

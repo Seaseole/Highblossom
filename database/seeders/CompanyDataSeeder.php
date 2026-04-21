@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Domains\Content\Models\CompanySetting;
-use App\Domains\Content\Models\ContactNumber;
 use App\Domains\Content\Models\GalleryImage;
 use App\Domains\Content\Models\Service;
 use App\Domains\Content\Models\Testimonial;
@@ -14,7 +13,6 @@ class CompanyDataSeeder extends Seeder
     public function run(): void
     {
         $this->seedCompanySettings();
-        $this->seedContactNumbers();
         $this->seedTestimonials();
         $this->seedServices();
     }
@@ -37,32 +35,6 @@ class CompanyDataSeeder extends Seeder
 
         foreach ($settings as $setting) {
             CompanySetting::set($setting['key'], $setting['value'], $setting['type']);
-        }
-    }
-
-    private function seedContactNumbers(): void
-    {
-        $numbers = [
-            [
-                'label' => 'Main',
-                'phone_number' => '+26712345678',
-                'is_primary' => true,
-                'is_whatsapp' => true,
-                'is_active' => true,
-                'sort_order' => 1,
-            ],
-            [
-                'label' => 'Emergency',
-                'phone_number' => '+26712345679',
-                'is_primary' => false,
-                'is_whatsapp' => false,
-                'is_active' => true,
-                'sort_order' => 2,
-            ],
-        ];
-
-        foreach ($numbers as $number) {
-            ContactNumber::create($number);
         }
     }
 

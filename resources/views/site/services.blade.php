@@ -47,7 +47,7 @@
                     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20 last:mb-0">
                         <div class="relative group overflow-hidden rounded-2xl">
                             <img
-                                src="{{ $service->image_url ?? 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80' }}"
+                                src="{{ $service->full_image_url ?? asset('storage/placeholder.gif') }}"
                                 alt="{{ $service->title }}"
                                 class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
                                 loading="lazy"
@@ -61,7 +61,7 @@
                         </div>
                         <div>
                             <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline mb-4">{{ $service->title }}</h2>
-                            <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service->description ?? $service->short_description }}</p>
+                            <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service->short_description }}</p>
                             @if ($service->features && count($service->features) > 0)
                             <ul class="space-y-3 mb-8">
                                 @foreach ($service->features as $feature)
@@ -87,7 +87,7 @@
                     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20 last:mb-0">
                         <div class="order-2 lg:order-1">
                             <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline mb-4">{{ $service->title }}</h2>
-                            <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service->description ?? $service->short_description }}</p>
+                            <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service->short_description }}</p>
                             @if ($service->features && count($service->features) > 0)
                             <ul class="space-y-3 mb-8">
                                 @foreach ($service->features as $feature)
@@ -109,7 +109,7 @@
                         </div>
                         <div class="relative group overflow-hidden rounded-2xl order-1 lg:order-2">
                             <img
-                                src="{{ $service->image_url ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80' }}"
+                                src="{{ $service->full_image_url ?? asset('storage/placeholder.gif') }}"
                                 alt="{{ $service->title }}"
                                 class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
                                 loading="lazy"
@@ -124,125 +124,13 @@
                     </div>
                 @endif
             @empty
-                <!-- Static Services when no database entries -->
-                @php
-                $staticServices = [
-                    [
-                        'title' => 'Windscreens',
-                        'description' => 'OEM-quality windscreen installations for all vehicle makes and models. From minor chip repairs to complete replacements, we ensure perfect fitment and safety compliance.',
-                        'features' => ['Same-day service available', 'OEM & aftermarket options', 'ADAS calibration included', 'Lifetime workmanship warranty'],
-                        'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80'
-                    ],
-                    [
-                        'title' => 'Side & Rear Windows',
-                        'description' => 'Full replacement of tempered and laminated side windows, heated rear screens, and quarter glass. We handle all vehicle types from sedans to SUVs.',
-                        'features' => ['Tempered safety glass', 'Heated rear screens', 'Privacy tinting options', 'Quick turnaround'],
-                        'image' => 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80'
-                    ],
-                    [
-                        'title' => 'Heavy Machinery',
-                        'description' => 'Specialized toughened glass solutions for mining, construction, and agricultural equipment. Custom fabricated to your exact specifications.',
-                        'features' => ['Excavators & bulldozers', 'Cranes & lifts', 'Agricultural machinery', 'Mining equipment specialists'],
-                        'image' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80'
-                    ],
-                    [
-                        'title' => 'Fleet Services',
-                        'description' => 'Dedicated fleet maintenance programs for commercial vehicle operators. Volume pricing and priority scheduling to keep your fleet on the road.',
-                        'features' => ['Volume pricing discounts', 'Priority scheduling', 'Account management', 'Regular maintenance programs'],
-                        'image' => 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80'
-                    ],
-                    [
-                        'title' => 'Mobile Service',
-                        'description' => 'Can\'t come to us? We\'ll come to you. Our fully-equipped mobile units serve Gaborone and surrounding areas with the same quality service.',
-                        'features' => ['On-site replacement', 'Gaborone metro area coverage', 'Same-day service', 'No additional call-out fee'],
-                        'image' => 'https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=800&q=80'
-                    ],
-                    [
-                        'title' => 'Emergency Repairs',
-                        'description' => 'Broken glass can\'t wait. Our emergency response team provides rapid assessment and immediate solutions to get you back on the road safely.',
-                        'features' => ['24/7 availability', 'Rapid response times', 'Temporary safety solutions', 'Insurance claim assistance'],
-                        'image' => 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80'
-                    ]
-                ];
-                @endphp
-
-                @foreach ($staticServices as $index => $service)
-                    @if ($index % 2 === 0)
-                        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20 last:mb-0">
-                            <div class="relative group overflow-hidden rounded-2xl">
-                                <img
-                                    src="{{ $service['image'] }}"
-                                    alt="{{ $service['title'] }}"
-                                    class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
-                                    loading="lazy"
-                                >
-                                <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent"></div>
-                                <div class="absolute bottom-6 left-6">
-                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30">
-                                        <span class="text-[#DC2626] text-xs font-semibold uppercase">Service {{ sprintf('%02d', $index + 1) }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline mb-4">{{ $service['title'] }}</h2>
-                                <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service['description'] }}</p>
-                                <ul class="space-y-3 mb-8">
-                                    @foreach ($service['features'] as $feature)
-                                    <li class="flex items-center gap-3 text-[#FAFAFA]">
-                                        <svg class="w-5 h-5 text-[#DC2626] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span>{{ $feature }}</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                                <a href="{{ route('quote') }}" class="btn-premium">
-                                    <span>Get Quote for This Service</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    @else
-                        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20 last:mb-0">
-                            <div class="order-2 lg:order-1">
-                                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline mb-4">{{ $service['title'] }}</h2>
-                                <p class="text-[#A1A1AA] text-lg leading-relaxed mb-6">{{ $service['description'] }}</p>
-                                <ul class="space-y-3 mb-8">
-                                    @foreach ($service['features'] as $feature)
-                                    <li class="flex items-center gap-3 text-[#FAFAFA]">
-                                        <svg class="w-5 h-5 text-[#DC2626] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span>{{ $feature }}</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                                <a href="{{ route('quote') }}" class="btn-premium">
-                                    <span>Get Quote for This Service</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                                    </svg>
-                                </a>
-                            </div>
-                            <div class="relative group overflow-hidden rounded-2xl order-1 lg:order-2">
-                                <img
-                                    src="{{ $service['image'] }}"
-                                    alt="{{ $service['title'] }}"
-                                    class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
-                                    loading="lazy"
-                                >
-                                <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent"></div>
-                                <div class="absolute bottom-6 left-6">
-                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30">
-                                        <span class="text-[#DC2626] text-xs font-semibold uppercase">Service {{ sprintf('%02d', $index + 1) }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20">
+                    <img src="{{ asset('storage/placeholder.gif') }}" alt="Services placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
+                    <div class="text-center">
+                        <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">No Services Available</h3>
+                        <p class="text-[#A1A1AA]">Check back soon to see our latest services</p>
+                    </div>
+                </div>
             @endforelse
 
             <!-- Load More -->
@@ -333,11 +221,11 @@
                             </svg>
                         </a>
                         @if ($primaryPhone)
-                        <a href="tel:{{ $primaryPhone->phone_number }}" class="btn-ghost text-lg px-8 py-4">
+                        <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="btn-ghost text-lg px-8 py-4">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                             </svg>
-                            <span>{{ $primaryPhone->formatted_number }}</span>
+                            <span>{{ $primaryPhone }}</span>
                         </a>
                         @endif
                     </div>

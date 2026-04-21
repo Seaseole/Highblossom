@@ -1,13 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Domains\Bookings\Models\StaffAbsence;
+use Illuminate\View\View;
 
-class StaffAbsenceController extends Controller
+final class StaffAbsenceController
 {
-    public function index()
+    public function index(): View
     {
-        return view('admin.absences.index');
+        $absences = StaffAbsence::query()->latest()->paginate(15);
+
+        return view('admin.absences.index', compact('absences'));
+    }
+
+    public function show(StaffAbsence $absence): View
+    {
+        $absence->load('staff');
+
+        return view('admin.absences.show', compact('absence'));
     }
 }

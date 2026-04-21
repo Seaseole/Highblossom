@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
@@ -13,24 +14,17 @@ Route::get('/', [SiteController::class, 'home'])->name('home');
 // Public Pages
 Route::get('/services', [SiteController::class, 'services'])->name('services');
 Route::get('/gallery', [SiteController::class, 'gallery'])->name('gallery');
+Route::get('/gallery/{galleryImage}', [SiteController::class, 'galleryShow'])->name('gallery.show');
 Route::get('/quote', [SiteController::class, 'quote'])->name('quote');
+Route::post('/quote', [SiteController::class, 'submitQuote'])->name('quote.submit');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->name('contact.submit');
 
-// Public Dynamic Routing
-Route::livewire('/pages/{page:slug}', 'pages::pages.show')->name('pages.show');
-
-// Public Blog
-Route::livewire('/blog', 'pages::blog.index')->name('blog.index');
-Route::get('/blog/feed', \App\Http\Controllers\BlogRssController::class)->name('blog.rss');
-Route::get('/blog/sitemap', \App\Http\Controllers\BlogSitemapController::class)->name('blog.sitemap');
-Route::livewire('/blog/{post:slug}', 'pages::blog.show')->name('blog.show');
-Route::livewire('/blog/category/{category:slug}', 'pages::blog.category')->name('blog.category');
-Route::livewire('/blog/tag/{tag:slug}', 'pages::blog.tag')->name('blog.tag');
 
 // Booking Flow 
 Route::middleware('throttle:6,1')->group(function () {
-    Route::livewire('bookings/create', 'pages::bookings.create')->name('bookings.create');
+    // TODO: Migrate to controller + Blade view
+    // Route::get('bookings/create', [BookingController::class, 'create'])->name('bookings.create');
     Route::get('/bookings/{booking}/confirmation', function (\App\Domains\Bookings\Models\Booking $booking) {
         return view('bookings.confirmation', ['booking' => $booking]);
     })->name('bookings.confirmation');
@@ -38,56 +32,102 @@ Route::middleware('throttle:6,1')->group(function () {
 
 // Admin Portal
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    // Existing admin routes
-    Route::livewire('pages', 'pages::admin.pages.index')->name('pages.index');
-    Route::livewire('bookings', 'pages::admin.bookings.index')->name('bookings.index');
-    Route::livewire('inspections', 'pages::admin.inspections.index')->name('inspections.index');
-    Route::livewire('absences', 'pages::admin.absences.index')->name('absences.index');
+    Route::get('bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
+
+    Route::get('inspections', [\App\Http\Controllers\Admin\InspectionController::class, 'index'])->name('inspections.index');
+    Route::get('inspections/{inspection}', [\App\Http\Controllers\Admin\InspectionController::class, 'show'])->name('inspections.show');
+
+    Route::get('absences', [\App\Http\Controllers\Admin\StaffAbsenceController::class, 'index'])->name('absences.index');
+    Route::get('absences/{absence}', [\App\Http\Controllers\Admin\StaffAbsenceController::class, 'show'])->name('absences.show');
 
     // Settings
-    Route::livewire('settings/company', 'pages::admin.settings.company')->name('settings.company');
-    Route::livewire('settings/smtp', 'pages::admin.settings.smtp')->name('settings.smtp');
+    Route::get('settings', [\App\Http\Controllers\Admin\CompanySettingController::class, 'index'])->name('settings.index');
+    Route::put('settings', [\App\Http\Controllers\Admin\CompanySettingController::class, 'update'])->name('settings.update');
 
     // Content Management
-    Route::livewire('testimonials', 'pages::admin.testimonials.index')->name('testimonials.index');
-    Route::livewire('testimonials/create', 'pages::admin.testimonials.edit')->name('testimonials.create');
-    Route::livewire('testimonials/{id}/edit', 'pages::admin.testimonials.edit')->name('testimonials.edit');
+    Route::get('testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
+    Route::get('testimonials/create', [\App\Http\Controllers\Admin\TestimonialController::class, 'create'])->name('testimonials.create');
+    Route::post('testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'store'])->name('testimonials.store');
+    Route::get('testimonials/{testimonial}/edit', [\App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->name('testimonials.edit');
+    Route::put('testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update');
+    Route::delete('testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
 
-    Route::livewire('services', 'pages::admin.services.index')->name('services.index');
-    Route::livewire('services/create', 'pages::admin.services.edit')->name('services.create');
-    Route::livewire('services/{id}/edit', 'pages::admin.services.edit')->name('services.edit');
+    Route::get('services', [\App\Http\Controllers\Admin\ServiceController::class, 'index'])->name('services.index');
+    Route::get('services/create', [\App\Http\Controllers\Admin\ServiceController::class, 'create'])->name('services.create');
+    Route::post('services', [\App\Http\Controllers\Admin\ServiceController::class, 'store'])->name('services.store');
+    Route::get('services/{service}/edit', [\App\Http\Controllers\Admin\ServiceController::class, 'edit'])->name('services.edit');
+    Route::put('services/{service}', [\App\Http\Controllers\Admin\ServiceController::class, 'update'])->name('services.update');
+    Route::delete('services/{service}', [\App\Http\Controllers\Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
-    Route::livewire('gallery', 'pages::admin.gallery.index')->name('gallery.index');
-    Route::livewire('gallery/create', 'pages::admin.gallery.edit')->name('gallery.create');
-    Route::livewire('gallery/{id}/edit', 'pages::admin.gallery.edit')->name('gallery.edit');
+    Route::get('gallery', [\App\Http\Controllers\Admin\GalleryController::class, 'index'])->name('gallery.index');
+    Route::get('gallery/create', [\App\Http\Controllers\Admin\GalleryController::class, 'create'])->name('gallery.create');
+    Route::post('gallery', [\App\Http\Controllers\Admin\GalleryController::class, 'store'])->name('gallery.store');
+    Route::get('gallery/{item}/edit', [\App\Http\Controllers\Admin\GalleryController::class, 'edit'])->name('gallery.edit');
+    Route::put('gallery/{item}', [\App\Http\Controllers\Admin\GalleryController::class, 'update'])->name('gallery.update');
+    Route::delete('gallery/{item}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
-    Route::livewire('contact-numbers', 'pages::admin.contact-numbers.index')->name('contact-numbers.index');
-    Route::livewire('contact-numbers/create', 'pages::admin.contact-numbers.edit')->name('contact-numbers.create');
-    Route::livewire('contact-numbers/{id}/edit', 'pages::admin.contact-numbers.edit')->name('contact-numbers.edit');
+    Route::get('glass-types', [\App\Http\Controllers\Admin\GlassTypeController::class, 'index'])->name('glass-types.index');
+    Route::get('glass-types/create', [\App\Http\Controllers\Admin\GlassTypeController::class, 'create'])->name('glass-types.create');
+    Route::post('glass-types', [\App\Http\Controllers\Admin\GlassTypeController::class, 'store'])->name('glass-types.store');
+    Route::get('glass-types/{glassType}/edit', [\App\Http\Controllers\Admin\GlassTypeController::class, 'edit'])->name('glass-types.edit');
+    Route::put('glass-types/{glassType}', [\App\Http\Controllers\Admin\GlassTypeController::class, 'update'])->name('glass-types.update');
+    Route::delete('glass-types/{glassType}', [\App\Http\Controllers\Admin\GlassTypeController::class, 'destroy'])->name('glass-types.destroy');
 
-    Route::livewire('contact-messages', 'pages::admin.contact-messages.index')->name('contact-messages.index');
+    Route::get('service-types', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'index'])->name('service-types.index');
+    Route::get('service-types/create', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'create'])->name('service-types.create');
+    Route::post('service-types', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'store'])->name('service-types.store');
+    Route::get('service-types/{serviceType}/edit', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'edit'])->name('service-types.edit');
+    Route::put('service-types/{serviceType}', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'update'])->name('service-types.update');
+    Route::delete('service-types/{serviceType}', [\App\Http\Controllers\Admin\ServiceTypeController::class, 'destroy'])->name('service-types.destroy');
 
-    // Blog Management
-    Route::livewire('blog', 'pages::admin.blog.index')->name('blog.index');
-    Route::livewire('blog/create', 'pages::admin.blog.editor')->name('blog.create');
-    Route::livewire('blog/{id}/edit', 'pages::admin.blog.editor')->name('blog.edit');
-    Route::livewire('blog/{id}/revisions', 'pages::admin.blog.revisions')->name('blog.revisions');
-    Route::livewire('blog/{id}/analytics', 'pages::admin.blog.analytics')->name('blog.analytics');
+    Route::get('contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('contact-messages.index');
+    Route::get('contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])->name('contact-messages.show');
+    Route::delete('contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('contact-messages.destroy');
 
-    // Categories Management
-    Route::livewire('categories', 'pages::admin.categories.index')->name('categories.index');
-    Route::livewire('categories/create', 'pages::admin.categories.edit')->name('categories.create');
-    Route::livewire('categories/{id}/edit', 'pages::admin.categories.edit')->name('categories.edit');
-
-    // Tags Management
-    Route::livewire('tags', 'pages::admin.tags.index')->name('tags.index');
+    // Quotes Management
+    Route::get('quotes', [\App\Http\Controllers\Admin\QuoteController::class, 'index'])->name('quotes.index');
+    Route::get('quotes/{quote}', [\App\Http\Controllers\Admin\QuoteController::class, 'show'])->name('quotes.show');
+    Route::put('quotes/{quote}/status', [\App\Http\Controllers\Admin\QuoteController::class, 'updateStatus'])->name('quotes.updateStatus');
+    Route::delete('quotes/{quote}', [\App\Http\Controllers\Admin\QuoteController::class, 'destroy'])->name('quotes.destroy');
 
     // SEO Management
-    Route::livewire('seo/static-routes', 'pages::admin.seo.static-route-manager')->name('seo.static-routes');
+    Route::get('seo/static-routes', [\App\Http\Controllers\Admin\SeoController::class, 'index'])->name('seo.static-routes');
+    Route::get('seo/{id}/edit', [\App\Http\Controllers\Admin\SeoController::class, 'edit'])->name('seo.edit');
+    Route::put('seo/{id}', [\App\Http\Controllers\Admin\SeoController::class, 'update'])->name('seo.update');
+
+    // Access Control
+    Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+    Route::post('users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+    Route::get('users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+    Route::delete('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+    
+    Route::get('roles', [\App\Http\Controllers\Admin\RoleController::class, 'index'])->name('roles.index');
+    Route::get('roles/create', [\App\Http\Controllers\Admin\RoleController::class, 'create'])->name('roles.create');
+    Route::post('roles', [\App\Http\Controllers\Admin\RoleController::class, 'store'])->name('roles.store');
+    Route::get('roles/{role}/edit', [\App\Http\Controllers\Admin\RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('roles/{role}', [\App\Http\Controllers\Admin\RoleController::class, 'update'])->name('roles.update');
+    Route::delete('roles/{role}', [\App\Http\Controllers\Admin\RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Media Library
+    Route::get('media-library', [\App\Http\Controllers\Admin\MediaLibraryController::class, 'index'])->name('media-library.index');
+    Route::post('media-library/upload', [\App\Http\Controllers\Admin\MediaLibraryController::class, 'upload'])->name('media-library.upload');
+
+    // Profile
+    Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::put('profile/appearance', [\App\Http\Controllers\Admin\ProfileController::class, 'updateAppearance'])->name('profile.appearance.update');
+    Route::put('profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::post('profile/two-factor/enable', [\App\Http\Controllers\Admin\ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
+    Route::post('profile/two-factor/disable', [\App\Http\Controllers\Admin\ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
+    Route::delete('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'destroy'])->name('profile.destroy');
+
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

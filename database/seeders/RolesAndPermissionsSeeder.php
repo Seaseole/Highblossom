@@ -66,6 +66,11 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // HR
             'manage absences',
+
+            // Access Control
+            'manage users',
+            'manage roles',
+            'access admin panel',
         ];
 
         // Create permissions
@@ -75,6 +80,36 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create Super Admin role
         $superAdminRole = Role::findOrCreate('Super Admin');
+        $superAdminRole->givePermissionTo(Permission::all());
+
+        // Create Admin role
+        $adminRole = Role::findOrCreate('Admin');
+        $adminRole->givePermissionTo([
+            'view blog', 'create blog', 'update blog', 'delete blog', 'publish blog',
+            'view bookings', 'create bookings', 'update bookings', 'delete bookings',
+            'view inspections', 'create inspections', 'update inspections', 'delete inspections',
+            'view gallery', 'manage gallery',
+            'view services', 'manage services',
+            'view settings',
+            'manage pages', 'manage categories', 'manage tags', 'manage testimonials',
+            'view contact messages', 'manage contact numbers',
+            'manage absences',
+            'access admin panel',
+        ]);
+
+        // Create Staff role
+        $staffRole = Role::findOrCreate('Staff');
+        $staffRole->givePermissionTo([
+            'view blog', 'create blog', 'update blog',
+            'view bookings', 'create bookings', 'update bookings',
+            'view inspections', 'create inspections',
+            'view gallery',
+            'view services',
+            'access admin panel',
+        ]);
+
+        // Create User role
+        $userRole = Role::findOrCreate('User');
 
         // Assign Super Admin role to the first user
         $user = User::first();

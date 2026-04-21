@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Seo\Actions;
 
-use App\Domains\Content\Models\SeoStaticRoute;
+use App\Domains\Seo\Models\SeoStaticRoute;
 
 final readonly class GenerateRobotsTxt
 {

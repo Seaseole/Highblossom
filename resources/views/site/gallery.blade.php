@@ -36,101 +36,32 @@
                         $isFeatured = $image->is_featured || $index === 0;
                         $rowSpan = $isFeatured ? 'md:row-span-2' : '';
                     @endphp
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer {{ $rowSpan }} {{ $index % 4 === 0 ? 'lg:row-span-2' : '' }}" onclick="openLightbox({{ $index }})">
+                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer {{ $rowSpan }} {{ $index % 4 === 0 ? 'lg:row-span-2' : '' }}">
                         <img alt="{{ $image->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $image->image_url }}" loading="lazy">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
                             <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">{{ str_replace('_', ' ', ucfirst($image->category)) }}</span>
                             <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">{{ $image->title }}</h3>
                             @if ($image->description)
-                                <p class="text-[#A1A1AA] text-sm mt-2">{{ $image->description }}</p>
+                                <p class="text-[#A1A1AA] text-sm mt-2 line-clamp-2">{{ $image->description }}</p>
                             @endif
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
+                            <div class="mt-4 flex items-center gap-3">
+                                <button onclick="openLightbox({{ $index }})" class="text-xs font-bold text-white bg-[#DC2626] px-4 py-2 rounded-full hover:bg-[#B91C1C] transition-colors">
+                                    Quick View
+                                </button>
+                                <a href="{{ route('gallery.show', $image) }}" class="text-xs font-bold text-[#FAFAFA] bg-white/10 backdrop-blur-md px-4 py-2 rounded-full hover:bg-white/20 transition-colors">
+                                    Project Details
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @empty
-                    <!-- Static fallback -->
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer md:row-span-2 lg:row-span-2" onclick="openLightbox(0)">
-                        <img alt="Mining Excavator Installation" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Heavy Machinery</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Mining Excavator Cabin</h3>
-                            <p class="text-[#A1A1AA] text-sm mt-2">Custom toughened glass fitment for CAT 320D</p>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer" onclick="openLightbox(1)">
-                        <img alt="Luxury Sedan Windshield" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Automotive</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Luxury Windshield</h3>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer" onclick="openLightbox(2)">
-                        <img alt="Fleet Service" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Fleet</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Commercial Fleet</h3>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer" onclick="openLightbox(3)">
-                        <img alt="Heavy Equipment" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Heavy Machinery</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Loader Windshield</h3>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer" onclick="openLightbox(4)">
-                        <img alt="Sports Car" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Automotive</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Sports Car Glass</h3>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="group relative overflow-hidden rounded-2xl cursor-pointer" onclick="openLightbox(5)">
-                        <img alt="Truck Fleet" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&q=80" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <span class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">Fleet</span>
-                            <h3 class="text-[#FAFAFA] text-xl font-bold font-headline mt-1">Truck Fleet Service</h3>
-                        </div>
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-full glass-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <svg class="w-5 h-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                            </svg>
+                    <!-- Placeholder fallback -->
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20">
+                        <img src="{{ asset('storage/placeholder.gif') }}" alt="Gallery placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
+                        <div class="text-center">
+                            <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">No Gallery Items Yet</h3>
+                            <p class="text-[#A1A1AA]">Check back soon to see our latest projects</p>
                         </div>
                     </div>
                 @endforelse
@@ -192,25 +123,62 @@
             </svg>
         </button>
         <div class="relative h-full flex items-center justify-center p-20">
-            <img id="lightbox-img" src="" alt="" class="max-h-full max-w-full object-contain rounded-2xl">
+            <div class="flex flex-col lg:flex-row items-center gap-8 max-w-6xl">
+                <img id="lightbox-img" src="" alt="" class="max-h-[70vh] max-w-full object-contain rounded-2xl">
+                <div id="lightbox-info" class="lg:max-w-md text-center lg:text-left"></div>
+            </div>
         </div>
     </div>
 </x-layouts::site>
 
 @push('scripts')
 <script>
-    const galleryImages = @json($images->map(fn($img) => ['src' => $img->image_url, 'title' => $img->title, 'category' => $img->category]));
+    @php
+        $galleryData = $images->map(fn($img) => [
+            'src' => $img->image_url,
+            'title' => $img->title,
+            'category' => $img->category,
+            'description' => $img->description,
+            'location_address' => $img->location_address,
+            'google_maps_url' => $img->google_maps_url,
+        ])->toArray();
+    @endphp
+
+    const galleryImages = @json($galleryData);
 
     let currentImageIndex = 0;
 
     function openLightbox(index) {
         const lightbox = document.getElementById('lightbox');
         const img = document.getElementById('lightbox-img');
+        const infoDiv = document.getElementById('lightbox-info');
         currentImageIndex = index;
 
         if (galleryImages.length > 0 && index < galleryImages.length) {
             img.src = galleryImages[index].src;
             img.alt = galleryImages[index].title;
+
+            // Update info section
+            let infoHtml = '<div class="text-[#DC2626] text-xs font-semibold uppercase tracking-wider">' + galleryImages[index].category + '</div>';
+            infoHtml += '<h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mt-1">' + galleryImages[index].title + '</h3>';
+
+            if (galleryImages[index].description) {
+                infoHtml += '<p class="text-[#A1A1AA] mt-2">' + galleryImages[index].description + '</p>';
+            }
+
+            if (galleryImages[index].location_address && galleryImages[index].google_maps_url) {
+                infoHtml += '<div class="mt-4 flex items-center">';
+                infoHtml += '<svg class="w-5 h-5 text-[#DC2626] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+                infoHtml += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>';
+                infoHtml += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                infoHtml += '</svg>';
+                infoHtml += '<a href="' + galleryImages[index].google_maps_url + '" target="_blank" rel="noopener noreferrer" class="text-[#FAFAFA] hover:text-[#DC2626] transition-colors">';
+                infoHtml += galleryImages[index].location_address;
+                infoHtml += '</a>';
+                infoHtml += '</div>';
+            }
+
+            infoDiv.innerHTML = infoHtml;
         } else {
             // Fallback for static images
             const fallbackImages = [
@@ -222,6 +190,7 @@
                 { src: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&q=80' }
             ];
             img.src = fallbackImages[index].src;
+            infoDiv.innerHTML = '';
         }
 
         lightbox.classList.remove('hidden');

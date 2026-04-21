@@ -1,13 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Domains\Bookings\Models\Booking;
+use Illuminate\View\View;
 
-class BookingController extends Controller
+final class BookingController
 {
-    public function index()
+    public function index(): View
     {
-        return view('admin.bookings.index');
+        $bookings = Booking::query()->latest()->paginate(15);
+
+        return view('admin.bookings.index', compact('bookings'));
+    }
+
+    public function show(Booking $booking): View
+    {
+        return view('admin.bookings.show', compact('booking'));
     }
 }

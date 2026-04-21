@@ -1,40 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Content\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Testimonial extends Model
+final class Testimonial extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
-        'company',
+        'role',
         'rating',
-        'comment',
-        'is_active',
+        'content',
+        'is_featured',
+        'is_published',
         'sort_order',
     ];
 
     protected $casts = [
         'rating' => 'integer',
-        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_published' => 'boolean',
         'sort_order' => 'integer',
     ];
 
-    /**
-     * Scope for active testimonials.
-     */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_published', true);
     }
 
-    /**
-     * Scope for ordered testimonials.
-     */
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('created_at', 'desc');

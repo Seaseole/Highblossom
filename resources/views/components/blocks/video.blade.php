@@ -16,10 +16,10 @@ $videoId = null;
 $platform = null;
 
 // Extract video ID from YouTube or Vimeo URLs
-if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/', $url, $matches)) {
+if ($url && preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/', $url, $matches)) {
     $videoId = $matches[1];
     $platform = 'youtube';
-} elseif (preg_match('/vimeo\.com\/(\d+)/', $url, $matches)) {
+} elseif ($url && preg_match('/vimeo\.com\/(\d+)/', $url, $matches)) {
     $videoId = $matches[1];
     $platform = 'vimeo';
 }

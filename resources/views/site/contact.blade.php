@@ -39,7 +39,79 @@
                     </div>
                     <p class="text-[#71717A] text-sm mb-6">
                         @if ($number->is_primary)
-                            Mon-Fri: 08:00-17:30
+                            @php
+                                try {
+                                    $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
+                                    $openDays = [];
+                                    $closedDays = [];
+                                    
+                                    if (isset($workingHours) && is_array($workingHours)) {
+                                        foreach ($dayOrder as $key => $abbr) {
+                                            if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
+                                                $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
+                                                $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')) . ' – ' . date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
+                                                $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
+                                            } else {
+                                                $closedDays[] = $abbr;
+                                            }
+                                        }
+                                        
+                                        // Group consecutive days with same hours
+                                        $groupedDays = [];
+                                        $currentGroup = [];
+                                        $currentTime = null;
+                                        $prevKey = null;
+                                        $dayKeys = array_keys($dayOrder);
+                                        
+                                        foreach ($dayKeys as $key) {
+                                            if (!isset($openDays[$key])) continue;
+                                            
+                                            $dayData = $openDays[$key];
+                                            $time = $dayData['time'];
+                                            
+                                            // Check if consecutive and same time
+                                            $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
+                                            
+                                            if ($time === $currentTime && $isConsecutive) {
+                                                $currentGroup[] = $dayData['abbr'];
+                                            } else {
+                                                if (!empty($currentGroup)) {
+                                                    $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                                }
+                                                $currentGroup = [$dayData['abbr']];
+                                                $currentTime = $time;
+                                            }
+                                            $prevKey = $key;
+                                        }
+                                        
+                                        if (!empty($currentGroup)) {
+                                            $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                        }
+                                        
+                                        // Modern professional format
+                                        $formatted = [];
+                                        foreach ($groupedDays as $group) {
+                                            $dayLabel = count($group['days']) > 2 
+                                                ? $group['days'][0] . '–' . end($group['days']) 
+                                                : implode(' & ', $group['days']);
+                                            $formatted[] = $dayLabel . ' · ' . $group['time'];
+                                        }
+                                        
+                                        if (!empty($closedDays)) {
+                                            $closedLabel = count($closedDays) > 2 
+                                                ? $closedDays[0] . '–' . end($closedDays) 
+                                                : implode(' & ', $closedDays);
+                                            $formatted[] = $closedLabel . ' · Closed';
+                                        }
+                                        
+                                        echo implode(' | ', $formatted);
+                                    } else {
+                                        echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                                    }
+                                } catch (\Exception $e) {
+                                    echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                                }
+                            @endphp
                         @elseif ($number->is_whatsapp)
                             Available 24/7
                         @else
@@ -63,10 +135,84 @@
                     </div>
                     <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">Phone</div>
                     <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
-                        {{ $primaryPhone?->formatted_number ?? '+267 123 456 78' }}
+                        {{ $primaryPhone ?? '+267 123 456 78' }}
                     </div>
-                    <p class="text-[#71717A] text-sm mb-6">Mon-Fri: 08:00-17:30</p>
-                    <a href="tel:{{ $primaryPhone?->phone_number ?? '+26712345678' }}" class="btn-premium">
+                    <p class="text-[#71717A] text-sm mb-6">
+                        @php
+                            try {
+                                $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
+                                $openDays = [];
+                                $closedDays = [];
+                                
+                                if (isset($workingHours) && is_array($workingHours)) {
+                                    foreach ($dayOrder as $key => $abbr) {
+                                        if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
+                                            $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
+                                            $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')) . ' – ' . date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
+                                            $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
+                                        } else {
+                                            $closedDays[] = $abbr;
+                                        }
+                                    }
+                                    
+                                    // Group consecutive days with same hours
+                                    $groupedDays = [];
+                                    $currentGroup = [];
+                                    $currentTime = null;
+                                    $prevKey = null;
+                                    $dayKeys = array_keys($dayOrder);
+                                    
+                                    foreach ($dayKeys as $key) {
+                                        if (!isset($openDays[$key])) continue;
+                                        
+                                        $dayData = $openDays[$key];
+                                        $time = $dayData['time'];
+                                        
+                                        // Check if consecutive and same time
+                                        $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
+                                        
+                                        if ($time === $currentTime && $isConsecutive) {
+                                            $currentGroup[] = $dayData['abbr'];
+                                        } else {
+                                            if (!empty($currentGroup)) {
+                                                $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                            }
+                                            $currentGroup = [$dayData['abbr']];
+                                            $currentTime = $time;
+                                        }
+                                        $prevKey = $key;
+                                    }
+                                    
+                                    if (!empty($currentGroup)) {
+                                        $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                    }
+                                    
+                                    // Modern professional format
+                                    $formatted = [];
+                                    foreach ($groupedDays as $group) {
+                                        $dayLabel = count($group['days']) > 2 
+                                            ? $group['days'][0] . '–' . end($group['days']) 
+                                            : implode(' & ', $group['days']);
+                                        $formatted[] = $dayLabel . ' · ' . $group['time'];
+                                    }
+                                    
+                                    if (!empty($closedDays)) {
+                                        $closedLabel = count($closedDays) > 2 
+                                            ? $closedDays[0] . '–' . end($closedDays) 
+                                            : implode(' & ', $closedDays);
+                                        $formatted[] = $closedLabel . ' · Closed';
+                                    }
+                                    
+                                    echo implode(' | ', $formatted);
+                                } else {
+                                    echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                                }
+                            } catch (\Exception $e) {
+                                echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                            }
+                        @endphp
+                    </p>
+                    <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone ?? '+26712345678') }}" class="btn-premium">
                         <span>Call Now</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -123,7 +269,7 @@
                 <div class="relative">
                     <div class="h-[600px] rounded-2xl overflow-hidden relative">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114588.25127598265!2d25.87234155!3d-24.6282075!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1ebb5b3b2c6c5c99%3A0x3e3a9f5c5c9c9c9c!2sGaborone%2C%20Botswana!5e0!3m2!1sen!2s!4v1234567890"
+                            src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($companyAddress) }}"
                             width="100%"
                             height="100%"
                             style="border:0;"
@@ -142,9 +288,15 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                             </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-[#FAFAFA] font-headline mb-1">Highblossom Pty Ltd</h3>
-                                <p class="text-[#A1A1AA] text-sm">Plot 123, Main Road<br>Broadhurst, Gaborone, Botswana</p>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-[#FAFAFA] font-headline mb-1">{{ $companyName }}</h3>
+                                <p class="text-[#A1A1AA] text-sm mb-3">{{ $companyAddress }}</p>
+                                <a href="{{ $mapDirectionsLink }}" target="_blank" class="inline-flex items-center gap-2 text-[#DC2626] text-sm font-semibold hover:text-[#FAFAFA] transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/>
+                                    </svg>
+                                    Get Directions
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -164,18 +316,6 @@
                                 <p class="text-[#71717A] text-sm">We'll get back to you within 24 hours</p>
                             </div>
                         </div>
-
-                        @if (session('success'))
-                            <div class="mb-6 p-4 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/30">
-                                <span class="text-[#22C55E] text-sm">{{ session('success') }}</span>
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="mb-6 p-4 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/30">
-                                <span class="text-[#DC2626] text-sm">{{ session('error') }}</span>
-                            </div>
-                        @endif
 
                         <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
                             @csrf
@@ -257,24 +397,46 @@
                         <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">Workshop Hours</h3>
                     </div>
                     <ul class="space-y-4">
-                        <li class="flex justify-between items-center py-3 border-b border-white/5">
-                            <span class="text-[#A1A1AA]">Monday - Friday</span>
-                            <span class="text-[#FAFAFA] font-semibold">08:00 - 17:30</span>
-                        </li>
-                        <li class="flex justify-between items-center py-3 border-b border-white/5">
-                            <span class="text-[#A1A1AA]">Saturday</span>
-                            <span class="text-[#FAFAFA] font-semibold">08:00 - 13:00</span>
-                        </li>
-                        <li class="flex justify-between items-center py-3">
-                            <span class="text-[#A1A1AA]">Sunday</span>
-                            <span class="text-[#DC2626] font-semibold">Closed</span>
-                        </li>
+                        @php
+                            $dayOrder = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
+                            $showDynamic = isset($workingHours) && is_array($workingHours);
+                        @endphp
+
+                        @if($showDynamic)
+                            @foreach($dayOrder as $key => $label)
+                                @php
+                                    $isClosed = $workingHours[$key]['is_closed'] ?? false;
+                                    $openTime = $workingHours[$key]['open'] ?? null;
+                                    $closeTime = $workingHours[$key]['close'] ?? null;
+                                    $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
+                                    $timeDisplay = $isClosed ? 'Closed' : (date($format, strtotime($openTime)) . ' – ' . date($format, strtotime($closeTime)));
+                                    $textClass = $isClosed ? 'text-[#DC2626]' : 'text-[#FAFAFA]';
+                                @endphp
+                                <li class="flex justify-between items-center py-3 border-b border-white/5">
+                                    <span class="text-[#A1A1AA]">{{ $label }}</span>
+                                    <span class="{{ $textClass }} font-semibold">{{ $timeDisplay }}</span>
+                                </li>
+                            @endforeach
+                        @else
+                            <li class="flex justify-between items-center py-3 border-b border-white/5">
+                                <span class="text-[#A1A1AA]">Monday - Friday</span>
+                                <span class="text-[#FAFAFA] font-semibold">7:30 AM – 5:00 PM</span>
+                            </li>
+                            <li class="flex justify-between items-center py-3 border-b border-white/5">
+                                <span class="text-[#A1A1AA]">Saturday</span>
+                                <span class="text-[#FAFAFA] font-semibold">8:00 AM – 1:00 PM</span>
+                            </li>
+                            <li class="flex justify-between items-center py-3">
+                                <span class="text-[#A1A1AA]">Sunday</span>
+                                <span class="text-[#DC2626] font-semibold">Closed</span>
+                            </li>
+                        @endif
                     </ul>
                 </div>
 
-                <div class="glass-card rounded-2xl p-8 relative overflow-hidden">
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden self-start">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-[#DC2626]/10 rounded-full blur-3xl"></div>
-                    <div class="flex items-center gap-3 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
                             <svg class="w-5 h-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -282,15 +444,15 @@
                         </div>
                         <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">Emergency Service</h3>
                     </div>
-                    <p class="text-[#A1A1AA] mb-6">
+                    <p class="text-[#A1A1AA] mb-4 text-sm">
                         Emergency glass repairs available 24/7 for fleet and commercial clients. Don't let broken glass stop your operations.
                     </p>
                     @if ($primaryPhone)
-                    <a href="tel:{{ $primaryPhone->phone_number }}" class="btn-premium">
+                    <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="btn-premium text-sm py-2 px-4">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
-                        <span>Hotline: {{ $primaryPhone->formatted_number }}</span>
+                        <span>Hotline: {{ $primaryPhone }}</span>
                     </a>
                     @endif
                 </div>
