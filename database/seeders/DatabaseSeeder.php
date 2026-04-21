@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CompanyDataSeeder::class,
+            RolesAndPermissionsSeeder::class,
             // ServiceSeeder::class,
             // GlassTypeSeeder::class,
             // ServiceTypeSeeder::class,
