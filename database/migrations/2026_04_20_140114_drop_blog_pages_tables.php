@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::dropIfExists('pages');
+        Schema::dropIfExists('post_views');
+        Schema::dropIfExists('post_revisions');
         Schema::dropIfExists('posts');
         Schema::dropIfExists('categories');
         Schema::dropIfExists('tags');
         Schema::dropIfExists('taggables');
         Schema::dropIfExists('content_blocks');
-        Schema::dropIfExists('post_revisions');
-        Schema::dropIfExists('post_views');
     }
 
     /**
