@@ -38,7 +38,7 @@ final class ServiceTypeController
 
         return redirect()
             ->route('admin.service-types.index')
-            ->with('success', 'Service type created successfully');
+            ->with('success', __('messages.service_type_created'));
     }
 
     public function edit(ServiceType $serviceType): View
@@ -61,7 +61,7 @@ final class ServiceTypeController
 
         return redirect()
             ->route('admin.service-types.index')
-            ->with('success', 'Service type updated successfully');
+            ->with('success', __('messages.service_type_updated'));
     }
 
     public function destroy(ServiceType $serviceType): RedirectResponse
@@ -70,6 +70,6 @@ final class ServiceTypeController
 
         return redirect()
             ->route('admin.service-types.index')
-            ->with('success', 'Service type deleted successfully');
+            ->with('success', __('messages.service_type_deleted'));
     }
 }

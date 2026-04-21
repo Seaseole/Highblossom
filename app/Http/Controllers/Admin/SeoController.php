@@ -86,7 +86,7 @@ final class SeoController
 
         return redirect()
             ->route('admin.seo.static-routes')
-            ->with('success', 'SEO settings saved successfully');
+            ->with('success', __('messages.seo_saved'));
     }
 
     private function getRouteLabel(string $routeName): string

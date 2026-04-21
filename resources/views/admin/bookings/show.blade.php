@@ -1,7 +1,7 @@
 <x-layouts::admin title="Booking Details">
     <div class="p-6">
         <div class="mb-6">
-            <a href="{{ route('admin.bookings.index') }}" class="text-indigo-600 hover:text-indigo-900 text-sm">
+            <a href="{{ route('admin-bookings.index') }}" class="text-indigo-600 hover:text-indigo-900 text-sm">
                 &larr; Back to Bookings
             </a>
         </div>

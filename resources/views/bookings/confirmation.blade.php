@@ -9,20 +9,20 @@
                         </svg>
                     </div>
                     
-                    <h1 class="text-3xl font-bold mb-4">Booking Confirmed!</h1>
+                    <h1 class="text-3xl font-bold mb-4">{{ __('confirmation.title') }}</h1>
                     <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                        Thank you, <strong>{{ $booking->client_name }}</strong>. Your inspection for the <strong>{{ $booking->vehicle_details }}</strong> has been received.
+                        {!! __('confirmation.message', ['name' => $booking->client_name, 'vehicle' => $booking->vehicle_details]) !!}
                     </p>
 
                     <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg inline-block text-left mb-8">
-                        <p><strong>Scheduled Date:</strong> {{ $booking->scheduled_at ? $booking->scheduled_at->format('M d, Y H:i') : 'TBC' }}</p>
-                        <p><strong>Status:</strong> {{ ucfirst($booking->status) }}</p>
-                        <p><strong>Confirmation Email sent to:</strong> {{ $booking->client_email }}</p>
+                        <p><strong>{{ __('confirmation.scheduled_date') }}</strong> {{ $booking->scheduled_at ? $booking->scheduled_at->format('M d, Y H:i') : __('confirmation.tbc') }}</p>
+                        <p><strong>{{ __('confirmation.status') }}</strong> {{ ucfirst($booking->status) }}</p>
+                        <p><strong>{{ __('confirmation.confirmation_email') }}</strong> {{ $booking->client_email }}</p>
                     </div>
 
                     <div class="mt-6">
                         <a href="{{ route('home') }}" class="text-indigo-600 hover:text-indigo-900 font-semibold">
-                            &larr; Return Home
+                            &larr; {{ __('confirmation.return_home') }}
                         </a>
                     </div>
                 </div>

@@ -18,7 +18,7 @@
                 <!-- Info Column -->
                 <div class="lg:w-1/3 flex flex-col justify-center">
                     <nav class="flex items-center gap-2 text-sm text-[#A1A1AA] mb-8">
-                        <a href="{{ route('gallery') }}" class="hover:text-[#DC2626] transition-colors">Gallery</a>
+                        <a href="{{ route('gallery') }}" class="hover:text-[#DC2626] transition-colors">{{ __('gallery-show.gallery') }}</a>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -47,11 +47,11 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="text-xs font-semibold text-[#DC2626] uppercase tracking-wider mb-1">Installation Site</div>
-                                    <div class="text-[#FAFAFA] font-medium">{{ $galleryImage->location_address ?? 'Precision On-Site Fitment' }}</div>
+                                    <div class="text-xs font-semibold text-[#DC2626] uppercase tracking-wider mb-1">{{ __('gallery-show.installation_site') }}</div>
+                                    <div class="text-[#FAFAFA] font-medium">{{ $galleryImage->location_address ?? __('gallery-show.default_location') }}</div>
                                     @if($galleryImage->google_maps_url)
                                         <a href="{{ $galleryImage->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-sm text-[#A1A1AA] hover:text-[#DC2626] mt-2 transition-colors">
-                                            <span>Open in Google Maps</span>
+                                            <span>{{ __('gallery-show.open_in_maps') }}</span>
                                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                             </svg>
@@ -69,15 +69,15 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="text-xs font-semibold text-[#DC2626] uppercase tracking-wider mb-1">Quality Assurance</div>
-                                    <div class="text-[#FAFAFA] font-medium">SABS Approved & Lifetime Workmanship Warranty</div>
+                                    <div class="text-xs font-semibold text-[#DC2626] uppercase tracking-wider mb-1">{{ __('gallery-show.quality_assurance') }}</div>
+                                    <div class="text-[#FAFAFA] font-medium">{{ __('gallery-show.warranty_text') }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <a href="{{ route('quote') }}" class="btn-premium w-full justify-center">
-                        <span>Request Similar Service</span>
+                        <span>{{ __('gallery-show.request_similar') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -93,13 +93,13 @@
             <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
                 <div class="flex items-end justify-between mb-12">
                     <div>
-                        <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Portfolio</div>
+                        <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('gallery-show.portfolio_label') }}</div>
                         <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline tracking-tight">
-                            Related Projects
+                            {{ __('gallery-show.related_projects') }}
                         </h2>
                     </div>
                     <a href="{{ route('gallery', ['category' => $galleryImage->category]) }}" class="hidden md:flex items-center gap-2 text-[#A1A1AA] hover:text-[#DC2626] transition-colors font-semibold">
-                        <span>View All {{ str_replace('_', ' ', ucfirst($galleryImage->category)) }}</span>
+                        <span>{{ __('gallery-show.view_all') }} {{ str_replace('_', ' ', ucfirst($galleryImage->category)) }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -136,20 +136,20 @@
                 
                 <div class="relative z-10 max-w-3xl mx-auto">
                     <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-8">
-                        Ready for a <span class="text-[#DC2626]">Professional</span> Fitment?
+                        {!! __('gallery-show.cta_title') !!}
                     </h2>
                     <p class="text-xl text-[#A1A1AA] mb-12 leading-relaxed">
-                        Whether it's a luxury sedan or heavy mining equipment, our expert team provides precision installation anywhere in Botswana.
+                        {{ __('gallery-show.cta_description') }}
                     </p>
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                         <a href="{{ route('quote') }}" class="btn-premium w-full sm:w-auto">
-                            <span>Get a Free Quote</span>
+                            <span>{{ __('gallery-show.get_free_quote') }}</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </a>
                         <a href="{{ route('contact') }}" class="btn-ghost w-full sm:w-auto">
-                            <span>Contact Our Team</span>
+                            <span>{{ __('gallery-show.contact_team') }}</span>
                         </a>
                     </div>
                 </div>

@@ -41,7 +41,7 @@ final class RoleController
 
         return redirect()
             ->route('admin.roles.index')
-            ->with('success', 'Role created successfully.');
+            ->with('success', __('messages.role_created'));
     }
 
     public function edit(Role $role): View
@@ -66,7 +66,7 @@ final class RoleController
 
         return redirect()
             ->route('admin.roles.index')
-            ->with('success', 'Role updated successfully.');
+            ->with('success', __('messages.role_updated'));
     }
 
     public function destroy(Role $role): RedirectResponse
@@ -74,12 +74,12 @@ final class RoleController
         if ($role->name === 'Super Admin') {
             return redirect()
                 ->route('admin.roles.index')
-                ->with('error', 'Super Admin role cannot be deleted.');
+                ->with('error', __('messages.unauthorized'));
         }
 
         $role->delete();
         return redirect()
             ->route('admin.roles.index')
-            ->with('success', 'Role deleted successfully.');
+            ->with('success', __('messages.role_deleted'));
     }
 }

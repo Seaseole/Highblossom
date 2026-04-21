@@ -1,12 +1,12 @@
-<x-layouts::admin title="Services">
+<x-layouts::admin title="{{ __('admin-services.title') }}">
     <div class="p-6">
         <div class="admin-section-header">
-            <h1 class="admin-section-title">Services</h1>
+            <h1 class="admin-section-title">{{ __('admin-services.title') }}</h1>
             <a href="{{ route('admin.services.create') }}" class="admin-action-btn admin-action-btn-primary">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
                 </svg>
-                <span>Create Service</span>
+                <span>{{ __('admin-services.create') }}</span>
             </a>
         </div>
 
@@ -14,11 +14,11 @@
             <table class="min-w-full divide-y divide-white/5">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Image</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Icon</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.image') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.title_header') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.icon') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.status') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -45,11 +45,11 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($service->is_active)
                                     <span class="admin-badge admin-badge-active">
-                                        Active
+                                        {{ __('admin-services.active_status') }}
                                     </span>
                                 @else
                                     <span class="admin-badge admin-badge-inactive">
-                                        Inactive
+                                        {{ __('admin-services.inactive_status') }}
                                     </span>
                                 @endif
                             </td>
@@ -58,7 +58,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
-                                    Edit
+                                    {{ __('admin-services.edit_button') }}
                                 </a>
                             </td>
                         </tr>
@@ -71,7 +71,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                         </svg>
                                     </div>
-                                    <p>No services found.</p>
+                                    <p>{{ __('admin-services.no_services_found') }}</p>
                                 </div>
                             </td>
                         </tr>

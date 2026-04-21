@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="mb-8">
             <nav class="flex items-center gap-2 text-sm text-zinc-500 mb-4">
-                <a href="{{ route('admin.users.index') }}" class="hover:text-zinc-700 transition-colors">Users</a>
+                <a href="{{ route('admin-users.index') }}" class="hover:text-zinc-700 transition-colors">Users</a>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -13,7 +13,7 @@
             <p class="mt-2 text-zinc-500">Add a new user account and assign roles</p>
         </div>
 
-        <form method="POST" action="{{ route('admin.users.store') }}" class="max-w-3xl">
+        <form method="POST" action="{{ route('admin-users.store') }}" class="max-w-3xl">
             @csrf
 
             <div class="space-y-8">
@@ -63,7 +63,7 @@
 
                 <!-- Actions -->
                 <div class="flex items-center justify-end gap-4 pt-4 border-t border-zinc-200">
-                    <a href="{{ route('admin.users.index') }}" class="px-6 py-3 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200 active:scale-[0.98]">
+                    <a href="{{ route('admin-users.index') }}" class="px-6 py-3 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200 active:scale-[0.98]">
                         Cancel
                     </a>
                     <button type="submit" class="px-6 py-3 rounded-xl bg-[#dc2626] text-white text-sm font-medium shadow-lg shadow-[#dc2626]/20 hover:bg-[#b91c1c] hover:shadow-xl hover:shadow-[#dc2626]/30 transition-all duration-200 active:scale-[0.98]">

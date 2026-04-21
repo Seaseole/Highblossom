@@ -39,13 +39,13 @@ final class QuoteController
 
         $quote->update(['status' => $request->status]);
 
-        return redirect()->back()->with('success', 'Quote status updated successfully.');
+        return redirect()->back()->with('success', __('messages.quote_status_updated'));
     }
 
     public function destroy(Quote $quote)
     {
         $quote->delete();
 
-        return redirect()->route('admin.quotes.index')->with('success', 'Quote deleted successfully.');
+        return redirect()->route('admin.quotes.index')->with('success', __('messages.quote_deleted'));
     }
 }

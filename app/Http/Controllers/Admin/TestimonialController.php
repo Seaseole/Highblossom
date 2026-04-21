@@ -38,7 +38,7 @@ final class TestimonialController
 
         return redirect()
             ->route('admin.testimonials.index')
-            ->with('success', 'Testimonial created successfully');
+            ->with('success', __('messages.testimonial_created'));
     }
 
     public function edit(Testimonial $testimonial): View
@@ -62,7 +62,7 @@ final class TestimonialController
 
         return redirect()
             ->route('admin.testimonials.index')
-            ->with('success', 'Testimonial updated successfully');
+            ->with('success', __('messages.testimonial_updated'));
     }
 
     public function destroy(Testimonial $testimonial)
@@ -71,6 +71,6 @@ final class TestimonialController
 
         return redirect()
             ->route('admin.testimonials.index')
-            ->with('success', 'Testimonial deleted successfully');
+            ->with('success', __('messages.testimonial_deleted'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Features;
@@ -28,7 +29,7 @@ class ProfileController extends Controller
 
         $user->update($validated);
 
-        return back()->with('success', 'Profile information updated successfully.');
+        return back()->with('success', __('messages.profile_information_updated'));
     }
 
     public function updateAppearance(Request $request)
@@ -39,7 +40,7 @@ class ProfileController extends Controller
 
         auth()->user()->update($validated);
 
-        return back()->with('success', 'Appearance settings updated successfully.');
+        return back()->with('success', __('messages.appearance_updated'));
     }
 
     public function updatePassword(Request $request)
@@ -52,14 +53,14 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         if (!Hash::check($validated['current_password'], $user->password)) {
-            return back()->withErrors(['current_password' => 'The provided password does not match your current password.']);
+            return back()->withErrors(['current_password' => __('validation.current_password')]);
         }
 
         $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('success', 'Password updated successfully.');
+        return back()->with('success', __('messages.password_updated'));
     }
 
     public function enableTwoFactor(Request $request)
@@ -77,7 +78,7 @@ class ProfileController extends Controller
             'two_factor_confirmed_at' => now(),
         ])->save();
 
-        return back()->with('success', 'Two-factor authentication enabled successfully.');
+        return back()->with('success', __('messages.two_factor_enabled'));
     }
 
     public function disableTwoFactor(Request $request)
@@ -94,7 +95,7 @@ class ProfileController extends Controller
             'two_factor_confirmed_at' => null,
         ])->save();
 
-        return back()->with('success', 'Two-factor authentication disabled successfully.');
+        return back()->with('success', __('messages.two_factor_disabled'));
     }
 
     public function destroy(Request $request)
@@ -106,13 +107,13 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         if (!Hash::check($validated['password'], $user->password)) {
-            return back()->withErrors(['password' => 'The provided password does not match your current password.']);
+            return back()->withErrors(['password' => __('validation.current_password')]);
         }
 
         auth()->logout();
 
         $user->delete();
 
-        return redirect('/')->with('success', 'Account deleted successfully.');
+        return redirect('/')->with('success', __('messages.account_deleted'));
     }
 }

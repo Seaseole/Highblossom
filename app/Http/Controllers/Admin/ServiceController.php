@@ -56,7 +56,7 @@ final class ServiceController
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service created successfully');
+            ->with('success', __('messages.service_created'));
     }
 
     public function edit(Service $service): View
@@ -99,7 +99,7 @@ final class ServiceController
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service updated successfully');
+            ->with('success', __('messages.service_updated'));
     }
 
     public function destroy(Service $service)
@@ -108,6 +108,6 @@ final class ServiceController
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service deleted successfully');
+            ->with('success', __('messages.service_deleted'));
     }
 }

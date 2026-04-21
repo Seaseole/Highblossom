@@ -4,12 +4,12 @@
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">What We Offer</div>
+                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('services.label') }}</div>
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
-                        Premium Glass<br>Services
+                        {!! __('services.title') !!}
                     </h1>
                     <p class="text-lg text-[#A1A1AA] leading-relaxed max-w-lg">
-                        From luxury vehicles to heavy industrial machinery, we deliver expert glass solutions with unmatched quality and precision.
+                        {{ __('services.description') }}
                     </p>
                 </div>
                 <div class="relative">
@@ -17,19 +17,19 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div class="text-center">
                                 <div class="text-3xl font-bold text-[#DC2626] font-headline">6+</div>
-                                <div class="text-[#71717A] text-sm mt-1">Service Types</div>
+                                <div class="text-[#71717A] text-sm mt-1">{{ __('services.service_types') }}</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-3xl font-bold text-[#DC2626] font-headline">24h</div>
-                                <div class="text-[#71717A] text-sm mt-1">Emergency Response</div>
+                                <div class="text-[#71717A] text-sm mt-1">{{ __('services.emergency_response') }}</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-3xl font-bold text-[#DC2626] font-headline">Same</div>
-                                <div class="text-[#71717A] text-sm mt-1">Day Service</div>
+                                <div class="text-[#71717A] text-sm mt-1">{{ __('services.day_service') }}</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-3xl font-bold text-[#DC2626] font-headline">OEM</div>
-                                <div class="text-[#71717A] text-sm mt-1">Quality Parts</div>
+                                <div class="text-[#71717A] text-sm mt-1">{{ __('services.quality_parts') }}</div>
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent"></div>
                             <div class="absolute bottom-6 left-6">
                                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30">
-                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">Service {{ sprintf('%02d', $index + 1) }}</span>
+                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">{{ __('services.service_label') }} {{ sprintf('%02d', $index + 1) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                             </ul>
                             @endif
                             <a href="{{ route('quote') }}" class="btn-premium">
-                                <span>Get Quote for This Service</span>
+                                <span>{{ __('services.get_quote_service') }}</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                                 </svg>
@@ -101,7 +101,7 @@
                             </ul>
                             @endif
                             <a href="{{ route('quote') }}" class="btn-premium">
-                                <span>Get Quote for This Service</span>
+                                <span>{{ __('services.get_quote_service') }}</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                                 </svg>
@@ -117,7 +117,7 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent"></div>
                             <div class="absolute bottom-6 left-6">
                                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30">
-                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">Service {{ sprintf('%02d', $index + 1) }}</span>
+                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">{{ __('services.service_label') }} {{ sprintf('%02d', $index + 1) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -127,8 +127,8 @@
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20">
                     <img src="{{ asset('storage/placeholder.gif') }}" alt="Services placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
                     <div class="text-center">
-                        <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">No Services Available</h3>
-                        <p class="text-[#A1A1AA]">Check back soon to see our latest services</p>
+                        <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">{{ __('services.no_services') }}</h3>
+                        <p class="text-[#A1A1AA]">{{ __('services.no_services_desc') }}</p>
                     </div>
                 </div>
             @endforelse
@@ -137,7 +137,7 @@
             @if (isset($services) && $services->hasMorePages())
             <div class="text-center mt-16">
                 <a href="{{ route('services', ['page' => $services->currentPage() + 1]) }}" class="btn-ghost">
-                    <span>Load More Services</span>
+                    <span>{{ __('services.load_more') }}</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
@@ -151,9 +151,9 @@
     <section class="py-24 lg:py-32 bg-[#121218]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-16">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">How It Works</div>
+                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('services.how_it_works') }}</div>
                 <h2 class="text-4xl md:text-5xl font-bold text-[#FAFAFA] font-headline tracking-tight">
-                    Our Process
+                    {{ __('services.process_title') }}
                 </h2>
             </div>
 
@@ -163,9 +163,9 @@
                         <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
                             <span class="text-2xl font-bold text-[#DC2626] font-headline">1</span>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">Request Quote</h3>
+                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('services.step_1_title') }}</h3>
                         <p class="text-[#71717A] text-sm leading-relaxed">
-                            Contact us with your vehicle details and glass requirements for a detailed quote.
+                            {{ __('services.step_1_desc') }}
                         </p>
                     </div>
                     <div class="hidden md:block absolute top-1/2 -right-4 w-8 h-[2px] bg-[#DC2626]/30"></div>
@@ -176,9 +176,9 @@
                         <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
                             <span class="text-2xl font-bold text-[#DC2626] font-headline">2</span>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">Assessment</h3>
+                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('services.step_2_title') }}</h3>
                         <p class="text-[#71717A] text-sm leading-relaxed">
-                            Our technicians assess the damage and confirm the right glass solution for your vehicle.
+                            {{ __('services.step_2_desc') }}
                         </p>
                     </div>
                     <div class="hidden md:block absolute top-1/2 -right-4 w-8 h-[2px] bg-[#DC2626]/30"></div>
@@ -189,9 +189,9 @@
                         <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
                             <span class="text-2xl font-bold text-[#DC2626] font-headline">3</span>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">Installation</h3>
+                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('services.step_3_title') }}</h3>
                         <p class="text-[#71717A] text-sm leading-relaxed">
-                            Expert installation with precision fitment. Quality checked and warranty provided.
+                            {{ __('services.step_3_desc') }}
                         </p>
                     </div>
                 </div>
@@ -207,15 +207,15 @@
 
                 <div class="relative z-10">
                     <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
-                        Ready to Get Started?
+                        {{ __('services.cta_title') }}
                     </h2>
                     <p class="text-lg text-[#A1A1AA] max-w-2xl mx-auto mb-10">
-                        Contact us today for a free quote on your glass replacement needs.
+                        {{ __('services.cta_description') }}
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <a href="{{ route('quote') }}" class="btn-premium glow-red text-lg px-8 py-4">
-                            <span>Request Your Quote</span>
+                            <span>{{ __('services.request_quote') }}</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                             </svg>

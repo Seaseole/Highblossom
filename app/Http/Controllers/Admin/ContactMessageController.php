@@ -31,6 +31,6 @@ final class ContactMessageController
 
         return redirect()
             ->route('admin.contact-messages.index')
-            ->with('success', 'Message deleted successfully');
+            ->with('success', __('messages.contact_message_deleted'));
     }
 }

@@ -22,9 +22,9 @@ class CompanyDataSeeder extends Seeder
         $settings = [
             ['key' => 'company_name', 'value' => 'Highblossom PTY LTD', 'type' => 'text'],
             ['key' => 'logo_text', 'value' => 'Highblossom PTY LTD', 'type' => 'text'],
-            ['key' => 'primary_phone', 'value' => '+26712345678', 'type' => 'text'],
-            ['key' => 'whatsapp_number', 'value' => '+26712345678', 'type' => 'text'],
-            ['key' => 'primary_email', 'value' => 'info@highblossom.co.bw', 'type' => 'text'],
+            ['key' => 'primary_phone', 'value' => '+2673117480', 'type' => 'text'],
+            ['key' => 'whatsapp_number', 'value' => '+2677773262', 'type' => 'text'],
+            ['key' => 'primary_email', 'value' => 'sales@highblossom.net', 'type' => 'text'],
             ['key' => 'address', 'value' => 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana', 'type' => 'text'],
             ['key' => 'smtp_host', 'value' => '', 'type' => 'text'],
             ['key' => 'smtp_port', 'value' => '587', 'type' => 'number'],

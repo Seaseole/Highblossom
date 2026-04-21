@@ -3,12 +3,12 @@
     <section class="relative pt-32 pb-20 bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Contact</div>
+                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.label') }}</div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
-                    Get In Touch
+                    {{ __('contact.title') }}
                 </h1>
                 <p class="text-lg text-[#A1A1AA] leading-relaxed">
-                    Visit our Gaborone workshop or reach out. We're here to help with all your automotive glass needs.
+                    {{ __('contact.description') }}
                 </p>
             </div>
         </div>
@@ -32,7 +32,7 @@
                         @endif
                     </div>
                     <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">
-                        {{ $number->is_whatsapp ? 'WhatsApp' : $number->label }}
+                        {{ $number->is_whatsapp ? __('contact.whatsapp') : $number->label }}
                     </div>
                     <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
                         {{ $number->formatted_number }}
@@ -113,13 +113,13 @@
                                 }
                             @endphp
                         @elseif ($number->is_whatsapp)
-                            Available 24/7
+                            {{ __('contact.available_24_7') }}
                         @else
-                            {{ $number->label }} Line
+                            {{ $number->label }} {{ __('contact.line_label') }}
                         @endif
                     </p>
                     <a href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . $number->phone_number }}" target="{{ $number->is_whatsapp ? '_blank' : '_self' }}" class="btn-premium">
-                        <span>{{ $number->is_whatsapp ? 'Chat on WhatsApp' : 'Call Now' }}</span>
+                        <span>{{ $number->is_whatsapp ? __('contact.chat_on_whatsapp') : __('contact.call_now') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -133,7 +133,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
                     </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">Phone</div>
+                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.phone') }}</div>
                     <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
                         {{ $primaryPhone ?? '+267 123 456 78' }}
                     </div>
@@ -213,7 +213,7 @@
                         @endphp
                     </p>
                     <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone ?? '+26712345678') }}" class="btn-premium">
-                        <span>Call Now</span>
+                        <span>{{ __('contact.call_now') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -226,13 +226,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">Email</div>
+                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.email') }}</div>
                     <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
                         {{ $primaryEmail ?? 'info@highblossom.co.bw' }}
                     </div>
-                    <p class="text-[#71717A] text-sm mb-6">Reply within 24 hours</p>
+                    <p class="text-[#71717A] text-sm mb-6">{{ __('contact.reply_within_24h') }}</p>
                     <a href="mailto:{{ $primaryEmail }}" class="btn-premium">
-                        <span>Send Email</span>
+                        <span>{{ __('contact.send_email') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -246,11 +246,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">Location</div>
-                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">Gaborone, Botswana</div>
-                    <p class="text-[#71717A] text-sm mb-6">Plot 123, Broadhurst</p>
+                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.location') }}</div>
+                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">{{ __('contact.location_address') }}</div>
+                    <p class="text-[#71717A] text-sm mb-6">{{ __('contact.location_details') }}</p>
                     <a href="https://maps.google.com" target="_blank" class="btn-premium">
-                        <span>Get Directions</span>
+                        <span>{{ __('contact.get_directions') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -295,7 +295,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/>
                                     </svg>
-                                    Get Directions
+                                    {{ __('contact.get_directions') }}
                                 </a>
                             </div>
                         </div>
@@ -312,8 +312,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-2xl font-bold text-[#FAFAFA] font-headline">Send a Message</h2>
-                                <p class="text-[#71717A] text-sm">We'll get back to you within 24 hours</p>
+                                <h2 class="text-2xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.send_message') }}</h2>
+                                <p class="text-[#71717A] text-sm">{{ __('contact.form_description') }}</p>
                             </div>
                         </div>
 
@@ -321,7 +321,7 @@
                             @csrf
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="contact_name" class="block text-sm font-medium text-[#A1A1AA] mb-2">Full Name *</label>
+                                    <label for="contact_name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.full_name') }} *</label>
                                     <input type="text" id="contact_name" name="name" required
                                         class="form-input-premium @error('name') border-red-500 @enderror"
                                         value="{{ old('name') }}"
@@ -329,44 +329,44 @@
                                     @error('name') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label for="contact_email" class="block text-sm font-medium text-[#A1A1AA] mb-2">Email Address *</label>
+                                    <label for="contact_email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.email_address') }} *</label>
                                     <input type="email" id="contact_email" name="email" required
                                         class="form-input-premium @error('email') border-red-500 @enderror"
                                         value="{{ old('email') }}"
-                                        placeholder="john@example.com">
+                                        placeholder="{{ __('contact.email_placeholder') }}">
                                     @error('email') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
                                 </div>
                             </div>
                             <div>
-                                <label for="contact_phone" class="block text-sm font-medium text-[#A1A1AA] mb-2">Phone Number</label>
+                                <label for="contact_phone" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.phone_number') }}</label>
                                 <input type="tel" id="contact_phone" name="phone"
                                     class="form-input-premium @error('phone') border-red-500 @enderror"
                                     value="{{ old('phone') }}"
-                                    placeholder="+267 XX XXX XXX">
+                                    placeholder="{{ __('contact.phone_placeholder') }}">
                                 @error('phone') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label for="contact_subject" class="block text-sm font-medium text-[#A1A1AA] mb-2">Subject *</label>
+                                <label for="contact_subject" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.subject') }} *</label>
                                 <select id="contact_subject" name="subject" required
                                     class="form-input-premium @error('subject') border-red-500 @enderror">
-                                    <option value="">Select a subject</option>
-                                    <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>General Inquiry</option>
-                                    <option value="quote" {{ old('subject') == 'quote' ? 'selected' : '' }}>Quote Request</option>
-                                    <option value="booking" {{ old('subject') == 'booking' ? 'selected' : '' }}>Booking Question</option>
-                                    <option value="complaint" {{ old('subject') == 'complaint' ? 'selected' : '' }}>Complaint</option>
-                                    <option value="other" {{ old('subject') == 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="">{{ __('contact.select_subject') }}</option>
+                                    <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>{{ __('contact.subject_general') }}</option>
+                                    <option value="quote" {{ old('subject') == 'quote' ? 'selected' : '' }}>{{ __('contact.subject_quote') }}</option>
+                                    <option value="booking" {{ old('subject') == 'booking' ? 'selected' : '' }}>{{ __('contact.subject_booking') }}</option>
+                                    <option value="complaint" {{ old('subject') == 'complaint' ? 'selected' : '' }}>{{ __('contact.subject_complaint') }}</option>
+                                    <option value="other" {{ old('subject') == 'other' ? 'selected' : '' }}>{{ __('contact.subject_other') }}</option>
                                 </select>
                                 @error('subject') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label for="contact_message" class="block text-sm font-medium text-[#A1A1AA] mb-2">Message *</label>
+                                <label for="contact_message" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.message') }} *</label>
                                 <textarea id="contact_message" name="message" rows="4" required
                                     class="form-input-premium resize-none @error('message') border-red-500 @enderror"
-                                    placeholder="How can we help you?">{{ old('message') }}</textarea>
+                                    placeholder="{{ __('contact.message_placeholder') }}">{{ old('message') }}</textarea>
                                 @error('message') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
                             </div>
                             <button type="submit" class="btn-premium glow-red-subtle w-full text-lg py-4">
-                                <span>Send Message</span>
+                                <span>{{ __('contact.submit_button') }}</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                 </svg>
@@ -382,8 +382,8 @@
     <section class="py-24 bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="text-center mb-12">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Operational Hours</div>
-                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">Business Hours</h2>
+                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.operational_hours') }}</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.business_hours') }}</h2>
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
@@ -394,7 +394,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">Workshop Hours</h3>
+                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.workshop_hours') }}</h3>
                     </div>
                     <ul class="space-y-4">
                         @php
@@ -419,16 +419,16 @@
                             @endforeach
                         @else
                             <li class="flex justify-between items-center py-3 border-b border-white/5">
-                                <span class="text-[#A1A1AA]">Monday - Friday</span>
+                                <span class="text-[#A1A1AA]">{{ __('contact.monday_friday') }}</span>
                                 <span class="text-[#FAFAFA] font-semibold">7:30 AM – 5:00 PM</span>
                             </li>
                             <li class="flex justify-between items-center py-3 border-b border-white/5">
-                                <span class="text-[#A1A1AA]">Saturday</span>
+                                <span class="text-[#A1A1AA]">{{ __('contact.saturday') }}</span>
                                 <span class="text-[#FAFAFA] font-semibold">8:00 AM – 1:00 PM</span>
                             </li>
                             <li class="flex justify-between items-center py-3">
-                                <span class="text-[#A1A1AA]">Sunday</span>
-                                <span class="text-[#DC2626] font-semibold">Closed</span>
+                                <span class="text-[#A1A1AA]">{{ __('contact.sunday') }}</span>
+                                <span class="text-[#DC2626] font-semibold">{{ __('contact.closed') }}</span>
                             </li>
                         @endif
                     </ul>
@@ -442,17 +442,17 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">Emergency Service</h3>
+                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.emergency_service') }}</h3>
                     </div>
                     <p class="text-[#A1A1AA] mb-4 text-sm">
-                        Emergency glass repairs available 24/7 for fleet and commercial clients. Don't let broken glass stop your operations.
+                        {{ __('contact.emergency_description') }}
                     </p>
                     @if ($primaryPhone)
                     <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="btn-premium text-sm py-2 px-4">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
-                        <span>Hotline: {{ $primaryPhone }}</span>
+                        <span>{{ __('contact.hotline') }}: {{ $primaryPhone }}</span>
                     </a>
                     @endif
                 </div>
@@ -464,8 +464,8 @@
     <section class="py-24 bg-gradient-to-b from-[#0A0A0F] to-[#121218] border-t border-white/5">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="text-center mb-12">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Navigation</div>
-                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">Quick Actions</h2>
+                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.navigation') }}</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.quick_actions') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -475,10 +475,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">Get Quote</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">Request detailed pricing for your glass needs</p>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">{{ __('contact.get_quote') }}</h3>
+                    <p class="text-[#A1A1AA] text-sm mb-4">{{ __('contact.get_quote_description') }}</p>
                     <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
-                        <span>Go</span>
+                        <span>{{ __('contact.go') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                         </svg>
@@ -491,10 +491,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">Services</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">Explore our comprehensive glass solutions</p>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">View Services</h3>
+                    <p class="text-[#A1A1AA] text-sm mb-4">Explore our range of glass services</p>
                     <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
-                        <span>Go</span>
+                        <span>{{ __('contact.go') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                         </svg>
@@ -507,10 +507,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">Gallery</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">View our recent glass installation projects</p>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">View Gallery</h3>
+                    <p class="text-[#A1A1AA] text-sm mb-4">See our completed projects</p>
                     <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
-                        <span>Go</span>
+                        <span>{{ __('contact.go') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                         </svg>

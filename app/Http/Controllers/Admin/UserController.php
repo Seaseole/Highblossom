@@ -53,7 +53,7 @@ final class UserController
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+            ->with('success', __('messages.user_created'));
     }
 
     public function edit(User $user): View
@@ -87,7 +87,7 @@ final class UserController
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User updated successfully.');
+            ->with('success', __('messages.user_updated'));
     }
 
     public function destroy(User $user): RedirectResponse
@@ -95,6 +95,6 @@ final class UserController
         $user->delete();
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
+            ->with('success', __('messages.user_deleted'));
     }
 }

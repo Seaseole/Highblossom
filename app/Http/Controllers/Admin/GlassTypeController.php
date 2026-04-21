@@ -38,7 +38,7 @@ final class GlassTypeController
 
         return redirect()
             ->route('admin.glass-types.index')
-            ->with('success', 'Glass type created successfully');
+            ->with('success', __('messages.glass_type_created'));
     }
 
     public function edit(GlassType $glassType): View
@@ -61,7 +61,7 @@ final class GlassTypeController
 
         return redirect()
             ->route('admin.glass-types.index')
-            ->with('success', 'Glass type updated successfully');
+            ->with('success', __('messages.glass_type_updated'));
     }
 
     public function destroy(GlassType $glassType): RedirectResponse
@@ -70,6 +70,6 @@ final class GlassTypeController
 
         return redirect()
             ->route('admin.glass-types.index')
-            ->with('success', 'Glass type deleted successfully');
+            ->with('success', __('messages.glass_type_deleted'));
     }
 }

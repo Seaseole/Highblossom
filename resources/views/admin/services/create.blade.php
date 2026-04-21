@@ -4,7 +4,7 @@
             <h1 class="admin-section-title">Create Service</h1>
         </div>
 
-        <form method="POST" action="{{ route('admin.services.store') }}" class="max-w-2xl" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin-services.store') }}" class="max-w-2xl" enctype="multipart/form-data">
             @csrf
 
             <div class="space-y-6">
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3">
-                    <a href="{{ route('admin.services.index') }}" class="admin-action-btn admin-action-btn-ghost">
+                    <a href="{{ route('admin-services.index') }}" class="admin-action-btn admin-action-btn-ghost">
                         Cancel
                     </a>
                     <button type="submit" class="admin-action-btn admin-action-btn-primary">

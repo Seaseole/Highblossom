@@ -50,7 +50,7 @@ final class GalleryController
 
         return redirect()
             ->route('admin.gallery.index')
-            ->with('success', 'Gallery item created successfully');
+            ->with('success', __('messages.gallery_created'));
     }
 
     public function edit(GalleryImage $item): View
@@ -85,7 +85,7 @@ final class GalleryController
 
         return redirect()
             ->route('admin.gallery.index')
-            ->with('success', 'Gallery item updated successfully');
+            ->with('success', __('messages.gallery_updated'));
     }
 
     public function destroy(GalleryImage $item): RedirectResponse
@@ -98,6 +98,6 @@ final class GalleryController
 
         return redirect()
             ->route('admin.gallery.index')
-            ->with('success', 'Gallery item deleted successfully');
+            ->with('success', __('messages.gallery_deleted'));
     }
 }

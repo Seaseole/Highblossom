@@ -3,12 +3,12 @@
     <section class="relative pt-32 pb-20 bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Portfolio</div>
+                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('gallery.label') }}</div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
-                    Our Work
+                    {{ __('gallery.title') }}
                 </h1>
                 <p class="text-lg text-[#A1A1AA] leading-relaxed">
-                    Browse our portfolio of precision installations across automotive, heavy machinery, and fleet sectors.
+                    {{ __('gallery.description') }}
                 </p>
             </div>
         </div>
@@ -20,7 +20,7 @@
             <!-- Category Filters -->
             <div class="flex flex-wrap justify-center gap-3 mb-16">
                 <a href="{{ route('gallery') }}" class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ !$category ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}">
-                    All Projects
+                    {{ __('gallery.all_projects') }}
                 </a>
                 @foreach ($categories as $cat)
                 <a href="{{ route('gallery', ['category' => $cat]) }}" class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ $category === $cat ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}">
@@ -47,7 +47,7 @@
                             @endif
                             <div class="mt-4 flex items-center gap-3">
                                 <button onclick="openLightbox({{ $index }})" class="text-xs font-bold text-white bg-[#DC2626] px-4 py-2 rounded-full hover:bg-[#B91C1C] transition-colors">
-                                    Quick View
+                                    {{ __('gallery.quick_view') }}
                                 </button>
                                 <a href="{{ route('gallery.show', $image) }}" class="text-xs font-bold text-[#FAFAFA] bg-white/10 backdrop-blur-md px-4 py-2 rounded-full hover:bg-white/20 transition-colors">
                                     Project Details

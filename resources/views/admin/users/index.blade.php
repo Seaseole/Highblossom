@@ -1,14 +1,14 @@
-<x-layouts::admin title="Users">
+<x-layouts::admin title="{{ __('admin-users.title') }}">
     <div class="p-6">
         <div class="admin-section-header">
-            <h1 class="admin-section-title">Users & Roles</h1>
+            <h1 class="admin-section-title">{{ __('admin-users.title') }}</h1>
             <div class="flex items-center gap-4">
                 <form method="GET" action="{{ route('admin.users.index') }}" class="w-64">
                     <input
                         type="text"
                         name="search"
                         value="{{ request('search') }}"
-                        placeholder="Search users..."
+                        placeholder="{{ __('admin-users.search_placeholder') }}"
                         class="admin-form-input"
                     >
                 </form>
@@ -16,7 +16,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
                     </svg>
-                    <span>Create User</span>
+                    <span>{{ __('admin-users.create') }}</span>
                 </a>
             </div>
         </div>
@@ -25,10 +25,10 @@
             <table class="min-w-full divide-y divide-white/5">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">User</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Roles</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.user') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.email') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.roles') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -57,7 +57,7 @@
                                             {{ $role->name }}
                                         </span>
                                     @empty
-                                        <span class="text-sm text-[#71717A] italic">No roles</span>
+                                        <span class="text-sm text-[#71717A] italic">{{ __('admin-users.no_roles') }}</span>
                                     @endforelse
                                 </div>
                             </td>
@@ -66,7 +66,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
-                                    Edit
+                                    {{ __('admin-users.edit_button') }}
                                 </label>
                             </td>
                         </tr>
@@ -81,14 +81,14 @@
     </div>
 
     <!-- Edit Modal -->
-    <x-modal id="edit" title="Edit User" maxWidth="2xl">
+    <x-modal id="edit" title="{{ __('admin-users.edit') }}" maxWidth="2xl">
         <form method="POST" action="{{ route('admin.users.update', $user ?? '') }}">
             @csrf
             @method('PUT')
 
             <div class="space-y-6">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-[#A1A1AA] mb-2">Name</label>
+                    <label for="name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.name') }}</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $user->name ?? '') }}" required class="admin-form-input @error('name') border-red-500 @enderror">
                     @error('name')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
@@ -96,7 +96,7 @@
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-[#A1A1AA] mb-2">Email</label>
+                    <label for="email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.email_label') }}</label>
                     <input type="email" name="email" id="email" value="{{ old('email', $user->email ?? '') }}" required class="admin-form-input @error('email') border-red-500 @enderror">
                     @error('email')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
@@ -104,15 +104,15 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-[#A1A1AA] mb-2">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Leave blank to keep current" class="admin-form-input @error('password') border-red-500 @enderror">
+                    <label for="password" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.password') }}</label>
+                    <input type="password" name="password" id="password" placeholder="{{ __('admin-users.password_placeholder') }}" class="admin-form-input @error('password') border-red-500 @enderror">
                     @error('password')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-[#A1A1AA] mb-2">Roles</label>
+                    <label class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.roles_label') }}</label>
                     <div class="grid grid-cols-1 gap-2 p-3 border border-white/10 rounded-xl max-h-48 overflow-y-auto bg-white/5">
                         @foreach($roles ?? [] as $role)
                             <label class="flex items-center cursor-pointer">
@@ -133,10 +133,10 @@
             <x-slot:footer>
                 <div class="flex justify-end gap-3">
                     <label for="edit-modal-toggle" class="admin-action-btn admin-action-btn-ghost cursor-pointer inline-block">
-                        Cancel
+                        {{ __('admin-users.cancel') }}
                     </label>
                     <button type="submit" class="admin-action-btn admin-action-btn-primary">
-                        Update User
+                        {{ __('admin-users.update_user') }}
                     </button>
                 </div>
             </x-slot:footer>

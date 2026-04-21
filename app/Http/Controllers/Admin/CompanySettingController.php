@@ -121,6 +121,6 @@ final class CompanySettingController
         }
         CompanySetting::set('working_hours', $workingHours, 'json');
 
-        return redirect()->back()->with('success', 'Settings updated successfully.');
+        return redirect()->back()->with('success', __('messages.settings_saved'));
     }
 }
