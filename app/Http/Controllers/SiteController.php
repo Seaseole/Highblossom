@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\StoreQuoteAction;
 use App\Domains\Content\Models\CompanySetting;
 use App\Domains\Content\Models\GalleryImage;
+use App\Domains\Content\Models\GalleryCategory;
 use App\Domains\Content\Models\GlassType;
 use App\Domains\Content\Models\Service;
 use App\Domains\Content\Models\ServiceType;
@@ -23,7 +24,7 @@ class SiteController extends Controller
         $featuredTestimonial = Testimonial::where('is_featured', true)->active()->first();
         $otherTestimonials = Testimonial::active()->where('is_featured', false)->ordered()->get();
         $featuredServices = Service::active()->ordered()->take(3)->get();
-        $featuredGalleryImages = GalleryImage::featured()->active()->ordered()->take(3)->get();
+        $featuredGalleryImages = GalleryImage::featured()->active()->with('category')->ordered()->take(3)->get();
 
         $workingHours = CompanySetting::get('working_hours', [
             'monday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
@@ -57,22 +58,25 @@ class SiteController extends Controller
         $perPage = 9;
         $page = $request->get('page', 1);
 
-        $query = GalleryImage::active()->ordered();
+        $query = GalleryImage::active()->with('category')->ordered();
 
         if ($category) {
             $query->byCategory($category);
         }
 
         $images = $query->paginate($perPage, ['*'], 'page', $page);
-        $categories = ['automotive', 'heavy_machinery', 'fleet', 'other'];
+        $categories = GalleryCategory::active()->ordered()->get();
 
         return view('site.gallery', compact('images', 'categories', 'category'));
     }
 
     public function galleryShow(GalleryImage $galleryImage)
     {
+        $galleryImage->load('category');
+        
         $relatedImages = GalleryImage::active()
-            ->where('category', $galleryImage->category)
+            ->with('category')
+            ->where('gallery_category_id', $galleryImage->gallery_category_id)
             ->where('id', '!=', $galleryImage->id)
             ->ordered()
             ->take(3)

@@ -67,6 +67,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::put('gallery/{item}', [\App\Http\Controllers\Admin\GalleryController::class, 'update'])->name('gallery.update');
     Route::delete('gallery/{item}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
+    Route::get('gallery-categories', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'index'])->name('gallery-categories.index');
+    Route::get('gallery-categories/create', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'create'])->name('gallery-categories.create');
+    Route::post('gallery-categories', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'store'])->name('gallery-categories.store');
+    Route::get('gallery-categories/{galleryCategory}/edit', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'edit'])->name('gallery-categories.edit');
+    Route::put('gallery-categories/{galleryCategory}', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'update'])->name('gallery-categories.update');
+    Route::delete('gallery-categories/{galleryCategory}', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'destroy'])->name('gallery-categories.destroy');
+
     Route::get('glass-types', [\App\Http\Controllers\Admin\GlassTypeController::class, 'index'])->name('glass-types.index');
     Route::get('glass-types/create', [\App\Http\Controllers\Admin\GlassTypeController::class, 'create'])->name('glass-types.create');
     Route::post('glass-types', [\App\Http\Controllers\Admin\GlassTypeController::class, 'store'])->name('glass-types.store');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\GalleryImage;
+use App\Domains\Content\Models\GalleryCategory;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,14 +16,15 @@ final class GalleryController
 {
     public function index(): View
     {
-        $items = GalleryImage::query()->latest()->paginate(15);
+        $items = GalleryImage::query()->with('category')->latest()->paginate(15);
 
         return view('admin.gallery.index', compact('items'));
     }
 
     public function create(): View
     {
-        return view('admin.gallery.create');
+        $categories = GalleryCategory::active()->ordered()->get();
+        return view('admin.gallery.create', compact('categories'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -31,7 +33,7 @@ final class GalleryController
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
             'description' => 'nullable|string',
-            'category' => 'required|in:automotive,heavy_machinery,fleet,other',
+            'gallery_category_id' => 'required|exists:gallery_categories,id',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
@@ -55,7 +57,8 @@ final class GalleryController
 
     public function edit(GalleryImage $item): View
     {
-        return view('admin.gallery.edit', compact('item'));
+        $categories = GalleryCategory::active()->ordered()->get();
+        return view('admin.gallery.edit', compact('item', 'categories'));
     }
 
     public function update(Request $request, GalleryImage $item): RedirectResponse
@@ -64,7 +67,7 @@ final class GalleryController
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
             'description' => 'nullable|string',
-            'category' => 'required|in:automotive,heavy_machinery,fleet,other',
+            'gallery_category_id' => 'required|exists:gallery_categories,id',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',

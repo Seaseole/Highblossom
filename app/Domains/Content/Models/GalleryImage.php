@@ -12,7 +12,7 @@ final class GalleryImage extends Model
         'title',
         'description',
         'image_path',
-        'category',
+        'gallery_category_id',
         'is_featured',
         'is_active',
         'sort_order',
@@ -37,6 +37,16 @@ final class GalleryImage extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+    }
+
+    public function scopeByCategory($query, $category)
+    {
+        return $query->whereHas('category', fn($q) => $q->where('slug', $category));
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(GalleryCategory::class, 'gallery_category_id');
     }
 
     public function getImageUrlAttribute(): ?string

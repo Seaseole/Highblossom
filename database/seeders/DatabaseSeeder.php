@@ -24,8 +24,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CompanyDataSeeder::class,
             RolesAndPermissionsSeeder::class,
+            GalleryCategorySeeder::class,
             // ServiceSeeder::class,
-            // GlassTypeSeeder::class,
+            GlassTypeSeeder::class,
             // ServiceTypeSeeder::class,
             // GallerySeeder::class,
         ]);

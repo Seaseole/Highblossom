@@ -43,7 +43,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
-                                {{ str_replace('_', ' ', ucfirst($item->category)) }}
+                                {{ $item->category->name ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 @if($item->location_address)

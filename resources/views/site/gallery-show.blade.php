@@ -22,7 +22,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        <span class="text-[#DC2626]">{{ str_replace('_', ' ', ucfirst($galleryImage->category)) }}</span>
+                        <span class="text-[#DC2626]">{{ $galleryImage->category->name ?? '-' }}</span>
                     </nav>
 
                     <h1 class="text-4xl md:text-5xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">

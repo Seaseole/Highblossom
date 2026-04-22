@@ -93,15 +93,14 @@
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-semibold text-zinc-700 mb-2">Category</label>
-                        <select name="category" id="category" required class="w-full px-4 py-3 rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:border-[#dc2626] focus:ring-4 focus:ring-[#dc2626]/10 transition-all duration-200">
+                        <label for="gallery_category_id" class="block text-sm font-semibold text-zinc-700 mb-2">Category</label>
+                        <select name="gallery_category_id" id="gallery_category_id" required class="w-full px-4 py-3 rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:border-[#dc2626] focus:ring-4 focus:ring-[#dc2626]/10 transition-all duration-200">
                             <option value="">Select a category</option>
-                            <option value="automotive" {{ old('category') === 'automotive' ? 'selected' : '' }}>Automotive</option>
-                            <option value="heavy_machinery" {{ old('category') === 'heavy_machinery' ? 'selected' : '' }}>Heavy Machinery</option>
-                            <option value="fleet" {{ old('category') === 'fleet' ? 'selected' : '' }}>Fleet</option>
-                            <option value="other" {{ old('category') === 'other' ? 'selected' : '' }}>Other</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('gallery_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
                         </select>
-                        @error('category')
+                        @error('gallery_category_id')
                             <p class="mt-2 text-sm text-[#dc2626]">{{ $message }}</p>
                         @enderror
                     </div>
