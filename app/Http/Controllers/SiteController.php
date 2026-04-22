@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\StoreQuoteAction;
+use App\Domains\Content\Models\AboutUsContent;
 use App\Domains\Content\Models\CompanySetting;
 use App\Domains\Content\Models\GalleryImage;
 use App\Domains\Content\Models\GalleryCategory;
@@ -38,6 +39,17 @@ class SiteController extends Controller
         $timeFormatDisplay = CompanySetting::get('time_format_display', '12');
 
         return view('welcome', compact('otherTestimonials', 'featuredServices', 'featuredTestimonial', 'workingHours', 'timeFormatDisplay', 'featuredGalleryImages'));
+    }
+
+    public function aboutUs()
+    {
+        $content = AboutUsContent::active();
+
+        if (! $content) {
+            abort(404);
+        }
+
+        return view('site.about-us', compact('content'));
     }
 
     public function services(Request $request)

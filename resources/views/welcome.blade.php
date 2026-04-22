@@ -228,7 +228,7 @@
                             <div class="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                                 <div
                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30 mb-4">
-                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">{{ str_replace('_', ' ', $featuredGalleryImages->first()->category) }}</span>
+                                    <span class="text-[#DC2626] text-xs font-semibold uppercase">{{ str_replace('_', ' ', $featuredGalleryImages->first()->category->name) }}</span>
                                 </div>
                                 <h3 class="text-xl lg:text-2xl font-bold text-[#FAFAFA] font-headline mb-2">{{ $featuredGalleryImages->first()->title }}</h3>
                                 @if($featuredGalleryImages->first()->description)
@@ -248,7 +248,7 @@
                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                 <div
                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 mb-3">
-                                    <span class="text-[#FAFAFA] text-xs font-semibold uppercase">{{ str_replace('_', ' ', $image->category) }}</span>
+                                    <span class="text-[#FAFAFA] text-xs font-semibold uppercase">{{ str_replace('_', ' ', $image->category->name) }}</span>
                                 </div>
                                 <h3 class="text-lg font-bold text-[#FAFAFA] font-headline">{{ $image->title }}</h3>
                             </div>

@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             CompanyDataSeeder::class,
             RolesAndPermissionsSeeder::class,
             GalleryCategorySeeder::class,
+            AboutUsContentSeeder::class,
             // ServiceSeeder::class,
             GlassTypeSeeder::class,
             // ServiceTypeSeeder::class,

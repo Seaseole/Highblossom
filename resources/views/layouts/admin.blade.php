@@ -15,6 +15,7 @@
 
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('vendor/ckeditor/ckeditor.js') }}"></script>
 </head>
 <body class="min-h-[100dvh] bg-[#0A0A0F] text-[#FAFAFA] font-body antialiased" x-data="{ sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true', mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false">
     <div class="flex min-h-[100dvh]">
@@ -82,6 +83,12 @@
                 <div class="pt-4 pb-2" x-show="!sidebarCollapsed">
                     <span class="text-[10px] font-semibold text-[#71717A] uppercase tracking-wider">Content</span>
                 </div>
+                <a href="{{ route('admin.about-us.edit') }}" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl group {{ request()->routeIs('admin.about-us.*') ? 'active' : 'text-[#A1A1AA]' }}" :title="sidebarCollapsed ? 'About Us' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-medium whitespace-nowrap" x-show="!sidebarCollapsed">About Us</span>
+                </a>
                 <a href="{{ route('admin.testimonials.index') }}" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl group {{ request()->routeIs('admin.testimonials.*') ? 'active' : 'text-[#A1A1AA]' }}" :title="sidebarCollapsed ? 'Testimonials' : ''">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -160,6 +167,12 @@
                     </svg>
                     <span class="font-medium whitespace-nowrap" x-show="!sidebarCollapsed">Settings</span>
                 </a>
+                <a href="{{ route('admin.smtp.index') }}" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl group {{ request()->routeIs('admin.smtp.*') ? 'active' : 'text-[#A1A1AA]' }}" :title="sidebarCollapsed ? 'SMTP' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span class="font-medium whitespace-nowrap" x-show="!sidebarCollapsed">SMTP</span>
+                </a>
             </nav>
 
             <!-- User Section -->
@@ -233,6 +246,12 @@
                 <div class="pt-4 pb-2">
                     <span class="text-[10px] font-semibold text-[#71717A] uppercase tracking-wider">Content</span>
                 </div>
+                <a href="{{ route('admin.about-us.edit') }}" @click="mobileMenuOpen = false" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.about-us.*') ? 'active' : 'text-[#A1A1AA]' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-medium">About Us</span>
+                </a>
                 <a href="{{ route('admin.testimonials.index') }}" @click="mobileMenuOpen = false" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.testimonials.*') ? 'active' : 'text-[#A1A1AA]' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -307,6 +326,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span class="font-medium">Settings</span>
+                </a>
+                <a href="{{ route('admin.smtp.index') }}" @click="mobileMenuOpen = false" class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.smtp.*') ? 'active' : 'text-[#A1A1AA]' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span class="font-medium">SMTP</span>
                 </a>
             </nav>
 
@@ -442,5 +467,6 @@
     </div>
 
     @livewireScripts
+    @stack('scripts')
 </body>
 </html>

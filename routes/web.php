@@ -12,6 +12,7 @@ Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 Route::get('/', [SiteController::class, 'home'])->name('home');
 
 // Public Pages
+Route::get('/about-us', [SiteController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [SiteController::class, 'services'])->name('services');
 Route::get('/gallery', [SiteController::class, 'gallery'])->name('gallery');
 Route::get('/gallery/{galleryImage}', [SiteController::class, 'galleryShow'])->name('gallery.show');
@@ -44,6 +45,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\CompanySettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\CompanySettingController::class, 'update'])->name('settings.update');
+
+    // About Us
+    Route::get('about-us', [\App\Http\Controllers\Admin\AboutUsController::class, 'edit'])->name('about-us.edit');
+    Route::put('about-us', [\App\Http\Controllers\Admin\AboutUsController::class, 'update'])->name('about-us.update');
+
+    // SMTP
+    Route::get('smtp', [\App\Http\Controllers\Admin\SmtpSettingController::class, 'index'])->name('smtp.index');
+    Route::put('smtp', [\App\Http\Controllers\Admin\SmtpSettingController::class, 'update'])->name('smtp.update');
+    Route::post('smtp/test', [\App\Http\Controllers\Admin\SmtpSettingController::class, 'sendTest'])->name('smtp.test');
 
     // Content Management
     Route::get('testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');

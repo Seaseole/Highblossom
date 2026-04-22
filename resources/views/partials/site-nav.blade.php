@@ -16,6 +16,9 @@
             <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight">
                 Home
             </a>
+            <a href="{{ route('about-us') }}" class="nav-link {{ request()->routeIs('about-us') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight">
+                About Us
+            </a>
             <a href="{{ route('services') }}" class="nav-link {{ request()->routeIs('services') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight">
                 Services
             </a>
@@ -92,6 +95,9 @@
             <div class="flex-1 flex flex-col px-6 py-8 gap-6">
                 <a href="{{ route('home') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('home') ? 'text-[#DC2626]' : '' }}">
                     Home
+                </a>
+                <a href="{{ route('about-us') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('about-us') ? 'text-[#DC2626]' : '' }}">
+                    About Us
                 </a>
                 <a href="{{ route('services') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('services') ? 'text-[#DC2626]' : '' }}">
                     Services

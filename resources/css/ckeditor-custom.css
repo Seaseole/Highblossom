@@ -1,0 +1,30 @@
+body {
+    padding: 15px;
+    padding-right: 25px;
+    margin: 0;
+    color: #FAFAFA;
+    background-color: #0A0A0F;
+}
+
+/* Custom scrollbar styling for CKEditor iframe content */
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #0A0A0F;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Ensure links have proper styling */
+a {
+    color: #DC2626;
+}
