@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Domains\Bookings\Models\Quote;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class StoreQuoteAction
 {
@@ -16,8 +16,20 @@ class StoreQuoteAction
     {
         try {
             $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('quotes', 'public');
+            
+            // Use AJAX uploaded path if provided, otherwise use traditional file upload
+            if (!empty($request->input('image_path'))) {
+                $imagePath = $request->input('image_path');
+            } elseif ($request->hasFile('image')) {
+                try {
+                    $file = $request->file('image');
+                    if ($file && $file->isValid()) {
+                        $imagePath = $file->store('quotes', 'public');
+                    }
+                } catch (\Exception $e) {
+                    // Continue without image if upload fails
+                    Log::error('Failed to store quote image: ' . $e->getMessage());
+                }
             }
 
             $quote = $this->quote->create([

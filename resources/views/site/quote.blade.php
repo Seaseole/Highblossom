@@ -160,6 +160,12 @@
                                 <div class="mb-6">
                                     <h3 class="text-lg font-medium text-[#FAFAFA] mb-2">{{ __('quote.visual_assessment') }}</h3>
                                     <p class="text-sm text-[#71717A] mb-4">{{ __('quote.upload_description') }}</p>
+                                    
+                                    <input type="hidden" name="image_path" id="quote-image-path">
+                                    
+                                    <div id="quote-image-preview" class="mb-4"></div>
+                                    <div id="quote-image-progress"></div>
+                                    
                                     <div class="mt-4 flex justify-center rounded-lg border border-dashed border-white/20 px-6 py-10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
                                         <div class="text-center">
                                             <svg class="mx-auto h-12 w-12 text-[#DC2626]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -271,3 +277,27 @@
         </div>
     </section>
 </x-layouts::site>
+
+<script src="{{ asset('js/image-upload.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof ImageUploader !== 'undefined') {
+            new ImageUploader({
+                fileInput: document.querySelector('input[name="image"]'),
+                previewContainer: document.getElementById('quote-image-preview'),
+                progressContainer: document.getElementById('quote-image-progress'),
+                hiddenInput: document.getElementById('quote-image-path'),
+                uploadUrl: '{{ route("admin.image-upload") }}',
+                csrfToken: '{{ csrf_token() }}',
+                maxSize: 2 * 1024 * 1024, // 2MB
+                acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                onUploadComplete: function(response) {
+                    console.log('Image uploaded successfully:', response);
+                },
+                onUploadError: function(message) {
+                    console.error('Upload error:', message);
+                }
+            });
+        }
+    });
+</script>

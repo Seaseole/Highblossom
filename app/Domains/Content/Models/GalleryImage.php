@@ -13,6 +13,7 @@ final class GalleryImage extends Model
         'description',
         'image_path',
         'gallery_category_id',
+        'category',
         'is_featured',
         'is_active',
         'sort_order',
