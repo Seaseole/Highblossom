@@ -136,6 +136,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div class="space-y-4">
                                     <label class="text-sm font-medium text-[#FAFAFA]">Business Logo</label>
+                                    <input type="hidden" name="business_logo_path" id="business-logo-path" value="{{ $settings['business_logo'] ?? '' }}">
+                                    <div id="business-logo-progress" class="mb-3"></div>
                                     <div class="flex flex-col items-center justify-center p-8 bg-black/20 border-2 border-dashed border-white/5 rounded-2xl group hover:border-[#DC2626]/50 transition-all cursor-pointer relative overflow-hidden">
                                         @if($settings['business_logo'])
                                             <img src="{{ Storage::url($settings['business_logo']) }}" class="h-20 object-contain mb-4">
@@ -145,12 +147,14 @@
                                             </svg>
                                         @endif
                                         <p class="text-xs text-[#71717A]">Click to upload or drag and drop</p>
-                                        <input type="file" name="business_logo" class="absolute inset-0 opacity-0 cursor-pointer">
+                                        <input type="file" name="business_logo" id="business-logo-input" class="absolute inset-0 opacity-0 cursor-pointer">
                                     </div>
                                     <p class="text-[10px] text-[#71717A]">Recommended: PNG or SVG, max 2MB.</p>
                                 </div>
                                 <div class="space-y-4">
                                     <label class="text-sm font-medium text-[#FAFAFA]">Favicon</label>
+                                    <input type="hidden" name="favicon_path" id="favicon-path" value="{{ $settings['favicon'] ?? '' }}">
+                                    <div id="favicon-progress" class="mb-3"></div>
                                     <div class="flex flex-col items-center justify-center p-8 bg-black/20 border-2 border-dashed border-white/5 rounded-2xl group hover:border-[#DC2626]/50 transition-all cursor-pointer relative overflow-hidden">
                                         @if($settings['favicon'])
                                             <img src="{{ Storage::url($settings['favicon']) }}" class="h-10 object-contain mb-4">
@@ -160,7 +164,7 @@
                                             </svg>
                                         @endif
                                         <p class="text-xs text-[#71717A]">Click to upload favicon</p>
-                                        <input type="file" name="favicon" class="absolute inset-0 opacity-0 cursor-pointer">
+                                        <input type="file" name="favicon" id="favicon-input" class="absolute inset-0 opacity-0 cursor-pointer">
                                     </div>
                                     <p class="text-[10px] text-[#71717A]">Recommended: ICO or PNG, max 1MB.</p>
                                 </div>
@@ -275,4 +279,47 @@
             </div>
         </form>
     </div>
+
+    <script src="{{ asset('js/image-upload.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ImageUploader !== 'undefined') {
+                // Business Logo Uploader
+                new ImageUploader({
+                    fileInput: document.getElementById('business-logo-input'),
+                    previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
+                    progressContainer: document.getElementById('business-logo-progress'),
+                    hiddenInput: document.getElementById('business-logo-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 2 * 1024 * 1024, // 2MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'],
+                    onUploadComplete: function(response) {
+                        console.log('Logo uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+
+                // Favicon Uploader
+                new ImageUploader({
+                    fileInput: document.getElementById('favicon-input'),
+                    previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
+                    progressContainer: document.getElementById('favicon-progress'),
+                    hiddenInput: document.getElementById('favicon-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 1 * 1024 * 1024, // 1MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'],
+                    onUploadComplete: function(response) {
+                        console.log('Favicon uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+            }
+        });
+    </script>
 </x-layouts::admin>

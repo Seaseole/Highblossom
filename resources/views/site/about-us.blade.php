@@ -32,14 +32,14 @@
                     @if($content->vision)
                     <div class="glass-card rounded-2xl p-8">
                         <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Our Vision</div>
-                        <p class="text-[#A1A1AA] leading-relaxed">{!! nl2br(e($content->vision)) !!}</p>
+                        <div class="text-[#A1A1AA] leading-relaxed">{!! $content->vision !!}</div>
                     </div>
                     @endif
 
                     @if($content->mission)
                     <div class="glass-card rounded-2xl p-8">
                         <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Our Mission</div>
-                        <p class="text-[#A1A1AA] leading-relaxed">{!! nl2br(e($content->mission)) !!}</p>
+                        <div class="text-[#A1A1AA] leading-relaxed">{!! $content->mission !!}</div>
                     </div>
                     @endif
                 </div>

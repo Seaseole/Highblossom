@@ -67,9 +67,26 @@
 
                         <div class="pt-4 border-t border-white/5 space-y-2">
                             <label class="text-sm font-medium text-[#FAFAFA]">Hero Image</label>
-                            @if($content->hero_image)
-                                <img src="{{ Storage::url($content->hero_image) }}" alt="Hero" class="w-full h-32 object-cover rounded-xl border border-white/5">
-                            @endif
+                            <input type="hidden" name="hero_image_path" id="hero-image-path" value="{{ $content->hero_image ?? '' }}">
+                            
+                            <div id="hero-image-preview" class="mb-3">
+                                @if($content->hero_image)
+                                    <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-white/5">
+                                        <img src="{{ Storage::url($content->hero_image) }}" alt="Hero" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm">
+                                            <div class="flex flex-col items-center text-white">
+                                                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                </svg>
+                                                <span class="font-semibold text-sm">Change Image</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <div id="hero-image-progress"></div>
+                            
                             <div class="flex flex-col items-center justify-center p-6 bg-black/20 border-2 border-dashed border-white/5 rounded-xl group hover:border-[#DC2626]/50 transition-all cursor-pointer relative overflow-hidden">
                                 <svg class="w-8 h-8 text-[#71717A] mb-2 group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -91,6 +108,7 @@
         </form>
     </div>
 
+    <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof CKEDITOR !== 'undefined') {
@@ -113,6 +131,26 @@
                 });
             } else {
                 console.error('CKEditor not loaded');
+            }
+
+            // Initialize Image Uploader
+            if (typeof ImageUploader !== 'undefined') {
+                new ImageUploader({
+                    fileInput: document.querySelector('input[name="hero_image"]'),
+                    previewContainer: document.getElementById('hero-image-preview'),
+                    progressContainer: document.getElementById('hero-image-progress'),
+                    hiddenInput: document.getElementById('hero-image-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 2 * 1024 * 1024, // 2MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                    onUploadComplete: function(response) {
+                        console.log('Image uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
             }
         });
     </script>

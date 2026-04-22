@@ -32,6 +32,7 @@ final class GalleryController
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
+            'image_path' => 'nullable|string',
             'description' => 'nullable|string',
             'gallery_category_id' => 'required|exists:gallery_categories,id',
             'is_featured' => 'boolean',
@@ -42,7 +43,10 @@ final class GalleryController
             'location_address' => 'nullable|string|max:255',
         ]);
 
-        if ($request->hasFile('image')) {
+        // Use AJAX uploaded path if provided, otherwise use traditional file upload
+        if (!empty($validated['image_path'])) {
+            // image_path is already set in validated
+        } elseif ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('gallery', 'public');
         } else {
             $validated['image_path'] = 'placeholder.gif';
@@ -66,6 +70,7 @@ final class GalleryController
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
+            'image_path' => 'nullable|string',
             'description' => 'nullable|string',
             'gallery_category_id' => 'required|exists:gallery_categories,id',
             'is_featured' => 'boolean',
@@ -76,12 +81,21 @@ final class GalleryController
             'location_address' => 'nullable|string|max:255',
         ]);
 
-        if ($request->hasFile('image')) {
+        // Use AJAX uploaded path if provided, otherwise use traditional file upload
+        if (!empty($validated['image_path'])) {
+            if ($item->image_path && $item->image_path !== $validated['image_path']) {
+                Storage::disk('public')->delete($item->image_path);
+            }
+            // image_path is already set in validated
+        } elseif ($request->hasFile('image')) {
             // Delete old image if it exists
             if ($item->image_path) {
                 Storage::disk('public')->delete($item->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('gallery', 'public');
+        } else {
+            // Keep existing image if no new image provided
+            unset($validated['image_path']);
         }
 
         $item->update($validated);

@@ -16,6 +16,7 @@
         <form method="POST" action="{{ route('admin-services.update', $service) }}" class="max-w-3xl" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="image_path" id="image-path" value="{{ $service->image ?? '' }}">
 
             <div class="space-y-8">
                 <!-- Basic Information -->
@@ -56,6 +57,8 @@
 
                 <!-- Image Section -->
                 <div class="space-y-6">
+                    <div id="image-progress" class="mb-3"></div>
+                    
                     @if ($service->image)
                         <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200">
                             <label class="block text-sm font-semibold text-zinc-700 mb-3">Current Image</label>
@@ -128,4 +131,28 @@
             </div>
         </form>
     </div>
+
+    <script src="{{ asset('js/image-upload.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ImageUploader !== 'undefined') {
+                new ImageUploader({
+                    fileInput: document.querySelector('input[name="image"]'),
+                    previewContainer: document.querySelector('.space-y-8'),
+                    progressContainer: document.getElementById('image-progress'),
+                    hiddenInput: document.getElementById('image-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 2 * 1024 * 1024, // 2MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                    onUploadComplete: function(response) {
+                        console.log('Image uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+            }
+        });
+    </script>
 </x-layouts::admin>

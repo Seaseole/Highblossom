@@ -81,6 +81,9 @@
                     </div>
 
                     <div x-show="activeTab === 'upload'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="space-y-6 pt-2">
+                        <input type="hidden" name="image_path" id="media-image-path" value="">
+                        <div id="media-image-progress" class="mb-3"></div>
+                        
                         <form 
                             hx-post="{{ route('admin.media-library.upload') }}" 
                             hx-encoding="multipart/form-data"
@@ -97,7 +100,7 @@
                                     </div>
                                     <p class="text-sm text-gray-500">{{ __('Click to upload or drag and drop') }}</p>
                                     <p class="text-sm text-gray-500 mt-2">{{ __('PNG, JPG, GIF up to 5MB') }}</p>
-                                    <input type="file" name="upload" class="hidden" accept="image/*" required>
+                                    <input type="file" name="upload" id="media-upload-input" class="hidden" accept="image/*" required>
                                 </label>
                             </div>
 
@@ -135,3 +138,27 @@
         </div>
     </div>
 </div>
+
+<script src="{{ asset('js/image-upload.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof ImageUploader !== 'undefined') {
+            new ImageUploader({
+                fileInput: document.getElementById('media-upload-input'),
+                previewContainer: document.querySelector('[x-show="activeTab === \'upload\'"]'),
+                progressContainer: document.getElementById('media-image-progress'),
+                hiddenInput: document.getElementById('media-image-path'),
+                uploadUrl: '{{ route("admin.image-upload") }}',
+                csrfToken: '{{ csrf_token() }}',
+                maxSize: 5 * 1024 * 1024, // 5MB
+                acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
+                onUploadComplete: function(response) {
+                    console.log('Image uploaded successfully:', response);
+                },
+                onUploadError: function(message) {
+                    console.error('Upload error:', message);
+                }
+            });
+        }
+    });
+</script>

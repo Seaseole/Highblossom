@@ -15,6 +15,7 @@
 
         <form method="POST" action="{{ route('admin.gallery.store') }}" class="max-w-3xl" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="image_path" id="image-path" value="">
 
             <div class="space-y-8" x-data="{ 
                 imagePreview: null,
@@ -38,6 +39,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-zinc-700 mb-2">Image Selection</label>
+                        <div id="image-progress" class="mb-3"></div>
                         <div 
                             class="relative group transition-all duration-300"
                             :class="isDragging ? 'scale-[0.99]' : ''"
@@ -181,4 +183,28 @@
             </div>
         </form>
     </div>
+
+    <script src="{{ asset('js/image-upload.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ImageUploader !== 'undefined') {
+                new ImageUploader({
+                    fileInput: document.querySelector('input[name="image"]'),
+                    previewContainer: document.querySelector('[x-data]'),
+                    progressContainer: document.getElementById('image-progress'),
+                    hiddenInput: document.getElementById('image-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 10 * 1024 * 1024, // 10MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                    onUploadComplete: function(response) {
+                        console.log('Image uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+            }
+        });
+    </script>
 </x-layouts::admin>

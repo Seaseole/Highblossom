@@ -72,7 +72,9 @@ final class CompanySettingController
             'time_format_display' => 'required|in:12,24',
             'currency_symbol' => 'required|string|max:5',
             'business_logo' => 'nullable|image|max:2048',
+            'business_logo_path' => 'nullable|string',
             'favicon' => 'nullable|image|max:1024',
+            'favicon_path' => 'nullable|string',
             'google_maps_api_key' => 'nullable|string|max:255',
             'map_directions_link' => 'nullable|url|max:500',
             'facebook_url' => 'nullable|url|max:255',
@@ -81,12 +83,33 @@ final class CompanySettingController
         ]);
 
         // Handle File Uploads
-        if ($request->hasFile('business_logo')) {
+        // Use AJAX uploaded path if provided, otherwise use traditional file upload
+        if (!empty($validated['business_logo_path'])) {
+            $oldLogo = CompanySetting::get('business_logo', '');
+            if ($oldLogo && $oldLogo !== $validated['business_logo_path']) {
+                Storage::disk('public')->delete($oldLogo);
+            }
+            CompanySetting::set('business_logo', $validated['business_logo_path']);
+        } elseif ($request->hasFile('business_logo')) {
+            $oldLogo = CompanySetting::get('business_logo', '');
+            if ($oldLogo) {
+                Storage::disk('public')->delete($oldLogo);
+            }
             $path = $request->file('business_logo')->store('settings', 'public');
             CompanySetting::set('business_logo', $path);
         }
 
-        if ($request->hasFile('favicon')) {
+        if (!empty($validated['favicon_path'])) {
+            $oldFavicon = CompanySetting::get('favicon', '');
+            if ($oldFavicon && $oldFavicon !== $validated['favicon_path']) {
+                Storage::disk('public')->delete($oldFavicon);
+            }
+            CompanySetting::set('favicon', $validated['favicon_path']);
+        } elseif ($request->hasFile('favicon')) {
+            $oldFavicon = CompanySetting::get('favicon', '');
+            if ($oldFavicon) {
+                Storage::disk('public')->delete($oldFavicon);
+            }
             $path = $request->file('favicon')->store('settings', 'public');
             CompanySetting::set('favicon', $path);
         }

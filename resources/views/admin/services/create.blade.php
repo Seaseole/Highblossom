@@ -6,6 +6,7 @@
 
         <form method="POST" action="{{ route('admin-services.store') }}" class="max-w-2xl" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="image_path" id="image-path" value="">
 
             <div class="space-y-6">
                 <div>
@@ -43,6 +44,7 @@
 
                 <div>
                     <label for="image" class="block text-sm font-medium text-[#A1A1AA] mb-2">Image Upload (Optional)</label>
+                    <div id="image-progress" class="mb-3"></div>
                     <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/jpg,image/webp" class="admin-form-input @error('image') border-red-500 @enderror">
                     <p class="mt-1 text-sm text-[#71717A]">Upload an image (JPEG, PNG, JPG, WebP - Max 2MB)</p>
                     @error('image')
@@ -83,4 +85,28 @@
             </div>
         </form>
     </div>
+
+    <script src="{{ asset('js/image-upload.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ImageUploader !== 'undefined') {
+                new ImageUploader({
+                    fileInput: document.querySelector('input[name="image"]'),
+                    previewContainer: document.querySelector('.space-y-6'),
+                    progressContainer: document.getElementById('image-progress'),
+                    hiddenInput: document.getElementById('image-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 2 * 1024 * 1024, // 2MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                    onUploadComplete: function(response) {
+                        console.log('Image uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+            }
+        });
+    </script>
 </x-layouts::admin>
