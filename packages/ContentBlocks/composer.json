@@ -1,0 +1,31 @@
+{
+    "name": "highblossom/content-blocks",
+    "description": "A content block template system for Laravel with singleton service classes, Blade directives, and auto-registration",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Highblossom\\ContentBlocks\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Highblossom\\ContentBlocks\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Highblossom\\ContentBlocks\\ContentBlocksServiceProvider"
+            ]
+        }
+    }
+}

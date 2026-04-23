@@ -5,23 +5,15 @@
 ])
 
 @php
-use App\Domains\Content\Services\BlockRegistry;
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 
 $blockRegistry = app(BlockRegistry::class);
-$blockClass = $blockRegistry->find($blockType);
+$blockClass = $blockRegistry->get($blockType);
 
-if (!$blockClass) {
-    $schema = [];
-    $debugInfo = "Block class not found for type: {$blockType}";
-} else {
-    try {
-        $schema = $blockClass::schema();
-        $debugInfo = "Schema loaded for {$blockType}: " . count($schema) . " fields";
-    } catch (\Exception $e) {
-        $schema = [];
-        $debugInfo = "Error loading schema: " . $e->getMessage();
-    }
-}
+// ContentBlocks package doesn't have schema() method
+// Using a simple fallback for now
+$schema = [];
+$debugInfo = "Block type: {$blockType}";
 @endphp
 
 <div class="space-y-6">

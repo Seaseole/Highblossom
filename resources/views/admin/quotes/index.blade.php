@@ -18,42 +18,42 @@
                     Filter
                 </button>
                 @if($status)
-                    <a href="{{ route('admin.quotes.index') }}" class="text-[#A1A1AA] hover:text-[#FAFAFA] text-sm transition-colors">Clear</a>
+                    <a href="{{ route('admin.quotes.index') }}" class="text-admin-text-muted hover:text-admin-text text-sm transition-colors">Clear</a>
                 @endif
             </form>
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Vehicle</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Service</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Received</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Vehicle</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Service</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Received</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($quotes as $quote)
                         <tr class="{{ $quote->status === 'pending' ? 'bg-[#DC2626]/5' : '' }} transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $quote->name }}</div>
-                                <div class="text-sm text-[#A1A1AA]">{{ $quote->phone }}</div>
+                                <div class="text-sm font-medium text-admin-text">{{ $quote->name }}</div>
+                                <div class="text-sm text-admin-text-muted">{{ $quote->phone }}</div>
                                 @if($quote->email)
-                                    <div class="text-sm text-[#71717A] text-xs">{{ $quote->email }}</div>
+                                    <div class="text-xs text-admin-text-muted">{{ $quote->email }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $quote->vehicle_type }}</div>
+                                <div class="text-sm font-medium text-admin-text">{{ $quote->vehicle_type }}</div>
                                 @if($quote->make_model)
-                                    <div class="text-sm text-[#A1A1AA]">{{ $quote->make_model }}</div>
+                                    <div class="text-sm text-admin-text-muted">{{ $quote->make_model }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-[#FAFAFA]">{{ $quote->glassType->name ?? 'N/A' }}</div>
-                                <div class="text-sm text-[#A1A1AA]">{{ $quote->serviceType->name ?? 'N/A' }}</div>
+                                <div class="text-sm text-admin-text">{{ $quote->glassType->name ?? 'N/A' }}</div>
+                                <div class="text-sm text-admin-text-muted">{{ $quote->serviceType->name ?? 'N/A' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($quote->status === 'pending')
@@ -77,7 +77,7 @@
                                     <span class="ml-1 admin-badge" style="background: rgba(168, 85, 247, 0.2); color: #A855F7; border: 1px solid rgba(168, 85, 247, 0.3);">Mobile</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $quote->created_at->format('M j, Y g:i A') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -88,7 +88,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-[#A1A1AA]">
+                            <td colspan="6" class="px-6 py-8 text-center text-admin-text-muted">
                                 No quotes found.
                             </td>
                         </tr>

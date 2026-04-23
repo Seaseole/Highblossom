@@ -11,35 +11,35 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.image') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.title_header') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.icon') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.status') }}</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-services.actions') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-services.image') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-services.title_header') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-services.icon') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-services.status') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-services.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($services as $service)
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($service->image)
-                                    <img src="{{ $service->image }}" alt="{{ $service->title }}" class="h-12 w-12 object-cover rounded-xl border border-white/10">
+                                    <img src="{{ $service->image }}" alt="{{ $service->title }}" class="h-12 w-12 object-cover rounded-xl border border-admin-border">
                                 @else
-                                    <div class="h-12 w-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="h-12 w-12 bg-admin-surface-alt rounded-xl border border-admin-border flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $service->title }}</div>
-                                <div class="text-sm text-[#A1A1AA] truncate max-w-xs">{{ $service->short_description }}</div>
+                                <div class="text-sm font-medium text-admin-text">{{ $service->title }}</div>
+                                <div class="text-sm text-admin-text-muted truncate max-w-xs">{{ $service->short_description }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $service->icon ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -64,10 +64,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-[#A1A1AA]">
+                            <td colspan="5" class="px-6 py-12 text-center text-admin-text-muted">
                                 <div class="flex flex-col items-center justify-center">
-                                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                                        <svg class="w-8 h-8 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="w-16 h-16 rounded-full bg-admin-surface-alt flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                         </svg>
                                     </div>

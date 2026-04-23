@@ -4,7 +4,7 @@
 ])
 
 @php
-use App\Domains\Content\Services\BlockRegistry;
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 $blockRegistry = app(BlockRegistry::class);
 @endphp
 
@@ -60,18 +60,10 @@ $blockRegistry = app(BlockRegistry::class);
                 @endif
 
                 @foreach($blocks as $block)
-                    @php
-                    $blockClass = $blockRegistry->find($block['type']);
-                    $componentName = $blockClass ? $blockClass::component() : 'blocks.default';
-                    @endphp
-
                     @if($block['is_visible'])
                         <div class="mb-6">
-                            @if(view()->exists($componentName))
-                                @include($componentName, ['content' => $block['content']])
-                            @else
-                                <div class="p-4 bg-gray-100 rounded-lg">
-                                    <p class="text-sm text-gray-600">Block type: {{ $block['type'] }}</p>
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <p class="text-sm text-gray-600">Block type: {{ $block['type'] }}</p>
                                     <pre class="text-xs text-gray-500 mt-2">{{ json_encode($block['content'], JSON_PRETTY_PRINT) }}</pre>
                                 </div>
                             @endif

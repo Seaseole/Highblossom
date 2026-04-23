@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -49,6 +50,18 @@
     --color-primary-fixed: #ffdada;
     --color-on-primary-fixed: #40000b;
 
+    /* Admin Semantic Colors */
+    --color-admin-bg: #f8f9fa;
+    --color-admin-text: #111827;
+    --color-admin-text-muted: #6b7280;
+    --color-admin-surface: #ffffff;
+    --color-admin-surface-alt: #f3f4f6;
+    --color-admin-border: #e5e7eb;
+    --color-admin-border-subtle: #f3f4f6;
+    --color-admin-input-bg: #ffffff;
+    --color-admin-input-border: #d1d5db;
+    --color-admin-accent: #DC2626;
+
     /* Custom Design Engineering Easings */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
@@ -65,6 +78,18 @@
         --color-surface-container: #2a2a2a;
         --color-surface-container-low: #1f1f1f;
         --color-surface-container-high: #303030;
+
+        /* Admin Semantic Colors - Dark */
+        --color-admin-bg: #0A0A0F;
+        --color-admin-text: #FAFAFA;
+        --color-admin-text-muted: #A1A1AA;
+        --color-admin-surface: #16161D;
+        --color-admin-surface-alt: #1a1a24;
+        --color-admin-border: rgba(255, 255, 255, 0.1);
+        --color-admin-border-subtle: rgba(255, 255, 255, 0.05);
+        --color-admin-input-bg: rgba(255, 255, 255, 0.05);
+        --color-admin-input-border: rgba(255, 255, 255, 0.1);
+        --color-admin-accent: #DC2626;
     }
 }
 
@@ -107,8 +132,8 @@
 
 .btn-ghost {
     background: transparent;
-    color: #FAFAFA;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-admin-text);
+    border: 1px solid var(--color-admin-border);
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -128,8 +153,8 @@
 }
 
 .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--color-admin-surface-alt);
+    border-color: var(--color-admin-border);
     transform: translateY(-2px);
 }
 
@@ -145,13 +170,13 @@
 
 /* Public Navigation Links */
 .nav-link {
-    color: #A1A1AA;
+    color: var(--color-admin-text-muted);
     transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
 
 .nav-link:hover {
-    color: #FAFAFA;
+    color: var(--color-admin-text);
 }
 
 .nav-link.active {
@@ -172,29 +197,29 @@
 /* Premium Form Inputs - Dark Theme */
 .form-input-premium {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-admin-input-bg);
+    border: 1px solid var(--color-admin-input-border);
     border-radius: 0.75rem;
     padding: 0.875rem 1rem;
-    color: #FAFAFA;
+    color: var(--color-admin-text);
     font-size: 0.875rem;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-input-premium::placeholder {
-    color: #71717A;
+    color: var(--color-admin-text-muted);
 }
 
 .form-input-premium:focus {
     outline: none;
     border-color: rgba(220, 38, 38, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-admin-surface);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .form-input-premium option {
-    background: #1A1A1A;
-    color: #FAFAFA;
+    background: var(--color-admin-surface);
+    color: var(--color-admin-text);
 }
 
 .form-input-premium option:checked {
@@ -208,23 +233,23 @@
 
 /* Admin Glass Cards */
 .admin-glass-card {
-    background: rgba(22, 22, 29, 0.8);
+    background: var(--color-admin-surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--color-admin-border-subtle);
 }
 
 .admin-glass-card:hover {
-    background: rgba(22, 22, 29, 0.9);
+    background: var(--color-admin-surface-alt);
     border-color: rgba(220, 38, 38, 0.2);
 }
 
 /* Admin Sidebar */
 .admin-sidebar {
-    background: rgba(10, 10, 15, 0.95);
+    background: var(--color-admin-surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid var(--color-admin-border-subtle);
 }
 
 /* Admin Navigation Items */
@@ -244,13 +269,22 @@
 
 /* Admin Main Content */
 .admin-main {
-    background: #0A0A0F;
+    background: var(--color-admin-bg);
+}
+
+/* Fix Flux Sidebar Active Text Color in Light Mode */
+[data-flux-sidebar-item][data-current] {
+    color: var(--color-admin-accent);
+}
+
+.dark [data-flux-sidebar-item][data-current] {
+    color: var(--color-admin-text);
 }
 
 /* Admin Table */
 .admin-table {
-    background: rgba(22, 22, 29, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--color-admin-surface);
+    border: 1px solid var(--color-admin-border-subtle);
     border-radius: 1.5rem;
     overflow: hidden;
 }
@@ -260,7 +294,7 @@
 }
 
 .admin-table th {
-    color: #FAFAFA;
+    color: var(--color-admin-text);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -268,8 +302,8 @@
 }
 
 .admin-table td {
-    color: #A1A1AA;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--color-admin-text-muted);
+    border-bottom: 1px solid var(--color-admin-border-subtle);
 }
 
 .admin-table tr:hover td {
@@ -279,29 +313,29 @@
 /* Admin Form Inputs - Light Theme for Admin */
 .admin-form-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-admin-input-bg);
+    border: 1px solid var(--color-admin-input-border);
     border-radius: 0.75rem;
     padding: 0.875rem 1rem;
-    color: #FAFAFA;
+    color: var(--color-admin-text);
     font-size: 0.875rem;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .admin-form-input::placeholder {
-    color: #71717A;
+    color: var(--color-admin-text-muted);
 }
 
 .admin-form-input:focus {
     outline: none;
     border-color: rgba(220, 38, 38, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-admin-surface);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .admin-form-input option {
-    background: #1A1A1A;
-    color: #FAFAFA;
+    background: var(--color-admin-surface);
+    color: var(--color-admin-text);
 }
 
 .admin-form-input option:checked {
@@ -326,9 +360,9 @@
 }
 
 .admin-badge-inactive {
-    background: rgba(161, 161, 170, 0.2);
-    color: #A1A1AA;
-    border: 1px solid rgba(161, 161, 170, 0.3);
+    background: var(--color-admin-surface-alt);
+    color: var(--color-admin-text-muted);
+    border: 1px solid var(--color-admin-border);
 }
 
 /* Admin Mobile Menu */
@@ -352,7 +386,7 @@
 .admin-section-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #FAFAFA;
+    color: var(--color-admin-text);
     font-family: 'Cabinet Grotesk', sans-serif;
 }
 
@@ -393,13 +427,13 @@
 
 .admin-action-btn-ghost {
     background: transparent;
-    color: #A1A1AA;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-admin-text-muted);
+    border: 1px solid var(--color-admin-border);
 }
 
 .admin-action-btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #FAFAFA;
+    background: var(--color-admin-surface-alt);
+    color: var(--color-admin-text);
 }
 
 /* ============================================
@@ -409,7 +443,7 @@
 .prose {
     /* Headings */
     h1, h2, h3, h4, h5, h6 {
-        color: #FAFAFA;
+        color: var(--color-admin-text);
         font-weight: 700;
         margin-top: 1.5em;
         margin-bottom: 0.5em;
@@ -427,6 +461,7 @@
     p {
         margin-bottom: 1em;
         line-height: 1.75;
+        color: var(--color-admin-text-muted);
     }
 
     /* Links */
@@ -466,7 +501,7 @@
         padding-left: 1em;
         margin: 1.5em 0;
         font-style: italic;
-        color: #A1A1AA;
+        color: var(--color-admin-text-muted);
     }
 
     /* Code */
@@ -479,8 +514,8 @@
     }
 
     pre {
-        background: rgba(10, 10, 15, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--color-admin-surface);
+        border: 1px solid var(--color-admin-border);
         border-radius: 8px;
         padding: 1em;
         overflow-x: auto;
@@ -490,7 +525,7 @@
     pre code {
         background: none;
         padding: 0;
-        color: #FAFAFA;
+        color: var(--color-admin-text);
     }
 
     /* Tables */
@@ -501,32 +536,32 @@
     }
 
     th, td {
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--color-admin-border);
         padding: 0.75em;
         text-align: left;
     }
 
     th {
-        background: rgba(220, 38, 38, 0.1);
-        color: #FAFAFA;
+        background: var(--color-admin-surface-alt);
+        color: var(--color-admin-text);
         font-weight: 600;
     }
 
     td {
-        color: #A1A1AA;
+        color: var(--color-admin-text-muted);
     }
 
     /* Horizontal Rule */
     hr {
         border: none;
         height: 1px;
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--color-admin-border);
         margin: 2em 0;
     }
 
     /* Strong/Bold */
     strong, b {
-        color: #FAFAFA;
+        color: var(--color-admin-text);
         font-weight: 700;
     }
 

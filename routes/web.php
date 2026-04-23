@@ -21,6 +21,10 @@ Route::post('/quote', [SiteController::class, 'submitQuote'])->name('quote.submi
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->name('contact.submit');
 
+// Blog
+Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
+Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
+
 
 // Booking Flow 
 Route::middleware('throttle:6,1')->group(function () {
@@ -69,6 +73,28 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('services/{service}/edit', [\App\Http\Controllers\Admin\ServiceController::class, 'edit'])->name('services.edit');
     Route::put('services/{service}', [\App\Http\Controllers\Admin\ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/{service}', [\App\Http\Controllers\Admin\ServiceController::class, 'destroy'])->name('services.destroy');
+
+    // Blog Management
+    Route::get('posts', [\App\Http\Controllers\Admin\PostController::class, 'index'])->name('posts.index');
+    Route::get('posts/create', [\App\Http\Controllers\Admin\PostController::class, 'create'])->name('posts.create');
+    Route::post('posts', [\App\Http\Controllers\Admin\PostController::class, 'store'])->name('posts.store');
+    Route::get('posts/{post}/edit', [\App\Http\Controllers\Admin\PostController::class, 'edit'])->name('posts.edit');
+    Route::put('posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'update'])->name('posts.update');
+    Route::delete('posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::get('categories', [\App\Http\Controllers\Admin\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('categories/create', [\App\Http\Controllers\Admin\CategoryController::class, 'create'])->name('categories.create');
+    Route::post('categories', [\App\Http\Controllers\Admin\CategoryController::class, 'store'])->name('categories.store');
+    Route::get('categories/{category}/edit', [\App\Http\Controllers\Admin\CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('tags', [\App\Http\Controllers\Admin\TagController::class, 'index'])->name('tags.index');
+    Route::get('tags/create', [\App\Http\Controllers\Admin\TagController::class, 'create'])->name('tags.create');
+    Route::post('tags', [\App\Http\Controllers\Admin\TagController::class, 'store'])->name('tags.store');
+    Route::get('tags/{tag}/edit', [\App\Http\Controllers\Admin\TagController::class, 'edit'])->name('tags.edit');
+    Route::put('tags/{tag}', [\App\Http\Controllers\Admin\TagController::class, 'update'])->name('tags.update');
+    Route::delete('tags/{tag}', [\App\Http\Controllers\Admin\TagController::class, 'destroy'])->name('tags.destroy');
 
     Route::get('gallery', [\App\Http\Controllers\Admin\GalleryController::class, 'index'])->name('gallery.index');
     Route::get('gallery/create', [\App\Http\Controllers\Admin\GalleryController::class, 'create'])->name('gallery.create');
@@ -134,6 +160,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Image Upload (AJAX)
     Route::post('image-upload', [\App\Http\Controllers\Admin\ImageUploadController::class, 'upload'])->name('image-upload');
+
+    // Video Upload (AJAX)
+    Route::post('video-upload', [\App\Http\Controllers\Admin\VideoUploadController::class, 'upload'])->name('video-upload');
 
     // Profile
     Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');

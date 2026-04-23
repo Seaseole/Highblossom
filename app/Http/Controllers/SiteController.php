@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Actions\StoreQuoteAction;
 use App\Domains\Content\Models\AboutUsContent;
+use App\Domains\Content\Models\Category;
 use App\Domains\Content\Models\CompanySetting;
 use App\Domains\Content\Models\GalleryImage;
 use App\Domains\Content\Models\GalleryCategory;
 use App\Domains\Content\Models\GlassType;
+use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Service;
 use App\Domains\Content\Models\ServiceType;
+use App\Domains\Content\Models\Tag;
 use App\Domains\Content\Models\Testimonial;
 use App\Http\Requests\QuoteFormRequest;
 use Illuminate\Http\Request;
@@ -28,15 +31,15 @@ class SiteController extends Controller
         $featuredGalleryImages = GalleryImage::featured()->active()->with('category')->ordered()->take(3)->get();
 
         $workingHours = CompanySetting::get('working_hours', [
-            'monday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'tuesday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'wednesday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'thursday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'friday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'saturday' => ['open' => null, 'close' => null, 'is_closed' => true],
+            'monday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+            'tuesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+            'wednesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+            'thursday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+            'friday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+            'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => true],
             'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
         ]);
-        $timeFormatDisplay = CompanySetting::get('time_format_display', '12');
+        $timeFormatDisplay = CompanySetting::get('time_format_display', '24');
 
         return view('welcome', compact('otherTestimonials', 'featuredServices', 'featuredTestimonial', 'workingHours', 'timeFormatDisplay', 'featuredGalleryImages'));
     }
@@ -55,7 +58,7 @@ class SiteController extends Controller
     public function services(Request $request)
     {
         $perPage = 6;
-        $page = $request->get('page', 1);
+        $page = $request->input('page', 1);
 
         $services = Service::active()
             ->ordered()
@@ -66,9 +69,9 @@ class SiteController extends Controller
 
     public function gallery(Request $request)
     {
-        $category = $request->get('category');
+        $category = $request->input('category');
         $perPage = 9;
-        $page = $request->get('page', 1);
+        $page = $request->input('page', 1);
 
         $query = GalleryImage::active()->with('category')->ordered();
 
@@ -102,7 +105,7 @@ class SiteController extends Controller
         $whatsappDefault = CompanySetting::get('whatsapp_number_default', '+267 123 4567');
         $whatsappAdditional = CompanySetting::get('whatsapp_additional_numbers', []);
         $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
-        $primaryEmail = CompanySetting::get('primary_email', 'info@highblossom.co.bw');
+        $primaryEmail = CompanySetting::get('primary_email', 'sales@highblossom.net');
         $workingHours = CompanySetting::get('working_hours', []);
         $timeFormatDisplay = CompanySetting::get('time_format_display', '12');
         $companyName = CompanySetting::get('company_name', 'Highblossom PTY LTD');
@@ -218,5 +221,50 @@ class SiteController extends Controller
         $result = $this->storeQuoteAction->execute($request);
 
         return redirect()->back()->with($result['success'] ? 'success' : 'error', $result['message']);
+    }
+
+    public function blog(Request $request)
+    {
+        $search = $request->input('search');
+        $categorySlug = $request->input('category');
+        $tagSlug = $request->input('tag');
+        $perPage = 9;
+
+        $query = Post::published()->with('categories', 'tags');
+
+        if ($search) {
+            $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('excerpt', 'like', '%' . $search . '%');
+        }
+
+        if ($categorySlug) {
+            $category = Category::where('slug', $categorySlug)->firstOrFail();
+            $query->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id));
+        }
+
+        if ($tagSlug) {
+            $tag = Tag::where('slug', $tagSlug)->firstOrFail();
+            $query->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id));
+        }
+
+        $posts = $query->latest()->paginate($perPage);
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        return view('blog.index', compact('posts', 'categories', 'tags', 'search', 'categorySlug', 'tagSlug'));
+    }
+
+    public function blogShow($slug)
+    {
+        $post = Post::published()->where('slug', $slug)->with('categories', 'tags')->firstOrFail();
+
+        $relatedPosts = Post::published()
+            ->where('id', '!=', $post->id)
+            ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $post->categories->pluck('id')))
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('blog.show', compact('post', 'relatedPosts'));
     }
 }

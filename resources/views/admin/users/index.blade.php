@@ -22,16 +22,16 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.user') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.email') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.roles') }}</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-users.actions') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.user') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.email') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.roles') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @foreach($users as $user)
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -42,22 +42,22 @@
                                         </div>
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-[#FAFAFA]">{{ $user->name }}</div>
-                                        <div class="text-sm text-[#A1A1AA]">{{ $user->email }}</div>
+                                        <div class="text-sm font-medium text-admin-text">{{ $user->name }}</div>
+                                        <div class="text-sm text-admin-text-muted">{{ $user->email }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $user->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex flex-wrap gap-2">
                                     @forelse($user->roles as $role)
-                                        <span class="admin-badge" style="background: rgba(220, 38, 38, 0.2); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.3);">
+                                        <span class="admin-badge admin-badge-role">
                                             {{ $role->name }}
                                         </span>
                                     @empty
-                                        <span class="text-sm text-[#71717A] italic">{{ __('admin-users.no_roles') }}</span>
+                                        <span class="text-sm text-admin-text-muted italic">{{ __('admin-users.no_roles') }}</span>
                                     @endforelse
                                 </div>
                             </td>
@@ -88,7 +88,7 @@
 
             <div class="space-y-6">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.name') }}</label>
+                    <label for="name" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.name') }}</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $user->name ?? '') }}" required class="admin-form-input @error('name') border-red-500 @enderror">
                     @error('name')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
@@ -96,7 +96,7 @@
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.email_label') }}</label>
+                    <label for="email" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.email_label') }}</label>
                     <input type="email" name="email" id="email" value="{{ old('email', $user->email ?? '') }}" required class="admin-form-input @error('email') border-red-500 @enderror">
                     @error('email')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
@@ -104,7 +104,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.password') }}</label>
+                    <label for="password" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.password') }}</label>
                     <input type="password" name="password" id="password" placeholder="{{ __('admin-users.password_placeholder') }}" class="admin-form-input @error('password') border-red-500 @enderror">
                     @error('password')
                         <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
@@ -112,8 +112,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('admin-users.roles_label') }}</label>
-                    <div class="grid grid-cols-1 gap-2 p-3 border border-white/10 rounded-xl max-h-48 overflow-y-auto bg-white/5">
+                    <label class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.roles_label') }}</label>
+                    <div class="grid grid-cols-1 gap-2 p-3 border border-admin-border rounded-xl max-h-48 overflow-y-auto bg-admin-surface-alt">
                         @foreach($roles ?? [] as $role)
                             <label class="flex items-center cursor-pointer">
                                 <input
@@ -121,9 +121,9 @@
                                     name="roles[]"
                                     value="{{ $role->name }}"
                                     {{ isset($user) && $user->roles->contains('name', $role->name) ? 'checked' : '' }}
-                                    class="h-4 w-4 text-[#DC2626] focus:ring-[#DC2626] border-white/20 rounded bg-white/5"
+                                    class="h-4 w-4 text-[#DC2626] focus:ring-[#DC2626] border-admin-border rounded bg-admin-input-bg"
                                 >
-                                <span class="ml-2 text-sm text-[#FAFAFA]">{{ $role->name }}</span>
+                                <span class="ml-2 text-sm text-admin-text">{{ $role->name }}</span>
                             </label>
                         @endforeach
                     </div>

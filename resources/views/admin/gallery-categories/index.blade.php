@@ -11,26 +11,26 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Slug</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Sort Order</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Slug</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Sort Order</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($categories as $galleryCategory)
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $galleryCategory->name }}</div>
+                                <div class="text-sm font-medium text-admin-text">{{ $galleryCategory->name }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $galleryCategory->slug }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $galleryCategory->sort_order ?? 0 }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -52,7 +52,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-[#A1A1AA]">
+                            <td colspan="5" class="px-6 py-8 text-center text-admin-text-muted">
                                 No gallery categories found.
                             </td>
                         </tr>

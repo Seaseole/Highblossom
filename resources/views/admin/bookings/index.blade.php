@@ -5,35 +5,35 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.client') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.contact') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.vehicle') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.price') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.status') }}</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">{{ __('admin-bookings.actions') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.client') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.contact') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.vehicle') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.price') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.status') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-bookings.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($bookings as $booking)
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA]">{{ $booking->client_name }}</div>
+                                <div class="text-sm font-medium text-admin-text">{{ $booking->client_name }}</div>
                                 @if($booking->user)
-                                    <div class="text-sm text-[#A1A1AA]">{{ $booking->user->email }}</div>
+                                    <div class="text-sm text-admin-text-muted">{{ $booking->user->email }}</div>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $booking->client_phone ?? '-' }}
                                 <br>
                                 {{ $booking->client_email ?? '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#FAFAFA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text">
                                 {{ $booking->vehicle_details }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#FAFAFA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text">
                                 {{ number_format($booking->total_price, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -59,7 +59,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-[#A1A1AA]">
+                            <td colspan="6" class="px-6 py-8 text-center text-admin-text-muted">
                                 {{ __('admin-bookings.no_bookings_found') }}
                             </td>
                         </tr>

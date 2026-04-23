@@ -3,6 +3,7 @@
 <head>
     @include('partials.head')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 </head>
 <body class="min-h-screen bg-gray-100" x-data="{ sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true', mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false">
     <div class="flex min-h-screen">
@@ -60,6 +61,27 @@
                     </svg>
                     <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Media Library</span>
                 </a>
+                <div class="mt-4 mb-2 px-4">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider" x-show="!sidebarCollapsed">Blog</span>
+                </div>
+                <a href="{{ route('admin.posts.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.posts.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Posts' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Posts</span>
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Categories' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Categories</span>
+                </a>
+                <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-3 py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.tags.*') ? 'bg-gray-200' : '' }}" :title="sidebarCollapsed ? 'Tags' : ''">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span class="whitespace-nowrap" x-show="!sidebarCollapsed">Tags</span>
+                </a>
             </nav>
 
             <!-- Logout -->
@@ -104,6 +126,18 @@
                 </a>
                 <a href="{{ route('admin.media-library.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.media-library.*') ? 'bg-gray-200' : '' }}">
                     Media Library
+                </a>
+                <div class="mt-4 mb-2 px-4">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blog</span>
+                </div>
+                <a href="{{ route('admin.posts.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.posts.*') ? 'bg-gray-200' : '' }}">
+                    Posts
+                </a>
+                <a href="{{ route('admin.categories.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-gray-200' : '' }}">
+                    Categories
+                </a>
+                <a href="{{ route('admin.tags.index') }}" @click="mobileMenuOpen = false" class="block py-2 px-4 rounded hover:bg-gray-100 transition-colors {{ request()->routeIs('admin.tags.*') ? 'bg-gray-200' : '' }}">
+                    Tags
                 </a>
             </nav>
 

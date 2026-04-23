@@ -25,6 +25,9 @@
             <a href="{{ route('gallery') }}" class="nav-link {{ request()->routeIs('gallery') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight">
                 Gallery
             </a>
+            <a href="{{ route('blog') }}" class="nav-link {{ request()->routeIs('blog') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight">
+                Blog
+            </a>
             <a href="{{ route('quote') }}" class="btn-premium text-sm py-2.5 px-5">
                 Get Quote
             </a>
@@ -105,9 +108,9 @@
                 <a href="{{ route('gallery') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('gallery') ? 'text-[#DC2626]' : '' }}">
                     Gallery
                 </a>
-                {{-- <a href="{{ route('blog.index') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('blog.*') ? 'text-[#DC2626]' : '' }}">
+                <a href="{{ route('blog') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('blog') ? 'text-[#DC2626]' : '' }}">
                     Blog
-                </a> --}}
+                </a>
                 <a href="{{ route('quote') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('quote') ? 'text-[#DC2626]' : '' }}">
                     Get Quote
                 </a>

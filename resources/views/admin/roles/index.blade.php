@@ -11,24 +11,24 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Permissions</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Permissions</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @foreach($roles as $role)
                         <tr class="transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-[#FAFAFA]">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-admin-text">
                                 {{ $role->name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($role->permissions as $permission)
-                                        <span class="admin-badge" style="background: rgba(220, 38, 38, 0.2); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.3);">
+                                        <span class="admin-badge admin-badge-role">
                                             {{ $permission->name }}
                                         </span>
                                     @endforeach
@@ -40,7 +40,7 @@
                                     <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this role?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[#DC2626] hover:text-[#FAFAFA] transition-colors">Delete</button>
+                                        <button type="submit" class="text-[#DC2626] hover:text-admin-text transition-colors">Delete</button>
                                     </form>
                                 @endif
                             </td>

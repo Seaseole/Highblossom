@@ -1,74 +1,67 @@
 <x-layouts::admin title="Edit User">
-    <div class="p-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <nav class="flex items-center gap-2 text-sm text-zinc-500 mb-4">
-                <a href="{{ route('admin-users.index') }}" class="hover:text-zinc-700 transition-colors">Users</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    <div class="p-6">
+        <div class="admin-section-header">
+            <h1 class="admin-section-title">Edit User</h1>
+            <a href="{{ route('admin-users.index') }}" class="admin-action-btn admin-action-btn-secondary">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-                <span class="text-zinc-400">Edit</span>
-            </nav>
-            <h1 class="text-4xl font-bold text-[#39393c] tracking-tight">Edit User</h1>
-            <p class="mt-2 text-zinc-500">Update user details and manage roles</p>
+                <span>Back</span>
+            </a>
         </div>
 
-        <form method="POST" action="{{ route('admin-users.update', $user) }}" class="max-w-3xl">
+        <form method="POST" action="{{ route('admin-users.update', $user) }}" class="max-w-2xl">
             @csrf
             @method('PUT')
 
-            <div class="space-y-8">
-                <!-- Basic Information -->
-                <div class="space-y-6">
-                    <div>
-                        <label for="name" class="block text-sm font-semibold text-zinc-700 mb-2">Name</label>
-                        <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required class="w-full px-4 py-3 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-[#dc2626] focus:ring-4 focus:ring-[#dc2626]/10 transition-all duration-200" placeholder="Full name">
-                        @error('name')
-                            <p class="mt-2 text-sm text-[#dc2626]">{{ $message }}</p>
-                        @enderror
-                    </div>
+            <div class="bg-admin-surface-alt border border-admin-border rounded-xl p-6 space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-admin-text-muted mb-2">Name</label>
+                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required class="w-full admin-form-input" placeholder="Full name">
+                    @error('name')
+                        <p class="mt-1 text-sm text-[#DC2626]">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    <div>
-                        <label for="email" class="block text-sm font-semibold text-zinc-700 mb-2">Email</label>
-                        <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required class="w-full px-4 py-3 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-[#dc2626] focus:ring-4 focus:ring-[#dc2626]/10 transition-all duration-200" placeholder="email@example.com">
-                        @error('email')
-                            <p class="mt-2 text-sm text-[#dc2626]">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-admin-text-muted mb-2">Email</label>
+                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required class="w-full admin-form-input" placeholder="email@example.com">
+                    @error('email')
+                        <p class="mt-1 text-sm text-[#DC2626]">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    <div>
-                        <label for="password" class="block text-sm font-semibold text-zinc-700 mb-2">Password <span class="font-normal text-zinc-400">(Optional)</span></label>
-                        <input type="password" name="password" id="password" placeholder="Leave blank to keep current" class="w-full px-4 py-3 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-[#dc2626] focus:ring-4 focus:ring-[#dc2626]/10 transition-all duration-200">
-                        @error('password')
-                            <p class="mt-2 text-sm text-[#dc2626]">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-admin-text-muted mb-2">Password <span class="text-admin-text-muted">(Optional)</span></label>
+                    <input type="password" name="password" id="password" placeholder="Leave blank to keep current" class="w-full admin-form-input">
+                    @error('password')
+                        <p class="mt-1 text-sm text-[#DC2626]">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-zinc-700 mb-2">Roles</label>
-                        <div class="grid grid-cols-1 gap-2 p-4 bg-zinc-50 rounded-xl border border-zinc-200 max-h-48 overflow-y-auto">
-                            @foreach($roles as $role)
-                                <label class="flex items-center gap-3 p-2 hover:bg-zinc-100 rounded-lg cursor-pointer transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        name="roles[]"
-                                        value="{{ $role->name }}"
-                                        {{ $user->roles->contains('name', $role->name) ? 'checked' : '' }}
-                                        class="h-5 w-5 text-[#dc2626] focus:ring-[#dc2626] focus:ring-offset-0 border-zinc-300 rounded transition-all duration-200 cursor-pointer"
-                                    >
-                                    <span class="text-sm text-zinc-700">{{ $role->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
+                <div>
+                    <label class="block text-sm font-medium text-admin-text-muted mb-2">Roles</label>
+                    <div class="grid grid-cols-1 gap-2 p-4 bg-admin-surface-alt rounded-xl border border-admin-border max-h-48 overflow-y-auto">
+                        @foreach($roles as $role)
+                            <label class="flex items-center gap-3 p-2 hover:bg-admin-surface rounded-lg cursor-pointer transition-colors">
+                                <input
+                                    type="checkbox"
+                                    name="roles[]"
+                                    value="{{ $role->name }}"
+                                    {{ $user->roles->contains('name', $role->name) ? 'checked' : '' }}
+                                    class="h-5 w-5 bg-admin-input-bg border-admin-input-border rounded focus:ring-2 focus:ring-[#DC2626] cursor-pointer"
+                                >
+                                <span class="text-sm text-admin-text">{{ $role->name }}</span>
+                            </label>
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="flex items-center justify-end gap-4 pt-4 border-t border-zinc-200">
-                    <a href="{{ route('admin-users.index') }}" class="px-6 py-3 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200 active:scale-[0.98]">
+                <div class="flex justify-end gap-3 pt-4">
+                    <a href="{{ route('admin-users.index') }}" class="admin-action-btn admin-action-btn-secondary">
                         Cancel
                     </a>
-                    <button type="submit" class="px-6 py-3 rounded-xl bg-[#dc2626] text-white text-sm font-medium shadow-lg shadow-[#dc2626]/20 hover:bg-[#b91c1c] hover:shadow-xl hover:shadow-[#dc2626]/30 transition-all duration-200 active:scale-[0.98]">
+                    <button type="submit" class="admin-action-btn admin-action-btn-primary">
                         Update User
                     </button>
                 </div>

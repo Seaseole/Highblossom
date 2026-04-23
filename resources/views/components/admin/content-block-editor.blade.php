@@ -6,11 +6,14 @@
 @aware(['contentModel'])
 
 @php
-use App\Domains\Content\Services\BlockRegistry;
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 
 $blockRegistry = app(BlockRegistry::class);
-$blockClass = $blockRegistry->find($block['type'] ?? null);
-$schema = $blockClass ? $blockClass::schema() : [];
+$blockClass = $blockRegistry->get($block['type'] ?? null);
+
+// ContentBlocks package doesn't have schema() method
+// Using a simple fallback for now
+$schema = [];
 @endphp
 
 <div class="p-4 rounded-xl bg-white/5 border border-white/10">

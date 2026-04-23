@@ -11,43 +11,43 @@
         </div>
 
         <div class="admin-table overflow-x-auto">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="min-w-full divide-y divide-admin-border-subtle">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Image</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Category</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Location</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#FAFAFA] uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Image</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Title</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5">
+                <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($items as $item)
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($item->image_path)
-                                    <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="h-12 w-12 object-cover rounded-xl border border-white/10">
+                                    <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="h-12 w-12 object-cover rounded-xl border border-admin-border">
                                 @else
-                                    <div class="h-12 w-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="h-12 w-12 bg-admin-surface-alt rounded-xl border border-admin-border flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                 @endif
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-[#FAFAFA] truncate w-64" title="{{ $item->title }}">{{ $item->title }}</div>
+                                <div class="text-sm font-medium text-admin-text truncate w-64" title="{{ $item->title }}">{{ $item->title }}</div>
                                 @if($item->description)
-                                    <div class="text-sm text-[#A1A1AA] truncate w-64" title="{{ $item->description }}">{{ $item->description }}</div>
+                                    <div class="text-sm text-admin-text-muted truncate w-64" title="{{ $item->description }}">{{ $item->description }}</div>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#A1A1AA]">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
                                 {{ $item->category->name ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 @if($item->location_address)
-                                    <div class="text-sm text-[#A1A1AA] truncate max-w-xs flex items-center" title="{{ $item->location_address }}">
+                                    <div class="text-sm text-admin-text-muted truncate max-w-xs flex items-center" title="{{ $item->location_address }}">
                                         <svg class="w-3 h-3 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -55,7 +55,7 @@
                                         <span class="truncate">{{ $item->location_address }}</span>
                                     </div>
                                 @else
-                                    <span class="text-sm text-[#71717A]">-</span>
+                                    <span class="text-sm text-admin-text-muted">-</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -85,10 +85,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-[#A1A1AA]">
+                            <td colspan="6" class="px-6 py-12 text-center text-admin-text-muted">
                                 <div class="flex flex-col items-center justify-center">
-                                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                                        <svg class="w-8 h-8 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="w-16 h-16 rounded-full bg-admin-surface-alt flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>

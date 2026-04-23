@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                     'wednesday' => ['open' => '07:30', 'close' => '17:00', 'is_closed' => false],
                     'thursday' => ['open' => '07:30', 'close' => '17:00', 'is_closed' => false],
                     'friday' => ['open' => '07:30', 'close' => '17:00', 'is_closed' => false],
-                    'saturday' => ['open' => '08:00', 'close' => '13:00', 'is_closed' => false],
+                    'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => false],
                     'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
                 ]),
                 'timeFormatDisplay' => \App\Domains\Content\Models\CompanySetting::get('time_format_display', '12'),
