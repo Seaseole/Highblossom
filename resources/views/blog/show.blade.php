@@ -41,6 +41,10 @@
                 </div>
             </article>
 
+            <div class="mt-8 pt-8 border-t border-white/10">
+                <x-blog.social-share :post="$post" />
+            </div>
+
             @if($relatedPosts->count() > 0)
                 <div class="mt-16">
                     <h2 class="text-2xl font-bold text-[#FAFAFA] mb-6">Related Posts</h2>

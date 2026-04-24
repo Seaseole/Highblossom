@@ -45,21 +45,23 @@ $networks = [
 ];
 @endphp
 
-<div class="flex items-center gap-2">
-    <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Share:') }}</span>
-    <div class="flex items-center gap-1">
-        @foreach($networks as $key => $network)
-            <a
-                href="{{ $network['url'] }}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="p-2 rounded-lg text-gray-500 hover:text-white transition-all {{ $network['color'] }}"
-                title="{{ __('Share on :network', ['network' => $network['label']]) }}"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    {!! $network['icon'] !!}
-                </svg>
-            </a>
-        @endforeach
+<div class="bg-white/5 border border-white/10 rounded-xl p-4">
+    <div class="flex items-center gap-3">
+        <span class="text-sm text-[#A1A1AA] font-medium">{{ __('Share:') }}</span>
+        <div class="flex items-center gap-2">
+            @foreach($networks as $key => $network)
+                <a
+                    href="{{ $network['url'] }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="p-2.5 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-white/5 transition-colors duration-200 ease-out-quint hover:scale-110 active:scale-95 {{ $network['color'] }}"
+                    title="{{ __('Share on :network', ['network' => $network['label']]) }}"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        {!! $network['icon'] !!}
+                    </svg>
+                </a>
+            @endforeach
+        </div>
     </div>
 </div>
