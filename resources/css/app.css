@@ -132,8 +132,8 @@
 
 .btn-ghost {
     background: transparent;
-    color: var(--color-admin-text);
-    border: 1px solid var(--color-admin-border);
+    color: #FAFAFA;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -153,8 +153,8 @@
 }
 
 .btn-ghost:hover {
-    background: var(--color-admin-surface-alt);
-    border-color: var(--color-admin-border);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
 
@@ -197,29 +197,29 @@
 /* Premium Form Inputs - Dark Theme */
 .form-input-premium {
     width: 100%;
-    background: var(--color-admin-input-bg);
-    border: 1px solid var(--color-admin-input-border);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     padding: 0.875rem 1rem;
-    color: var(--color-admin-text);
+    color: #FAFAFA;
     font-size: 0.875rem;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-input-premium::placeholder {
-    color: var(--color-admin-text-muted);
+    color: #71717A;
 }
 
 .form-input-premium:focus {
     outline: none;
     border-color: rgba(220, 38, 38, 0.5);
-    background: var(--color-admin-surface);
+    background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .form-input-premium option {
-    background: var(--color-admin-surface);
-    color: var(--color-admin-text);
+    background: #16161D;
+    color: #FAFAFA;
 }
 
 .form-input-premium option:checked {
@@ -443,7 +443,7 @@
 .prose {
     /* Headings */
     h1, h2, h3, h4, h5, h6 {
-        color: var(--color-admin-text);
+        color: white;
         font-weight: 700;
         margin-top: 1.5em;
         margin-bottom: 0.5em;
@@ -561,7 +561,7 @@
 
     /* Strong/Bold */
     strong, b {
-        color: var(--color-admin-text);
+        color: rgb(220, 220, 220);
         font-weight: 700;
     }
 

@@ -99,4 +99,18 @@ class BlockRegistry
     {
         return "<!-- Unknown block type: {$type} -->";
     }
+
+    /**
+     * Render a block from variadic arguments (type, attributes).
+     *
+     * @param mixed ...$args
+     * @return string
+     */
+    public function renderArray(...$args): string
+    {
+        $type = $args[0] ?? '';
+        $attributes = $args[1] ?? [];
+
+        return $this->render($type, $attributes);
+    }
 }

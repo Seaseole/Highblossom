@@ -8,9 +8,11 @@
         $wire.updateBlock(index, attributes);
     }
 }" x-init="
-    @this.on('blocks-updated', (event) => {
-        if (event.detail && event.detail.blocks) {
-            blocks = event.detail.blocks;
+    $wire.$on('blocks-updated', (event) => {
+        const updatedBlocks = event.blocks || (Array.isArray(event) ? event : []);
+        console.log('blocks-updated received:', updatedBlocks);
+        if (Array.isArray(updatedBlocks)) {
+            blocks = updatedBlocks;
         }
     });
 " class="space-y-4">
@@ -34,7 +36,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-medium px-2 py-1 rounded bg-admin-accent/20 text-admin-accent uppercase tracking-wide">
-                                <span x-text="availableBlockTypes[block.type] || block.type"></span>
+                                <span x-text="(availableBlockTypes && availableBlockTypes[block.type]) || block.type"></span>
                             </span>
                             <span class="text-xs text-admin-text-muted" x-text="'#' + (index + 1)"></span>
                         </div>
@@ -115,14 +117,51 @@
                             <div x-init="editAttributes.itemsRaw = (editAttributes.items || []).join('\n')"></div>
                         </template>
                         <template x-if="block.type === 'paragraph'">
-                            <div class="space-y-3">
+                            <div class="space-y-3" x-data="{
+                                editorId: 'ckeditor-' + block.id,
+                                editorInstance: null,
+                                initEditor() {
+                                    this.$nextTick(() => {
+                                        // Destroy any existing instance first (Livewire morph safety)
+                                        if (CKEDITOR.instances[this.editorId]) {
+                                            CKEDITOR.instances[this.editorId].destroy(true);
+                                        }
+
+                                        this.editorInstance = CKEDITOR.replace(this.editorId, {
+                                            customConfig: '/vendor/ckeditor/config.js',
+                                            height: 200,
+                                        });
+
+                                        // Push changes to Livewire on every change event
+                                        this.editorInstance.on('change', () => {
+                                            editAttributes.content = this.editorInstance.getData();
+                                            $wire.updateBlock(index, editAttributes);
+                                        });
+
+                                        // Also catch paste and key events CKEditor sometimes misses
+                                        this.editorInstance.on('key', () => {
+                                            editAttributes.content = this.editorInstance.getData();
+                                            $wire.updateBlock(index, editAttributes);
+                                        });
+                                    });
+                                },
+                                destroyEditor() {
+                                    if (this.editorInstance) {
+                                        this.editorInstance.destroy(true);
+                                        this.editorInstance = null;
+                                    }
+                                }
+                            }"
+                            x-init="initEditor()"
+                            x-effect="if (editingIndex === index) { initEditor() } else { destroyEditor() }"
+                            >
                                 <div>
                                     <label class="block text-sm font-medium text-admin-text-muted mb-2">Content</label>
-                                    <textarea 
-                                        x-model="editAttributes.content"
-                                        @input.debounce.300ms="$wire.updateBlock(index, editAttributes)"
-                                        rows="4"
-                                        class="w-full bg-admin-surface-alt border border-admin-border rounded-lg px-3 py-2 text-admin-text text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                                    {{-- CKEditor replaces this textarea; id must be unique per block --}}
+                                    <textarea
+                                        :id="editorId"
+                                        x-text="editAttributes.content"
+                                        class="w-full"
                                     ></textarea>
                                 </div>
                                 <div>
@@ -177,12 +216,31 @@
                         </template>
 
                         <template x-if="block.type === 'image'">
-                            <div class="space-y-3">
+                            <div class="space-y-3" x-data="{
+                                previewUrl: null,
+                                imageMode: editAttributes.src && (editAttributes.src.startsWith('temp://') || editAttributes.src.startsWith('/') || editAttributes.src.includes('storage/') || editAttributes.src.includes('uploads/')) ? 'upload' : (editAttributes.src ? 'url' : 'upload'),
+                                imageError: null
+                            }" x-init="
+                                previewUrl = editAttributes.src || null;
+                                $watch('block.attributes.src', (value) => {
+                                    if (value && !value.startsWith('temp://')) {
+                                        editAttributes.src = value;
+                                        previewUrl = null;
+                                    }
+                                });
+                                $wire.$on('upload:errored', ({ name }) => {
+                                    if (name === 'imageUpload') {
+                                        imageError = 'Upload failed. Check file size and type.';
+                                        previewUrl = null;
+                                    }
+                                });
+                            "
+                            " x-bind="{ get availableBlockTypes() { return $parent.availableBlockTypes; } }">
                                 <!-- Image Preview -->
-                                <div x-show="editAttributes.src || $wire.imageUpload" class="relative rounded-lg overflow-hidden bg-admin-surface-alt border border-admin-border">
-                                    <img 
-                                        :src="editAttributes.src || ($wire.imageUpload ? URL.createObjectURL($wire.imageUpload) : '')"
-                                        x-show="editAttributes.src || $wire.imageUpload"
+                                <div x-show="editAttributes.src || previewUrl || $wire.imageUpload" class="relative rounded-lg overflow-hidden bg-admin-surface-alt border border-admin-border">
+                                    <img
+                                        :src="editAttributes.src || previewUrl || ''"
+                                        x-show="editAttributes.src || previewUrl"
                                         class="w-full h-48 object-cover"
                                     >
                                     <button 
@@ -204,50 +262,111 @@
                                         <span x-text="$wire.uploadProgress + '%'"></span>
                                     </div>
                                     <div class="w-full bg-admin-surface rounded-full h-2">
-                                        <div 
+                                        <div
                                             class="bg-admin-accent h-2 rounded-full transition-all duration-300"
                                             :style="'width: ' + $wire.uploadProgress + '%'"
                                         ></div>
                                     </div>
                                 </div>
 
-                                <!-- Upload Button -->
+                                <!-- Source Mode Toggle -->
                                 <div>
-                                    <label class="block">
-                                        <input 
-                                            type="file" 
-                                            wire:model="imageUpload"
-                                            wire:upload="uploadImage"
-                                            wire:upload.progress="uploadProgress"
-                                            @change="$wire.startImageUpload(index)"
-                                            accept="image/*"
-                                            class="hidden"
+                                    <label class="block text-sm font-medium text-admin-text-muted mb-2">Image Source</label>
+                                    <div class="flex gap-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                x-model="imageMode"
+                                                value="upload"
+                                                @change="if (imageMode === 'upload') { editAttributes.src = ''; previewUrl = null; imageError = null; $wire.updateBlock(index, editAttributes); }"
+                                                class="rounded border-admin-border bg-admin-surface-alt text-admin-accent focus:ring-admin-accent"
+                                            >
+                                            <span class="text-sm text-admin-text">Upload Image</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                x-model="imageMode"
+                                                value="url"
+                                                @change="if (imageMode === 'url') { editAttributes.src = ''; previewUrl = null; imageError = null; $wire.updateBlock(index, editAttributes); }"
+                                                class="rounded border-admin-border bg-admin-surface-alt text-admin-accent focus:ring-admin-accent"
+                                            >
+                                            <span class="text-sm text-admin-text">External URL</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Upload Mode -->
+                                <template x-if="imageMode === 'upload'">
+                                    <div class="space-y-2">
+                                        <label class="block">
+                                            <input
+                                                type="file"
+                                                wire:model="imageUpload"
+                                                @change="
+                                                    const file = $event.target.files[0];
+                                                    if (!file) return;
+
+                                                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                                                    if (!validTypes.includes(file.type)) {
+                                                        imageError = 'Invalid file type. Please select an image (JPG, PNG, WebP, GIF).';
+                                                        $event.target.value = '';
+                                                        return;
+                                                    }
+
+                                                    imageError = null;
+                                                    previewUrl = URL.createObjectURL(file);
+
+                                                    $wire.set('activeImageUploadIndex', index)
+                                                        .then(() => $wire.upload('imageUpload', file))
+                                                        .catch(err => {
+                                                            imageError = 'Upload failed: ' + (err.message || 'Unknown error');
+                                                            previewUrl = null;
+                                                        });
+                                                "
+                                                accept="image/*"
+                                                class="hidden"
+                                            >
+                                            <div class="mt-2 space-y-1">
+                                                <template x-if="imageError">
+                                                    <p class="text-red-400 text-xs" x-text="imageError"></p>
+                                                </template>
+                                                @error('imageUpload')
+                                                    <p class="text-red-400 text-xs">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                            <span class="inline-flex items-center justify-center w-full px-4 py-2 bg-admin-surface-alt border border-admin-border rounded-lg text-admin-text hover:bg-admin-surface transition-colors cursor-pointer">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                                </svg>
+                                                Upload Image
+                                            </span>
+                                        </label>
+                                        <!-- Validation Error -->
+                                        <div x-show="imageError" x-transition class="text-red-400 text-sm">
+                                            <span x-text="imageError"></span>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- URL Mode -->
+                                <template x-if="imageMode === 'url'">
+                                    <div>
+                                        <label class="block text-sm font-medium text-admin-text-muted mb-2">Image URL</label>
+                                        <input
+                                            type="url"
+                                            x-model="editAttributes.src"
+                                            @input.debounce.300ms="$wire.updateBlock(index, editAttributes)"
+                                            class="w-full bg-admin-surface-alt border border-admin-border rounded-lg px-3 py-2 text-admin-text text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                                            placeholder="https://..."
                                         >
-                                        <span class="inline-flex items-center justify-center w-full px-4 py-2 bg-admin-surface-alt border border-admin-border rounded-lg text-admin-text hover:bg-admin-surface transition-colors cursor-pointer">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                            </svg>
-                                            Upload Image
-                                        </span>
-                                    </label>
-                                </div>
+                                    </div>
+                                </template>
 
-                                <div class="text-center text-admin-text-muted text-sm">or</div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-admin-text-muted mb-2">Image URL</label>
-                                    <input 
-                                        type="url" 
-                                        x-model="editAttributes.src"
-                                        @input.debounce.300ms="$wire.updateBlock(index, editAttributes)"
-                                        class="w-full bg-admin-surface-alt border border-admin-border rounded-lg px-3 py-2 text-admin-text text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent"
-                                        placeholder="https://..."
-                                    >
-                                </div>
                                 <div>
                                     <label class="block text-sm font-medium text-admin-text-muted mb-2">Alt Text</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         x-model="editAttributes.alt"
                                         @input.debounce.300ms="$wire.updateBlock(index, editAttributes)"
                                         class="w-full bg-admin-surface-alt border border-admin-border rounded-lg px-3 py-2 text-admin-text text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent"
@@ -255,8 +374,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-admin-text-muted mb-2">Caption (optional)</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         x-model="editAttributes.caption"
                                         @input.debounce.300ms="$wire.updateBlock(index, editAttributes)"
                                         class="w-full bg-admin-surface-alt border border-admin-border rounded-lg px-3 py-2 text-admin-text text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent"
@@ -421,6 +540,7 @@
                                 videoMode: editAttributes.src && (editAttributes.src.startsWith('/') || editAttributes.src.includes('storage/') || editAttributes.src.includes('videos/')) ? 'upload' : 'url',
                                 videoPreviewState: 'empty',
                                 videoSourceType: null,
+                                get availableBlockTypes() { return $parent.availableBlockTypes; },
                                 videoSourceLabel: '',
                                 videoEmbedUrl: null,
                                 videoFullUrl: null,
@@ -457,7 +577,13 @@
                             }" x-init="$watch('editAttributes.src', (value) => {
                                 clearTimeout(videoDetectTimeout);
                                 videoDetectTimeout = setTimeout(() => { detectVideoUrl(); }, 500);
-                            }); if (editAttributes.src && videoMode === 'url') detectVideoUrl();">
+                            }); if (editAttributes.src && videoMode === 'url') detectVideoUrl();
+                            $wire.$on('upload:errored', ({ name }) => {
+                                if (name === 'videoUpload') {
+                                    videoError = 'Upload failed. File may have exceeded size limit allowed is 60MB or use an unsupported format.';
+                                    videoPreviewState = 'invalid';
+                                }
+                            });">
                                 <!-- Source Mode Toggle -->
                                 <div>
                                     <label class="block text-sm font-medium text-admin-text-muted mb-2">Video Source</label>
@@ -616,6 +742,15 @@
                                             </div>
                                         </div>
 
+                                        <template x-if="videoError && videoMode === 'upload'">
+                                            <div class="flex items-center gap-2 text-red-400 text-sm mt-1">
+                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9.303 3.376c-.866 1.5.217 3.374 1.948 3.374H14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/>
+                                                </svg>
+                                                <span x-text="videoError"></span>
+                                            </div>
+                                        </template>
+
                                         <!-- Upload Button -->
                                         <div>
                                             <label class="block">
@@ -635,7 +770,7 @@
                                                     Upload Video
                                                 </span>
                                             </label>
-                                            <p class="text-xs text-admin-text-muted mt-1">MP4, WEBM, MOV up to 30MB</p>
+                                            <p class="text-xs text-admin-text-muted mt-1">MP4, WEBM, MOV up to 60MB</p>
                                         </div>
                                     </div>
                                 </template>

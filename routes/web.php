@@ -26,10 +26,9 @@ Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
 
 
-// Booking Flow 
+// Booking Flow
 Route::middleware('throttle:6,1')->group(function () {
     // TODO: Migrate to controller + Blade view
-    // Route::get('bookings/create', [BookingController::class, 'create'])->name('bookings.create');
     Route::get('/bookings/{booking}/confirmation', function (\App\Domains\Bookings\Models\Booking $booking) {
         return view('bookings.confirmation', ['booking' => $booking]);
     })->name('bookings.confirmation');
@@ -136,6 +135,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // SEO Management
     Route::get('seo/static-routes', [\App\Http\Controllers\Admin\SeoController::class, 'index'])->name('seo.static-routes');
+    Route::get('seo/create', [\App\Http\Controllers\Admin\SeoController::class, 'create'])->name('seo.create');
+    Route::post('seo', [\App\Http\Controllers\Admin\SeoController::class, 'store'])->name('seo.store');
     Route::get('seo/{id}/edit', [\App\Http\Controllers\Admin\SeoController::class, 'edit'])->name('seo.edit');
     Route::put('seo/{id}', [\App\Http\Controllers\Admin\SeoController::class, 'update'])->name('seo.update');
 

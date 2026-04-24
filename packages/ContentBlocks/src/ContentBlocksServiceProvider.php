@@ -102,9 +102,14 @@ class ContentBlocksServiceProvider extends ServiceProvider
             });
         }
 
-        // Generic block directive
+        // Generic block directive - passes type and attributes separately
         Blade::directive('block', function ($expression) {
-            return "<?php echo app('Highblossom\\\\ContentBlocks\\\\Services\\\\BlockRegistry')->render(...{$expression}); ?>";
+            // Extract type and attributes from expression like "($type, $attributes)"
+            $inner = trim($expression, '()');
+            $parts = array_map('trim', explode(',', $inner, 2));
+            $type = $parts[0] ?? '';
+            $attributes = $parts[1] ?? '[]';
+            return "<?php echo app('Highblossom\\ContentBlocks\\Services\\BlockRegistry')->render({$type}, {$attributes}); ?>";
         });
     }
 

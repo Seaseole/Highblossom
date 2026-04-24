@@ -2,7 +2,7 @@
     <div class="p-6">
         <div class="admin-section-header">
             <h1 class="admin-section-title">Edit User</h1>
-            <a href="{{ route('admin-users.index') }}" class="admin-action-btn admin-action-btn-secondary">
+            <a href="{{ route('admin.users.index') }}" class="admin-action-btn admin-action-btn-secondary">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
@@ -10,7 +10,7 @@
             </a>
         </div>
 
-        <form method="POST" action="{{ route('admin-users.update', $user) }}" class="max-w-2xl">
+        <form method="POST" action="{{ route('admin.users.update', $user) }}" class="max-w-2xl">
             @csrf
             @method('PUT')
 
@@ -58,7 +58,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
-                    <a href="{{ route('admin-users.index') }}" class="admin-action-btn admin-action-btn-secondary">
+                    <a href="{{ route('admin.users.index') }}" class="admin-action-btn admin-action-btn-secondary">
                         Cancel
                     </a>
                     <button type="submit" class="admin-action-btn admin-action-btn-primary">

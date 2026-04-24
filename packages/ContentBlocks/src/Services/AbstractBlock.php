@@ -3,6 +3,7 @@
 namespace Highblossom\ContentBlocks\Services;
 
 use Highblossom\ContentBlocks\Contracts\BlockInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
@@ -39,7 +40,16 @@ abstract class AbstractBlock implements BlockInterface
         $rules = $this->getValidationRules();
         $validator = Validator::make($attributes, $rules);
 
-        return !$validator->fails();
+        if ($validator->fails()) {
+            Log::warning("ContentBlocks validation failed for {$this->getType()} block", [
+                'errors' => $validator->errors()->toArray(),
+                'attributes' => $attributes,
+            ]);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -147,6 +157,14 @@ abstract class AbstractBlock implements BlockInterface
      */
     protected function renderError(array $attributes): string
     {
+        $rules = $this->getValidationRules();
+        $validator = Validator::make($attributes, $rules);
+
+        Log::warning("ContentBlocks rendering failed for {$this->getType()} block - invalid attributes", [
+            'errors' => $validator->fails() ? $validator->errors()->toArray() : [],
+            'attributes' => $attributes,
+        ]);
+
         return "<!-- Invalid attributes for {$this->getType()} block -->";
     }
 }

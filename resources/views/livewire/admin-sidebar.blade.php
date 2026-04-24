@@ -186,7 +186,7 @@
     {{-- Desktop Sidebar --}}
     <flux:sidebar collapsible class="hidden lg:flex">
         {{-- Brand --}}
-        <flux:sidebar.brand name="Highblossom Admin" {{ $attributes }}>
+        <flux:sidebar.brand name="{{ config('app.name') }} Admin" {{ $attributes }}>
             <x-slot name="logo" class="flex aspect-square size-8 items-center justify-center rounded-md bg-[#DC2626] text-white shadow-lg shadow-[#DC2626]/20">
                 <svg class="size-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>

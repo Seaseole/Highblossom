@@ -31,15 +31,55 @@
                             @enderror
                         </div>
 
-                        <div class="space-y-2">
+                        <div class="space-y-2" x-data="{
+                            editorId: 'body-editor',
+                            editorInstance: null,
+                            initEditor() {
+                                this.$nextTick(() => {
+                                    if (CKEDITOR.instances[this.editorId]) {
+                                        CKEDITOR.instances[this.editorId].destroy(true);
+                                    }
+                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
+                                        customConfig: '/vendor/ckeditor/config.js',
+                                        height: 200,
+                                    });
+                                    this.editorInstance.on('change', () => {
+                                        document.querySelector('textarea[name=body]').value = this.editorInstance.getData();
+                                    });
+                                    this.editorInstance.on('key', () => {
+                                        document.querySelector('textarea[name=body]').value = this.editorInstance.getData();
+                                    });
+                                });
+                            }
+                        }" x-init="initEditor()">
                             <label class="text-sm font-medium text-[#FAFAFA]">Body</label>
-                            <textarea name="body" id="editor" rows="8" required>{{ old('body', $content->body) }}</textarea>
+                            <textarea name="body" id="body-editor" rows="8" required>{{ old('body', $content->body) }}</textarea>
                             @error('body')
                                 <p class="text-sm text-[#DC2626]">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="space-y-2">
+                        <div class="space-y-2" x-data="{
+                            editorId: 'mission-editor',
+                            editorInstance: null,
+                            initEditor() {
+                                this.$nextTick(() => {
+                                    if (CKEDITOR.instances[this.editorId]) {
+                                        CKEDITOR.instances[this.editorId].destroy(true);
+                                    }
+                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
+                                        customConfig: '/vendor/ckeditor/config.js',
+                                        height: 150,
+                                    });
+                                    this.editorInstance.on('change', () => {
+                                        document.querySelector('textarea[name=mission]').value = this.editorInstance.getData();
+                                    });
+                                    this.editorInstance.on('key', () => {
+                                        document.querySelector('textarea[name=mission]').value = this.editorInstance.getData();
+                                    });
+                                });
+                            }
+                        }" x-init="initEditor()">
                             <label class="text-sm font-medium text-[#FAFAFA]">Mission</label>
                             <textarea name="mission" id="mission-editor" rows="3">{{ old('mission', $content->mission) }}</textarea>
                             @error('mission')
@@ -47,7 +87,27 @@
                             @enderror
                         </div>
 
-                        <div class="space-y-2">
+                        <div class="space-y-2" x-data="{
+                            editorId: 'vision-editor',
+                            editorInstance: null,
+                            initEditor() {
+                                this.$nextTick(() => {
+                                    if (CKEDITOR.instances[this.editorId]) {
+                                        CKEDITOR.instances[this.editorId].destroy(true);
+                                    }
+                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
+                                        customConfig: '/vendor/ckeditor/config.js',
+                                        height: 150,
+                                    });
+                                    this.editorInstance.on('change', () => {
+                                        document.querySelector('textarea[name=vision]').value = this.editorInstance.getData();
+                                    });
+                                    this.editorInstance.on('key', () => {
+                                        document.querySelector('textarea[name=vision]').value = this.editorInstance.getData();
+                                    });
+                                });
+                            }
+                        }" x-init="initEditor()">
                             <label class="text-sm font-medium text-[#FAFAFA]">Vision</label>
                             <textarea name="vision" id="vision-editor" rows="3">{{ old('vision', $content->vision) }}</textarea>
                             @error('vision')
@@ -111,28 +171,6 @@
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof CKEDITOR !== 'undefined') {
-                CKEDITOR.replace('editor', {
-                    height: 300,
-                    uiColor: '#16161d',
-                    contentsCss: ['{{ asset("vendor/ckeditor/contents.css") }}', '{{ asset("css/ckeditor-custom.css") }}']
-                });
-                
-                CKEDITOR.replace('mission-editor', {
-                    height: 150,
-                    uiColor: '#16161d',
-                    contentsCss: ['{{ asset("vendor/ckeditor/contents.css") }}', '{{ asset("css/ckeditor-custom.css") }}']
-                });
-                
-                CKEDITOR.replace('vision-editor', {
-                    height: 150,
-                    uiColor: '#16161d',
-                    contentsCss: ['{{ asset("vendor/ckeditor/contents.css") }}', '{{ asset("css/ckeditor-custom.css") }}']
-                });
-            } else {
-                console.error('CKEditor not loaded');
-            }
-
             // Initialize Image Uploader
             if (typeof ImageUploader !== 'undefined') {
                 new ImageUploader({

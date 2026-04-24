@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Content\RelocateTempUploadsAction;
 use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Category;
 use App\Domains\Content\Models\Tag;
-use Illuminate\Http\Request;
+use App\Http\Requests\Content\StoreBlockContentRequest;
 use Illuminate\View\View;
 
 final class PostController
@@ -27,29 +28,20 @@ final class PostController
         return view('admin.blog.posts.create', compact('categories', 'tags'));
     }
 
-    public function store(Request $request)
+    public function store(StoreBlockContentRequest $request, RelocateTempUploadsAction $relocateAction)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
-            'content' => 'nullable|string',
-            'featured_image_path' => 'nullable|string',
-            'featured_image_url' => 'nullable|url|max:500',
-            'status' => 'required|in:draft,published',
-            'published_at' => 'nullable|date',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
-        ]);
+        $validated = $request->validatedContent();
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']);
-        $validated['content'] = isset($validated['content']) && $validated['content'] !== ''
-            ? json_decode($validated['content'], true) ?? []
-            : [];
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            $path = $request->file('featured_image')->store('uploads/blog', 'public');
+            $validated['featured_image_path'] = $path;
+            $validated['featured_image_url'] = null;
+        }
 
-        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
-            $validated['published_at'] = now();
+        // Relocate temp uploads to permanent storage
+        if (!empty($validated['content'])) {
+            $validated['content'] = $relocateAction->execute($validated['content']);
         }
 
         $post = Post::create($validated);
@@ -76,29 +68,26 @@ final class PostController
         return view('admin.blog.posts.edit', compact('post', 'categories', 'tags'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(StoreBlockContentRequest $request, Post $post, RelocateTempUploadsAction $relocateAction)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
-            'content' => 'nullable|string',
-            'featured_image_path' => 'nullable|string',
-            'featured_image_url' => 'nullable|url|max:500',
-            'status' => 'required|in:draft,published',
-            'published_at' => 'nullable|date',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
-        ]);
+        $validated = $request->validatedContent();
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']);
-        $validated['content'] = isset($validated['content']) && $validated['content'] !== ''
-            ? json_decode($validated['content'], true) ?? []
-            : [];
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            $path = $request->file('featured_image')->store('uploads/blog', 'public');
+            $validated['featured_image_path'] = $path;
+            $validated['featured_image_url'] = null;
+        }
 
-        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
-            $validated['published_at'] = now();
+        // Handle delete featured image
+        if ($request->boolean('delete_featured_image')) {
+            $validated['featured_image_path'] = null;
+            $validated['featured_image_url'] = null;
+        }
+
+        // Relocate temp uploads to permanent storage
+        if (!empty($validated['content'])) {
+            $validated['content'] = $relocateAction->execute($validated['content']);
         }
 
         $post->update($validated);

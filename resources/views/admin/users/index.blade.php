@@ -62,12 +62,12 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <label for="edit-modal-toggle" class="admin-action-btn admin-action-btn-secondary cursor-pointer">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="admin-action-btn admin-action-btn-secondary">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                     {{ __('admin-users.edit_button') }}
-                                </label>
+                                </a>
                             </td>
                         </tr>
                     @endforeach
@@ -79,67 +79,4 @@
             {{ $users->links() }}
         </div>
     </div>
-
-    <!-- Edit Modal -->
-    <x-modal id="edit" title="{{ __('admin-users.edit') }}" maxWidth="2xl">
-        <form method="POST" action="{{ route('admin.users.update', $user ?? '') }}">
-            @csrf
-            @method('PUT')
-
-            <div class="space-y-6">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.name') }}</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $user->name ?? '') }}" required class="admin-form-input @error('name') border-red-500 @enderror">
-                    @error('name')
-                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.email_label') }}</label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $user->email ?? '') }}" required class="admin-form-input @error('email') border-red-500 @enderror">
-                    @error('email')
-                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.password') }}</label>
-                    <input type="password" name="password" id="password" placeholder="{{ __('admin-users.password_placeholder') }}" class="admin-form-input @error('password') border-red-500 @enderror">
-                    @error('password')
-                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-admin-text-muted mb-2">{{ __('admin-users.roles_label') }}</label>
-                    <div class="grid grid-cols-1 gap-2 p-3 border border-admin-border rounded-xl max-h-48 overflow-y-auto bg-admin-surface-alt">
-                        @foreach($roles ?? [] as $role)
-                            <label class="flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name="roles[]"
-                                    value="{{ $role->name }}"
-                                    {{ isset($user) && $user->roles->contains('name', $role->name) ? 'checked' : '' }}
-                                    class="h-4 w-4 text-[#DC2626] focus:ring-[#DC2626] border-admin-border rounded bg-admin-input-bg"
-                                >
-                                <span class="ml-2 text-sm text-admin-text">{{ $role->name }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <x-slot:footer>
-                <div class="flex justify-end gap-3">
-                    <label for="edit-modal-toggle" class="admin-action-btn admin-action-btn-ghost cursor-pointer inline-block">
-                        {{ __('admin-users.cancel') }}
-                    </label>
-                    <button type="submit" class="admin-action-btn admin-action-btn-primary">
-                        {{ __('admin-users.update_user') }}
-                    </button>
-                </div>
-            </x-slot:footer>
-        </form>
-    </x-modal>
 </x-layouts::admin>

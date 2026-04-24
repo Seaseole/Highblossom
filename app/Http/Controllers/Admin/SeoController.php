@@ -35,6 +35,63 @@ final class SeoController
         return view('admin.seo.index', compact('routes'));
     }
 
+    public function create(Request $request): View
+    {
+        $routeName = $request->query('route_name');
+        $routeLabel = $routeName ? $this->getRouteLabel($routeName) : '';
+
+        return view('admin.seo.create', [
+            'route_name' => $routeName,
+            'route_label' => $routeLabel,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'route_name' => 'required|string|max:255|unique:seo_static_routes,route_name',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:300',
+            'meta_keywords' => 'nullable|string|max:255',
+            'og_title' => 'nullable|string|max:70',
+            'og_description' => 'nullable|string|max:300',
+            'og_image' => 'nullable|string|max:255',
+            'twitter_title' => 'nullable|string|max:70',
+            'twitter_description' => 'nullable|string|max:300',
+            'twitter_image' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|string|max:255',
+            'robots' => 'nullable|string|max:50',
+            'no_index' => 'boolean',
+            'priority' => 'numeric|between:0,1',
+            'changefreq' => 'in:always,hourly,daily,weekly,monthly,yearly,never',
+        ]);
+
+        SeoStaticRoute::create([
+            'route_name' => $validated['route_name'],
+            'meta_title' => $validated['meta_title'] ?: null,
+            'meta_description' => $validated['meta_description'] ?: null,
+            'meta_keywords' => $validated['meta_keywords'] ?: null,
+            'og_title' => $validated['og_title'] ?: null,
+            'og_description' => $validated['og_description'] ?: null,
+            'og_image' => $validated['og_image'] ?: null,
+            'twitter_title' => $validated['twitter_title'] ?: null,
+            'twitter_description' => $validated['twitter_description'] ?: null,
+            'twitter_image' => $validated['twitter_image'] ?: null,
+            'canonical_url' => $validated['canonical_url'] ?: null,
+            'robots' => $validated['robots'] ?: null,
+            'no_index' => $validated['no_index'] ?? false,
+            'priority' => $validated['priority'] ?? 0.5,
+            'changefreq' => $validated['changefreq'] ?? 'monthly',
+        ]);
+
+        Cache::forget('seo.sitemap');
+        Cache::forget('seo.robots');
+
+        return redirect()
+            ->route('admin.seo.static-routes')
+            ->with('success', __('messages.seo_created'));
+    }
+
     public function edit(int $id): View
     {
         $route = SeoStaticRoute::findOrFail($id);

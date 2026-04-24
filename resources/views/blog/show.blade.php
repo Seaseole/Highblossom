@@ -35,23 +35,7 @@
                 <div class="prose prose-invert max-w-none">
                     @if($post->content && is_array($post->content))
                         @foreach($post->content as $block)
-                            @if($block['type'] === 'paragraph')
-                                @cbParagraph($block['attributes'])
-                            @elseif($block['type'] === 'heading')
-                                @cbHeading($block['attributes'])
-                            @elseif($block['type'] === 'image')
-                                @cbImage($block['attributes'])
-                            @elseif($block['type'] === 'quote')
-                                @cbQuote($block['attributes'])
-                            @elseif($block['type'] === 'code')
-                                @cbCode($block['attributes'])
-                            @elseif($block['type'] === 'list')
-                                @cbList($block['attributes'])
-                            @elseif($block['type'] === 'cta')
-                                @cbCta($block['attributes'])
-                            @elseif($block['type'] === 'video')
-                                @cbVideo($block['attributes'])
-                            @endif
+                            @block($block['type'], $block['attributes'] ?? [])
                         @endforeach
                     @endif
                 </div>

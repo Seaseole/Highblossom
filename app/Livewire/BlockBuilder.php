@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -17,12 +18,17 @@ final class BlockBuilder extends Component
 
     public array $blocks = [];
 
+    #[Validate(['nullable', 'image', 'max:61440'])]
     public $imageUpload = null;
+
+    // Track which block index is being uploaded to (persists better than uploadingBlockIndex)
+    public ?int $activeImageUploadIndex = null;
 
     public int $uploadProgress = 0;
 
     public ?int $uploadingBlockIndex = null;
 
+    #[Validate(['nullable', 'file', 'max:61440'])]
     public $videoUpload = null;
 
     public int $videoUploadProgress = 0;
@@ -106,30 +112,67 @@ final class BlockBuilder extends Component
         $this->dispatch('blocks-updated', blocks: $this->blocks);
     }
 
-    public function uploadImage(): void
+    /**
+     * Auto-upload when imageUpload property changes.
+     */
+    public function updatedImageUpload(): void
     {
+        // Use activeImageUploadIndex which is set by Alpine before upload
+        $blockIndex = $this->activeImageUploadIndex ?? $this->uploadingBlockIndex;
+
+        if ($this->imageUpload && $blockIndex !== null) {
+            $this->uploadImageForBlock($blockIndex);
+        }
+    }
+
+    public function uploadImageForBlock(int $blockIndex): void
+    {
+        if (empty($this->imageUpload)) {
+            \Illuminate\Support\Facades\Log::error('uploadImageForBlock called with empty imageUpload');
+            return;
+        }
+
         $this->validate([
-            'imageUpload' => 'required|image|max:10240|mimes:jpg,jpeg,png,webp,gif',
+            'imageUpload' => 'required|image|max:61440|mimes:jpg,jpeg,png,webp,gif',
         ]);
 
-        $path = $this->imageUpload->store('uploads/images', 'public');
-        $url = asset('storage/' . $path);
+        // Store in temp disk - will be relocated to permanent on post save
+        $path = $this->imageUpload->store('uploads/images', 'temp');
 
-        if ($this->uploadingBlockIndex !== null && isset($this->blocks[$this->uploadingBlockIndex])) {
-            $this->blocks[$this->uploadingBlockIndex]['attributes']['src'] = $url;
+        if (empty($path)) {
+            \Illuminate\Support\Facades\Log::error('Image store returned empty path');
+            return;
+        }
+
+        $url = 'temp://' . $path;
+
+        \Illuminate\Support\Facades\Log::debug('uploadImageForBlock', [
+            'blockIndex' => $blockIndex,
+            'path' => $path,
+            'url' => $url,
+            'blocks_count' => count($this->blocks),
+        ]);
+
+        if (isset($this->blocks[$blockIndex])) {
+            $this->blocks[$blockIndex]['attributes']['src'] = $url;
             $this->dispatchBlocksUpdated();
+            \Illuminate\Support\Facades\Log::debug('Image src set successfully', [
+                'index' => $blockIndex,
+                'src' => $url,
+            ]);
+        } else {
+            \Illuminate\Support\Facades\Log::error('Failed to set image src - invalid block index', [
+                'blockIndex' => $blockIndex,
+                'blocks' => $this->blocks,
+            ]);
         }
 
         $this->imageUpload = null;
         $this->uploadProgress = 0;
+        $this->activeImageUploadIndex = null;
         $this->uploadingBlockIndex = null;
 
         $this->dispatch('notify', message: 'Image uploaded successfully', type: 'success');
-    }
-
-    public function startImageUpload(int $blockIndex): void
-    {
-        $this->uploadingBlockIndex = $blockIndex;
     }
 
     public function removeUploadedImage(int $blockIndex): void
@@ -142,46 +185,50 @@ final class BlockBuilder extends Component
     public function uploadVideo(): void
     {
         $this->validate([
-            'videoUpload' => 'required|file|max:30720|mimes:mp4,webm,mov,avi',
+            'videoUpload' => 'required|file|max:61440|mimes:mp4,webm,mov,avi',
         ]);
+        
+        // Store video file in temp disk - will be relocated to permanent on post save
+        $path = $this->videoUpload->store('uploads/videos', 'temp');
+        $videoUrl = 'temp://' . $path;
+        $thumbnailUrl = null;
 
-        // Store video file using Livewire's file upload
-        $path = $this->videoUpload->store('uploads/videos', 'public');
-        $videoUrl = asset('storage/' . $path);
-        $thumbnailPath = null;
-
-        // Generate thumbnail using FFmpeg directly
-        $fullPath = storage_path('app/public/' . $path);
+        // Generate thumbnail using FFmpeg directly from temp location
+        $fullPath = storage_path('app/temp/' . $path);
         if (file_exists($fullPath)) {
             try {
-                $ffmpeg = \FFMpeg\FFMpeg::create();
+                $ffmpeg = \FFMpeg\FFMpeg::create([
+                    'ffmpeg.binaries' => 'C:\\ffmpeg\\bin\\ffmpeg.exe',
+                    'ffprobe.binaries' => 'C:\\ffmpeg\\bin\\ffprobe.exe',
+                    'timeout' => 3600,
+                ]);
                 $video = $ffmpeg->open($fullPath);
 
-                // Create thumbnail directory
-                $thumbnailDir = public_path('videos/thumbnails');
+                // Create thumbnail directory in temp
+                $thumbnailDir = storage_path('app/temp/uploads/videos/thumbnails');
                 if (!is_dir($thumbnailDir)) {
                     mkdir($thumbnailDir, 0755, true);
                 }
 
                 // Generate thumbnail filename
                 $thumbnailFilename = 'thumb_' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
-                $thumbnailPath = $thumbnailDir . '/' . $thumbnailFilename;
+                $thumbnailFullPath = $thumbnailDir . '/' . $thumbnailFilename;
 
                 // Extract frame at 1 second mark
                 $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
-                $frame->save($thumbnailPath);
+                $frame->save($thumbnailFullPath);
 
-                $thumbnailPath = 'videos/thumbnails/' . $thumbnailFilename;
+                $thumbnailUrl = 'temp://uploads/videos/thumbnails/' . $thumbnailFilename;
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('Video thumbnail generation failed: ' . $e->getMessage());
-                $thumbnailPath = null;
+                $thumbnailUrl = null;
             }
         }
 
         if ($this->uploadingVideoBlockIndex !== null && isset($this->blocks[$this->uploadingVideoBlockIndex])) {
             $this->blocks[$this->uploadingVideoBlockIndex]['attributes']['src'] = $videoUrl;
-            if ($thumbnailPath) {
-                $this->blocks[$this->uploadingVideoBlockIndex]['attributes']['poster'] = asset($thumbnailPath);
+            if ($thumbnailUrl) {
+                $this->blocks[$this->uploadingVideoBlockIndex]['attributes']['poster'] = $thumbnailUrl;
             }
             $this->dispatchBlocksUpdated();
         }
@@ -196,6 +243,16 @@ final class BlockBuilder extends Component
     public function startVideoUpload(int $blockIndex): void
     {
         $this->uploadingVideoBlockIndex = $blockIndex;
+    }
+
+    /**
+     * Auto-upload when videoUpload property changes.
+     */
+    public function updatedVideoUpload(): void
+    {
+        if ($this->videoUpload) {
+            $this->uploadVideo();
+        }
     }
 
     public function removeUploadedVideo(int $blockIndex): void

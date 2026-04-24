@@ -10,7 +10,7 @@
             </a>
         </div>
 
-        <form method="POST" action="{{ route('admin.posts.store') }}" class="max-w-4xl">
+        <form method="POST" action="{{ route('admin.posts.store') }}" enctype="multipart/form-data" class="max-w-4xl">
             @csrf
 
             <div class="space-y-6">
@@ -72,9 +72,11 @@
                 <div class="bg-admin-surface-alt border border-admin-border rounded-xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                     <h2 class="text-lg font-semibold text-admin-text mb-4">Content Blocks</h2>
                     
-                    <livewire:block-builder name="content" :value="old('content')" />
-                    
-                    <input type="hidden" name="content" id="content-input">
+                    <div x-ref="blockBuilder">
+                        <livewire:block-builder name="content" :value="old('content')" />
+                    </div>
+
+                    <input type="hidden" name="content" id="content-input" x-ref="contentInput">
                 </div>
 
                 <div class="bg-admin-surface-alt border border-admin-border rounded-xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
@@ -127,14 +129,32 @@
                     <h2 class="text-lg font-semibold text-admin-text mb-4">Featured Image</h2>
                     
                     <div>
-                        <label class="block text-sm font-medium text-admin-text-muted mb-2">Image URL</label>
-                        <input 
-                            type="url" 
-                            name="featured_image_url" 
-                            value="{{ old('featured_image_url') }}"
-                            class="w-full bg-admin-surface-alt border border-admin-border rounded-xl px-4 py-3 text-admin-text placeholder-admin-text-muted focus:ring-2 focus:ring-admin-accent focus:border-transparent"
-                            placeholder="https://..."
-                        >
+                        <label class="block text-sm font-medium text-admin-text-muted mb-2">Upload Image</label>
+                        <div class="border-2 border-dashed border-admin-border rounded-xl p-6 text-center hover:border-admin-accent/50 transition-colors">
+                            <input 
+                                type="file" 
+                                name="featured_image" 
+                                accept="image/jpeg,image/png,image/jpg,image/webp,image/gif"
+                                id="featured-image-upload"
+                                class="hidden"
+                                onchange="previewImage(this)"
+                            >
+                            <label for="featured-image-upload" class="cursor-pointer">
+                                <div id="image-preview-container" class="hidden mb-4">
+                                    <img id="image-preview" src="" alt="Preview" class="max-h-64 mx-auto rounded-lg">
+                                </div>
+                                <div id="upload-placeholder">
+                                    <svg class="w-12 h-12 mx-auto text-admin-text-muted mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <p class="text-sm text-admin-text-muted">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-admin-text-muted mt-1">JPEG, PNG, WebP, GIF (max 5MB)</p>
+                                </div>
+                            </label>
+                        </div>
+                        @error('featured_image')
+                            <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -151,17 +171,43 @@
     </div>
 
     <script>
+        function previewImage(input) {
+            const previewContainer = document.getElementById('image-preview-container');
+            const preview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                previewContainer.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('blocks-updated', (event) => {
-                const blocks = event.detail?.blocks ?? event.blocks ?? [];
+                const blocks = event.blocks || (Array.isArray(event) ? event : []);
                 document.getElementById('content-input').value = JSON.stringify(blocks);
+                console.log('Blocks updated:', blocks);
             });
         });
 
         // Ensure content is synced before form submission
-        document.querySelector('form').addEventListener('submit', function() {
+        document.querySelector('form').addEventListener('submit', function(e) {
             const contentInput = document.getElementById('content-input');
-            if (!contentInput.value) {
+            const blockBuilder = document.querySelector('[wire\\:id]');
+
+            // Get current blocks from Livewire component synchronously
+            if (blockBuilder && blockBuilder.__livewire) {
+                const currentBlocks = blockBuilder.__livewire.get('blocks') || [];
+                contentInput.value = JSON.stringify(currentBlocks);
+            } else if (!contentInput.value) {
                 contentInput.value = JSON.stringify([]);
             }
         });

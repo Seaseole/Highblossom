@@ -23,6 +23,7 @@ return [
 
     // SEO messages
     'seo_saved' => 'SEO settings saved successfully.',
+    'seo_created' => 'SEO configuration created successfully.',
 
     // Booking messages
     'booking_created' => 'Booking created successfully.',

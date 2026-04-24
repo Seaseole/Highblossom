@@ -230,7 +230,7 @@ class SiteController extends Controller
         $tagSlug = $request->input('tag');
         $perPage = 9;
 
-        $query = Post::published()->with('categories', 'tags');
+        $query = Post::published()->with('categories', 'tags', 'author');
 
         if ($search) {
             $query->where('title', 'like', '%' . $search . '%')

@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace App\Domains\Content\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
+#[Fillable(['title','slug','excerpt','content','featured_image_path', 'featured_image_url','status','published_at','user_id'])]
 final class Post extends Model
 {
-    protected $fillable = [
-        'title',
-        'slug',
-        'excerpt',
-        'content',
-        'featured_image_path',
-        'featured_image_url',
-        'status',
-        'published_at',
-    ];
+    // protected $fillable = [
+    //     'title',
+    //     'slug',
+    //     'excerpt',
+    //     'content',
+    //     'featured_image_path',
+    //     'featured_image_url',
+    //     'status',
+    //     'published_at',
+    //     'user_id',
+    // ];
 
     protected $casts = [
         'content' => 'array',
@@ -33,6 +36,11 @@ final class Post extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'post_tag');
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function scopePublished($query)

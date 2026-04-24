@@ -7,8 +7,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/48.0.1/ckeditor5.css" />
-    <script src="https://cdn.ckeditor.com/ckeditor5/48.0.1/ckeditor5.umd.js"></script>
+    <script src="/vendor/ckeditor/ckeditor.js"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,32 +60,7 @@
 
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @stack('scripts')
 </body>
-
-    <script>
-    const {
-        ClassicEditor,
-        Essentials,
-        Bold,
-        Italic,
-        Font,
-        Paragraph
-    } = CKEDITOR;
-    const { FormatPainter } = CKEDITOR_PREMIUM_FEATURES;
-
-    ClassicEditor
-        .create( {
-            attachTo: document.querySelector( '#editor' ),
-            licenseKey: '<YOUR_LICENSE_KEY>',
-            plugins: [ Essentials, Bold, Italic, Font, Paragraph, FormatPainter ],
-            toolbar: [
-                'undo', 'redo', '|', 'bold', 'italic', '|',
-                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
-                'formatPainter'
-            ]
-        } )
-        .then( /* ... */ )
-        .catch( /* ... */ );
-</script>
 </html>
