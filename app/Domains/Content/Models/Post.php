@@ -28,6 +28,11 @@ final class Post extends Model
         'published_at' => 'datetime',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'post_category');
