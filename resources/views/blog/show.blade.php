@@ -3,34 +3,62 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <article>
                 @if($post->featured_image_url)
-                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-96 object-cover rounded-2xl mb-8">
-                @endif
+                    <div class="relative h-64 rounded-2xl overflow-hidden mb-8">
+                        <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/60 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <h1 class="text-4xl font-bold text-[#FAFAFA] mb-4 drop-shadow-lg">{{ $post->title }}</h1>
+                            
+                            <div class="flex items-center gap-4 text-sm text-[#A1A1AA] mb-4">
+                                <span class="drop-shadow-md">{{ $post->published_at?->format('M d, Y') }}</span>
+                                @if($post->categories->count() > 0)
+                                    <span>•</span>
+                                    @foreach($post->categories as $category)
+                                        <a href="{{ route('blog', ['category' => $category->slug]) }}" class="hover:text-[#DC2626] drop-shadow-md">
+                                            {{ $category->name }}
+                                        </a>
+                                    @endforeach
+                                @endif
+                            </div>
 
-                <div class="mb-8">
-                    <h1 class="text-4xl font-bold text-[#FAFAFA] mb-4">{{ $post->title }}</h1>
-                    
-                    <div class="flex items-center gap-4 text-sm text-[#71717A] mb-4">
-                        <span>{{ $post->published_at?->format('M d, Y') }}</span>
-                        @if($post->categories->count() > 0)
-                            <span>•</span>
-                            @foreach($post->categories as $category)
-                                <a href="{{ route('blog', ['category' => $category->slug]) }}" class="hover:text-[#DC2626]">
-                                    {{ $category->name }}
-                                </a>
-                            @endforeach
+                            @if($post->tags->count() > 0)
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($post->tags as $tag)
+                                        <a href="{{ route('blog', ['tag' => $tag->slug]) }}" class="text-xs bg-white/10 border border-white/20 px-3 py-1 rounded-full text-[#A1A1AA] hover:border-[#DC2626]/30 transition-colors drop-shadow-md">
+                                            #{{ $tag->name }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <div class="mb-8">
+                        <h1 class="text-4xl font-bold text-[#FAFAFA] mb-4">{{ $post->title }}</h1>
+                        
+                        <div class="flex items-center gap-4 text-sm text-[#71717A] mb-4">
+                            <span>{{ $post->published_at?->format('M d, Y') }}</span>
+                            @if($post->categories->count() > 0)
+                                <span>•</span>
+                                @foreach($post->categories as $category)
+                                    <a href="{{ route('blog', ['category' => $category->slug]) }}" class="hover:text-[#DC2626]">
+                                        {{ $category->name }}
+                                    </a>
+                                @endforeach
+                            @endif
+                        </div>
+
+                        @if($post->tags->count() > 0)
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($post->tags as $tag)
+                                    <a href="{{ route('blog', ['tag' => $tag->slug]) }}" class="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[#A1A1AA] hover:border-[#DC2626]/30 transition-colors">
+                                        #{{ $tag->name }}
+                                    </a>
+                                @endforeach
+                            </div>
                         @endif
                     </div>
-
-                    @if($post->tags->count() > 0)
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($post->tags as $tag)
-                                <a href="{{ route('blog', ['tag' => $tag->slug]) }}" class="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[#A1A1AA] hover:border-[#DC2626]/30 transition-colors">
-                                    #{{ $tag->name }}
-                                </a>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+                @endif
 
                 <div class="prose prose-invert max-w-none">
                     @if($post->content && is_array($post->content))
