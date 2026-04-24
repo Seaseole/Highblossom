@@ -5,7 +5,7 @@
                 @if($post->featured_image_url)
                     <div class="relative h-64 rounded-2xl overflow-hidden mb-8">
                         <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="absolute inset-0 w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/60 to-transparent"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/50 via-[#0A0A0F]/30 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-6">
                             <h1 class="text-4xl font-bold text-[#FAFAFA] mb-4 drop-shadow-lg">{{ $post->title }}</h1>
                             
