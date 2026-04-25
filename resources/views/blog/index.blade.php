@@ -4,10 +4,10 @@
             {{-- Header Section --}}
             <div class="max-w-2xl mb-12 lg:mb-16">
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight leading-[1.1] mb-4">
-                    From the Blog
+                    Our Blog
                 </h1>
                 <p class="text-lg text-[#A1A1AA] leading-relaxed">
-                    Learn how to grow your business with our expert advice.
+                    <span>Stay updated with the latest insights in the work behind <span class="font-semibold text-[#DC2626]">{{strtoupper(config('app.name'))  }}</span>.</span>
                 </p>
             </div>
 
