@@ -225,33 +225,12 @@ class SiteController extends Controller
 
     public function blog(Request $request)
     {
-        $search = $request->input('search');
+        // Pass initial URL parameters to the view for Livewire component
+        $search = $request->input('search', '');
         $categorySlug = $request->input('category');
         $tagSlug = $request->input('tag');
-        $perPage = 9;
 
-        $query = Post::published()->with('categories', 'tags', 'author');
-
-        if ($search) {
-            $query->where('title', 'like', '%' . $search . '%')
-                ->orWhere('excerpt', 'like', '%' . $search . '%');
-        }
-
-        if ($categorySlug) {
-            $category = Category::where('slug', $categorySlug)->firstOrFail();
-            $query->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id));
-        }
-
-        if ($tagSlug) {
-            $tag = Tag::where('slug', $tagSlug)->firstOrFail();
-            $query->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id));
-        }
-
-        $posts = $query->latest()->paginate($perPage);
-        $categories = Category::all();
-        $tags = Tag::all();
-
-        return view('blog.index', compact('posts', 'categories', 'tags', 'search', 'categorySlug', 'tagSlug'));
+        return view('blog.index', compact('search', 'categorySlug', 'tagSlug'));
     }
 
     public function blogShow($slug)

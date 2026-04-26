@@ -26,7 +26,17 @@ abstract class AbstractBlock implements BlockInterface
             return $this->renderError($attributes);
         }
 
-        return $this->buildView($attributes);
+        try {
+            return $this->buildView($attributes);
+        } catch (\Throwable $e) {
+            Log::error("ContentBlocks view rendering failed for {$this->getType()} block", [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'attributes' => $attributes,
+            ]);
+
+            return $this->renderError($attributes);
+        }
     }
 
     /**
@@ -165,6 +175,12 @@ abstract class AbstractBlock implements BlockInterface
             'attributes' => $attributes,
         ]);
 
-        return "<!-- Invalid attributes for {$this->getType()} block -->";
+        $debugMode = config('content-blocks.debug_mode', false);
+
+        if ($debugMode) {
+            return "<!-- Invalid attributes for {$this->getType()} block -->";
+        }
+
+        return '';
     }
 }

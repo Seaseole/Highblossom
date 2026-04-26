@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\GlassType;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class GlassTypeController
@@ -31,7 +32,7 @@ final class GlassTypeController
             'is_active' => 'boolean',
         ]);
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->has('is_active');
 
         GlassType::create($validated);
@@ -54,7 +55,7 @@ final class GlassTypeController
             'is_active' => 'boolean',
         ]);
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->has('is_active');
 
         $glassType->update($validated);

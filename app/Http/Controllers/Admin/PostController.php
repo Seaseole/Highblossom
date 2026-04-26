@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Content\RelocateTempUploadsAction;
-use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Category;
+use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Tag;
 use App\Http\Requests\Content\StoreBlockContentRequest;
 use Illuminate\View\View;
@@ -40,17 +40,17 @@ final class PostController
         }
 
         // Relocate temp uploads to permanent storage
-        if (!empty($validated['content'])) {
+        if (! empty($validated['content'])) {
             $validated['content'] = $relocateAction->execute($validated['content']);
         }
 
         $post = Post::create($validated);
 
-        if (!empty($validated['categories'])) {
+        if (! empty($validated['categories'])) {
             $post->categories()->attach($validated['categories']);
         }
 
-        if (!empty($validated['tags'])) {
+        if (! empty($validated['tags'])) {
             $post->tags()->attach($validated['tags']);
         }
 
@@ -86,7 +86,7 @@ final class PostController
         }
 
         // Relocate temp uploads to permanent storage
-        if (!empty($validated['content'])) {
+        if (! empty($validated['content'])) {
             $validated['content'] = $relocateAction->execute($validated['content']);
         }
 

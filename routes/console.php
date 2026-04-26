@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Schedule temp uploads cleanup daily at 2 AM
-Schedule::command('content-blocks:cleanup-temp-uploads --hours=24')
+Schedule::command('content-blocks:cleanup-orphaned-uploads')
     ->dailyAt('02:00')
     ->withoutOverlapping()
-    ->appendOutputTo(storage_path('logs/cleanup-temp-uploads.log'));
+    ->appendOutputTo(storage_path('logs/cleanup-orphaned-uploads.log'));
