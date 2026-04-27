@@ -95,15 +95,13 @@
                                         <div class="w-32">
                                             <label class="text-sm font-medium text-admin-text">{{ $label }}</label>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <input type="checkbox"
-                                                name="working_hours[{{ $key }}][is_closed]"
-                                                x-model="workingHours.{{ $key }}.is_closed"
-                                                value="1"
-                                                {{ ($settings['working_hours'][$key]['is_closed'] ?? false) ? 'checked' : '' }}
-                                                class="w-4 h-4 rounded border-admin-border bg-admin-input-bg text-[#DC2626] focus:ring-[#DC2626]">
-                                            <span class="text-sm text-admin-text-muted">Closed</span>
-                                        </div>
+                                        <x-ui.checkbox
+                                            name="working_hours[{{ $key }}][is_closed]"
+                                            x-model="workingHours.{{ $key }}.is_closed"
+                                            value="1"
+                                            :checked="$settings['working_hours'][$key]['is_closed'] ?? false"
+                                            label="Closed"
+                                        />
                                         <div class="flex-1 flex gap-4">
                                             <div class="flex-1 space-y-1">
                                                 <label class="text-xs text-admin-text-muted">Open</label>

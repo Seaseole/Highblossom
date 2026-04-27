@@ -111,12 +111,9 @@
                             >
                         </div>
 
-                        <div class="flex items-start">
-                            <input type="checkbox" name="terms" id="terms" class="w-4 h-4 text-[#DC2626] border-white/20 rounded bg-white/5 focus:ring-[#DC2626] focus:ring-offset-0 mt-1" required>
-                            <label for="terms" class="ml-2 text-sm text-[#A1A1AA]">
-                                I agree to the <a href="#" class="text-[#DC2626] hover:text-[#B91C1C] transition-colors">terms</a>
-                            </label>
-                        </div>
+                        <x-ui.checkbox name="terms" id="terms" required>
+                            I agree to the <a href="#" class="text-[#DC2626] hover:text-[#B91C1C] transition-colors">terms</a>
+                        </x-ui.checkbox>
 
                         <button
                             type="submit"

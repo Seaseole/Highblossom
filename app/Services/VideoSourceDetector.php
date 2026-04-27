@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\VideoSourceType;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 final class VideoSourceDetector
 {
+    /** @var array<string, string> Cache of resolved Facebook share URLs */
+    private array $resolvedFacebookUrls = [];
+
     /**
      * Detect the source type from a video src string.
      */
@@ -79,7 +84,7 @@ final class VideoSourceDetector
             VideoSourceType::YOUTUBE => "https://www.youtube.com/embed/{$videoId}",
             VideoSourceType::VIMEO => "https://player.vimeo.com/video/{$videoId}",
             VideoSourceType::DAILYMOTION => "https://www.dailymotion.com/embed/video/{$videoId}",
-            VideoSourceType::FACEBOOK => "https://www.facebook.com/plugins/video.php?href=" . urlencode($src) . "&show_text=0",
+            VideoSourceType::FACEBOOK => 'https://www.facebook.com/plugins/video.php?href='.urlencode($src).'&show_text=0',
             default => null,
         };
     }
@@ -203,13 +208,21 @@ final class VideoSourceDetector
             return true;
         }
 
-        // Share links: facebook.com/share/r/xxxxx
+        // Share links: facebook.com/share/r/xxxxx - try to resolve first
         if (preg_match('/facebook\.com\/share\/r\//', $src)) {
+            $resolved = $this->resolveFacebookShareUrl($src);
+            if ($resolved !== null) {
+                $this->resolvedFacebookUrls[$src] = $resolved;
+            }
             return true;
         }
 
-        // Short URL format: fb.watch/xxxxx
+        // Short URL format: fb.watch/xxxxx - try to resolve first
         if (str_contains($lowerSrc, 'fb.watch/')) {
+            $resolved = $this->resolveFacebookShareUrl($src);
+            if ($resolved !== null) {
+                $this->resolvedFacebookUrls[$src] = $resolved;
+            }
             return true;
         }
 
@@ -247,13 +260,163 @@ final class VideoSourceDetector
     }
 
     /**
+     * Resolve Facebook share/short URLs (fb.watch, facebook.com/share/r/) to actual video URLs.
+     * Uses browser user-agent spoofing to bypass Facebook's bot detection.
+     */
+    private function resolveFacebookShareUrl(string $url): ?string
+    {
+        // Check cache first
+        if (isset($this->resolvedFacebookUrls[$url])) {
+            return $this->resolvedFacebookUrls[$url];
+        }
+
+        // Browser user-agent to spoof
+        $browserUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+        try {
+            // Make HEAD request with browser user-agent to get redirect location
+            $response = Http::withHeaders([
+                'User-Agent' => $browserUserAgent,
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.5',
+                'Accept-Encoding' => 'gzip, deflate, br',
+                'DNT' => '1',
+                'Connection' => 'keep-alive',
+                'Upgrade-Insecure-Requests' => '1',
+                'Sec-Fetch-Dest' => 'document',
+                'Sec-Fetch-Mode' => 'navigate',
+                'Sec-Fetch-Site' => 'none',
+                'Sec-Fetch-User' => '?1',
+                'Cache-Control' => 'max-age=0',
+            ])
+                ->withOptions([
+                    'allow_redirects' => false,
+                    'verify' => false,
+                ])
+                ->timeout(10)
+                ->head($url);
+
+            // Check for redirect (302 or 301)
+            if ($response->redirect()) {
+                $location = $response->header('Location');
+                if ($location) {
+                    // Handle relative URLs
+                    if (str_starts_with($location, '/')) {
+                        $parsedUrl = parse_url($url);
+                        $location = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $location;
+                    }
+
+                    Log::debug('Facebook share URL resolved', [
+                        'original' => $url,
+                        'resolved' => $location,
+                    ]);
+
+                    return $location;
+                }
+            }
+
+            // If no redirect, try GET request and follow redirects
+            $response = Http::withHeaders([
+                'User-Agent' => $browserUserAgent,
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.5',
+            ])
+                ->withOptions([
+                    'allow_redirects' => true,
+                    'verify' => false,
+                ])
+                ->timeout(10)
+                ->get($url);
+
+            if ($response->successful()) {
+                $effectiveUrl = $response->effectiveUri();
+                if ($effectiveUrl && $effectiveUrl !== $url) {
+                    Log::debug('Facebook share URL resolved via redirect chain', [
+                        'original' => $url,
+                        'resolved' => (string) $effectiveUrl,
+                    ]);
+
+                    return (string) $effectiveUrl;
+                }
+            }
+
+            return null;
+        } catch (\Throwable $e) {
+            Log::warning('Failed to resolve Facebook share URL', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
      * Extract Facebook video ID (returns full URL for embed).
      * Facebook embeds work best with the complete original URL.
+     * Uses resolved URL if the original was a share/short link.
      */
     private function extractFacebookId(string $src): ?string
     {
-        // Facebook uses the full URL for embedding via plugins/video.php
+        // Use resolved URL if available (for share links like fb.watch)
+        if (isset($this->resolvedFacebookUrls[$src])) {
+            $resolvedUrl = $this->resolvedFacebookUrls[$src];
+
+            // Extract video ID from resolved URL if possible
+            $extractedId = $this->extractVideoIdFromFacebookUrl($resolvedUrl);
+            if ($extractedId !== null) {
+                return $extractedId;
+            }
+
+            return $resolvedUrl;
+        }
+
+        // For direct URLs, try to extract video ID
+        $extractedId = $this->extractVideoIdFromFacebookUrl($src);
+        if ($extractedId !== null) {
+            return $extractedId;
+        }
+
+        // Fall back to using the full URL for embedding via plugins/video.php
         return $src;
+    }
+
+    /**
+     * Extract video ID from a Facebook URL.
+     */
+    private function extractVideoIdFromFacebookUrl(string $url): ?string
+    {
+        // Reel format: facebook.com/reel/123456789012345
+        if (preg_match('/facebook\.com\/reel\/(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        // Watch URL: facebook.com/watch?v=123456789012345
+        if (preg_match('/facebook\.com\/watch\?v=(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        // Watch URL with path: facebook.com/watch/123456789012345
+        if (preg_match('/facebook\.com\/watch\/(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        // Legacy video.php: facebook.com/video.php?v=123456789012345
+        if (preg_match('/facebook\.com\/video\.php\?v=(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        // Legacy photo.php with video: facebook.com/photo.php?v=123456789012345
+        if (preg_match('/facebook\.com\/photo\.php\?v=(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        // Profile videos: facebook.com/username/videos/123456789012345
+        if (preg_match('/facebook\.com\/[^\/]+\/videos\/(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     /**

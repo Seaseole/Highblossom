@@ -182,11 +182,11 @@
                                     </div>
                                 </div>
 
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="mobile_service" value="1"
-                                        class="w-5 h-5 rounded border border-white/20 bg-white/5 text-[#DC2626] focus:ring-[#DC2626] focus:ring-offset-0 focus:ring-offset-gray-900 transition-all cursor-pointer accent-[#DC2626]">
-                                    <span class="text-[#A1A1AA] text-sm group-hover:text-[#FAFAFA] transition-colors">{{ __('quote.mobile_service') }}</span>
-                                </label>
+                                <x-ui.checkbox
+                                    name="mobile_service"
+                                    value="1"
+                                    label="{{ __('quote.mobile_service') }}"
+                                />
                             </div>
 
                             <!-- Submit -->

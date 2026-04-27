@@ -86,10 +86,7 @@
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" name="remember" class="w-4 h-4 text-[#DC2626] border-white/20 rounded bg-white/5 focus:ring-[#DC2626] focus:ring-offset-0">
-                                <span class="ml-2 text-sm text-[#A1A1AA]">{{ __('auth.login.remember_me') }}</span>
-                            </label>
+                            <x-ui.checkbox name="remember" label="{{ __('auth.login.remember_me') }}" />
 
                             <a href="{{ route('password.request') }}" class="text-sm text-[#DC2626] hover:text-[#B91C1C] transition-colors">
                                 {{ __('auth.login.forgot_password') }}
