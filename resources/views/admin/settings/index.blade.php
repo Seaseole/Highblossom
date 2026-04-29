@@ -39,6 +39,9 @@
                 <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Social & WhatsApp
                 </button>
+                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                    Notifications
+                </button>
             </div>
 
             <!-- Tab Contents -->
@@ -217,7 +220,7 @@
                                     <label class="text-sm font-medium text-admin-text">Default WhatsApp</label>
                                     <input type="text" name="whatsapp_number_default" value="{{ old('whatsapp_number_default', $settings['whatsapp_number_default']) }}" class="w-full admin-form-input">
                                 </div>
-                                
+
                                 <div class="space-y-4 pt-4 border-t border-admin-border-subtle">
                                     <div class="flex items-center justify-between">
                                         <label class="text-sm font-medium text-admin-text">Additional Numbers</label>
@@ -255,6 +258,18 @@
                                     <label class="text-sm font-medium text-admin-text">LinkedIn URL</label>
                                     <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $settings['linkedin_url']) }}" class="w-full admin-form-input">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div x-show="tab === 'notifications'" class="space-y-6" style="display: none;">
+                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
+                            <h3 class="text-lg font-bold text-admin-text">Quote Notifications</h3>
+                            <div class="md:col-span-2 space-y-2">
+                                <label class="text-sm font-medium text-admin-text">Quote Notification Emails</label>
+                                <textarea name="quote_notification_emails" rows="3" class="w-full admin-form-input">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
+                                <p class="text-[10px] text-admin-text-muted">Enter comma-separated email addresses for staff who should receive quote notifications. If empty, notifications will be sent to the primary email.</p>
                             </div>
                         </div>
                     </div>

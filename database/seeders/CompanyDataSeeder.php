@@ -31,6 +31,7 @@ class CompanyDataSeeder extends Seeder
             ['key' => 'smtp_username', 'value' => '', 'type' => 'text'],
             ['key' => 'smtp_password', 'value' => '', 'type' => 'text'],
             ['key' => 'smtp_encryption', 'value' => 'tls', 'type' => 'text'],
+            ['key' => 'quote_notification_emails', 'value' => '', 'type' => 'text'],
         ];
 
         foreach ($settings as $setting) {

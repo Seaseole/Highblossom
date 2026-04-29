@@ -44,6 +44,7 @@ final class CompanySettingController
             'facebook_url' => CompanySetting::get('facebook_url', 'https://facebook.com'),
             'instagram_url' => CompanySetting::get('instagram_url', 'https://instagram.com'),
             'linkedin_url' => CompanySetting::get('linkedin_url', 'https://linkedin.com'),
+            'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
         ];
 
         return view('admin.settings.index', compact('settings'));
@@ -80,6 +81,7 @@ final class CompanySettingController
             'facebook_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
             'linkedin_url' => 'nullable|url|max:255',
+            'quote_notification_emails' => 'nullable|string|max:500',
         ]);
 
         // Handle File Uploads
@@ -119,7 +121,7 @@ final class CompanySettingController
             'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone',
             'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
             'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
-            'facebook_url', 'instagram_url', 'linkedin_url'
+            'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails'
         ];
 
         foreach ($simpleFields as $field) {
