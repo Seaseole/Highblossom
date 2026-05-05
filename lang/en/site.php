@@ -24,6 +24,14 @@ return [
         // Hero section
         'hero_trust_badge' => 'Gaborone\'s Trusted Auto Glass Specialists',
         'hero_headline' => 'Precision<br><span class="gradient-text-accent">Glass</span> Works',
+        'hero_headline_animated' => [
+            'Expert Automotive Glass 
+Solutions',
+            'Precision Glass Works',
+            'Your Trusted Auto Glass Partner',
+            'Premium Windshield Specialists',
+            'Gaborone\'s Glass Experts',
+        ],
         'hero_subheadline' => 'Premium automotive glass repair, restoration, and replacement for Gaborone\'s vehicle owners and commercial fleets.',
         'hero_get_quote' => 'Get Your Quote',
         'hero_view_work' => 'View Our Work',

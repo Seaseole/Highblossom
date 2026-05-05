@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\ServiceType;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\ServiceTypeRequest;
+use App\Services\ServiceTypeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 final class ServiceTypeController
 {
+    public function __construct(
+        private readonly ServiceTypeService $serviceTypeService,
+    ) {}
+
     public function index(): View
     {
         $serviceTypes = ServiceType::query()->ordered()->paginate(15);
@@ -23,18 +28,9 @@ final class ServiceTypeController
         return view('admin.service-types.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(ServiceTypeRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-        $validated['is_active'] = $request->has('is_active');
-
-        ServiceType::create($validated);
+        $this->serviceTypeService->create($request->validated());
 
         return redirect()
             ->route('admin.service-types.index')
@@ -46,18 +42,9 @@ final class ServiceTypeController
         return view('admin.service-types.edit', compact('serviceType'));
     }
 
-    public function update(Request $request, ServiceType $serviceType): RedirectResponse
+    public function update(ServiceTypeRequest $request, ServiceType $serviceType): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-        $validated['is_active'] = $request->has('is_active');
-
-        $serviceType->update($validated);
+        $this->serviceTypeService->update($serviceType, $request->validated());
 
         return redirect()
             ->route('admin.service-types.index')
@@ -66,7 +53,7 @@ final class ServiceTypeController
 
     public function destroy(ServiceType $serviceType): RedirectResponse
     {
-        $serviceType->delete();
+        $this->serviceTypeService->delete($serviceType);
 
         return redirect()
             ->route('admin.service-types.index')

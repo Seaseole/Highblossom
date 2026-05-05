@@ -12,29 +12,28 @@
         </div>
 
         {{-- Hero Content --}}
-        <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8 pt-32 pb-48 md:pb-40">
-            <div class="max-w-3xl">
+        <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32 sm:pt-32 sm:pb-40 md:pt-32 md:pb-40 text-center">
+            <div class="max-w-4xl mx-auto">
                 {{-- Trust Badge --}}
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 animate-fade-up">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 sm:mb-8 animate-fade-up">
                     <span class="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse"></span>
-                    <span class="text-[#A1A1AA] text-sm font-medium">{{ __('site.home.hero_trust_badge') }}</span>
+                    <span class="text-[#A1A1AA] text-xs sm:text-sm font-medium">{{ __('site.home.hero_trust_badge') }}</span>
                 </div>
 
-                {{-- Headline --}}
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-[#FAFAFA] font-headline tracking-tight leading-[1.1] mb-6 animate-fade-up"
-                    style="animation-delay: 100ms;">
-                    {!! __('site.home.hero_headline') !!}
-                </h1>
+                {{-- Animated Headline - Focus Blur Resolve --}}
+                <div id="hero-headline-container" class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight leading-[1.2] sm:leading-[1.1] mb-4 sm:mb-6 mx-auto break-words hyphens-auto"
+                    style="perspective: 900px; min-height: 2.4em;">
+                </div>
 
                 {{-- Subhead --}}
-                <p class="text-lg md:text-xl text-[#A1A1AA] leading-relaxed max-w-xl mb-10 animate-fade-up"
+                <p class="text-base sm:text-lg md:text-xl text-[#A1A1AA] leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10 animate-fade-up"
                     style="animation-delay: 200ms;">
                     {{ __('site.home.hero_subheadline') }}
                 </p>
 
                 {{-- CTAs --}}
-                <div class="flex flex-col sm:flex-row gap-4 animate-fade-up" style="animation-delay: 300ms;">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style="animation-delay: 300ms;">
                     <a href="{{ route('quote') }}" class="btn-premium glow-red-subtle">
                         <span>{{ __('site.home.hero_get_quote') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -744,4 +743,191 @@
             </div>
         </div>
     </section>
+
+    {{-- Typewriter Animation Script --}}
+    <script>
+        (function() {
+            const phrases = @json(__('site.home.hero_headline_animated'));
+            const container = document.getElementById('hero-headline-container');
+            
+            if (!container || !phrases || phrases.length === 0) return;
+
+            // Animation parameters from typewriter spec
+            const ENTER_DURATION = 173; // scaled from 240ms * 0.72
+            const ENTER_STAGGER = 33; // scaled from 46ms * 0.72
+            const EXIT_DURATION = 187; // scaled from 260ms * 0.72
+            const EXIT_STAGGER = 7; // scaled from 10ms * 0.72
+            const HOLD_MS = 550;
+            const GAP_MS = 320;
+            const MICRO_DELAY_MS = 85;
+            const Y_TRAVEL_MULTIPLIER = 0.58;
+            const INITIAL_DELAY_MS = Math.random() * 400;
+
+            const ENTER_EASING = 'steps(1, end)';
+            const EXIT_EASING = 'cubic-bezier(0.7, 0, 0.84, 0)';
+
+            let currentIndex = 0;
+            let activeAnimations = [];
+            let activeTimeout = null;
+            let isRunning = true;
+
+            function createPhrase(text) {
+                const title = document.createElement('h1');
+                title.className = 'text-animation-title';
+                title.style.cssText = 'display: inline-block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity; width: 100%;';
+                
+                // Split text into individual characters for per-character animation
+                const characters = Array.from(text);
+                const units = [];
+                
+                characters.forEach((char, index) => {
+                    const unit = document.createElement('span');
+                    unit.className = 'text-animation-unit';
+                    unit.textContent = char;
+                    unit.style.cssText = 'display: inline-block; backface-visibility: hidden; will-change: transform, opacity; white-space: pre;';
+                    title.appendChild(unit);
+                    units.push(unit);
+                });
+                
+                return { title, units };
+            }
+
+            function applyEnterFrom(element) {
+                element.style.opacity = '0';
+            }
+
+            function applyEnterTo(element) {
+                element.style.opacity = '1';
+            }
+
+            function applyExitFrom(element) {
+                element.style.opacity = '1';
+            }
+
+            function applyExitTo(element) {
+                const yEnd = -4 * Y_TRAVEL_MULTIPLIER;
+                element.style.opacity = '0';
+                element.style.transform = `translate3d(0, ${yEnd}px, 0)`;
+            }
+
+            async function enterAnimation(elements) {
+                const promises = elements.map((element, index) => {
+                    const delay = index * ENTER_STAGGER;
+                    const keyframes = [
+                        { opacity: 0 },
+                        { opacity: 1 }
+                    ];
+
+                    const animation = element.animate(keyframes, {
+                        delay: delay,
+                        duration: ENTER_DURATION,
+                        easing: ENTER_EASING,
+                        fill: 'forwards'
+                    });
+
+                    activeAnimations.push(animation);
+                    return animation.finished;
+                });
+
+                await Promise.all(promises);
+                activeAnimations = [];
+            }
+
+            async function exitAnimation(elements) {
+                const promises = elements.map((element, index) => {
+                    const delay = index * EXIT_STAGGER;
+                    const yEnd = -4 * Y_TRAVEL_MULTIPLIER;
+                    const keyframes = [
+                        { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+                        { opacity: 0, transform: `translate3d(0, ${yEnd}px, 0)` }
+                    ];
+
+                    const animation = element.animate(keyframes, {
+                        delay: delay,
+                        duration: EXIT_DURATION,
+                        easing: EXIT_EASING,
+                        fill: 'forwards'
+                    });
+
+                    activeAnimations.push(animation);
+                    return animation.finished;
+                });
+
+                await Promise.all(promises);
+                activeAnimations = [];
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => {
+                    activeTimeout = setTimeout(resolve, ms);
+                });
+            }
+
+            async function runAnimationLoop() {
+                if (!isRunning) return;
+
+                // Initial delay
+                await sleep(INITIAL_DELAY_MS);
+
+                // Create and animate first phrase
+                let { title, units } = createPhrase(phrases[currentIndex]);
+                units.forEach(unit => applyEnterFrom(unit));
+                container.appendChild(title);
+                await enterAnimation(units);
+
+                // Loop
+                while (isRunning) {
+                    await sleep(HOLD_MS);
+
+                    if (!isRunning) break;
+
+                    // Exit current phrase
+                    await exitAnimation(units);
+
+                    if (!isRunning) break;
+
+                    // Prepare next phrase
+                    currentIndex = (currentIndex + 1) % phrases.length;
+                    const nextPhrase = createPhrase(phrases[currentIndex]);
+                    nextPhrase.units.forEach(unit => applyEnterFrom(unit));
+
+                    await sleep(MICRO_DELAY_MS);
+
+                    if (!isRunning) break;
+
+                    // Replace and enter next phrase
+                    container.replaceChild(nextPhrase.title, title);
+                    title = nextPhrase.title;
+                    units = nextPhrase.units;
+                    await enterAnimation(units);
+
+                    await sleep(GAP_MS);
+                }
+            }
+
+            // Cleanup on page navigation
+            function cleanup() {
+                isRunning = false;
+                activeAnimations.forEach(animation => {
+                    animation.cancel();
+                });
+                activeAnimations = [];
+                if (activeTimeout) {
+                    clearTimeout(activeTimeout);
+                    activeTimeout = null;
+                }
+            }
+
+            // Start animation when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', runAnimationLoop);
+            } else {
+                runAnimationLoop();
+            }
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', cleanup);
+            window.addEventListener('pagehide', cleanup);
+        })();
+    </script>
 </x-layouts::site>

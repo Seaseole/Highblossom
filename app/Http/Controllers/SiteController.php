@@ -108,6 +108,15 @@ class SiteController extends Controller
         $primaryEmail = CompanySetting::get('primary_email', 'sales@highblossom.net');
         $workingHours = CompanySetting::get('working_hours', []);
         $timeFormatDisplay = CompanySetting::get('time_format_display', '12');
+
+        // Validate working hours for dynamic display
+        $hasWorkingHours = is_array($workingHours)
+            && ! empty($workingHours)
+            && isset($workingHours['monday']);
+
+        // Day order mapping for working hours display
+        $dayOrder = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
+
         $companyName = CompanySetting::get('company_name', 'Highblossom PTY LTD');
         $companyAddress = CompanySetting::get('address', 'Plot 123, Broadhurst, Gaborone, Botswana');
         $googleMapsApiKey = CompanySetting::get('google_maps_api_key', '');
@@ -154,7 +163,7 @@ class SiteController extends Controller
             ]);
         }
 
-        return view('site.contact', compact('contactNumbers', 'primaryPhone', 'primaryEmail', 'workingHours', 'timeFormatDisplay', 'companyName', 'companyAddress', 'googleMapsApiKey', 'mapDirectionsLink'));
+        return view('site.contact', compact('contactNumbers', 'primaryPhone', 'primaryEmail', 'workingHours', 'timeFormatDisplay', 'companyName', 'companyAddress', 'googleMapsApiKey', 'mapDirectionsLink', 'hasWorkingHours', 'dayOrder'));
     }
 
     public function quote()

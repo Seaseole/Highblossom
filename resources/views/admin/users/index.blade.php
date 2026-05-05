@@ -36,8 +36,8 @@
                         <tr class="transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        <div class="h-12 w-12 rounded-full bg-[#DC2626] flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[#DC2626]/20">
+                                    <div class="shrink-0 h-12 w-12">
+                                        <div class="h-12 w-12 rounded-full bg-admin-accent flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-admin-accent/20">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
                                     </div>

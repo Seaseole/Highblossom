@@ -40,7 +40,7 @@
                                     <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this role?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[#DC2626] hover:text-admin-text transition-colors">Delete</button>
+                                        <button type="submit" class="text-admin-accent hover:text-admin-text transition-colors">Delete</button>
                                     </form>
                                 @endif
                             </td>

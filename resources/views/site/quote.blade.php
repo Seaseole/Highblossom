@@ -21,8 +21,12 @@
                 <!-- Main Form -->
                 <div class="lg:col-span-2">
                     <div class="glass-card rounded-2xl p-8 md:p-12">
-                        <form action="{{ route('quote.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
+                        <form action="{{ route('quote.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-10"
+                            x-data="{ isSubmitting: false, isUploading: false, hasImage: false }"
+                            @submit.prevent="if (!isSubmitting && !isUploading) { isSubmitting = true; $el.submit(); }">
                             @csrf
+                            <input type="hidden" name="_idempotency_token" value="{{ session()->get('quote_token', md5(uniqid())) }}">
+                            @php(session()->put('quote_token', md5(uniqid())))
 
                             <!-- Personal Information -->
                             <div>
@@ -191,13 +195,33 @@
 
                             <!-- Submit -->
                             <div class="pt-10 border-t border-white/5">
-                                <button type="submit" class="btn-premium glow-red-subtle w-full md:w-auto text-lg px-12 py-4">
-                                    <span>{{ __('quote.submit_quote') }}</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button type="submit"
+                                    class="btn-premium glow-red-subtle w-full md:w-auto text-lg px-12 py-4"
+                                    :disabled="isSubmitting || isUploading"
+                                    :class="{ 'opacity-75 cursor-not-allowed': isSubmitting || isUploading }">
+                                    <span x-show="!isSubmitting && !isUploading">{{ __('quote.submit_quote') }}</span>
+                                    <span x-show="isUploading" class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Uploading image...
+                                    </span>
+                                    <span x-show="isSubmitting && !isUploading" class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Submitting...
+                                    </span>
+                                    <svg x-show="!isSubmitting && !isUploading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                     </svg>
                                 </button>
-                                <p class="text-[#71717A] text-sm mt-4">
+                                <p class="text-[#71717A] text-sm mt-4" x-show="isUploading">
+                                    Please wait for the image to finish uploading before submitting.
+                                </p>
+                                <p class="text-[#71717A] text-sm mt-4" x-show="!isUploading">
                                     {{ __('quote.submit_disclaimer') }}
                                 </p>
                             </div>
@@ -282,7 +306,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof ImageUploader !== 'undefined') {
-            new ImageUploader({
+            // Get Alpine.js component reference for state synchronization
+            const form = document.querySelector('form[x-data]');
+            let alpineComponent = null;
+
+            // Find the Alpine.js component
+            if (form && form._x_dataStack) {
+                alpineComponent = form._x_dataStack[0];
+            }
+
+            const uploader = new ImageUploader({
                 fileInput: document.querySelector('input[name="image"]'),
                 previewContainer: document.getElementById('quote-image-preview'),
                 progressContainer: document.getElementById('quote-image-progress'),
@@ -291,13 +324,34 @@
                 csrfToken: '{{ csrf_token() }}',
                 maxSize: 2 * 1024 * 1024, // 2MB
                 acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                onUploadStart: function() {
+                    // Sync with Alpine.js
+                    if (alpineComponent && alpineComponent.isUploading !== undefined) {
+                        alpineComponent.isUploading = true;
+                    }
+                    // Dispatch custom event for any other listeners
+                    form?.dispatchEvent(new CustomEvent('upload:start'));
+                },
+                onUploadEnd: function() {
+                    // Sync with Alpine.js
+                    if (alpineComponent && alpineComponent.isUploading !== undefined) {
+                        alpineComponent.isUploading = false;
+                    }
+                    form?.dispatchEvent(new CustomEvent('upload:end'));
+                },
                 onUploadComplete: function(response) {
                     console.log('Image uploaded successfully:', response);
+                    if (alpineComponent && alpineComponent.hasImage !== undefined) {
+                        alpineComponent.hasImage = true;
+                    }
                 },
                 onUploadError: function(message) {
                     console.error('Upload error:', message);
                 }
             });
+
+            // Also expose uploader instance for debugging
+            window.quoteUploader = uploader;
         }
     });
 </script>

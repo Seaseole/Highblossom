@@ -5,13 +5,37 @@ namespace App\Actions;
 use App\Domains\Content\Models\CompanySetting;
 use App\Domains\Content\Models\ContactMessage;
 use App\Http\Requests\ContactFormRequest;
+use App\Services\IdempotencyService;
 use Illuminate\Support\Facades\Mail;
 
 class SendContactMessage
 {
+    private IdempotencyService $idempotencyService;
+
+    public function __construct(IdempotencyService $idempotencyService)
+    {
+        $this->idempotencyService = $idempotencyService;
+    }
+
     public function handle(ContactFormRequest $request): array
     {
+        // Check for duplicate submission using idempotency token
+        $token = $request->input('_idempotency_token');
+
+        if (!empty($token) && $this->idempotencyService->isProcessed($token)) {
+            return [
+                'success' => true,
+                'duplicate' => true,
+                'message' => 'Your message has already been sent. Please wait a moment before sending another.',
+            ];
+        }
+
         $validated = $request->validated();
+
+        // Mark token as processed before database operation
+        if (!empty($token)) {
+            $this->idempotencyService->markProcessed($token);
+        }
 
         // Save to database
         $contactMessage = ContactMessage::create([

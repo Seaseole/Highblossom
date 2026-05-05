@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\Testimonial;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\TestimonialRequest;
+use App\Services\TestimonialService;
 use Illuminate\View\View;
 
 final class TestimonialController
 {
+    public function __construct(
+        private readonly TestimonialService $testimonialService,
+    ) {}
+
     public function index(): View
     {
         $testimonials = Testimonial::query()->latest()->paginate(15);
@@ -22,19 +27,9 @@ final class TestimonialController
         return view('admin.testimonials.create');
     }
 
-    public function store(Request $request)
+    public function store(TestimonialRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'content' => 'required|string',
-            'role' => 'nullable|string|max:255',
-            'rating' => 'required|integer|min:1|max:5',
-            'is_featured' => 'boolean',
-            'is_published' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
-
-        Testimonial::create($validated);
+        $this->testimonialService->create($request->validated());
 
         return redirect()
             ->route('admin.testimonials.index')
@@ -46,19 +41,9 @@ final class TestimonialController
         return view('admin.testimonials.edit', compact('testimonial'));
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(TestimonialRequest $request, Testimonial $testimonial)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'content' => 'required|string',
-            'role' => 'nullable|string|max:255',
-            'rating' => 'required|integer|min:1|max:5',
-            'is_featured' => 'boolean',
-            'is_published' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
-
-        $testimonial->update($validated);
+        $this->testimonialService->update($testimonial, $request->validated());
 
         return redirect()
             ->route('admin.testimonials.index')
@@ -67,7 +52,7 @@ final class TestimonialController
 
     public function destroy(Testimonial $testimonial)
     {
-        $testimonial->delete();
+        $this->testimonialService->delete($testimonial);
 
         return redirect()
             ->route('admin.testimonials.index')

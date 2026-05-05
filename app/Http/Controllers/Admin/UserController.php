@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\UserRequest;
 use App\Models\User;
-use App\Actions\Admin\AssignRoleToUser;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,6 +14,10 @@ use Spatie\Permission\Models\Role;
 
 final class UserController
 {
+    public function __construct(
+        private readonly UserService $userService,
+    ) {}
+
     public function index(Request $request): View
     {
         $users = User::query()
@@ -32,24 +37,9 @@ final class UserController
         return view('admin.users.create', compact('roles'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(UserRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|min:8',
-            'roles' => 'array',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
-
-        if (!empty($validated['roles'])) {
-            $user->syncRoles($validated['roles']);
-        }
+        $this->userService->create($request->validated());
 
         return redirect()
             ->route('admin.users.index')
@@ -63,27 +53,9 @@ final class UserController
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:8',
-            'roles' => 'array',
-        ]);
-
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-        ]);
-
-        if (!empty($validated['password'])) {
-            $user->update(['password' => bcrypt($validated['password'])]);
-        }
-
-        if (isset($validated['roles'])) {
-            $user->syncRoles($validated['roles']);
-        }
+        $this->userService->update($user, $request->validated());
 
         return redirect()
             ->route('admin.users.index')
@@ -92,7 +64,8 @@ final class UserController
 
     public function destroy(User $user): RedirectResponse
     {
-        $user->delete();
+        $this->userService->delete($user);
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', __('messages.user_deleted'));

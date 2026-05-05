@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\Category;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\CategoryRequest;
+use App\Services\CategoryService;
 use Illuminate\View\View;
 
 final class CategoryController
 {
+    public function __construct(
+        private readonly CategoryService $categoryService,
+    ) {}
+
     public function index(): View
     {
         $categories = Category::query()->latest()->paginate(15);
@@ -22,16 +27,9 @@ final class CategoryController
         return view('admin.blog.categories.create');
     }
 
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-
-        Category::create($validated);
+        $this->categoryService->create($request->validated());
 
         return redirect()
             ->route('admin.categories.index')
@@ -43,16 +41,9 @@ final class CategoryController
         return view('admin.blog.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(CategoryRequest $request, Category $category)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-
-        $category->update($validated);
+        $this->categoryService->update($category, $request->validated());
 
         return redirect()
             ->route('admin.categories.index')
@@ -61,7 +52,7 @@ final class CategoryController
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        $this->categoryService->delete($category);
 
         return redirect()
             ->route('admin.categories.index')

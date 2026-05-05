@@ -1,45 +1,51 @@
 <x-layouts::admin title="Create Category">
     <div class="p-6">
-        <div class="admin-section-header">
-            <h1 class="admin-section-title">Create Category</h1>
-            <a href="{{ route('admin.categories.index') }}" class="admin-action-btn admin-action-btn-secondary">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        {{-- Header --}}
+        <div class="mb-6">
+            <a href="{{ route('admin.categories.index') }}" class="inline-flex items-center gap-2 text-sm text-admin-text-muted hover:text-admin-accent transition-colors duration-200 group">
+                <svg class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span>Back</span>
+                Back to Categories
             </a>
+        </div>
+
+        {{-- Title Section --}}
+        <div class="mb-8">
+            <h1 class="font-headline text-3xl font-bold text-admin-text tracking-tight">Create Category</h1>
+            <p class="text-admin-text-muted text-sm mt-2">Add a new blog category</p>
         </div>
 
         <form method="POST" action="{{ route('admin.categories.store') }}" class="max-w-2xl">
             @csrf
 
-            <div class="bg-admin-surface-alt border border-admin-border rounded-xl p-6 space-y-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <div class="admin-glass-card rounded-3xl shadow-black/20 p-6 space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-admin-text-muted mb-2">Name</label>
+                    <label class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-2">Name</label>
                     <input
                         type="text"
                         name="name"
                         value="{{ old('name') }}"
                         required
-                        class="w-full bg-admin-surface-alt border border-admin-border rounded-xl px-4 py-3 text-admin-text placeholder-admin-text-muted focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                        class="admin-form-input w-full"
                         placeholder="Enter category name..."
                     >
                     @error('name')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-admin-text-muted mb-2">Description</label>
+                    <label class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-2">Description</label>
                     <textarea
                         name="description"
                         rows="3"
-                        class="w-full bg-admin-surface-alt border border-admin-border rounded-xl px-4 py-3 text-admin-text placeholder-admin-text-muted focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                        class="admin-form-input w-full resize-none"
                         placeholder="Category description..."
                     >{{ old('description') }}</textarea>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4">
+                <div class="flex justify-end gap-3 pt-4 border-t border-admin-border-subtle">
                     <a href="{{ route('admin.categories.index') }}" class="admin-action-btn admin-action-btn-secondary">
                         Cancel
                     </a>

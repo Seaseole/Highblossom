@@ -11,6 +11,12 @@ class ImageUploader {
         this.onUploadComplete = options.onUploadComplete || (() => {});
         this.onUploadError = options.onUploadError || (() => {});
         this.onPreview = options.onPreview || (() => {});
+        this.onUploadStart = options.onUploadStart || (() => {});
+        this.onUploadEnd = options.onUploadEnd || (() => {});
+        this.folder = options.folder || 'uploads';
+
+        this.isUploading = false;
+        this.currentXhr = null;
 
         this.init();
     }
@@ -83,15 +89,20 @@ class ImageUploader {
                 
                 // Create overlay for change button
                 const overlay = document.createElement('div');
-                overlay.className = 'absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm rounded-xl';
+                overlay.className = 'absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm rounded-xl cursor-pointer';
                 overlay.innerHTML = `
-                    <div class="flex flex-col items-center text-white">
+                    <div class="flex flex-col items-center text-white pointer-events-none">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
                         <span class="font-semibold text-sm">Change Image</span>
                     </div>
                 `;
+                overlay.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.fileInput.click();
+                });
                 
                 // Create wrapper
                 const wrapper = document.createElement('div');
@@ -113,9 +124,18 @@ class ImageUploader {
             return;
         }
 
+        // Cancel any existing upload
+        if (this.currentXhr) {
+            this.currentXhr.abort();
+        }
+
+        this.isUploading = true;
+        this.onUploadStart();
+
         const formData = new FormData();
         formData.append('image', file);
         formData.append('_token', this.csrfToken);
+        formData.append('folder', this.folder);
 
         const xhr = new XMLHttpRequest();
         xhr.timeout = 30000; // 30 second timeout
@@ -146,21 +166,25 @@ class ImageUploader {
         });
 
         xhr.addEventListener('load', () => {
+            this.isUploading = false;
+            this.currentXhr = null;
+            this.onUploadEnd();
+
             if (xhr.status === 200) {
                 try {
                     const response = JSON.parse(xhr.responseText);
-                    
+
                     if (response.success) {
                         // Update hidden input with image path
                         if (this.hiddenInput) {
                             this.hiddenInput.value = response.path;
                         }
-                        
+
                         // Hide progress bar
                         if (this.progressContainer) {
                             this.progressContainer.innerHTML = '';
                         }
-                        
+
                         this.onUploadComplete(response);
                     } else {
                         console.error('Upload failed:', response);
@@ -177,14 +201,22 @@ class ImageUploader {
         });
 
         xhr.addEventListener('error', () => {
+            this.isUploading = false;
+            this.currentXhr = null;
+            this.onUploadEnd();
             console.error('Network error during upload');
             this.showError('Network error. Please try again.');
         });
 
         xhr.addEventListener('timeout', () => {
+            this.isUploading = false;
+            this.currentXhr = null;
+            this.onUploadEnd();
             console.error('Upload timed out');
             this.showError('Upload timed out. Please try again.');
         });
+
+        this.currentXhr = xhr;
 
         xhr.open('POST', this.uploadUrl, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');

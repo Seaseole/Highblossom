@@ -73,6 +73,34 @@
         return route($route . '.index');
     };
 
+    // Helper to get permission for specific routes
+    $getRoutePermission = function($route) {
+        $permissions = [
+            'dashboard' => 'access admin panel',
+            'admin.bookings' => 'view bookings',
+            'admin.inspections' => 'view inspections',
+            'admin.quotes' => 'view bookings',
+            'admin.about-us' => 'manage pages',
+            'admin.testimonials' => 'manage testimonials',
+            'admin.services' => 'view services',
+            'admin.gallery' => 'view gallery',
+            'admin.gallery-categories' => 'view gallery',
+            'admin.glass-types' => 'view services',
+            'admin.service-types' => 'view services',
+            'admin.posts' => 'view blog',
+            'admin.categories' => 'view blog',
+            'admin.tags' => 'view blog',
+            'admin.users' => 'manage users',
+            'admin.roles' => 'manage roles',
+            'admin.media-library' => 'access admin panel',
+            'admin.settings' => 'view settings',
+            'admin.smtp' => 'view settings',
+            'admin.seo' => 'manage seo',
+            'admin.profile' => 'access admin panel',
+        ];
+        return $permissions[$route] ?? null;
+    };
+
     // Helper to get icon for specific routes
     $getRouteIcon = function($route) {
         $icons = [
@@ -197,10 +225,17 @@
         {{-- Navigation --}}
         <flux:sidebar.nav>
             @foreach($group as $groupKey => $groupData)
-                @if(count($groupData['routes']) === 1)
+                @php
+                    $visibleRoutes = array_filter($groupData['routes'], function($r) use ($getRoutePermission) {
+                        $perm = $getRoutePermission($r);
+                        return $perm ? auth()->user()->can($perm) : true;
+                    });
+                @endphp
+
+                @if(count($visibleRoutes) === 1)
                     {{-- Single item group - render as standalone item --}}
                     @php
-                        $route = $groupData['routes'][0];
+                        $route = reset($visibleRoutes);
                         $isActive = $isRouteActive($route);
                     @endphp
                     <flux:sidebar.item 
@@ -211,10 +246,10 @@
                     >
                         {{ $getRouteLabel($route) }}
                     </flux:sidebar.item>
-                @else
+                @elseif(count($visibleRoutes) > 1)
                     {{-- Multi-item group - render as collapsible group --}}
-                    <flux:sidebar.group label="{{ $groupData['label'] }}" :collapsed="!$isGroupActive($groupData['routes'])">
-                        @foreach($groupData['routes'] as $route)
+                    <flux:sidebar.group label="{{ $groupData['label'] }}" :collapsed="!$isGroupActive($visibleRoutes)">
+                        @foreach($visibleRoutes as $route)
                             @php
                                 $isActive = $isRouteActive($route);
                             @endphp
@@ -330,10 +365,17 @@
         {{-- Navigation --}}
         <nav class="p-4 flex-1 overflow-y-auto space-y-1">
             @foreach($group as $groupKey => $groupData)
-                @if(count($groupData['routes']) === 1)
+                @php
+                    $visibleRoutes = array_filter($groupData['routes'], function($r) use ($getRoutePermission) {
+                        $perm = $getRoutePermission($r);
+                        return $perm ? auth()->user()->can($perm) : true;
+                    });
+                @endphp
+
+                @if(count($visibleRoutes) === 1)
                     {{-- Single item group - render as standalone item --}}
                     @php
-                        $route = $groupData['routes'][0];
+                        $route = reset($visibleRoutes);
                         $isActive = $isRouteActive($route);
                     @endphp
                     <a href="{{ $getRouteName($route) }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $isActive ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
@@ -342,12 +384,12 @@
                         </svg>
                         <span class="whitespace-nowrap">{{ $getRouteLabel($route) }}</span>
                     </a>
-                @else
+                @elseif(count($visibleRoutes) > 1)
                     {{-- Multi-item group - render with header --}}
                     <div class="mt-4 mb-2 px-4">
                         <span class="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">{{ $groupData['label'] }}</span>
                     </div>
-                    @foreach($groupData['routes'] as $route)
+                    @foreach($visibleRoutes as $route)
                         @php
                             $isActive = $isRouteActive($route);
                         @endphp

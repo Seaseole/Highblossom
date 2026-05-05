@@ -17,6 +17,7 @@ final class Service extends Model
         'features',
         'is_active',
         'sort_order',
+        'image_path',
     ];
 
     protected $casts = [
@@ -46,5 +47,10 @@ final class Service extends Model
         }
 
         return null;
+    }
+
+    public function getImageAttribute(): ?string
+    {
+        return $this->full_image_url;
     }
 }

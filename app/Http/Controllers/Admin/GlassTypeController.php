@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\GlassType;
+use App\Http\Requests\Admin\GlassTypeRequest;
+use App\Services\GlassTypeService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class GlassTypeController
 {
+    public function __construct(
+        private readonly GlassTypeService $glassTypeService,
+    ) {}
+
     public function index(): View
     {
         $glassTypes = GlassType::query()->ordered()->paginate(15);
@@ -24,18 +28,9 @@ final class GlassTypeController
         return view('admin.glass-types.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(GlassTypeRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-        $validated['is_active'] = $request->has('is_active');
-
-        GlassType::create($validated);
+        $this->glassTypeService->create($request->validated());
 
         return redirect()
             ->route('admin.glass-types.index')
@@ -47,18 +42,9 @@ final class GlassTypeController
         return view('admin.glass-types.edit', compact('glassType'));
     }
 
-    public function update(Request $request, GlassType $glassType): RedirectResponse
+    public function update(GlassTypeRequest $request, GlassType $glassType): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-        $validated['is_active'] = $request->has('is_active');
-
-        $glassType->update($validated);
+        $this->glassTypeService->update($glassType, $request->validated());
 
         return redirect()
             ->route('admin.glass-types.index')
@@ -67,7 +53,7 @@ final class GlassTypeController
 
     public function destroy(GlassType $glassType): RedirectResponse
     {
-        $glassType->delete();
+        $this->glassTypeService->delete($glassType);
 
         return redirect()
             ->route('admin.glass-types.index')

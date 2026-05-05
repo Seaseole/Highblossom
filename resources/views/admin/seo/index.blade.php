@@ -39,7 +39,7 @@
                                         Configured
                                     </span>
                                 @else
-                                    <span class="admin-badge" style="background: rgba(113, 113, 122, 0.2); color: #A1A1AA; border: 1px solid rgba(113, 113, 122, 0.3);">
+                                    <span class="admin-badge admin-badge-muted">
                                         Default
                                     </span>
                                 @endif

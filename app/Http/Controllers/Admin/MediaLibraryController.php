@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\GalleryImage;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\MediaLibraryRequest;
+use App\Services\MediaLibraryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class MediaLibraryController
 {
-    public function index(Request $request)
+    public function __construct(
+        private readonly MediaLibraryService $mediaLibraryService,
+    ) {}
+
+    public function index(Request $request): View
     {
         $images = GalleryImage::query()
             ->when($request->search, fn ($q) => $q->where('title', 'like', '%' . $request->search . '%'))
@@ -26,51 +31,20 @@ final class MediaLibraryController
         return view('admin.media-library.index', compact('images'));
     }
 
-    public function upload(Request $request): JsonResponse
+    public function upload(MediaLibraryRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|in:automotive,heavy_machinery,fleet,other',
-        ]);
+        try {
+            $image = $this->mediaLibraryService->create($request->validated(), $request);
 
-        $imagePath = null;
-        
-        // Use AJAX uploaded path if provided, otherwise use traditional file upload
-        if (!empty($request->input('image_path'))) {
-            $imagePath = $request->input('image_path');
-        } elseif ($request->hasFile('upload')) {
-            try {
-                $file = $request->file('upload');
-                if ($file && $file->isValid()) {
-                    $imagePath = $file->store('gallery', 'public');
-                }
-            } catch (\Exception $e) {
-                Log::error('Failed to store media library image: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to upload image.',
-                ], 500);
-            }
-        }
-
-        if (!$imagePath) {
+            return response()->json([
+                'url' => $image->image_url,
+                'id' => $image->id,
+            ]);
+        } catch (\RuntimeException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'No image provided.',
-            ], 422);
+                'message' => $e->getMessage(),
+            ], $e->getMessage() === 'No image provided.' ? 422 : 500);
         }
-
-        $image = GalleryImage::create([
-            'title' => $validated['title'],
-            'image_path' => $imagePath,
-            'category' => $validated['category'],
-            'is_active' => true,
-            'sort_order' => GalleryImage::max('sort_order') + 1,
-        ]);
-
-        return response()->json([
-            'url' => $image->image_url,
-            'id' => $image->id,
-        ]);
     }
 }

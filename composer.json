@@ -28,6 +28,7 @@
         "livewire/flux": "^2.13",
         "livewire/livewire": "*",
         "php-ffmpeg/php-ffmpeg": "*",
+        "resend/resend-laravel": "^1.3",
         "spatie/laravel-permission": "^7.3"
     },
     "require-dev": {

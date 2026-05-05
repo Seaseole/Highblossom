@@ -64,10 +64,10 @@
                     <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-4">
                         <h3 class="font-bold text-admin-text">Actions</h3>
                         <p class="text-xs text-admin-text-muted leading-relaxed">
-                            Saving will update the <code class="text-[#DC2626]">.env</code> file directly. You may need to clear the config cache for changes to take effect immediately.
+                            Saving will update the <code class="text-admin-accent">.env</code> file directly. You may need to clear the config cache for changes to take effect immediately.
                         </p>
                         <div class="pt-4 border-t border-admin-border-subtle">
-                            <button type="submit" class="w-full py-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
+                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
                                 Save SMTP Settings
                             </button>
                         </div>

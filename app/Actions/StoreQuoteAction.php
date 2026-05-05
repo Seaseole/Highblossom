@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Domains\Bookings\Models\Quote;
 use App\Domains\Content\Models\CompanySetting;
 use App\Mail\QuoteSubmittedMail;
+use App\Services\IdempotencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -12,14 +13,26 @@ use Illuminate\Support\Facades\Mail;
 class StoreQuoteAction
 {
     public function __construct(
-        protected Quote $quote
+        protected Quote $quote,
+        protected IdempotencyService $idempotencyService
     ) {}
 
     public function execute(Request $request): array
     {
+        // Check for duplicate submission using idempotency token
+        $token = $request->input('_idempotency_token');
+
+        if (!empty($token) && $this->idempotencyService->isProcessed($token)) {
+            return [
+                'success' => true,
+                'duplicate' => true,
+                'message' => 'Your quote request has already been submitted. Please wait a moment before submitting another.',
+            ];
+        }
+
         try {
             $imagePath = null;
-            
+
             // Use AJAX uploaded path if provided, otherwise use traditional file upload
             if (!empty($request->input('image_path'))) {
                 $imagePath = $request->input('image_path');
@@ -33,6 +46,11 @@ class StoreQuoteAction
                     // Continue without image if upload fails
                     Log::error('Failed to store quote image: ' . $e->getMessage());
                 }
+            }
+
+            // Mark token as processed before database operation
+            if (!empty($token)) {
+                $this->idempotencyService->markProcessed($token);
             }
 
             $quote = $this->quote->create([

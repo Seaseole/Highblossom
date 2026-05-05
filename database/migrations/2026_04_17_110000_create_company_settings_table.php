@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('company_settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
-            $table->text('value');
+            $table->text('value')->nullable();
             $table->string('type')->default('text'); // text, number, boolean, json
             $table->timestamps();
         });

@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\RoleRequest;
+use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 final class RoleController
 {
+    public function __construct(
+        private readonly RoleService $roleService,
+    ) {}
+
     public function index(): View
     {
         $roles = Role::with('permissions')->latest()->get();
@@ -26,18 +31,9 @@ final class RoleController
         return view('admin.roles.create', compact('permissions'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(RoleRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:roles,name',
-            'permissions' => 'array',
-        ]);
-
-        $role = Role::create(['name' => $validated['name']]);
-
-        if (!empty($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
-        }
+        $this->roleService->create($request->validated());
 
         return redirect()
             ->route('admin.roles.index')
@@ -51,18 +47,9 @@ final class RoleController
         return view('admin.roles.edit', compact('role', 'permissions'));
     }
 
-    public function update(Request $request, Role $role): RedirectResponse
+    public function update(RoleRequest $request, Role $role): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $role->id,
-            'permissions' => 'array',
-        ]);
-
-        $role->update(['name' => $validated['name']]);
-
-        if (isset($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
-        }
+        $this->roleService->update($role, $request->validated());
 
         return redirect()
             ->route('admin.roles.index')
@@ -71,13 +58,14 @@ final class RoleController
 
     public function destroy(Role $role): RedirectResponse
     {
-        if ($role->name === 'Super Admin') {
+        $success = $this->roleService->delete($role);
+
+        if (!$success) {
             return redirect()
                 ->route('admin.roles.index')
                 ->with('error', __('messages.unauthorized'));
         }
 
-        $role->delete();
         return redirect()
             ->route('admin.roles.index')
             ->with('success', __('messages.role_deleted'));

@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\Tag;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\TagRequest;
+use App\Services\TagService;
 use Illuminate\View\View;
 
 final class TagController
 {
+    public function __construct(
+        private readonly TagService $tagService,
+    ) {}
+
     public function index(): View
     {
         $tags = Tag::query()->latest()->paginate(15);
@@ -22,15 +27,9 @@ final class TagController
         return view('admin.blog.tags.create');
     }
 
-    public function store(Request $request)
+    public function store(TagRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-
-        Tag::create($validated);
+        $this->tagService->create($request->validated());
 
         return redirect()
             ->route('admin.tags.index')
@@ -42,15 +41,9 @@ final class TagController
         return view('admin.blog.tags.edit', compact('tag'));
     }
 
-    public function update(Request $request, Tag $tag)
+    public function update(TagRequest $request, Tag $tag)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
-
-        $tag->update($validated);
+        $this->tagService->update($tag, $request->validated());
 
         return redirect()
             ->route('admin.tags.index')
@@ -59,7 +52,7 @@ final class TagController
 
     public function destroy(Tag $tag)
     {
-        $tag->delete();
+        $this->tagService->delete($tag);
 
         return redirect()
             ->route('admin.tags.index')

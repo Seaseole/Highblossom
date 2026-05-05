@@ -19,7 +19,7 @@
                     <label for="name" class="block text-sm font-medium text-admin-text-muted mb-2">Role Name</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $role->name) }}" required class="w-full admin-form-input" placeholder="e.g. Editor">
                     @error('name')
-                        <p class="mt-1 text-sm text-[#DC2626]">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -33,7 +33,7 @@
                                     name="permissions[]"
                                     value="{{ $permission->name }}"
                                     {{ $role->permissions->contains('name', $permission->name) ? 'checked' : '' }}
-                                    class="h-5 w-5 bg-admin-input-bg border-admin-border rounded focus:ring-2 focus:ring-[#DC2626] cursor-pointer"
+                                    class="h-5 w-5 bg-admin-input-bg border-admin-border rounded focus:ring-2 focus:ring-admin-accent cursor-pointer"
                                 >
                                 <span class="text-sm text-admin-text">{{ $permission->name }}</span>
                             </label>

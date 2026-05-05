@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\ContactMessage;
+use App\Services\ContactMessageService;
 use Illuminate\View\View;
 
 final class ContactMessageController
 {
+    public function __construct(
+        private readonly ContactMessageService $contactMessageService,
+    ) {}
+
     public function index(): View
     {
         $messages = ContactMessage::query()->latest()->paginate(15);
@@ -18,16 +23,14 @@ final class ContactMessageController
 
     public function show(ContactMessage $message): View
     {
-        if (!$message->is_read) {
-            $message->markAsRead();
-        }
+        $this->contactMessageService->markAsRead($message);
 
         return view('admin.contact-messages.show', compact('message'));
     }
 
     public function destroy(ContactMessage $message)
     {
-        $message->delete();
+        $this->contactMessageService->delete($message);
 
         return redirect()
             ->route('admin.contact-messages.index')

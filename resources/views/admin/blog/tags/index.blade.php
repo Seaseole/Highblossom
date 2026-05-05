@@ -2,12 +2,14 @@
     <div class="p-6">
         <div class="admin-section-header">
             <h1 class="admin-section-title">Tags</h1>
-            <a href="{{ route('admin.tags.create') }}" class="admin-action-btn admin-action-btn-primary">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span>Create Tag</span>
-            </a>
+            @can('create blog')
+                <a href="{{ route('admin.tags.create') }}" class="admin-action-btn admin-action-btn-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Create Tag</span>
+                </a>
+            @endcan
         </div>
 
         <div class="admin-table">
@@ -29,12 +31,28 @@
                                 {{ $tag->slug }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.tags.edit', $tag) }}" class="admin-action-btn admin-action-btn-secondary">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Edit
-                                </a>
+                                <div class="flex items-center justify-end gap-2">
+                                    @can('update blog')
+                                        <a href="{{ route('admin.tags.edit', $tag) }}" class="admin-action-btn admin-action-btn-secondary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Edit
+                                        </a>
+                                    @endcan
+                                    @can('delete blog')
+                                        <form action="{{ route('admin.tags.destroy', $tag) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this tag?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="admin-action-btn bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-600 border border-transparent">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @empty

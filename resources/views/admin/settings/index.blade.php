@@ -24,22 +24,22 @@
 
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
-                <button type="button" @click="tab = 'general'" :class="tab === 'general' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'general'" :class="tab === 'general' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     General Info
                 </button>
-                <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Business Hours
                 </button>
-                <button type="button" @click="tab = 'assets'" :class="tab === 'assets' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'assets'" :class="tab === 'assets' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Assets & Branding
                 </button>
-                <button type="button" @click="tab = 'localization'" :class="tab === 'localization' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'localization'" :class="tab === 'localization' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Localization
                 </button>
-                <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Social & WhatsApp
                 </button>
-                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Notifications
                 </button>
             </div>
@@ -138,16 +138,25 @@
                                 <div class="space-y-4">
                                     <label class="text-sm font-medium text-admin-text">Business Logo</label>
                                     <input type="hidden" name="business_logo_path" id="business-logo-path" value="{{ $settings['business_logo'] ?? '' }}">
+                                    <input type="hidden" name="remove_business_logo" id="remove-business-logo" value="0">
                                     <div id="business-logo-progress" class="mb-3"></div>
-                                    <div class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-[#DC2626]/50 transition-all cursor-pointer relative overflow-hidden">
-                                        @if($settings['business_logo'])
-                                            <img src="{{ Storage::url($settings['business_logo']) }}" class="h-20 object-contain mb-4">
-                                        @else
-                                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        @endif
-                                        <p class="text-xs text-admin-text-muted">Click to upload or drag and drop</p>
+                                    <div id="business-logo-container" class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-admin-accent/50 transition-all cursor-pointer relative overflow-hidden">
+                                        <div id="business-logo-preview" class="flex flex-col items-center w-full">
+                                            @if($settings['business_logo'])
+                                                <img src="{{ Storage::url($settings['business_logo']) }}" class="h-20 object-contain mb-4" id="business-logo-img">
+                                                <button type="button" id="remove-logo-btn" class="mt-2 px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Remove Logo
+                                                </button>
+                                            @else
+                                                <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
+                                            @endif
+                                        </div>
                                         <input type="file" name="business_logo" id="business-logo-input" class="absolute inset-0 opacity-0 cursor-pointer">
                                     </div>
                                     <p class="text-[10px] text-admin-text-muted">Recommended: PNG or SVG, max 2MB.</p>
@@ -156,11 +165,11 @@
                                     <label class="text-sm font-medium text-admin-text">Favicon</label>
                                     <input type="hidden" name="favicon_path" id="favicon-path" value="{{ $settings['favicon'] ?? '' }}">
                                     <div id="favicon-progress" class="mb-3"></div>
-                                    <div class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-[#DC2626]/50 transition-all cursor-pointer relative overflow-hidden">
+                                    <div class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-admin-accent/50 transition-all cursor-pointer relative overflow-hidden">
                                         @if($settings['favicon'])
                                             <img src="{{ Storage::url($settings['favicon']) }}" class="h-10 object-contain mb-4">
                                         @else
-                                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.643-1.643a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-1.643 1.643M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         @endif
@@ -224,7 +233,7 @@
                                 <div class="space-y-4 pt-4 border-t border-admin-border-subtle">
                                     <div class="flex items-center justify-between">
                                         <label class="text-sm font-medium text-admin-text">Additional Numbers</label>
-                                        <button type="button" @click="addNumber()" class="text-xs text-[#DC2626] hover:underline">+ Add Number</button>
+                                        <button type="button" @click="addNumber()" class="text-xs text-admin-accent hover:underline">+ Add Number</button>
                                     </div>
                                     <template x-for="(item, index) in whatsappNumbers" :key="index">
                                         <div class="flex gap-4 items-start">
@@ -234,7 +243,7 @@
                                             <div class="flex-1 space-y-1">
                                                 <input type="text" :name="`whatsapp_additional_numbers[${index}][number]`" x-model="item.number" placeholder="Phone Number" class="w-full admin-form-input text-sm py-2">
                                             </div>
-                                            <button type="button" @click="removeNumber(index)" class="p-2 text-admin-text-muted hover:text-[#DC2626] transition-colors">
+                                            <button type="button" @click="removeNumber(index)" class="p-2 text-admin-text-muted hover:text-admin-accent transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -283,7 +292,7 @@
                             Changes saved here will reflect immediately across the public website. Some changes might require a browser refresh due to server-side caching.
                         </p>
                         <div class="pt-4 border-t border-admin-border-subtle">
-                            <button type="submit" class="w-full py-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
+                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
                                 Save All Changes
                             </button>
                         </div>
@@ -296,11 +305,40 @@
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Business Logo Remove Handler
+            const removeLogoBtn = document.getElementById('remove-logo-btn');
+            if (removeLogoBtn) {
+                removeLogoBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    if (!confirm('Are you sure you want to remove the business logo?')) {
+                        return;
+                    }
+
+                    // Set removal flag
+                    document.getElementById('remove-business-logo').value = '1';
+                    document.getElementById('business-logo-path').value = '';
+
+                    // Reset preview to empty state
+                    const preview = document.getElementById('business-logo-preview');
+                    preview.innerHTML = `
+                        <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-xs text-admin-text-muted">Click to upload or drag and drop</p>
+                    `;
+
+                    // Clear progress
+                    document.getElementById('business-logo-progress').innerHTML = '';
+                });
+            }
+
             if (typeof ImageUploader !== 'undefined') {
                 // Business Logo Uploader
                 new ImageUploader({
                     fileInput: document.getElementById('business-logo-input'),
-                    previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
+                    previewContainer: document.getElementById('business-logo-preview'),
                     progressContainer: document.getElementById('business-logo-progress'),
                     hiddenInput: document.getElementById('business-logo-path'),
                     uploadUrl: '{{ route("admin.image-upload") }}',
@@ -308,6 +346,8 @@
                     maxSize: 2 * 1024 * 1024, // 2MB
                     acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'],
                     onUploadComplete: function(response) {
+                        // Reset removal flag if new image uploaded
+                        document.getElementById('remove-business-logo').value = '0';
                         console.log('Logo uploaded successfully:', response);
                     },
                     onUploadError: function(message) {

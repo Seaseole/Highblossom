@@ -14,13 +14,13 @@
         }">
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
-                <button type="button" @click="tab = 'profile'" :class="tab === 'profile' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'profile'" :class="tab === 'profile' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Profile
                 </button>
-                <button type="button" @click="tab = 'appearance'" :class="tab === 'appearance' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'appearance'" :class="tab === 'appearance' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Appearance
                 </button>
-                <button type="button" @click="tab = 'security'" :class="tab === 'security' ? 'border-[#DC2626] text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'security'" :class="tab === 'security' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
                     Security
                 </button>
             </div>
@@ -40,20 +40,20 @@
                                     <label class="text-sm font-medium text-admin-text-muted">Name</label>
                                     <input type="text" name="name" value="{{ $user->name }}" class="w-full admin-form-input">
                                     @error('name')
-                                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-admin-text-muted">Email</label>
                                     <input type="email" name="email" value="{{ $user->email }}" class="w-full admin-form-input">
                                     @error('email')
-                                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
                                     Save Profile
                                 </button>
                             </div>
@@ -83,7 +83,7 @@
                                 <div class="grid grid-cols-3 gap-4">
                                     <label class="relative cursor-pointer">
                                         <input type="radio" name="theme_preference" value="light" {{ $user->theme_preference === 'light' ? 'checked' : '' }} class="peer sr-only">
-                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-[#DC2626] peer-checked:bg-[#DC2626]/10 transition-all">
+                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -94,7 +94,7 @@
                                     </label>
                                     <label class="relative cursor-pointer">
                                         <input type="radio" name="theme_preference" value="dark" {{ $user->theme_preference === 'dark' ? 'checked' : '' }} class="peer sr-only">
-                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-[#DC2626] peer-checked:bg-[#DC2626]/10 transition-all">
+                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -105,7 +105,7 @@
                                     </label>
                                     <label class="relative cursor-pointer">
                                         <input type="radio" name="theme_preference" value="auto" {{ $user->theme_preference === 'auto' || !$user->theme_preference ? 'checked' : '' }} class="peer sr-only">
-                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-[#DC2626] peer-checked:bg-[#DC2626]/10 transition-all">
+                                        <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -119,7 +119,7 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
                                     Save Appearance
                                 </button>
                             </div>
@@ -141,14 +141,14 @@
                                     <label class="text-sm font-medium text-admin-text-muted">Current Password</label>
                                     <input type="password" name="current_password" class="w-full admin-form-input">
                                     @error('current_password')
-                                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-admin-text-muted">New Password</label>
                                     <input type="password" name="password" class="w-full admin-form-input">
                                     @error('password')
-                                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
@@ -158,7 +158,7 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
                                     Update Password
                                 </button>
                             </div>
@@ -180,7 +180,7 @@
                         @else
                             <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
                                     Enable Two-Factor Authentication
                                 </button>
                             </form>
@@ -203,7 +203,7 @@
                     <label class="text-sm font-medium text-admin-text-muted">Password</label>
                     <input type="password" name="password" class="w-full admin-form-input">
                     @error('password')
-                        <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                     @enderror
                 </div>
                 

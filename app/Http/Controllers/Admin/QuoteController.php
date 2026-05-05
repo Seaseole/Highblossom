@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Domains\Bookings\Models\Quote;
+use App\Http\Requests\Admin\QuoteStatusRequest;
+use App\Services\QuoteService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class QuoteController
 {
+    public function __construct(
+        private readonly QuoteService $quoteService,
+    ) {}
+
     public function index(Request $request): View
     {
         $status = $request->get('status');
@@ -31,20 +37,16 @@ final class QuoteController
         return view('admin.quotes.show', compact('quote'));
     }
 
-    public function updateStatus(Request $request, Quote $quote)
+    public function updateStatus(QuoteStatusRequest $request, Quote $quote)
     {
-        $request->validate([
-            'status' => 'required|in:pending,contacted,completed,cancelled',
-        ]);
-
-        $quote->update(['status' => $request->status]);
+        $this->quoteService->updateStatus($quote, $request->input('status'));
 
         return redirect()->back()->with('success', __('messages.quote_status_updated'));
     }
 
     public function destroy(Quote $quote)
     {
-        $quote->delete();
+        $this->quoteService->delete($quote);
 
         return redirect()->route('admin.quotes.index')->with('success', __('messages.quote_deleted'));
     }
