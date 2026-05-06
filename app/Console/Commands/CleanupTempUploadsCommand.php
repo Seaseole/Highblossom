@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Content\ContentBlockCleanupService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -26,58 +27,30 @@ final class CleanupTempUploadsCommand extends Command
      */
     protected $description = 'Clean up temporary uploaded files older than the specified hours (default: 24)';
 
+    public function __construct(
+        protected ContentBlockCleanupService $cleanupService
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
         $hours = (int) $this->option('hours');
-        $cutoffTime = now()->subHours($hours);
+        $this->info("Cleaning up all temp files older than {$hours} hours...");
 
-        $tempDisk = Storage::disk('temp');
-        $tempPath = $tempDisk->path('');
+        $results = $this->cleanupService->cleanupAllTempFiles($hours);
 
-        if (!is_dir($tempPath)) {
-            $this->info("Temp directory does not exist: {$tempPath}");
-
-            return self::SUCCESS;
-        }
-
-        $finder = new Finder();
-        $finder->files()
-            ->in($tempPath)
-            ->date("< {$cutoffTime->format('Y-m-d H:i:s')}");
-
-        $count = 0;
-        $errors = 0;
-
-        foreach ($finder as $file) {
-            $relativePath = $file->getRelativePathname();
-
-            try {
-                if ($tempDisk->delete($relativePath)) {
-                    $count++;
-                    Log::info("Cleaned up old temp file: {$relativePath}");
-                } else {
-                    $errors++;
-                    Log::warning("Failed to delete temp file: {$relativePath}");
-                }
-            } catch (\Exception $e) {
-                $errors++;
-                Log::error("Error deleting temp file: {$relativePath}", [
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
-
-        if ($count > 0) {
-            $this->info("Cleaned up {$count} temp file(s) older than {$hours} hour(s).");
+        if ($results['deleted'] > 0) {
+            $this->info("Cleaned up {$results['deleted']} temp file(s).");
         } else {
-            $this->info("No temp files found older than {$hours} hour(s).");
+            $this->info("No temp files found to clean up.");
         }
 
-        if ($errors > 0) {
-            $this->warn("Failed to delete {$errors} file(s).");
+        if ($results['errors'] > 0) {
+            $this->warn("Failed to delete {$results['errors']} file(s).");
         }
 
         return self::SUCCESS;
