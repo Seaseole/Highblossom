@@ -744,7 +744,7 @@
         </div>
     </section>
 
-    {{-- Typewriter Animation Script --}}
+    {{-- Soft Blur In Animation Script --}}
     <script>
         (function() {
             const phrases = @json(__('site.home.hero_headline_animated'));
@@ -752,19 +752,19 @@
             
             if (!container || !phrases || phrases.length === 0) return;
 
-            // Animation parameters from typewriter spec
-            const ENTER_DURATION = 173; // scaled from 240ms * 0.72
-            const ENTER_STAGGER = 33; // scaled from 46ms * 0.72
-            const EXIT_DURATION = 187; // scaled from 260ms * 0.72
-            const EXIT_STAGGER = 7; // scaled from 10ms * 0.72
+            // Animation parameters from soft-blur-in spec
+            const ENTER_DURATION = 648; // scaled from 900ms * 0.72
+            const ENTER_STAGGER = 18; // scaled from 25ms * 0.72
+            const EXIT_DURATION = 432; // scaled from 600ms * 0.72
+            const EXIT_STAGGER = 11; // scaled from 15ms * 0.72
             const HOLD_MS = 550;
             const GAP_MS = 320;
-            const MICRO_DELAY_MS = 85;
+            const MICRO_DELAY_MS = 0;
             const Y_TRAVEL_MULTIPLIER = 0.58;
             const INITIAL_DELAY_MS = Math.random() * 400;
 
-            const ENTER_EASING = 'steps(1, end)';
-            const EXIT_EASING = 'cubic-bezier(0.7, 0, 0.84, 0)';
+            const ENTER_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+            const EXIT_EASING = 'cubic-bezier(0.64, 0, 0.78, 0)';
 
             let currentIndex = 0;
             let activeAnimations = [];
@@ -774,7 +774,7 @@
             function createPhrase(text) {
                 const title = document.createElement('h1');
                 title.className = 'text-animation-title';
-                title.style.cssText = 'display: inline-block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity; width: 100%;';
+                title.style.cssText = 'display: inline-block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity, filter; width: 100%;';
                 
                 // Split text into individual characters for per-character animation
                 const characters = Array.from(text);
@@ -784,7 +784,7 @@
                     const unit = document.createElement('span');
                     unit.className = 'text-animation-unit';
                     unit.textContent = char;
-                    unit.style.cssText = 'display: inline-block; backface-visibility: hidden; will-change: transform, opacity; white-space: pre;';
+                    unit.style.cssText = 'display: inline-block; backface-visibility: hidden; will-change: transform, opacity, filter; white-space: pre; transform-origin: 50% 55%;';
                     title.appendChild(unit);
                     units.push(unit);
                 });
@@ -793,29 +793,46 @@
             }
 
             function applyEnterFrom(element) {
+                const yStart = 16 * Y_TRAVEL_MULTIPLIER;
                 element.style.opacity = '0';
+                element.style.transform = `translate3d(0, ${yStart}px, 0)`;
+                element.style.filter = 'blur(12px)';
             }
 
             function applyEnterTo(element) {
                 element.style.opacity = '1';
+                element.style.transform = 'translate3d(0, 0, 0)';
+                element.style.filter = 'blur(0px)';
             }
 
             function applyExitFrom(element) {
                 element.style.opacity = '1';
+                element.style.transform = 'translate3d(0, 0, 0)';
+                element.style.filter = 'blur(0px)';
             }
 
             function applyExitTo(element) {
-                const yEnd = -4 * Y_TRAVEL_MULTIPLIER;
+                const yEnd = -16 * Y_TRAVEL_MULTIPLIER;
                 element.style.opacity = '0';
                 element.style.transform = `translate3d(0, ${yEnd}px, 0)`;
+                element.style.filter = 'blur(12px)';
             }
 
             async function enterAnimation(elements) {
                 const promises = elements.map((element, index) => {
                     const delay = index * ENTER_STAGGER;
+                    const yStart = 16 * Y_TRAVEL_MULTIPLIER;
                     const keyframes = [
-                        { opacity: 0 },
-                        { opacity: 1 }
+                        { 
+                            opacity: 0, 
+                            transform: `translate3d(0, ${yStart}px, 0)`,
+                            filter: 'blur(12px)'
+                        },
+                        { 
+                            opacity: 1, 
+                            transform: 'translate3d(0, 0, 0)',
+                            filter: 'blur(0px)'
+                        }
                     ];
 
                     const animation = element.animate(keyframes, {
@@ -836,10 +853,18 @@
             async function exitAnimation(elements) {
                 const promises = elements.map((element, index) => {
                     const delay = index * EXIT_STAGGER;
-                    const yEnd = -4 * Y_TRAVEL_MULTIPLIER;
+                    const yEnd = -16 * Y_TRAVEL_MULTIPLIER;
                     const keyframes = [
-                        { opacity: 1, transform: 'translate3d(0, 0, 0)' },
-                        { opacity: 0, transform: `translate3d(0, ${yEnd}px, 0)` }
+                        { 
+                            opacity: 1, 
+                            transform: 'translate3d(0, 0, 0)',
+                            filter: 'blur(0px)'
+                        },
+                        { 
+                            opacity: 0, 
+                            transform: `translate3d(0, ${yEnd}px, 0)`,
+                            filter: 'blur(12px)'
+                        }
                     ];
 
                     const animation = element.animate(keyframes, {
