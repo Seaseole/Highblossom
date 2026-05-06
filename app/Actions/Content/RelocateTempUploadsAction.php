@@ -57,113 +57,61 @@ final class RelocateTempUploadsAction
 
     /**
      * Process image block attributes.
-     *
-     * @param array $attributes
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @return array
      */
     private function processImageBlock(array $attributes, $tempDisk, $publicDisk): array
     {
-        $src = $attributes['src'] ?? '';
-
-        if (empty($src)) {
-            return $attributes;
-        }
-
-        // Check if the file is in temp storage
-        $tempPath = $this->extractStoragePath($src, 'temp');
-
-        if ($tempPath && $tempDisk->exists($tempPath)) {
-            $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, 'uploads/images');
-
-            if ($newPath) {
-                $attributes['src'] = asset('storage/' . $newPath);
-                Log::info("Relocated image from temp: {$tempPath} -> {$newPath}");
-            }
-        }
-
+        $attributes['src'] = $this->relocateFile($attributes['src'] ?? '', $tempDisk, $publicDisk, 'uploads/images');
         return $attributes;
     }
 
     /**
      * Process video block attributes.
-     *
-     * @param array $attributes
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @return array
      */
     private function processVideoBlock(array $attributes, $tempDisk, $publicDisk): array
     {
-        $src = $attributes['src'] ?? '';
-        $poster = $attributes['poster'] ?? '';
-
-        // Process video file
-        if (!empty($src)) {
-            $tempPath = $this->extractStoragePath($src, 'temp');
-
-            if ($tempPath && $tempDisk->exists($tempPath)) {
-                $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, 'uploads/videos');
-
-                if ($newPath) {
-                    $attributes['src'] = asset('storage/' . $newPath);
-                    Log::info("Relocated video from temp: {$tempPath} -> {$newPath}");
-                }
-            }
-        }
-
-        // Process poster image
-        if (!empty($poster)) {
-            $tempPath = $this->extractStoragePath($poster, 'temp');
-
-            if ($tempPath && $tempDisk->exists($tempPath)) {
-                $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, 'uploads/videos/thumbnails');
-
-                if ($newPath) {
-                    $attributes['poster'] = asset('storage/' . $newPath);
-                    Log::info("Relocated video poster from temp: {$tempPath} -> {$newPath}");
-                }
-            }
-        }
-
+        $attributes['src'] = $this->relocateFile($attributes['src'] ?? '', $tempDisk, $publicDisk, 'uploads/videos');
+        $attributes['poster'] = $this->relocateFile($attributes['poster'] ?? '', $tempDisk, $publicDisk, 'uploads/videos/thumbnails');
+        
         return $attributes;
     }
 
     /**
      * Process gallery block attributes.
-     *
-     * @param array $attributes
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @return array
      */
     private function processGalleryBlock(array $attributes, $tempDisk, $publicDisk): array
     {
         $images = $attributes['images'] ?? [];
 
         foreach ($images as &$image) {
-            $src = $image['src'] ?? '';
-
-            if (empty($src)) {
-                continue;
-            }
-
-            $tempPath = $this->extractStoragePath($src, 'temp');
-
-            if ($tempPath && $tempDisk->exists($tempPath)) {
-                $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, 'uploads/gallery');
-
-                if ($newPath) {
-                    $image['src'] = asset('storage/' . $newPath);
-                    Log::info("Relocated gallery image from temp: {$tempPath} -> {$newPath}");
-                }
-            }
+            $image['src'] = $this->relocateFile($image['src'] ?? '', $tempDisk, $publicDisk, 'uploads/gallery');
         }
 
         $attributes['images'] = $images;
 
         return $attributes;
+    }
+
+    /**
+     * Relocate a single file from temp to permanent storage.
+     */
+    private function relocateFile(string $url, $tempDisk, $publicDisk, string $destinationDir): string
+    {
+        if (empty($url)) {
+            return $url;
+        }
+
+        $tempPath = $this->extractStoragePath($url, 'temp');
+
+        if ($tempPath && $tempDisk->exists($tempPath)) {
+            $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, $destinationDir);
+
+            if ($newPath) {
+                Log::info("Relocated file from temp: {$tempPath} -> {$newPath}");
+                return asset('storage/' . $newPath);
+            }
+        }
+
+        return $url;
     }
 
     /**
