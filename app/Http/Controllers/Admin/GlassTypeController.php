@@ -21,7 +21,7 @@ final readonly class GlassTypeController
 
     public function index(): View
     {
-        $glassTypes = GlassType::query()->ordered()->paginate(15);
+        $glassTypes = GlassType::query()->ordered()->with('subCategories')->paginate(15);
 
         return view('admin.glass-types.index', compact('glassTypes'));
     }

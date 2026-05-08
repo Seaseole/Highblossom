@@ -42,9 +42,9 @@
                             <td class="px-8 py-6 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-admin-surface-alt text-admin-text-muted border border-admin-border-subtle">
-                                        {{ $glassType->subCategories()->count() }}
+                                        {{ $glassType->subCategories->count() }}
                                     </span>
-                                    @if($glassType->subCategories()->count() > 0)
+                                    @if($glassType->subCategories->count() > 0)
                                         <a href="{{ route('admin.glass-sub-categories.index') }}?glass_type_id={{ $glassType->id }}" class="text-admin-accent hover:text-admin-accent/80 text-xs font-medium">
                                             View All
                                         </a>

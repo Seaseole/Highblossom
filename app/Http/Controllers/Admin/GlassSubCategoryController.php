@@ -26,7 +26,7 @@ final class GlassSubCategoryController
 
     public function create(): View
     {
-        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->get();
+        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->with('subCategories')->get();
         
         return view('admin.glass-sub-categories.create', compact('glassTypes'));
     }
@@ -42,7 +42,7 @@ final class GlassSubCategoryController
 
     public function edit(GlassSubCategory $glassSubCategory): View
     {
-        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->get();
+        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->with('subCategories')->get();
         
         return view('admin.glass-sub-categories.edit', compact('glassSubCategory', 'glassTypes'));
     }

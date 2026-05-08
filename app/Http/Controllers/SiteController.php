@@ -24,7 +24,8 @@ class SiteController extends Controller
     public function __construct(
         protected StoreQuoteAction $storeQuoteAction,
         protected ContactNumberService $contactNumberService,
-        protected SiteService $siteService
+        protected SiteService $siteService,
+        protected SendContactMessage $sendContactMessage
     ) {}
     public function home()
     {
@@ -107,7 +108,7 @@ class SiteController extends Controller
         $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
 
         // Defensive eager loading: models have no relationships, with([]) documents intent
-        $glassTypes = GlassType::active()->ordered()->with([])->get();
+        $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
         $serviceTypes = ServiceType::active()->ordered()->with([])->get();
         $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
 
@@ -119,7 +120,7 @@ class SiteController extends Controller
 
     public function submitContact(ContactFormRequest $request)
     {
-        $result = (new SendContactMessage)->handle($request);
+        $result = $this->sendContactMessage->handle($request);
 
         return redirect()->back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }
