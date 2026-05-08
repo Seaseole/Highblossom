@@ -22,6 +22,7 @@ class QuoteFormRequest extends FormRequest
             'reg_number' => 'nullable|string|max:20',
             'year' => 'nullable|integer|min:1980|max:' . (date('Y') + 1),
             'glass_type_id' => 'required|exists:glass_types,id',
+            'glass_sub_category_id' => 'nullable|exists:glass_sub_categories,id',
             'service_type_id' => 'required|exists:service_types,id',
             'image' => 'nullable|image|max:10240', // Max 10MB
             'mobile_service' => 'nullable|boolean',
@@ -33,6 +34,7 @@ class QuoteFormRequest extends FormRequest
         return [
             'glass_type_id.required' => 'Please select a glass type',
             'glass_type_id.exists' => 'Invalid glass type selected',
+            'glass_sub_category_id.exists' => 'Invalid glass sub-category selected',
             'service_type_id.required' => 'Please select a service type',
             'service_type_id.exists' => 'Invalid service type selected',
             'vehicle_type.in' => 'Please select a valid vehicle type',

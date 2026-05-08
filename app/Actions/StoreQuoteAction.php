@@ -116,6 +116,7 @@ class StoreQuoteAction
             'reg_number' => $request->input('reg_number'),
             'year' => $request->input('year'),
             'glass_type_id' => $request->input('glass_type_id'),
+            'glass_sub_category_id' => $request->input('glass_sub_category_id'),
             'service_type_id' => $request->input('service_type_id'),
             'image_path' => $imagePath,
             'mobile_service' => $request->boolean('mobile_service', false),
@@ -123,7 +124,7 @@ class StoreQuoteAction
         ]);
 
         // Load relationships for email
-        $quote->load(['glassType', 'serviceType']);
+        $quote->load(['glassType', 'glassSubCategory', 'serviceType']);
 
         return $quote;
     }

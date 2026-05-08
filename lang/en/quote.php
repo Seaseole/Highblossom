@@ -27,6 +27,8 @@ return [
     'vehicle_year' => 'Year',
     'glass_type' => 'Glass Type',
     'select_glass_type' => 'Select glass type',
+    'glass_sub_category' => 'Glass Sub-Category',
+    'select_sub_category' => 'Select sub-category',
     'service_type' => 'Service Type',
     'select_service' => 'Select service',
     'visual_assessment' => 'Visual Assessment',

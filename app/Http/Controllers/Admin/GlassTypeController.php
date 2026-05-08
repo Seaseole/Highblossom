@@ -6,14 +6,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\GlassType;
 use App\Http\Requests\Admin\GlassTypeRequest;
+use App\Services\GlassSubCategoryService;
 use App\Services\GlassTypeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
-final class GlassTypeController
+final readonly class GlassTypeController
 {
     public function __construct(
-        private readonly GlassTypeService $glassTypeService,
+        private GlassTypeService $glassTypeService,
+        private GlassSubCategoryService $glassSubCategoryService,
     ) {}
 
     public function index(): View
@@ -39,7 +42,9 @@ final class GlassTypeController
 
     public function edit(GlassType $glassType): View
     {
-        return view('admin.glass-types.edit', compact('glassType'));
+        $glassSubCategories = $this->glassSubCategoryService->getByGlassType($glassType);
+
+        return view('admin.glass-types.edit', compact('glassType', 'glassSubCategories'));
     }
 
     public function update(GlassTypeRequest $request, GlassType $glassType): RedirectResponse
@@ -58,5 +63,17 @@ final class GlassTypeController
         return redirect()
             ->route('admin.glass-types.index')
             ->with('success', __('messages.glass_type_deleted'));
+    }
+
+    /**
+     * Get sub-categories for a glass type (AJAX endpoint).
+     */
+    public function getSubCategories(GlassType $glassType): JsonResponse
+    {
+        $subCategories = $this->glassSubCategoryService->getByGlassType($glassType);
+
+        return response()->json([
+            'sub_categories' => $subCategories,
+        ]);
     }
 }

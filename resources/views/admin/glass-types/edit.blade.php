@@ -86,6 +86,80 @@
                 </div>
             </div>
         </form>
+
+        <!-- Sub-Categories Management -->
+        <div class="mt-8 admin-glass-card rounded-2xl shadow-2xl shadow-black/20">
+            <div class="px-8 py-6 border-b border-admin-border-subtle">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-admin-text font-headline">Sub-Categories</h3>
+                        <p class="text-admin-text-muted text-sm mt-1">Manage detailed sub-categories for this glass type.</p>
+                    </div>
+                    <a href="{{ route('admin.glass-sub-categories.create') }}?glass_type_id={{ $glassType->id }}" class="admin-action-btn admin-action-btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Add Sub-Category</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-8">
+                @if($glassSubCategories->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($glassSubCategories as $subCategory)
+                            <div class="flex items-center justify-between p-4 bg-admin-surface-alt rounded-xl border border-admin-border-subtle hover:border-admin-accent/30 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg bg-admin-accent/10 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-admin-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-admin-text">{{ $subCategory->name }}</h4>
+                                        <p class="text-sm text-admin-text-muted font-mono">{{ $subCategory->slug }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm text-admin-text-muted">Order: {{ $subCategory->sort_order }}</span>
+                                    @if($subCategory->is_active)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/30">
+                                            Active
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-admin-surface-alt text-admin-text-muted border border-admin-border-subtle">
+                                            Inactive
+                                        </span>
+                                    @endif
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('admin.glass-sub-categories.edit', $subCategory) }}" class="admin-action-btn admin-action-btn-ghost">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 rounded-full bg-admin-surface-alt flex items-center justify-center border border-admin-border-subtle mx-auto mb-4">
+                            <svg class="w-8 h-8 text-admin-text-muted/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-admin-text mb-2">No Sub-Categories Yet</h3>
+                        <p class="text-admin-text-muted text-sm mb-6">Add detailed sub-categories to help customers specify their exact glass needs.</p>
+                        <a href="{{ route('admin.glass-sub-categories.create') }}?glass_type_id={{ $glassType->id }}" class="admin-action-btn admin-action-btn-primary">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Create First Sub-Category</span>
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 </x-layouts::admin>
-

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SendContactMessage;
 use App\Actions\StoreQuoteAction;
 use App\Domains\Content\Models\AboutUsContent;
-use App\Domains\Content\Models\GalleryImage;
+use App\Domains\Content\Models\CompanySetting;
 use App\Domains\Content\Models\GalleryCategory;
+use App\Domains\Content\Models\GalleryImage;
+use App\Domains\Content\Models\GlassSubCategory;
 use App\Domains\Content\Models\GlassType;
 use App\Domains\Content\Models\Post;
 use App\Domains\Content\Models\Service;
 use App\Domains\Content\Models\ServiceType;
-use App\Domains\Content\Models\CompanySetting;
+use App\Http\Requests\ContactFormRequest;
 use App\Http\Requests\QuoteFormRequest;
 use App\Services\ContactNumberService;
 use App\Services\SiteService;
@@ -23,7 +26,6 @@ class SiteController extends Controller
         protected ContactNumberService $contactNumberService,
         protected SiteService $siteService
     ) {}
-
     public function home()
     {
         return view('welcome', $this->siteService->getHomeData());
@@ -74,7 +76,7 @@ class SiteController extends Controller
     public function galleryShow(GalleryImage $galleryImage)
     {
         $galleryImage->load('category');
-        
+
         $relatedImages = GalleryImage::active()
             ->with('category')
             ->where('gallery_category_id', $galleryImage->gallery_category_id)
@@ -107,16 +109,17 @@ class SiteController extends Controller
         // Defensive eager loading: models have no relationships, with([]) documents intent
         $glassTypes = GlassType::active()->ordered()->with([])->get();
         $serviceTypes = ServiceType::active()->ordered()->with([])->get();
+        $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
 
         // Build contact numbers using service
         $contactNumbers = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
 
-        return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes'));
+        return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes', 'glassSubCategories'));
     }
 
-    public function submitContact(\App\Http\Requests\ContactFormRequest $request)
+    public function submitContact(ContactFormRequest $request)
     {
-        $result = (new \App\Actions\SendContactMessage())->handle($request);
+        $result = (new SendContactMessage)->handle($request);
 
         return redirect()->back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }

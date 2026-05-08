@@ -125,16 +125,77 @@
                                     </div>
                                 </div>
 
-                                <div class="grid md:grid-cols-2 gap-6">
+                                <div class="grid md:grid-cols-2 gap-6" x-data="{ 
+                                        selectedGlassType: null,
+                                        subCategories: [],
+                                        loading: false,
+                                        loadSubCategories: function(glassTypeId) {
+                                            if (!glassTypeId) {
+                                                this.subCategories = [];
+                                                return;
+                                            }
+                                            
+                                            this.loading = true;
+                                            this.subCategories = [];
+                                            
+                                            loadSubCategories(glassTypeId)
+                                                .then(subCategories => {
+                                                    this.subCategories = subCategories;
+                                                })
+                                                .catch(error => {
+                                                    console.error('Failed to load sub-categories:', error);
+                                                })
+                                                .finally(() => {
+                                                    this.loading = false;
+                                                });
+                                        }
+                                    }">
                                     <div>
                                         <label for="glass_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.glass_type') }} *</label>
-                                        <select id="glass_type_id" name="glass_type_id" required class="form-input-premium">
+                                        <select 
+                                            id="glass_type_id" 
+                                            name="glass_type_id" 
+                                            required 
+                                            class="form-input-premium"
+                                            x-model="selectedGlassType"
+                                            @change="loadSubCategories($event.target.value)"
+                                        >
                                             <option value="">{{ __('quote.select_glass_type') }}</option>
                                             @foreach($glassTypes as $glassType)
                                             <option value="{{ $glassType->id }}">{{ $glassType->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div>
+                                        <label for="glass_sub_category_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">
+                                            {{ __('quote.glass_sub_category') }} 
+                                            <span class="text-xs text-[#71717A] font-normal" x-show="!selectedGlassType">(select glass type first)</span>
+                                            <span class="text-red-500" x-show="selectedGlassType && subCategories.length === 0 && !loading">*</span>
+                                        </label>
+                                        <select 
+                                            id="glass_sub_category_id" 
+                                            name="glass_sub_category_id" 
+                                            class="form-input-premium"
+                                            :disabled="!selectedGlassType || loading"
+                                            x-show="selectedGlassType"
+                                            :required="subCategories.length > 0"
+                                        >
+                                            <option value="" x-show="!loading">{{ __('quote.select_sub_category') }}</option>
+                                            <template x-for="subCategory in subCategories" :key="subCategory.id">
+                                                <option :value="subCategory.id" x-text="subCategory.name"></option>
+                                            </template>
+                                        </select>
+                                        <div x-show="loading" class="flex items-center gap-2 mt-2">
+                                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            <span class="text-sm text-[#A1A1AA]">Loading sub-categories...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-1 gap-6">
                                     <div>
                                         <label for="service_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.service_type') }} *</label>
                                         <select id="service_type_id" name="service_type_id" required class="form-input-premium">
@@ -304,6 +365,21 @@
 
 <script src="{{ asset('js/image-upload.js') }}"></script>
 <script>
+    // Function to load sub-categories via AJAX
+    function loadSubCategories(glassTypeId) {
+        if (!glassTypeId) {
+            return Promise.resolve([]);
+        }
+
+        return fetch(`{{ route('api.glass-types.sub-categories', ':id') }}`.replace(':id', glassTypeId))
+            .then(response => response.json())
+            .then(data => data.sub_categories || [])
+            .catch(error => {
+                console.error('Error loading sub-categories:', error);
+                return [];
+            });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof ImageUploader !== 'undefined') {
             // Get Alpine.js component reference for state synchronization

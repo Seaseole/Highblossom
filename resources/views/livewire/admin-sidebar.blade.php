@@ -5,7 +5,7 @@
         'dashboard' => [
             'label' => 'Dashboard',
             'icon' => 'home',
-            'routes' => ['dashboard']
+            'routes' => ['dashboard'],
         ],
         'bookings' => [
             'label' => 'Bookings',
@@ -86,6 +86,7 @@
             'admin.gallery' => 'view gallery',
             'admin.gallery-categories' => 'view gallery',
             'admin.glass-types' => 'view services',
+            'admin.glass-sub-categories' => 'manage services',
             'admin.service-types' => 'view services',
             'admin.posts' => 'view blog',
             'admin.categories' => 'view blog',
@@ -114,6 +115,7 @@
             'admin.gallery' => 'photo',
             'admin.gallery-categories' => 'folder',
             'admin.glass-types' => 'squares-2x2',
+            'admin.glass-sub-categories' => 'squares-2x2',
             'admin.service-types' => 'tag',
             'admin.posts' => 'document',
             'admin.categories' => 'tag',

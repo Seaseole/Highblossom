@@ -115,7 +115,7 @@
                                         <span class="text-xs font-bold text-purple-500 uppercase tracking-widest">Mobile Unit</span>
                                     @else
                                         <span class="w-1.5 h-1.5 rounded-full bg-admin-text-muted"></span>
-                                        <span class="text-xs font-bold text-admin-text-muted uppercase tracking-widest">In-Studio</span>
+                                        <span class="text-xs font-bold text-admin-text-muted uppercase tracking-widest">In-WorkShop</span>
                                     @endif
                                 </div>
                             </div>

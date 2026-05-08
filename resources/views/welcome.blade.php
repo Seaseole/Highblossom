@@ -12,13 +12,13 @@
         </div>
 
         {{-- Hero Content --}}
-        <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32 sm:pt-32 sm:pb-40 md:pt-32 md:pb-40 text-center">
+        <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-[10px] pb-32 text-center">
             <div class="max-w-4xl mx-auto">
                 {{-- Trust Badge --}}
                 <div
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 sm:mb-8 animate-fade-up">
                     <span class="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse"></span>
-                    <span class="text-[#A1A1AA] text-xs sm:text-sm font-medium">{{ __('site.home.hero_trust_badge') }}</span>
+                    <span class="text-[#FAFAFA] text-xs sm:text-sm font-medium">{{ __('site.home.hero_trust_badge') }}</span>
                 </div>
 
                 {{-- Animated Headline - Focus Blur Resolve --}}
@@ -27,21 +27,21 @@
                 </div>
 
                 {{-- Subhead --}}
-                <p class="text-base sm:text-lg md:text-xl text-[#A1A1AA] leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10 animate-fade-up"
+                <p class="text-base sm:text-lg md:text-xl text-[#FAFAFA] leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10 animate-fade-up"
                     style="animation-delay: 200ms;">
                     {{ __('site.home.hero_subheadline') }}
                 </p>
 
                 {{-- CTAs --}}
-                <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style="animation-delay: 300ms;">
-                    <a href="{{ route('quote') }}" class="btn-premium glow-red-subtle">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style="animation-delay: 300ms;">
+                    <a href="{{ route('quote') }}" class="btn-premium-md glow-red-subtle">
                         <span>{{ __('site.home.hero_get_quote') }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                         </svg>
                     </a>
-                    <a href="{{ route('gallery') }}" class="btn-ghost">
+                    <a href="{{ route('gallery') }}" class="btn-ghost-md">
                         <span>{{ __('site.home.hero_view_work') }}</span>
                     </a>
                 </div>
@@ -55,19 +55,19 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                     <div class="text-center md:text-left">
                         <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">22+</div>
-                        <div class="text-[#71717A] text-sm mt-1">{{ __('site.home.years_experience') }}</div>
+                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.years_experience') }}</div>
                     </div>
                     <div class="text-center md:text-left">
                         <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline"></div>
-                        <div class="text-[#71717A] text-sm mt-1">{{ __('site.home.vehicles_serviced') }}</div>
+                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.vehicles_serviced') }}</div>
                     </div>
                     <div class="text-center md:text-left">
                         <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">98%</div>
-                        <div class="text-[#71717A] text-sm mt-1">{{ __('site.home.on_time_rate') }}</div>
+                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.on_time_rate') }}</div>
                     </div>
                     <div class="text-center md:text-left">
                         <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">Same</div>
-                        <div class="text-[#71717A] text-sm mt-1">{{ __('site.home.same_day_service') }}</div>
+                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.same_day_service') }}</div>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.windscreens') }}</h3>
-                    <p class="text-[#A1A1AA] text-sm leading-relaxed mb-6">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed mb-6">
                         {{ __('site.home.windscreens_description') }}
                     </p>
                     <a href="{{ route('services') }}"
@@ -131,7 +131,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.side_rear') }}</h3>
-                    <p class="text-[#A1A1AA] text-sm leading-relaxed mb-6">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed mb-6">
                         {{ __('site.home.side_rear_description') }}
                     </p>
                     <a href="{{ route('services') }}"
@@ -155,7 +155,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.heavy_machinery') }}</h3>
-                    <p class="text-[#A1A1AA] text-sm leading-relaxed mb-6">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed mb-6">
                         {{ __('site.home.heavy_machinery_description') }}
                     </p>
                     <a href="{{ route('services') }}"
@@ -178,7 +178,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.fleet_services') }}</h3>
-                    <p class="text-[#A1A1AA] text-sm leading-relaxed mb-6">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed mb-6">
                         {{ __('site.home.fleet_services_description') }}
                     </p>
                     <a href="{{ route('services') }}"
@@ -231,7 +231,7 @@
                                 </div>
                                 <h3 class="text-xl lg:text-2xl font-bold text-[#FAFAFA] font-headline mb-2">{{ $featuredGalleryImages->first()->title }}</h3>
                                 @if($featuredGalleryImages->first()->description)
-                                    <p class="text-[#A1A1AA] text-sm">{{ $featuredGalleryImages->first()->description }}</p>
+                                    <p class="text-[#FAFAFA] text-sm">{{ $featuredGalleryImages->first()->description }}</p>
                                 @endif
                             </div>
                         </div>
@@ -256,14 +256,14 @@
                 </div>
             @else
                 <div class="glass-card rounded-2xl p-12 text-center">
-                    <div class="text-[#71717A] mb-4">
+                    <div class="text-[#FAFAFA] mb-4">
                         <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                             </path>
                         </svg>
                     </div>
-                    <p class="text-[#A1A1AA]">{{ __('site.home.gallery_no_items') }}</p>
+                    <p class="text-[#FAFAFA]">{{ __('site.home.gallery_no_items') }}</p>
                 </div>
             @endif
         </div>
@@ -278,7 +278,7 @@
                 <h2 class="text-4xl md:text-5xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
                     {{ __('site.home.why_choose_title') }}
                 </h2>
-                <p class="text-[#A1A1AA] text-lg">
+                <p class="text-[#FAFAFA] text-lg">
                     {{ __('site.home.why_choose_subtitle') }}
                 </p>
             </div>
@@ -295,7 +295,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.safety_first') }}</h3>
-                    <p class="text-[#71717A] text-sm leading-relaxed">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
                         {{ __('site.home.safety_first_description') }}
                     </p>
                 </div>
@@ -309,7 +309,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.same_day_service_feature') }}</h3>
-                    <p class="text-[#71717A] text-sm leading-relaxed">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
                         {{ __('site.home.same_day_service_description') }}
                     </p>
                 </div>
@@ -324,7 +324,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.expert_craftsmanship') }}</h3>
-                    <p class="text-[#71717A] text-sm leading-relaxed">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
                         {{ __('site.home.expert_craftsmanship_description') }}
                     </p>
                 </div>
@@ -339,7 +339,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.mobile_service') }}</h3>
-                    <p class="text-[#71717A] text-sm leading-relaxed">
+                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
                         {{ __('site.home.mobile_service_description') }}
                     </p>
                 </div>
@@ -370,7 +370,7 @@
                                         {{-- Stars --}}
                                         <div class="flex gap-1 mb-6">
                                             @for($i = 1; $i <= 5; $i++)
-                                                <svg class="w-5 h-5 {{ $i <= $testimonial->rating ? 'text-[#DC2626]' : 'text-[#71717A]' }}"
+                                                <svg class="w-5 h-5 {{ $i <= $testimonial->rating ? 'text-[#DC2626]' : 'text-[#D4D4D8]' }}"
                                                      fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                 </svg>
@@ -390,7 +390,7 @@
                                             <div>
                                                 <div class="text-[#FAFAFA] font-semibold">{{ $testimonial->name }}</div>
                                                 @if($testimonial->role)
-                                                    <div class="text-[#71717A] text-sm">{{ $testimonial->role }}</div>
+                                                    <div class="text-[#FAFAFA] text-sm">{{ $testimonial->role }}</div>
                                                 @endif
                                             </div>
                                         </div>
@@ -402,7 +402,7 @@
                             <div class="flex justify-center gap-2 mt-8" id="carouselIndicators">
                                 @foreach($otherTestimonials as $index => $testimonial)
                                     <button data-slide="{{ $index }}"
-                                            class="carousel-indicator w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-[#DC2626] w-6' : 'bg-[#71717A]' }}">
+                                            class="carousel-indicator w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-[#DC2626] w-6' : 'bg-[#A1A1AA]' }}">
                                     </button>
                                 @endforeach
                             </div>
@@ -424,14 +424,14 @@
                         </div>
                     @else
                         <div class="glass-card rounded-2xl p-8 text-center">
-                            <div class="text-[#71717A] mb-4">
+                            <div class="text-[#FAFAFA] mb-4">
                                 <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
                                     </path>
                                 </svg>
                             </div>
-                            <p class="text-[#A1A1AA]">{{ __('site.home.testimonials_no_testimonials') }}</p>
+                            <p class="text-[#FAFAFA]">{{ __('site.home.testimonials_no_testimonials') }}</p>
                         </div>
                     @endif
                 </div>
@@ -450,7 +450,7 @@
 
                             <div class="flex gap-1 mb-3">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-4 h-4 {{ $i <= $featuredTestimonial->rating ? 'text-[#DC2626]' : 'text-[#71717A]' }}"
+                                    <svg class="w-4 h-4 {{ $i <= $featuredTestimonial->rating ? 'text-[#DC2626]' : 'text-[#D4D4D8]' }}"
                                         fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                     </svg>
@@ -468,7 +468,7 @@
                                 <div>
                                     <div class="text-[#FAFAFA] font-semibold text-sm">{{ $featuredTestimonial->name }}</div>
                                     @if($featuredTestimonial->role)
-                                        <div class="text-[#71717A] text-xs">{{ $featuredTestimonial->role }}</div>
+                                        <div class="text-[#FAFAFA] text-xs">{{ $featuredTestimonial->role }}</div>
                                     @endif
                                 </div>
                             </div>
@@ -480,19 +480,19 @@
                         <div class="glass-card rounded-2xl p-4 text-center">
                             <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-1">{{ $otherTestimonials->count() + ($featuredTestimonial ? 1 : 0) }}+
                             </div>
-                            <div class="text-[#71717A] text-xs">{{ __('site.home.happy_clients') }}</div>
+                            <div class="text-[#FAFAFA] text-xs">{{ __('site.home.happy_clients') }}</div>
                         </div>
                         <div class="glass-card rounded-2xl p-4 text-center">
                             <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-1">4.9</div>
-                            <div class="text-[#71717A] text-xs">{{ __('site.home.average_rating') }}</div>
+                            <div class="text-[#FAFAFA] text-xs">{{ __('site.home.average_rating') }}</div>
                         </div>
                         <div class="glass-card rounded-2xl p-4 text-center">
                             <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-1">98%</div>
-                            <div class="text-[#71717A] text-xs">{{ __('site.home.recommend_us') }}</div>
+                            <div class="text-[#FAFAFA] text-xs">{{ __('site.home.recommend_us') }}</div>
                         </div>
                         <div class="glass-card rounded-2xl p-4 text-center">
                             <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-1">24h</div>
-                            <div class="text-[#71717A] text-xs">{{ __('site.home.response_time') }}</div>
+                            <div class="text-[#FAFAFA] text-xs">{{ __('site.home.response_time') }}</div>
                         </div>
                     </div>
                 </div>
@@ -528,11 +528,11 @@
 
                 indicators.forEach((indicator, i) => {
                     if (i === index) {
-                        indicator.classList.remove('bg-[#71717A]');
+                        indicator.classList.remove('bg-[#A1A1AA]');
                         indicator.classList.add('bg-[#DC2626]', 'w-6');
                     } else {
                         indicator.classList.remove('bg-[#DC2626]', 'w-6');
-                        indicator.classList.add('bg-[#71717A]');
+                        indicator.classList.add('bg-[#A1A1AA]');
                     }
                 });
 
@@ -603,7 +603,7 @@
                         class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
                         Ready for Crystal<br>Clear Vision?
                     </h2>
-                    <p class="text-lg text-[#A1A1AA] max-w-2xl mx-auto mb-10">
+                    <p class="text-lg text-[#FAFAFA] max-w-2xl mx-auto mb-10">
                         Get a free quote today. Our team is ready to help with all your automotive glass needs.
                     </p>
 
@@ -647,7 +647,7 @@
                     </div>
                     <div>
                         <div class="text-[#FAFAFA] font-semibold text-sm">{{ $companyAddress }}</div>
-                        <div class="text-[#71717A] text-xs">
+                        <div class="text-[#FAFAFA] text-xs">
                             @php
                                 try {
                                     $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
@@ -736,7 +736,7 @@
                         </div>
                         <div>
                             <div class="text-[#FAFAFA] font-semibold text-sm">{{ $primaryPhone }}</div>
-                            <div class="text-[#71717A] text-xs">Call for immediate assistance</div>
+                            <div class="text-[#FAFAFA] text-xs">Call for immediate assistance</div>
                         </div>
                     </div>
                 @endif

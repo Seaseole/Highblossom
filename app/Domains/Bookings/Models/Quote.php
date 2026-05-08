@@ -20,6 +20,7 @@ class Quote extends Model
         'reg_number',
         'year',
         'glass_type_id',
+        'glass_sub_category_id',
         'service_type_id',
         'message',
         'image_path',
@@ -62,5 +63,25 @@ class Quote extends Model
     public function serviceType()
     {
         return $this->belongsTo(ServiceType::class);
+    }
+
+    /**
+     * Get the glass sub-category for this quote.
+     */
+    public function glassSubCategory()
+    {
+        return $this->belongsTo(\App\Domains\Content\Models\GlassSubCategory::class);
+    }
+
+    /**
+     * Get the full glass description including sub-category.
+     */
+    public function getFullGlassDescriptionAttribute(): string
+    {
+        if ($this->glassSubCategory) {
+            return $this->glassSubCategory->full_name;
+        }
+        
+        return $this->glassType ? $this->glassType->name : 'Unknown';
     }
 }
