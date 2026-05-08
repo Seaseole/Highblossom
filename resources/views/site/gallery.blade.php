@@ -58,7 +58,7 @@
                 @empty
                     <!-- Placeholder fallback -->
                     <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center pt-16 md:pt-32 pb-20">
-                        <img src="{{ asset('storage/placeholder.gif') }}" alt="Gallery placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
+                        <img src="{{ asset('placeholder.gif') }}" alt="Gallery placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
                         <div class="text-center">
                             <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">No Gallery Items Yet</h3>
                             <p class="text-[#A1A1AA]">Check back soon to see our latest projects</p>

@@ -47,7 +47,7 @@
                     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20 last:mb-0">
                         <div class="relative group overflow-hidden rounded-2xl">
                             <img
-                                src="{{ $service->full_image_url ?? asset('storage/placeholder.gif') }}"
+                                src="{{ $service->full_image_url ?? asset('placeholder.gif') }}"
                                 alt="{{ $service->title }}"
                                 class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
                                 loading="lazy"
@@ -109,7 +109,7 @@
                         </div>
                         <div class="relative group overflow-hidden rounded-2xl order-1 lg:order-2">
                             <img
-                                src="{{ $service->full_image_url ?? asset('storage/placeholder.gif') }}"
+                                src="{{ $service->full_image_url ?? asset('placeholder.gif') }}"
                                 alt="{{ $service->title }}"
                                 class="w-full h-80 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
                                 loading="lazy"
@@ -125,7 +125,7 @@
                 @endif
             @empty
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20">
-                    <img src="{{ asset('storage/placeholder.gif') }}" alt="Services placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
+                    <img src="{{ asset('placeholder.gif') }}" alt="Services placeholder" class="max-w-md w-full h-auto rounded-2xl mb-8">
                     <div class="text-center">
                         <h3 class="text-[#FAFAFA] text-2xl font-bold font-headline mb-2">{{ __('services.no_services') }}</h3>
                         <p class="text-[#A1A1AA]">{{ __('services.no_services_desc') }}</p>
