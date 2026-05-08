@@ -3,18 +3,38 @@
         {{-- Header --}}
         <div class="admin-section-header mb-6">
             <h1 class="admin-section-title">Contact Messages</h1>
-            <div class="flex items-center gap-3">
-                <form action="{{ route('admin.contact-messages.index') }}" method="GET" class="flex items-center gap-2">
-                    <select name="status" class="admin-form-input text-sm py-2">
-                        <option value="">All Messages</option>
-                        <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>Unread Only</option>
-                        <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Read Only</option>
-                    </select>
-                    <button type="submit" class="admin-action-btn admin-action-btn-secondary text-sm">
-                        Filter
-                    </button>
-                </form>
-            </div>
+        </div>
+
+        {{-- Tab Navigation --}}
+        <div class="mb-6">
+            <nav class="flex space-x-1 p-1 bg-admin-surface-alt rounded-xl border border-admin-border-subtle">
+                {{-- All Messages Tab --}}
+                <a href="{{ route('admin.contact-messages.index') }}" 
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {{ !request('status') ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent' : 'text-admin-text-muted hover:text-admin-text hover:bg-admin-surface' }}">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                    </svg>
+                    All Messages
+                </a>
+
+                {{-- Unread Tab --}}
+                <a href="{{ route('admin.contact-messages.index', ['status' => 'unread']) }}" 
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {{ request('status') === 'unread' ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent' : 'text-admin-text-muted hover:text-admin-text hover:bg-admin-surface' }}">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"/>
+                    </svg>
+                    Unread
+                </a>
+
+                {{-- Read Tab --}}
+                <a href="{{ route('admin.contact-messages.index', ['status' => 'read']) }}" 
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {{ request('status') === 'read' ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent' : 'text-admin-text-muted hover:text-admin-text hover:bg-admin-surface' }}">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Read
+                </a>
+            </nav>
         </div>
 
         {{-- Table --}}

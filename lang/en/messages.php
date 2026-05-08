@@ -64,6 +64,7 @@ return [
     'contact_message_created' => 'Contact message sent successfully.',
     'contact_message_updated' => 'Contact message updated successfully.',
     'contact_message_deleted' => 'Contact message deleted successfully.',
+    'contact_message_marked_read' => 'Message marked as read.',
 
     // Profile messages
     'profile_updated' => 'Profile updated successfully.',

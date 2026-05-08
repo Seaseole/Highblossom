@@ -160,6 +160,7 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
 
     Route::get('contact-messages', [ContactMessageController::class, 'index'])->middleware('can:view contact messages')->name('contact-messages.index');
     Route::get('contact-messages/{message}', [ContactMessageController::class, 'show'])->middleware('can:view contact messages')->name('contact-messages.show');
+    Route::patch('contact-messages/{message}/mark-read', [ContactMessageController::class, 'markAsRead'])->middleware('can:view contact messages')->name('contact-messages.mark-read');
     Route::delete('contact-messages/{message}', [ContactMessageController::class, 'destroy'])->middleware('can:view contact messages')->name('contact-messages.destroy');
 
     // Quotes Management

@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Domains\Content\Models\ContactMessage;
 use App\Services\ContactMessageService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class ContactMessageController
@@ -14,9 +16,17 @@ final class ContactMessageController
         private readonly ContactMessageService $contactMessageService,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $messages = ContactMessage::query()->latest()->paginate(15);
+        $query = ContactMessage::query();
+
+        match ($request->input('status')) {
+            'read' => $query->read(),
+            'unread' => $query->unread(),
+            default => null,
+        };
+
+        $messages = $query->latest()->paginate(15);
 
         return view('admin.contact-messages.index', compact('messages'));
     }
@@ -28,7 +38,16 @@ final class ContactMessageController
         return view('admin.contact-messages.show', compact('message'));
     }
 
-    public function destroy(ContactMessage $message)
+    public function markAsRead(ContactMessage $message): RedirectResponse
+    {
+        $this->contactMessageService->markAsRead($message);
+
+        return redirect()
+            ->route('admin.contact-messages.show', $message)
+            ->with('success', __('messages.contact_message_marked_read'));
+    }
+
+    public function destroy(ContactMessage $message): RedirectResponse
     {
         $this->contactMessageService->delete($message);
 
