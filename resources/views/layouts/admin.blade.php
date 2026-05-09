@@ -41,6 +41,52 @@
         </main>
     </div>
 
+    {{-- Environment Badge --}}
+    @php
+        $environment = config('app.env');
+        $envColors = [
+            'production' => 'bg-red-500/20 border-red-500/30 text-red-600',
+            'staging' => 'bg-yellow-500/20 border-yellow-500/30 text-yellow-600',
+            'development' => 'bg-blue-500/20 border-blue-500/30 text-blue-600',
+            'local' => 'bg-emerald-500/20 border-emerald-500/30 text-emerald-600',
+        ];
+        $envColor = $envColors[$environment] ?? $envColors['development'];
+        $envDotColors = [
+            'production' => 'bg-red-500',
+            'staging' => 'bg-yellow-500',
+            'development' => 'bg-blue-500',
+            'local' => 'bg-emerald-500',
+        ];
+        $envDotColor = $envDotColors[$environment] ?? $envDotColors['development'];
+    @endphp
+
+    <div class="fixed top-6 right-6 z-[8000]">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-sm {{ $envColor }}">
+            <span class="relative flex items-center justify-center">
+                <span class="absolute inline-flex h-2 w-2 rounded-full {{ $envDotColor }} animate-pulse-dot"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full {{ $envDotColor }} opacity-75"></span>
+            </span>
+            <span class="text-xs font-semibold uppercase tracking-wide">{{ $environment }}</span>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.25);
+            }
+        }
+
+        .animate-pulse-dot {
+            animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+
     {{-- Global Toaster --}}
     <div x-data="{
         toasts: [],
