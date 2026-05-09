@@ -44,7 +44,7 @@ final class BlogPosts extends Component
     public function posts()
     {
         $query = Post::published()->with('categories', 'tags', 'author');
-
+        
         if ($this->search) {
             $query->where('title', 'like', '%' . $this->search . '%')
                 ->orWhere('excerpt', 'like', '%' . $this->search . '%');
@@ -60,7 +60,16 @@ final class BlogPosts extends Component
             $query->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id));
         }
 
-        return $query->latest()->paginate($this->perPage);
+        // Debug: Log the SQL query
+        \Log::debug('BlogPosts SQL: ' . $query->latest()->toSql());
+        \Log::debug('BlogPosts bindings: ' . json_encode($query->latest()->getBindings()));
+
+        $result = $query->latest()->paginate($this->perPage);
+        
+        // Debug: Log the count
+        \Log::debug('BlogPosts count: ' . $result->total());
+        
+        return $result;
     }
 
     #[Computed]
