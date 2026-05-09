@@ -144,12 +144,6 @@
                                         <div id="business-logo-preview" class="flex flex-col items-center w-full">
                                             @if($settings['business_logo'])
                                                 <img src="{{ Storage::url($settings['business_logo']) }}" class="h-20 object-contain mb-4" id="business-logo-img">
-                                                <button type="button" id="remove-logo-btn" class="mt-2 px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center gap-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    Remove Logo
-                                                </button>
                                             @else
                                                 <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -159,6 +153,14 @@
                                         </div>
                                         <input type="file" name="business_logo" id="business-logo-input" class="absolute inset-0 opacity-0 cursor-pointer">
                                     </div>
+                                    @if($settings['business_logo'])
+                                        <button type="button" id="remove-logo-btn" class="w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Remove Logo
+                                        </button>
+                                    @endif
                                     <p class="text-[10px] text-admin-text-muted">Recommended: PNG or SVG, max 2MB.</p>
                                 </div>
                                 <div class="space-y-4">
@@ -305,34 +307,48 @@
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Business Logo Remove Handler
-            const removeLogoBtn = document.getElementById('remove-logo-btn');
-            if (removeLogoBtn) {
-                removeLogoBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
+            // Function to attach remove button handler
+            function attachRemoveButtonHandler() {
+                const removeLogoBtn = document.getElementById('remove-logo-btn');
+                if (removeLogoBtn) {
+                    removeLogoBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
 
-                    if (!confirm('Are you sure you want to remove the business logo?')) {
-                        return;
-                    }
+                        if (!confirm('Are you sure you want to remove the business logo?')) {
+                            return;
+                        }
 
-                    // Set removal flag
-                    document.getElementById('remove-business-logo').value = '1';
-                    document.getElementById('business-logo-path').value = '';
+                        // Set removal flag
+                        document.getElementById('remove-business-logo').value = '1';
+                        document.getElementById('business-logo-path').value = '';
 
-                    // Reset preview to empty state
-                    const preview = document.getElementById('business-logo-preview');
-                    preview.innerHTML = `
-                        <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p class="text-xs text-admin-text-muted">Click to upload or drag and drop</p>
-                    `;
+                        // Reset preview to empty state
+                        const preview = document.getElementById('business-logo-preview');
+                        preview.innerHTML = `
+                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
+                        `;
 
-                    // Clear progress
-                    document.getElementById('business-logo-progress').innerHTML = '';
-                });
+                        // Clear progress
+                        document.getElementById('business-logo-progress').innerHTML = '';
+
+                        // Remove the remove button
+                        removeLogoBtn.remove();
+
+                        // Submit the form to process the removal
+                        const form = document.querySelector('form[action="{{ route("admin.settings.update") }}"]');
+                        if (form) {
+                            form.submit();
+                        }
+                    });
+                }
             }
+
+            // Attach handler to initial button if it exists
+            attachRemoveButtonHandler();
 
             if (typeof ImageUploader !== 'undefined') {
                 // Business Logo Uploader
@@ -348,6 +364,26 @@
                     onUploadComplete: function(response) {
                         // Reset removal flag if new image uploaded
                         document.getElementById('remove-business-logo').value = '0';
+                        
+                        // Create and insert remove button if it doesn't exist
+                        if (!document.getElementById('remove-logo-btn')) {
+                            const container = document.getElementById('business-logo-container');
+                            const newBtn = document.createElement('button');
+                            newBtn.type = 'button';
+                            newBtn.id = 'remove-logo-btn';
+                            newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
+                            newBtn.innerHTML = `
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Remove Logo
+                            `;
+                            container.parentNode.insertBefore(newBtn, container.nextSibling);
+                            
+                            // Re-attach click handler to new button
+                            attachRemoveButtonHandler();
+                        }
+                        
                         console.log('Logo uploaded successfully:', response);
                     },
                     onUploadError: function(message) {

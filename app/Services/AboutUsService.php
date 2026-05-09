@@ -49,6 +49,16 @@ final class AboutUsService
 
     private function handleHeroImage(AboutUsContent $content, Request $request): void
     {
+        // Handle removal request first
+        if ($request->boolean('remove_hero_image')) {
+            if ($content->hero_image) {
+                Storage::disk('public')->delete($content->hero_image);
+            }
+            $content->hero_image = null;
+
+            return;
+        }
+
         $imagePath = $request->input('hero_image_path');
 
         if (!empty($imagePath)) {
