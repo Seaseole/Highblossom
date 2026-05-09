@@ -7,17 +7,17 @@
                     @if($content->hero_image)
                         <div class="relative rounded-[2.5rem] overflow-hidden mb-8 about-hero js-scroll-with-image">
                             <img src="{{ Storage::url($content->hero_image) }}" alt="About Highblossom" class="w-full h-[420px] object-cover transition-transform duration-1000 ease-out hover:scale-[1.02]">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent"></div>
+                            <div class="absolute inset-0 bg-linear-to-t from-[#0A0A0F]/90 via-[#0A0A0F]/20 to-transparent"></div>
                             <div class="absolute inset-0 pointer-events-none feather-overlay"></div>
                             <div class="absolute inset-x-0 bottom-[2px] px-6 lg:px-12">
-                                <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white/88 via-white/40 to-transparent pointer-events-none"></div>
+                                <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-white/88 via-white/40 to-transparent pointer-events-none"></div>
                                 <div class="relative max-w-3xl text-[#0B0B0F] space-y-5 transform transition-transform duration-300 ease-out">
                                     <div class="text-admin-accent text-sm font-semibold uppercase tracking-wider">About Us</div>
                                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0B0B0F] font-headline tracking-tight">
                                         {!! nl2br(e($content->title)) !!}
                                     </h1>
                                     @if($content->subtitle)
-                                        <p class="text-lg text-[#4B5563] leading-relaxed max-w-2xl">
+                                        <p class="text-lg text-[#0a0a0f] leading-relaxed max-w-2xl">
                                             {{ $content->subtitle }}
                                         </p>
                                     @endif

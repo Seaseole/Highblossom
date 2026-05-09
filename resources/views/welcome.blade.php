@@ -2,7 +2,7 @@
 // $companyName.
         ' | Precision Automotive Glass'">
     <!-- Hero Section - Cinematic Dark -->
-    <header class="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0A0A0F]">
+    <header class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
         {{-- Background Image with Overlay --}}
         <div class="absolute inset-0 z-0">
             <img alt="Premium automotive glass installation" class="w-full h-full object-cover opacity-40"
@@ -12,7 +12,7 @@
         </div>
 
         {{-- Hero Content --}}
-        <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-[10px] pb-32 text-center">
+        <div class="relative z-10 flex-grow flex items-center justify-center w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 text-center">
             <div class="max-w-4xl mx-auto">
                 {{-- Trust Badge --}}
                 <div
@@ -48,29 +48,105 @@
             </div>
         </div>
 
-        {{-- Trust Bar --}}
-        <div
-            class="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-[#0A0A0F]/50 backdrop-blur-sm py-4 md:py-6">
-            <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                    <div class="text-center md:text-left">
-                        <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">22+</div>
-                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.years_experience') }}</div>
-                    </div>
-                    <div class="text-center md:text-left">
-                        <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline"></div>
-                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.vehicles_serviced') }}</div>
-                    </div>
-                    <div class="text-center md:text-left">
-                        <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">98%</div>
-                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.on_time_rate') }}</div>
-                    </div>
-                    <div class="text-center md:text-left">
-                        <div class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">Same</div>
-                        <div class="text-[#FAFAFA] text-sm mt-1">{{ __('site.home.same_day_service') }}</div>
-                    </div>
+        <div x-data="{ 
+             activeCard: null,
+             steps: [
+                {
+                    title: 'Free Quote',
+                    description: 'Request instant quote online or call',
+                    details: 'Get a free, no-obligation quote within minutes. Simply provide your vehicle details and glass type, or call our team directly for immediate assistance.',
+                    icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\'></path></svg>`
+                },
+                {
+                    title: 'Schedule',
+                    description: 'Choose convenient appointment time',
+                    details: 'Select a time that works for you. We offer flexible scheduling including same-day service for urgent repairs to get you back on the road.',
+                    icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\'></path></svg>`
+                },
+                {
+                    title: 'Mobile Service',
+                    description: 'We come to your location',
+                    details: 'Our mobile technicians come to your home or office. Fully equipped vehicles for on-site glass replacement and high-precision calibration.',
+                    icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z\'></path><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M15 11a3 3 0 11-6 0 3 3 0 016 0z\'></path></svg>`
+                },
+                {
+                    title: 'Quality Check',
+                    description: 'Final inspection and warranty',
+                    details: 'Every installation passes rigorous safety and quality inspections. Backed by our lifetime workmanship warranty for complete peace of mind.',
+                    icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\'></path></svg>`
+                }
+             ]
+        }"
+             class="relative z-10 w-full border-t border-white/5 bg-[#0A0A0F]/50 backdrop-blur-sm py-6 md:py-6">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-start">
+                    <template x-for="(step, index) in steps" :key="index">
+                        <div @click="activeCard = index"
+                             class="glass-card rounded-xl p-4 md:p-6 cursor-pointer group transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-[#DC2626]/20 animate-fade-up"
+                             :style="`animation-delay: ${index * 100}ms`">
+                            <div class="flex items-start justify-between">
+                                <div class="w-10 h-10 rounded-lg bg-[#DC2626]/10 flex items-center justify-center mb-3 group-hover:bg-[#DC2626]/20 transition-colors" x-html="step.icon">
+                                </div>
+                                <svg class="w-4 h-4 text-[#A1A1AA] opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-[#FAFAFA] font-semibold text-sm md:text-base mb-1" x-text="step.title"></h3>
+                            <p class="text-[#A1A1AA] text-xs md:text-sm leading-relaxed line-clamp-1" x-text="step.description"></p>
+                        </div>
+                    </template>
                 </div>
             </div>
+
+            {{-- Modal Overlay --}}
+            <template x-teleport="body">
+                <div x-show="activeCard !== null" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0A0A0F]/80 backdrop-blur-md">
+                    
+                    <div x-show="activeCard !== null"
+                         @click.away="activeCard = null"
+                         @keydown.escape.window="activeCard = null"
+                         x-transition:enter="transition cubic-bezier(0.32, 0.72, 0, 1) duration-500"
+                         x-transition:enter-start="opacity-0 scale-95 translateY(20px)"
+                         x-transition:enter-end="opacity-100 scale-100 translateY(0)"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="w-full max-w-lg glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
+                        
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center" x-html="activeCard !== null ? steps[activeCard].icon.replace('w-5 h-5', 'w-7 h-7') : ''">
+                                </div>
+                                <button @click="activeCard = null" class="p-2 rounded-full hover:bg-white/5 transition-colors text-[#A1A1AA] hover:text-[#FAFAFA]">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <h2 class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2" x-text="activeCard !== null ? steps[activeCard].title : ''"></h2>
+                            <p class="text-[#DC2626] font-medium mb-6" x-text="activeCard !== null ? steps[activeCard].description : ''"></p>
+                            
+                            <div class="space-y-4">
+                                <p class="text-[#A1A1AA] text-lg leading-relaxed" x-text="activeCard !== null ? steps[activeCard].details : ''"></p>
+                            </div>
+
+                            <div class="mt-8 flex gap-4">
+                                <button @click="activeCard = null" class="flex-1 py-4 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-[#FAFAFA] font-bold transition-all active:scale-[0.98]">
+                                    Got it
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     </header>
 
