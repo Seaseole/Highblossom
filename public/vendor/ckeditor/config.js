@@ -4,7 +4,11 @@
  */
 
 CKEDITOR.editorConfig = function( config ) {
-	// Define changes to default configuration here. For example:
+	// Disable the automatic version security warning for this embedded CKEditor build.
+	config.versionCheck = false;
+	CKEDITOR.config.versionCheck = false;
+
+	// Define other changes to default configuration here. For example:
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
 };
