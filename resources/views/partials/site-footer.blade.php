@@ -4,14 +4,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
             {{-- Brand Column --}}
             <div class="lg:col-span-1">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    @if($businessLogo)
-                        <img src="{{ Storage::url($businessLogo) }}" alt="{{ $logoText }}" class="h-12 w-auto object-contain">
-                    @else
-                        <span class="text-xl font-bold text-[#FAFAFA] font-headline tracking-tight hover:text-[#DC2626] transition-colors">
-                            {{ $logoText }}
-                        </span>
-                    @endif
+                <a href="{{ route('home') }}" class="hover:opacity-80 transition-opacity">
+                    <x-logo-trust-badge 
+                        :business-name="$logoText" 
+                        :icon-src="$businessLogo ? Storage::url($businessLogo) : null" 
+                        font-size="text-xl font-bold font-headline" 
+                        :show-badge="false"
+                    />
                 </a>
                 <p class="mt-4 text-[#A1A1AA] text-sm leading-relaxed max-w-xs">
                     Premium automotive glass repair, restoration, and replacement for Gaborone's vehicle owners and commercial fleets.
