@@ -165,59 +165,73 @@
 
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Remove Image Handler
-            const removeImageBtn = document.getElementById('remove-image-btn');
-            if (removeImageBtn) {
-                removeImageBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
+        (function() {
+            const initServices = function() {
+                // Remove Image Handler
+                const removeImageBtn = document.getElementById('remove-image-btn');
+                if (removeImageBtn) {
+                    removeImageBtn.onclick = function(e) {
+                        e.preventDefault();
 
-                    if (!confirm('Are you sure you want to remove the service image?')) {
-                        return;
-                    }
-
-                    // Set removal flag
-                    document.getElementById('remove-image').value = '1';
-                    document.getElementById('image-path').value = '';
-
-                    // Clear preview container
-                    document.getElementById('image-preview-container').innerHTML = '';
-
-                    // Hide remove button
-                    removeImageBtn.style.display = 'none';
-
-                    // Clear progress
-                    document.getElementById('image-progress').innerHTML = '';
-                });
-            }
-
-            if (typeof ImageUploader !== 'undefined') {
-                new ImageUploader({
-                    fileInput: document.querySelector('input[name="image"]'),
-                    previewContainer: document.getElementById('image-preview-container'),
-                    progressContainer: document.getElementById('image-progress'),
-                    hiddenInput: document.getElementById('image-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    folder: 'services',
-                    maxSize: 2 * 1024 * 1024, // 2MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
-                    onUploadComplete: function(response) {
-                        // Reset removal flag if new image uploaded
-                        document.getElementById('remove-image').value = '0';
-                        // Show remove button after upload so user can remove the uploaded image
-                        const removeBtn = document.getElementById('remove-image-btn');
-                        if (removeBtn) {
-                            removeBtn.style.display = 'flex';
+                        if (!confirm('Are you sure you want to remove the service image?')) {
+                            return;
                         }
-                        console.log('Image uploaded successfully:', response);
-                    },
-                    onUploadError: function(message) {
-                        console.error('Upload error:', message);
-                    }
-                });
+
+                        // Set removal flag
+                        const removeInput = document.getElementById('remove-image');
+                        const pathInput = document.getElementById('image-path');
+                        if (removeInput) removeInput.value = '1';
+                        if (pathInput) pathInput.value = '';
+
+                        // Clear preview container
+                        const preview = document.getElementById('image-preview-container');
+                        if (preview) preview.innerHTML = '';
+
+                        // Hide remove button
+                        removeImageBtn.style.display = 'none';
+
+                        // Clear progress
+                        const progress = document.getElementById('image-progress');
+                        if (progress) progress.innerHTML = '';
+                    };
+                }
+
+                if (typeof ImageUploader !== 'undefined') {
+                    new ImageUploader({
+                        fileInput: document.querySelector('input[name="image"]'),
+                        previewContainer: document.getElementById('image-preview-container'),
+                        progressContainer: document.getElementById('image-progress'),
+                        hiddenInput: document.getElementById('image-path'),
+                        uploadUrl: '{{ route("admin.image-upload") }}',
+                        csrfToken: '{{ csrf_token() }}',
+                        folder: 'services',
+                        maxSize: 2 * 1024 * 1024, // 2MB
+                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                        onUploadComplete: function(response) {
+                            // Reset removal flag if new image uploaded
+                            const removeInput = document.getElementById('remove-image');
+                            if (removeInput) removeInput.value = '0';
+                            // Show remove button after upload so user can remove the uploaded image
+                            const removeBtn = document.getElementById('remove-image-btn');
+                            if (removeBtn) {
+                                removeBtn.style.display = 'flex';
+                            }
+                            console.log('Image uploaded successfully:', response);
+                        },
+                        onUploadError: function(message) {
+                            console.error('Upload error:', message);
+                        }
+                    });
+                }
+            };
+
+            // Execute initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initServices);
+            } else {
+                initServices();
             }
-        });
+        })();
     </script>
 </x-layouts::admin>
 

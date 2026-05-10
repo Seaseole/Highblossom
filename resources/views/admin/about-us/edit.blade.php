@@ -179,94 +179,107 @@
 
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to attach remove button handler
-            function attachRemoveButtonHandler() {
-                const removeHeroImageBtn = document.getElementById('remove-hero-image-btn');
-                if (removeHeroImageBtn) {
-                    removeHeroImageBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.preventDefault();
+        (function() {
+            const initAboutUs = function() {
+                // Function to attach remove button handler
+                function attachRemoveButtonHandler() {
+                    const removeHeroImageBtn = document.getElementById('remove-hero-image-btn');
+                    if (removeHeroImageBtn) {
+                        // Use onclick to avoid multiple bindings if initialized twice
+                        removeHeroImageBtn.onclick = function(e) {
+                            e.stopPropagation();
+                            e.preventDefault();
 
-                        if (!confirm('Are you sure you want to remove the hero image?')) {
-                            return;
-                        }
+                            if (!confirm('Are you sure you want to remove the hero image?')) {
+                                return;
+                            }
 
-                        // Set removal flag
-                        document.getElementById('remove-hero-image').value = '1';
-                        document.getElementById('hero-image-path').value = '';
+                            // Set removal flag
+                            const removeInput = document.getElementById('remove-hero-image');
+                            const pathInput = document.getElementById('hero-image-path');
+                            if (removeInput) removeInput.value = '1';
+                            if (pathInput) pathInput.value = '';
 
-                        // Reset preview to empty state
-                        const preview = document.getElementById('hero-image-preview');
-                        preview.innerHTML = '';
+                            // Reset preview to empty state
+                            const preview = document.getElementById('hero-image-preview');
+                            if (preview) preview.innerHTML = '';
 
-                        // Clear progress
-                        document.getElementById('hero-image-progress').innerHTML = '';
+                            // Clear progress
+                            const progress = document.getElementById('hero-image-progress');
+                            if (progress) progress.innerHTML = '';
 
-                        // Remove the remove button
-                        removeHeroImageBtn.remove();
+                            // Remove the remove button
+                            removeHeroImageBtn.remove();
 
-                        // Submit the form to process the removal
-                        const form = removeHeroImageBtn.closest('form');
-                        if (form) {
-                            form.submit();
+                            // Submit the form to process the removal
+                            const form = document.getElementById('aboutUsForm');
+                            if (form) {
+                                form.submit();
+                            }
+                        };
+                    }
+                }
+
+                // Attach handler to initial button if it exists
+                attachRemoveButtonHandler();
+
+                // Initialize Image Uploader
+                if (typeof ImageUploader !== 'undefined') {
+                    new ImageUploader({
+                        fileInput: document.querySelector('input[name="hero_image"]'),
+                        previewContainer: document.getElementById('hero-image-preview'),
+                        progressContainer: document.getElementById('hero-image-progress'),
+                        hiddenInput: document.getElementById('hero-image-path'),
+                        uploadUrl: '{{ route("admin.image-upload") }}',
+                        csrfToken: '{{ csrf_token() }}',
+                        maxSize: 2 * 1024 * 1024, // 2MB
+                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                        onUploadComplete: function(response) {
+                            // Reset removal flag if new image uploaded
+                            const removeInput = document.getElementById('remove-hero-image');
+                            if (removeInput) removeInput.value = '0';
+
+                            // Create and insert remove button if it doesn't exist
+                            if (!document.getElementById('remove-hero-image-btn')) {
+                                const fileInput = document.querySelector('input[name="hero_image"]');
+                                if (fileInput) {
+                                    const uploadDiv = fileInput.closest('div');
+                                    
+                                    const newBtn = document.createElement('button');
+                                    newBtn.type = 'button';
+                                    newBtn.id = 'remove-hero-image-btn';
+                                    newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
+                                    newBtn.innerHTML = `
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Remove Image
+                                    `;
+                                    
+                                    // Insert button after the upload div
+                                    uploadDiv.insertAdjacentElement('afterend', newBtn);
+
+                                    // Re-attach click handler to new button
+                                    attachRemoveButtonHandler();
+                                }
+                            }
+
+                            console.log('Image uploaded successfully:', response);
+                        },
+                        onUploadError: function(message) {
+                            console.error('Upload error:', message);
                         }
                     });
                 }
+            };
+
+            // Execute initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initAboutUs);
+            } else {
+                initAboutUs();
             }
-
-            // Attach handler to initial button if it exists
-            attachRemoveButtonHandler();
-
-            // Initialize Image Uploader
-            if (typeof ImageUploader !== 'undefined') {
-                new ImageUploader({
-                    fileInput: document.querySelector('input[name="hero_image"]'),
-                    previewContainer: document.getElementById('hero-image-preview'),
-                    progressContainer: document.getElementById('hero-image-progress'),
-                    hiddenInput: document.getElementById('hero-image-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    maxSize: 2 * 1024 * 1024, // 2MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
-                    onUploadComplete: function(response) {
-                        // Reset removal flag if new image uploaded
-                        document.getElementById('remove-hero-image').value = '0';
-
-                        // Create and insert remove button if it doesn't exist
-                        if (!document.getElementById('remove-hero-image-btn')) {
-                            const fileInput = document.querySelector('input[name="hero_image"]');
-                            if (fileInput) {
-                                const uploadDiv = fileInput.closest('div');
-                                const parentContainer = uploadDiv.parentNode;
-                                
-                                const newBtn = document.createElement('button');
-                                newBtn.type = 'button';
-                                newBtn.id = 'remove-hero-image-btn';
-                                newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
-                                newBtn.innerHTML = `
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Remove Image
-                                `;
-                                
-                                // Insert button after the upload div
-                                uploadDiv.insertAdjacentElement('afterend', newBtn);
-
-                                // Re-attach click handler to new button
-                                attachRemoveButtonHandler();
-                            }
-                        }
-
-                        console.log('Image uploaded successfully:', response);
-                    },
-                    onUploadError: function(message) {
-                        console.error('Upload error:', message);
-                    }
-                });
-            }
-        });
+        })();
     </script>
     <style>
         .cke_chrome {

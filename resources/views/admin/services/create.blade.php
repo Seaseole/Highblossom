@@ -144,27 +144,36 @@
 
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof ImageUploader !== 'undefined') {
-                new ImageUploader({
-                    fileInput: document.querySelector('input[name="image"]'),
-                    previewContainer: document.getElementById('image-preview-container'),
-                    progressContainer: document.getElementById('image-progress'),
-                    hiddenInput: document.getElementById('image-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    folder: 'services',
-                    maxSize: 2 * 1024 * 1024, // 2MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
-                    onUploadComplete: function(response) {
-                        console.log('Image uploaded successfully:', response);
-                    },
-                    onUploadError: function(message) {
-                        console.error('Upload error:', message);
-                    }
-                });
+        (function() {
+            const initCreateService = function() {
+                if (typeof ImageUploader !== 'undefined') {
+                    new ImageUploader({
+                        fileInput: document.querySelector('input[name="image"]'),
+                        previewContainer: document.getElementById('image-preview-container'),
+                        progressContainer: document.getElementById('image-progress'),
+                        hiddenInput: document.getElementById('image-path'),
+                        uploadUrl: '{{ route("admin.image-upload") }}',
+                        csrfToken: '{{ csrf_token() }}',
+                        folder: 'services',
+                        maxSize: 2 * 1024 * 1024, // 2MB
+                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+                        onUploadComplete: function(response) {
+                            console.log('Image uploaded successfully:', response);
+                        },
+                        onUploadError: function(message) {
+                            console.error('Upload error:', message);
+                        }
+                    });
+                }
+            };
+
+            // Execute initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCreateService);
+            } else {
+                initCreateService();
             }
-        });
+        })();
     </script>
 </x-layouts::admin>
 

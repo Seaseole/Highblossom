@@ -93,24 +93,33 @@
 
 <script src="{{ asset('js/image-upload.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof ImageUploader !== 'undefined') {
-            new ImageUploader({
-                fileInput: document.querySelector('input[name="upload"]'),
-                previewContainer: document.getElementById('media-image-preview'),
-                progressContainer: document.getElementById('media-image-progress'),
-                hiddenInput: document.getElementById('media-image-path'),
-                uploadUrl: '{{ route("admin.image-upload") }}',
-                csrfToken: '{{ csrf_token() }}',
-                maxSize: 5 * 1024 * 1024, // 5MB
-                acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
-                onUploadComplete: function(response) {
-                    console.log('Image uploaded successfully:', response);
-                },
-                onUploadError: function(message) {
-                    console.error('Upload error:', message);
-                }
-            });
+    (function() {
+        const initMediaLibrary = function() {
+            if (typeof ImageUploader !== 'undefined') {
+                new ImageUploader({
+                    fileInput: document.querySelector('input[name="upload"]'),
+                    previewContainer: document.getElementById('media-image-preview'),
+                    progressContainer: document.getElementById('media-image-progress'),
+                    hiddenInput: document.getElementById('media-image-path'),
+                    uploadUrl: '{{ route("admin.image-upload") }}',
+                    csrfToken: '{{ csrf_token() }}',
+                    maxSize: 5 * 1024 * 1024, // 5MB
+                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
+                    onUploadComplete: function(response) {
+                        console.log('Image uploaded successfully:', response);
+                    },
+                    onUploadError: function(message) {
+                        console.error('Upload error:', message);
+                    }
+                });
+            }
+        };
+
+        // Execute initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMediaLibrary);
+        } else {
+            initMediaLibrary();
         }
-    });
+    })();
 </script>

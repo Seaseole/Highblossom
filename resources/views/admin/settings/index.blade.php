@@ -306,109 +306,126 @@
 
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to attach remove button handler
-            function attachRemoveButtonHandler() {
-                const removeLogoBtn = document.getElementById('remove-logo-btn');
-                if (removeLogoBtn) {
-                    removeLogoBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.preventDefault();
+        (function() {
+            const initSettings = function() {
+                // Function to attach remove button handler
+                function attachRemoveButtonHandler() {
+                    const removeLogoBtn = document.getElementById('remove-logo-btn');
+                    if (removeLogoBtn) {
+                        removeLogoBtn.onclick = function(e) {
+                            e.stopPropagation();
+                            e.preventDefault();
 
-                        if (!confirm('Are you sure you want to remove the business logo?')) {
-                            return;
+                            if (!confirm('Are you sure you want to remove the business logo?')) {
+                                return;
+                            }
+
+                            // Set removal flag
+                            const removeInput = document.getElementById('remove-business-logo');
+                            const pathInput = document.getElementById('business-logo-path');
+                            if (removeInput) removeInput.value = '1';
+                            if (pathInput) pathInput.value = '';
+
+                            // Reset preview to empty state
+                            const preview = document.getElementById('business-logo-preview');
+                            if (preview) {
+                                preview.innerHTML = `
+                                    <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
+                                `;
+                            }
+
+                            // Clear progress
+                            const progress = document.getElementById('business-logo-progress');
+                            if (progress) progress.innerHTML = '';
+
+                            // Remove the remove button
+                            removeLogoBtn.remove();
+
+                            // Submit the form to process the removal
+                            const form = document.querySelector('form[action="{{ route("admin.settings.update") }}"]');
+                            if (form) {
+                                form.submit();
+                            }
+                        };
+                    }
+                }
+
+                // Attach handler to initial button if it exists
+                attachRemoveButtonHandler();
+
+                if (typeof ImageUploader !== 'undefined') {
+                    // Business Logo Uploader
+                    new ImageUploader({
+                        fileInput: document.getElementById('business-logo-input'),
+                        previewContainer: document.getElementById('business-logo-preview'),
+                        progressContainer: document.getElementById('business-logo-progress'),
+                        hiddenInput: document.getElementById('business-logo-path'),
+                        uploadUrl: '{{ route("admin.image-upload") }}',
+                        csrfToken: '{{ csrf_token() }}',
+                        maxSize: 2 * 1024 * 1024, // 2MB
+                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'],
+                        onUploadComplete: function(response) {
+                            // Reset removal flag if new image uploaded
+                            const removeInput = document.getElementById('remove-business-logo');
+                            if (removeInput) removeInput.value = '0';
+                            
+                            // Create and insert remove button if it doesn't exist
+                            if (!document.getElementById('remove-logo-btn')) {
+                                const container = document.getElementById('business-logo-container');
+                                if (container) {
+                                    const newBtn = document.createElement('button');
+                                    newBtn.type = 'button';
+                                    newBtn.id = 'remove-logo-btn';
+                                    newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
+                                    newBtn.innerHTML = `
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Remove Logo
+                                    `;
+                                    container.parentNode.insertBefore(newBtn, container.nextSibling);
+                                    
+                                    // Re-attach click handler to new button
+                                    attachRemoveButtonHandler();
+                                }
+                            }
+                            
+                            console.log('Logo uploaded successfully:', response);
+                        },
+                        onUploadError: function(message) {
+                            console.error('Upload error:', message);
                         }
+                    });
 
-                        // Set removal flag
-                        document.getElementById('remove-business-logo').value = '1';
-                        document.getElementById('business-logo-path').value = '';
-
-                        // Reset preview to empty state
-                        const preview = document.getElementById('business-logo-preview');
-                        preview.innerHTML = `
-                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
-                        `;
-
-                        // Clear progress
-                        document.getElementById('business-logo-progress').innerHTML = '';
-
-                        // Remove the remove button
-                        removeLogoBtn.remove();
-
-                        // Submit the form to process the removal
-                        const form = document.querySelector('form[action="{{ route("admin.settings.update") }}"]');
-                        if (form) {
-                            form.submit();
+                    // Favicon Uploader
+                    new ImageUploader({
+                        fileInput: document.getElementById('favicon-input'),
+                        previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
+                        progressContainer: document.getElementById('favicon-progress'),
+                        hiddenInput: document.getElementById('favicon-path'),
+                        uploadUrl: '{{ route("admin.image-upload") }}',
+                        csrfToken: '{{ csrf_token() }}',
+                        maxSize: 1 * 1024 * 1024, // 1MB
+                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'],
+                        onUploadComplete: function(response) {
+                            console.log('Favicon uploaded successfully:', response);
+                        },
+                        onUploadError: function(message) {
+                            console.error('Upload error:', message);
                         }
                     });
                 }
+            };
+
+            // Execute initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSettings);
+            } else {
+                initSettings();
             }
-
-            // Attach handler to initial button if it exists
-            attachRemoveButtonHandler();
-
-            if (typeof ImageUploader !== 'undefined') {
-                // Business Logo Uploader
-                new ImageUploader({
-                    fileInput: document.getElementById('business-logo-input'),
-                    previewContainer: document.getElementById('business-logo-preview'),
-                    progressContainer: document.getElementById('business-logo-progress'),
-                    hiddenInput: document.getElementById('business-logo-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    maxSize: 2 * 1024 * 1024, // 2MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'],
-                    onUploadComplete: function(response) {
-                        // Reset removal flag if new image uploaded
-                        document.getElementById('remove-business-logo').value = '0';
-                        
-                        // Create and insert remove button if it doesn't exist
-                        if (!document.getElementById('remove-logo-btn')) {
-                            const container = document.getElementById('business-logo-container');
-                            const newBtn = document.createElement('button');
-                            newBtn.type = 'button';
-                            newBtn.id = 'remove-logo-btn';
-                            newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
-                            newBtn.innerHTML = `
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Remove Logo
-                            `;
-                            container.parentNode.insertBefore(newBtn, container.nextSibling);
-                            
-                            // Re-attach click handler to new button
-                            attachRemoveButtonHandler();
-                        }
-                        
-                        console.log('Logo uploaded successfully:', response);
-                    },
-                    onUploadError: function(message) {
-                        console.error('Upload error:', message);
-                    }
-                });
-
-                // Favicon Uploader
-                new ImageUploader({
-                    fileInput: document.getElementById('favicon-input'),
-                    previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
-                    progressContainer: document.getElementById('favicon-progress'),
-                    hiddenInput: document.getElementById('favicon-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    maxSize: 1 * 1024 * 1024, // 1MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'],
-                    onUploadComplete: function(response) {
-                        console.log('Favicon uploaded successfully:', response);
-                    },
-                    onUploadError: function(message) {
-                        console.error('Upload error:', message);
-                    }
-                });
-            }
-        });
+        })();
     </script>
 </x-layouts::admin>
