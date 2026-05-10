@@ -29,12 +29,15 @@ use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
+use Lubusin\Decomposer\Controllers\DecomposerController;
+use Lubusin\Decomposer\Decomposer;
 
 // Public SEO endpoints
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
+Route::get('/logo-demo', fn() => view('logo-demo'))->name('logo.demo');
 
 // Public Pages
 Route::get('/about-us', [SiteController::class, 'aboutUs'])->name('about-us');
@@ -210,6 +213,7 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::post('profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
 });
 
 // Public API endpoints for quote form
@@ -219,4 +223,4 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(functio
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

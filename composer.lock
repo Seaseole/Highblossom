@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a1bf488476b516c6f6912503195daafc",
+    "content-hash": "7333332534f51b353b50cb17c622329e",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -2739,6 +2739,65 @@
             "time": "2026-05-01T00:46:07+00:00"
         },
         {
+            "name": "lubusin/laravel-decomposer",
+            "version": "v1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lubusIN/laravel-decomposer.git",
+                "reference": "d521ea99b1ea01c306d53805d11801fd1cf121fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lubusIN/laravel-decomposer/zipball/d521ea99b1ea01c306d53805d11801fd1cf121fd",
+                "reference": "d521ea99b1ea01c306d53805d11801fd1cf121fd",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0"
+            },
+            "type": "laravel-package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Lubusin\\Decomposer\\DecomposerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lubusin\\Decomposer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ajit Bohra",
+                    "email": "ajit@lubus.in"
+                },
+                {
+                    "name": "Punit Verma",
+                    "email": "punit@lubus.in"
+                },
+                {
+                    "name": "Harish Toshniwal"
+                }
+            ],
+            "description": "A Laravel package to decompose your installed packages, their dependencies, your app & server environment",
+            "support": {
+                "issues": "https://github.com/lubusIN/laravel-decomposer/issues",
+                "source": "https://github.com/lubusIN/laravel-decomposer/tree/v1.4"
+            },
+            "time": "2026-03-19T13:42:26+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "3.10.0",
             "source": {
@@ -3248,6 +3307,147 @@
                 }
             ],
             "time": "2026-02-16T23:10:27+00:00"
+        },
+        {
+            "name": "opcodesio/log-viewer",
+            "version": "v3.24.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opcodesio/log-viewer.git",
+                "reference": "8afefde09f6005f7d8ee3f628aa311f27c91d125"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opcodesio/log-viewer/zipball/8afefde09f6005f7d8ee3f628aa311f27c91d125",
+                "reference": "8afefde09f6005f7d8ee3f628aa311f27c91d125",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "opcodesio/mail-parser": "^0.2.3",
+                "php": "^8.0"
+            },
+            "conflict": {
+                "arcanedev/log-viewer": "^8.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.2",
+                "itsgoingd/clockwork": "^5.1",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.0|^8.0",
+                "orchestra/testbench": "^7.6|^8.0|^9.5|^10.0|^11.0",
+                "pestphp/pest": "^2.0|^3.7|^4.4",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.1|^4.1",
+                "spatie/test-time": "^1.3"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Required for multi-host support. ^7.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "LogViewer": "Opcodes\\LogViewer\\Facades\\LogViewer"
+                    },
+                    "providers": [
+                        "Opcodes\\LogViewer\\LogViewerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Opcodes\\LogViewer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arunas Skirius",
+                    "email": "arukomp@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Fast and easy-to-use log viewer for your Laravel application",
+            "homepage": "https://github.com/opcodesio/log-viewer",
+            "keywords": [
+                "arukompas",
+                "better-log-viewer",
+                "laravel",
+                "log viewer",
+                "logs",
+                "opcodesio"
+            ],
+            "support": {
+                "issues": "https://github.com/opcodesio/log-viewer/issues",
+                "source": "https://github.com/opcodesio/log-viewer/tree/v3.24.0"
+            },
+            "funding": [
+                {
+                    "url": "https://www.buymeacoffee.com/arunas",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/arukompas",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-15T19:31:14+00:00"
+        },
+        {
+            "name": "opcodesio/mail-parser",
+            "version": "v0.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opcodesio/mail-parser.git",
+                "reference": "6f9544a1e526d5849cf8d96600556b2951893aec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opcodesio/mail-parser/zipball/6f9544a1e526d5849cf8d96600556b2951893aec",
+                "reference": "6f9544a1e526d5849cf8d96600556b2951893aec",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^2.16",
+                "symfony/var-dumper": "^6.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Opcodes\\MailParser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arunas Skirius",
+                    "email": "arukomp@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Parse emails without the mailparse extension",
+            "keywords": [
+                "arukompas",
+                "email",
+                "email parser",
+                "mail",
+                "opcodesio",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/opcodesio/mail-parser/issues",
+                "source": "https://github.com/opcodesio/mail-parser/tree/v0.2.3"
+            },
+            "time": "2026-02-28T09:04:57+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -4496,16 +4696,16 @@
         },
         {
             "name": "resend/resend-laravel",
-            "version": "v1.3.2",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/resend/resend-laravel.git",
-                "reference": "49773f31e9e7753f596f8459b6a8200525ffde0c"
+                "reference": "6dd5f5ec607404068c5af067fd7f6ba4b659262b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/resend/resend-laravel/zipball/49773f31e9e7753f596f8459b6a8200525ffde0c",
-                "reference": "49773f31e9e7753f596f8459b6a8200525ffde0c",
+                "url": "https://api.github.com/repos/resend/resend-laravel/zipball/6dd5f5ec607404068c5af067fd7f6ba4b659262b",
+                "reference": "6dd5f5ec607404068c5af067fd7f6ba4b659262b",
                 "shasum": ""
             },
             "require": {
@@ -4559,9 +4759,9 @@
             ],
             "support": {
                 "issues": "https://github.com/resend/resend-laravel/issues",
-                "source": "https://github.com/resend/resend-laravel/tree/v1.3.2"
+                "source": "https://github.com/resend/resend-laravel/tree/v1.4.0"
             },
-            "time": "2026-03-27T02:11:50+00:00"
+            "time": "2026-05-06T17:08:44+00:00"
         },
         {
             "name": "resend/resend-php",
@@ -9013,16 +9213,16 @@
         },
         {
             "name": "laramint/laravel-stress",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laramint/laravel-stress.git",
-                "reference": "5756ff3cf3c57534efa725e9e7c4bf3fae53802f"
+                "reference": "adbdea7b2e49d4e6c8d3616d46eb20ba6e03cacb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laramint/laravel-stress/zipball/5756ff3cf3c57534efa725e9e7c4bf3fae53802f",
-                "reference": "5756ff3cf3c57534efa725e9e7c4bf3fae53802f",
+                "url": "https://api.github.com/repos/laramint/laravel-stress/zipball/adbdea7b2e49d4e6c8d3616d46eb20ba6e03cacb",
+                "reference": "adbdea7b2e49d4e6c8d3616d46eb20ba6e03cacb",
                 "shasum": ""
             },
             "require": {
@@ -9064,9 +9264,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laramint/laravel-stress/issues",
-                "source": "https://github.com/laramint/laravel-stress/tree/v1.0.1"
+                "source": "https://github.com/laramint/laravel-stress/tree/v1.0.2"
             },
-            "time": "2026-05-04T21:56:35+00:00"
+            "time": "2026-05-06T18:24:33+00:00"
         },
         {
             "name": "laravel/pail",

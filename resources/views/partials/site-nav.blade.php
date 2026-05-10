@@ -1,14 +1,16 @@
 <nav class="fixed top-0 w-full z-50 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5">
     <div class="flex justify-between items-center px-6 lg:px-8 py-4 max-w-[1400px] mx-auto">
         {{-- Logo --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            @if($businessLogo)
-                <img src="{{ Storage::url($businessLogo) }}" alt="{{ $logoText }}" class="h-10 w-auto object-contain">
-            @else
-                <span class="text-lg lg:text-xl font-bold text-[#FAFAFA] font-headline tracking-tight hover:text-[#DC2626] transition-colors">
-                    {{ $logoText }}
-                </span>
-            @endif
+        <a href="{{ route('home') }}" class="hover:opacity-80 transition-opacity">
+            <x-logo-trust-badge 
+                :business-name="$logoText" 
+                :icon-src="$businessLogo ? Storage::url($businessLogo) : null" 
+                font-size="text-lg lg:text-xl font-bold font-headline" 
+                :badge-size="10"
+                gap="gap-1.5"
+                :badge-top="-2"
+                :badge-right="-16"
+            />
         </a>
 
         {{-- Desktop Navigation --}}
