@@ -238,37 +238,49 @@
                     });
                 @endphp
 
-                @if(count($visibleRoutes) === 1)
-                    {{-- Single item group - render as standalone item --}}
-                    @php
-                        $route = reset($visibleRoutes);
-                        $isActive = $isRouteActive($route);
-                    @endphp
-                    <flux:sidebar.item 
-                        :href="$getRouteName($route)"
-                        :icon="$getRouteIcon($route)"
-                        :active="$isActive"
-                        wire:navigate
-                    >
-                        {{ $getRouteLabel($route) }}
-                    </flux:sidebar.item>
-                @elseif(count($visibleRoutes) > 1)
-                    {{-- Multi-item group - render as collapsible group --}}
-                    <flux:sidebar.group label="{{ $groupData['label'] }}" :collapsed="!$isGroupActive($visibleRoutes)">
-                        @foreach($visibleRoutes as $route)
-                            @php
-                                $isActive = $isRouteActive($route);
-                            @endphp
-                            <flux:sidebar.item 
-                                :href="$getRouteName($route)"
-                                :icon="$getRouteIcon($route)"
-                                :active="$isActive"
-                                wire:navigate
-                            >
-                                {{ $getRouteLabel($route) }}
-                            </flux:sidebar.item>
-                        @endforeach
-                    </flux:sidebar.group>
+                @if(count($visibleRoutes) > 0)
+                    {{-- Group Label - Now appearing on desktop too --}}
+                    <div class="mt-4 mb-2 px-4 first:mt-0">
+                        <span class="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">{{ $groupData['label'] }}</span>
+                    </div>
+
+                    @if(count($visibleRoutes) === 1)
+                        {{-- Single item group - render as standalone item --}}
+                        @php
+                            $route = reset($visibleRoutes);
+                            $isActive = $isRouteActive($route);
+                        @endphp
+                        <flux:sidebar.item 
+                            :href="$getRouteName($route)"
+                            :icon="$getRouteIcon($route)"
+                            :active="$isActive"
+                            wire:navigate
+                        >
+                            {{ $getRouteLabel($route) }}
+                        </flux:sidebar.item>
+                    @elseif(count($visibleRoutes) > 1)
+                        {{-- Multi-item group - render as expandable group --}}
+                        <flux:sidebar.group 
+                            :heading="$groupData['label']" 
+                            :icon="$groupData['icon']" 
+                            expandable 
+                            :expanded="$isGroupActive($visibleRoutes)"
+                        >
+                            @foreach($visibleRoutes as $route)
+                                @php
+                                    $isActive = $isRouteActive($route);
+                                @endphp
+                                <flux:sidebar.item 
+                                    :href="$getRouteName($route)"
+                                    :icon="$getRouteIcon($route)"
+                                    :active="$isActive"
+                                    wire:navigate
+                                >
+                                    {{ $getRouteLabel($route) }}
+                                </flux:sidebar.item>
+                            @endforeach
+                        </flux:sidebar.group>
+                    @endif
                 @endif
             @endforeach
         </flux:sidebar.nav>
@@ -378,23 +390,12 @@
                     });
                 @endphp
 
-                @if(count($visibleRoutes) === 1)
-                    {{-- Single item group - render as standalone item --}}
-                    @php
-                        $route = reset($visibleRoutes);
-                        $isActive = $isRouteActive($route);
-                    @endphp
-                    <a href="{{ $getRouteName($route) }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $isActive ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getMobileIcon($route) }}" />
-                        </svg>
-                        <span class="whitespace-nowrap">{{ $getRouteLabel($route) }}</span>
-                    </a>
-                @elseif(count($visibleRoutes) > 1)
-                    {{-- Multi-item group - render with header --}}
-                    <div class="mt-4 mb-2 px-4">
+                @if(count($visibleRoutes) > 0)
+                    {{-- Group Label --}}
+                    <div class="mt-4 mb-2 px-4 first:mt-0">
                         <span class="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">{{ $groupData['label'] }}</span>
                     </div>
+
                     @foreach($visibleRoutes as $route)
                         @php
                             $isActive = $isRouteActive($route);

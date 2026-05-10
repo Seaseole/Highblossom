@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,6 +45,10 @@
         }
         .text-wrap-pretty {
             text-wrap: pretty;
+        }
+        /* Base background color to prevent flash */
+        html {
+            background-color: #0A0A0F;
         }
     </style>
 </head>

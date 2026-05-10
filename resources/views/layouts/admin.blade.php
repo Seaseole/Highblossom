@@ -16,19 +16,31 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('vendor/ckeditor/ckeditor.js') }}"></script>
-</head>
-<body class="min-h-[100dvh] bg-admin-bg text-admin-text font-body antialiased" x-data="{ darkMode: localStorage.getItem('theme') || 'auto' }" x-init="
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-        const updateDark = () => {
-            if (darkMode === 'dark' || (darkMode === 'auto' && prefersDark.matches)) {
+
+    {{-- Instant Dark Mode Script --}}
+    <script>
+        (function() {
+            const theme = @json(auth()->user()?->theme_preference) || localStorage.getItem('theme') || 'auto';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (theme === 'auto' && prefersDark)) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
-        };
-        updateDark();
-        prefersDark.addEventListener('change', () => { if (darkMode === 'auto') updateDark(); });
-    ">
+        })();
+    </script>
+
+    <style>
+        /* Base background colors to prevent flash */
+        html {
+            background-color: #f8f9fa; /* --color-admin-bg (light) */
+        }
+        html.dark {
+            background-color: #0A0A0F; /* --color-admin-bg (dark) */
+        }
+    </style>
+</head>
+<body class="min-h-[100dvh] bg-admin-bg text-admin-text font-body antialiased">
     <div class="flex min-h-[100dvh]">
         <!-- Livewire Admin Sidebar -->
         <livewire:admin-sidebar />
