@@ -4,7 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Two-Factor Authentication - {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        @keyframes caret-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .caret-blink {
+            animation: caret-blink 1s step-end infinite;
+        }
+    </style>
 </head>
 <body class="min-h-[100dvh] bg-[#0A0A0F]">
     <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh]">
@@ -48,29 +59,58 @@
                     <h2 class="text-2xl font-bold text-[#FAFAFA] mb-2 font-headline">Two-Factor Authentication</h2>
                     <p class="text-[#A1A1AA] mb-8">Enter the authentication code from your authenticator app</p>
 
-                    <form method="POST" action="{{ route('two-factor.login') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('two-factor.login') }}" class="space-y-8" x-data="{ code: '' }" x-cloak>
                         @csrf
 
-                        <div>
-                            <label for="code" class="block text-sm font-medium text-[#A1A1AA] mb-2">Authentication Code</label>
+                        <div class="relative">
+                            <label for="code" class="block text-sm font-medium text-[#A1A1AA] mb-4">Authentication Code</label>
+                            
+                            <!-- Real Hidden Input -->
                             <input
                                 id="code"
                                 type="text"
                                 name="code"
-                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-transparent transition-all duration-200"
-                                placeholder="123456"
+                                x-model="code"
+                                maxlength="6"
                                 required
                                 autofocus
                                 inputmode="numeric"
+                                pattern="[0-9]*"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-text z-10"
+                                autocomplete="one-time-code"
+                                @input="code = code.replace(/\D/g, '').slice(0, 6)"
                             >
+
+                            <!-- Visual Representation -->
+                            <div class="flex justify-between gap-3 relative z-0">
+                                <template x-for="i in [0,1,2,3,4,5]" :key="i">
+                                    <div 
+                                        class="w-12 h-16 flex items-center justify-center text-3xl font-bold bg-white/5 border transition-all duration-200 rounded-[5px]"
+                                        :class="{
+                                            'border-[#DC2626] ring-1 ring-[#DC2626]': code.length === i,
+                                            'border-white/10': code.length !== i,
+                                            'text-[#FAFAFA]': code[i],
+                                            'text-transparent': !code[i]
+                                        }"
+                                    >
+                                        <span x-text="code[i] || ''" class="relative z-10"></span>
+                                        
+                                        <!-- Blinking Caret -->
+                                        <div x-show="code.length === i" 
+                                             class="absolute w-[2px] h-8 bg-[#DC2626] caret-blink">
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
                             @error('code')
-                                <p class="mt-2 text-sm text-[#DC2626]">{{ $message }}</p>
+                                <p class="mt-4 text-sm text-[#DC2626]">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <button
                             type="submit"
-                            class="w-full bg-[#DC2626] text-white py-3 px-4 rounded-xl hover:bg-[#B91C1C] focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2 transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#DC2626]/20"
+                            class="w-full bg-[#DC2626] text-white py-4 px-4 rounded-xl hover:bg-[#B91C1C] font-bold text-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2 transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#DC2626]/20"
                         >
                             Verify
                         </button>

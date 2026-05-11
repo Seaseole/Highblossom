@@ -8,12 +8,23 @@
             </div>
         </div>
 
+        <style>
+            @keyframes caret-blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0; }
+            }
+            .caret-blink {
+                animation: caret-blink 1s step-end infinite;
+            }
+        </style>
+
         <div x-data="{ 
             tab: '{{ request()->query('tab', 'profile') }}',
             showDeleteModal: false,
             showRecoveryCodesModal: false,
             recoveryCodes: @json(session('recovery_codes', [])),
             loadingCodes: false,
+            confirmCode: '',
 
             init() {
                 if (this.recoveryCodes.length > 0) {
@@ -263,11 +274,50 @@
                                     <p class="text-xs text-admin-text-muted">Or enter this setup key manually: <span class="font-mono text-admin-text select-all">{{ decrypt($user->two_factor_secret) }}</span></p>
                                 </div>
 
-                                <form action="{{ route('admin.profile.two-factor.confirm') }}" method="POST" class="max-w-xs space-y-4">
+                                <form action="{{ route('admin.profile.two-factor.confirm') }}" method="POST" class="max-w-xs space-y-6">
                                     @csrf
-                                    <div class="space-y-2">
+                                    <div class="space-y-4">
                                         <label class="text-sm font-medium text-admin-text-muted">Authentication Code</label>
-                                        <input type="text" name="code" placeholder="000000" class="w-full admin-form-input text-center text-xl tracking-[0.5em]" maxlength="6" autofocus required autocomplete="one-time-code">
+                                        
+                                        <div class="relative">
+                                            <!-- Real Hidden Input -->
+                                            <input
+                                                type="text"
+                                                name="code"
+                                                x-model="confirmCode"
+                                                maxlength="6"
+                                                required
+                                                autofocus
+                                                inputmode="numeric"
+                                                pattern="[0-9]*"
+                                                class="absolute inset-0 w-full h-full opacity-0 cursor-text z-10"
+                                                autocomplete="one-time-code"
+                                                @input="confirmCode = confirmCode.replace(/\D/g, '').slice(0, 6)"
+                                            >
+
+                                            <!-- Visual Representation -->
+                                            <div class="flex justify-between gap-2 relative z-0">
+                                                <template x-for="i in [0,1,2,3,4,5]" :key="i">
+                                                    <div 
+                                                        class="w-10 h-14 flex items-center justify-center text-2xl font-bold bg-admin-surface-alt border transition-all duration-200 rounded-[5px]"
+                                                        :class="{
+                                                            'border-admin-accent ring-1 ring-admin-accent': confirmCode.length === i,
+                                                            'border-admin-border-subtle': confirmCode.length !== i,
+                                                            'text-admin-text': confirmCode[i],
+                                                            'text-transparent': !confirmCode[i]
+                                                        }"
+                                                    >
+                                                        <span x-text="confirmCode[i] || ''" class="relative z-10"></span>
+                                                        
+                                                        <!-- Blinking Caret -->
+                                                        <div x-show="confirmCode.length === i" 
+                                                             class="absolute w-[2px] h-6 bg-admin-accent caret-blink">
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+
                                         @error('code')
                                             <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
                                         @enderror
