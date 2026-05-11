@@ -44,7 +44,7 @@
                 <img 
                     src="{{ Storage::url($businessLogo) }}" 
                     alt="{{ $logoText }}" 
-                    class="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+                    class="h-10 w-auto object-contain rounded-lg transition-transform duration-200 group-hover:scale-105"
                 >
             @else
                 <span class="font-headline text-2xl font-bold text-[#FAFAFA] transition-transform duration-200 group-hover:scale-105">

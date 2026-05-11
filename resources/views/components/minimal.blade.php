@@ -12,8 +12,23 @@
         <div 
             class="bg-[#16161D]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-[#0A0A0F]/50 p-8 md:p-12 text-center animate-error-entrance"
         >
+            @php
+                $businessLogo = App\Domains\Content\Models\CompanySetting::get('business_logo', '');
+                $logoText = App\Domains\Content\Models\CompanySetting::get('logo_text', 'Highblossom');
+            @endphp
+
+            @if($businessLogo)
+                <div class="flex justify-center mb-6">
+                    <img 
+                        src="{{ Storage::url($businessLogo) }}" 
+                        alt="{{ $logoText }}" 
+                        class="h-16 w-auto object-contain rounded-lg shadow-lg"
+                    >
+                </div>
+            @endif
+
             <!-- Status Code -->
-            <h1 class="font-headline text-7xl md:text-8xl font-bold bg-gradient-to-br from-[#DC2626] to-[#991B1B] bg-clip-text text-transparent mb-4">
+            <h1 class="font-headline text-7xl md:text-8xl font-bold text-[#DC2626] mb-4">
                 {{ $status }}
             </h1>
 
