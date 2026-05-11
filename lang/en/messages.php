@@ -88,6 +88,7 @@ return [
     'password_updated' => 'Password updated successfully.',
     'two_factor_enabled' => 'Two-factor authentication enabled successfully.',
     'two_factor_disabled' => 'Two-factor authentication disabled successfully.',
+    'recovery_codes_regenerated' => 'Recovery codes regenerated successfully.',
     'account_deleted' => 'Account deleted successfully.',
 
     // Quote messages
@@ -95,6 +96,6 @@ return [
 
     // Post messages
     'post_created' => 'Post created successfully.',
-    'post_updated'=> 'Post updated successfully.',
-    'post_deleted'=> 'Post deleted successfully.',
+    'post_updated' => 'Post updated successfully.',
+    'post_deleted' => 'Post deleted successfully.',
 ];

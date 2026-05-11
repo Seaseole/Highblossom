@@ -10,6 +10,8 @@ use App\Http\Requests\Admin\AppearanceRequest;
 use App\Http\Requests\Admin\PasswordUpdateRequest;
 use App\Http\Requests\Admin\ProfileUpdateRequest;
 use App\Services\ProfileService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Features;
 
 final class ProfileController extends Controller
@@ -50,7 +52,7 @@ final class ProfileController extends Controller
             $validated['password']
         );
 
-        if (!$success) {
+        if (! $success) {
             return back()->withErrors(['current_password' => __('validation.current_password')]);
         }
 
@@ -59,18 +61,72 @@ final class ProfileController extends Controller
 
     public function enableTwoFactor()
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
         }
 
-        $this->profileService->enableTwoFactor(auth()->user());
+        $user = auth()->user();
 
-        return back()->with('success', __('messages.two_factor_enabled'));
+        $this->profileService->enableTwoFactor($user);
+
+        return back()
+            ->with('twoFactorQrCode', $user->twoFactorQrCodeSvg())
+            ->with('twoFactorSecret', decrypt($user->two_factor_secret))
+            ->with('showTwoFactorSetup', true);
+    }
+
+    public function confirmTwoFactor(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string'],
+        ]);
+
+        $user = auth()->user();
+
+        try {
+            $this->profileService->confirmTwoFactor($user, $request->input('code'));
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors(), 'confirmTwoFactorAuthentication');
+        }
+
+        return back()
+            ->with('success', __('messages.two_factor_enabled'))
+            ->with('showRecoveryCodes', true)
+            ->with('recoveryCodes', $user->recoveryCodes());
+    }
+
+    public function showRecoveryCodes()
+    {
+        $user = auth()->user();
+
+        if (! $user->hasEnabledTwoFactorAuthentication()) {
+            return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
+        }
+
+        return back()
+            ->with('showRecoveryCodes', true)
+            ->with('recoveryCodes', $user->recoveryCodes());
+    }
+
+    public function regenerateRecoveryCodes()
+    {
+        $user = auth()->user();
+
+        if (! $user->hasEnabledTwoFactorAuthentication()) {
+            return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
+        }
+
+        $this->profileService->regenerateRecoveryCodes($user);
+
+        return back()
+            ->with('success', __('messages.recovery_codes_regenerated'))
+            ->with('showRecoveryCodes', true)
+            ->with('recoveryCodes', $user->recoveryCodes());
     }
 
     public function disableTwoFactor()
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
         }
 
@@ -86,7 +142,7 @@ final class ProfileController extends Controller
             $request->validated()['password']
         );
 
-        if (!$success) {
+        if (! $success) {
             return back()->withErrors(['password' => __('validation.current_password')]);
         }
 
