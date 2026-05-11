@@ -27,6 +27,7 @@
         "laravel/tinker": "^3.0",
         "livewire/flux": "^2.13",
         "livewire/livewire": "*",
+        "endroid/qr-code": "^5.0",
         "lubusin/laravel-decomposer": "^1.4",
         "opcodesio/log-viewer": "^3.24",
         "php-ffmpeg/php-ffmpeg": "*",

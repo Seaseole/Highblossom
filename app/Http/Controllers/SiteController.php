@@ -107,12 +107,12 @@ class SiteController extends Controller
         $whatsappAdditional = CompanySetting::get('whatsapp_additional_numbers', []);
         $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
 
-        // Defensive eager loading: models have no relationships, with([]) documents intent
+      
         $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
         $serviceTypes = ServiceType::active()->ordered()->with([])->get();
         $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
 
-        // Build contact numbers using service
+        
         $contactNumbers = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
 
         return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes', 'glassSubCategories'));
@@ -142,7 +142,7 @@ class SiteController extends Controller
         return view('blog.index', compact('search', 'categorySlug', 'tagSlug'));
     }
 
-    public function blogShow($slug)
+    public function blogShow(string $slug)
     {
         $post = Post::published()->where('slug', $slug)->with('categories', 'tags')->firstOrFail();
 

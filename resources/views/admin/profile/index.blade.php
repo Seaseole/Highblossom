@@ -10,7 +10,16 @@
 
         <div x-data="{ 
             tab: 'profile',
-            showDeleteModal: false
+            showDeleteModal: false,
+            showTwoFactorModal: false,
+            twoFactorStep: 1,
+            twoFactorData: null,
+            twoFactorSecret: '',
+            twoFactorCode: '',
+            recoveryCodes: [],
+            showRecoveryCodes: false,
+            loading: false,
+            errors: {}
         }">
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
@@ -170,20 +179,51 @@
                         <h3 class="text-lg font-bold text-admin-text mb-2">Two-Factor Authentication</h3>
                         <p class="text-sm text-admin-text-muted mb-6">Add an extra layer of security to your account by enabling two-factor authentication.</p>
                         
-                        @if($user->two_factor_secret)
-                            <form action="{{ route('admin.profile.two-factor.disable') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition-all">
-                                    Disable Two-Factor Authentication
+                        @if($user->two_factor_secret && $user->two_factor_confirmed_at)
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0m-6-4l-2-2m0 0l2 2m0-6l2-2" />
+                                        </svg>
+                                        <div>
+                                            <p class="font-medium text-green-600">Two-factor authentication is enabled</p>
+                                            <p class="text-sm text-admin-text-muted">Your account is protected with 2FA</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="showTwoFactorModal = true" class="text-admin-accent hover:text-admin-accent/80 text-sm font-medium">
+                                        Manage Settings
+                                    </button>
+                                </div>
+                                
+                                <button type="button" @click="showRecoveryCodes = !showRecoveryCodes" class="text-admin-text-muted hover:text-admin-text text-sm font-medium">
+                                    <span x-show="!showRecoveryCodes">Show Recovery Codes</span>
+                                    <span x-show="showRecoveryCodes">Hide Recovery Codes</span>
                                 </button>
-                            </form>
+                                
+                                <div x-show="showRecoveryCodes" x-transition class="mt-4 p-4 bg-admin-surface-alt border border-admin-border-subtle rounded-xl space-y-2">
+                                    <p class="text-sm text-admin-text-muted mb-3">Store these recovery codes in a safe place. You can use them to access your account if you lose access to your authenticator device.</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <template x-for="code in recoveryCodes" :key="code">
+                                            <div class="p-3 bg-admin-surface border border-admin-border-subtle rounded-lg font-mono text-sm text-admin-text">
+                                                <span x-text="code"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="mt-4 flex gap-3">
+                                        <button type="button" @click="regenerateRecoveryCodes()" class="flex-1 bg-admin-accent hover:bg-admin-accent/90 text-white font-medium py-2 px-4 rounded-lg transition-all">
+                                            Regenerate Codes
+                                        </button>
+                                        <button type="button" @click="downloadRecoveryCodes()" class="flex-1 bg-admin-surface-alt hover:bg-admin-surface border border-admin-border-subtle text-admin-text font-medium py-2 px-4 rounded-lg transition-all">
+                                            Download Codes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         @else
-                            <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
-                                    Enable Two-Factor Authentication
-                                </button>
-                            </form>
+                            <button type="button" @click="enableTwoFactor()" class="w-full bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                                Enable Two-Factor Authentication
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -218,4 +258,258 @@
             </form>
         </div>
     </div>
+
+    <!-- Two-Factor Setup Modal -->
+    <div x-show="showTwoFactorModal" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-admin-text">Set Up Two-Factor Authentication</h3>
+                    <button type="button" @click="showTwoFactorModal = false" class="text-admin-text-muted hover:text-admin-text">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Step 1: QR Code Setup -->
+                <div x-show="twoFactorStep === 1" class="space-y-6">
+                    <div class="text-center space-y-4">
+                        <div class="w-32 h-32 mx-auto bg-white p-4 rounded-xl border border-admin-border-subtle">
+                            <div x-show="!twoFactorData?.qr_code_url" class="w-full h-full flex items-center justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-admin-accent"></div>
+                            </div>
+                            <img x-show="twoFactorData?.qr_code_url" :src="`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(twoFactorData?.qr_code_url || '')}`" alt="QR Code" class="w-full h-full">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <p class="text-admin-text font-medium">Scan this QR code with your authenticator app</p>
+                            <p class="text-sm text-admin-text-muted">Or manually enter this secret key:</p>
+                            <div class="p-3 bg-admin-surface-alt border border-admin-border-subtle rounded-lg">
+                                <code class="font-mono text-sm text-admin-text" x-text="twoFactorData?.secret || ''"></code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="button" @click="twoFactorStep = 2" :disabled="!twoFactorData" class="bg-admin-accent hover:bg-admin-accent/90 disabled:opacity-50 text-white font-medium py-2 px-6 rounded-lg transition-all">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Verification -->
+                <div x-show="twoFactorStep === 2" class="space-y-6">
+                    <div class="text-center space-y-4">
+                        <div class="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0m-6-4l-2-2m0 0l2 2m0-6l2-2" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-admin-text font-medium">Enter the 6-digit code from your authenticator app</p>
+                            <p class="text-sm text-admin-text-muted">This verifies that your app is set up correctly</p>
+                        </div>
+                    </div>
+
+                    <form @submit.prevent="confirmTwoFactor()" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-admin-text">Authentication Code</label>
+                            <input 
+                                type="text" 
+                                x-model="twoFactorCode" 
+                                maxlength="6" 
+                                pattern="[0-9]{6}" 
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                class="w-full admin-form-input text-center text-lg tracking-widest"
+                                placeholder="000000"
+                                :class="{'border-red-500': errors.code}"
+                            >
+                            <p x-show="errors.code" class="mt-2 text-sm text-red-500" x-text="errors.code"></p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button type="button" @click="twoFactorStep = 1" class="flex-1 bg-admin-surface-alt hover:bg-admin-surface border border-admin-border-subtle text-admin-text font-medium py-2 px-4 rounded-lg transition-all">
+                                Back
+                            </button>
+                            <button type="submit" :disabled="loading || !twoFactorCode" class="flex-1 bg-admin-accent hover:bg-admin-accent/90 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-all">
+                                <span x-show="!loading">Verify Code</span>
+                                <span x-show="loading">Verifying...</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 3: Recovery Codes -->
+                <div x-show="twoFactorStep === 3" class="space-y-6">
+                    <div class="text-center space-y-4">
+                        <div class="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0m-6-4l-2-2m0 0l2 2m0-6l2-2" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-admin-text font-medium">Save your recovery codes</p>
+                            <p class="text-sm text-admin-text-muted">Store these codes in a safe place. You can use them to access your account if you lose access to your authenticator device.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="code in recoveryCodes" :key="code">
+                                <div class="p-3 bg-admin-surface-alt border border-admin-border-subtle rounded-lg font-mono text-sm text-admin-text">
+                                    <span x-text="code"></span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                            <p class="text-sm text-yellow-600 font-medium">
+                                <strong>Important:</strong> These codes are only shown once. Save them now before closing this window.
+                            </p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button type="button" @click="downloadRecoveryCodes()" class="flex-1 bg-admin-surface-alt hover:bg-admin-surface border border-admin-border-subtle text-admin-text font-medium py-2 px-4 rounded-lg transition-all">
+                                Download Codes
+                            </button>
+                            <button type="button" @click="finishTwoFactorSetup()" class="flex-1 bg-admin-accent hover:bg-admin-accent/90 text-white font-medium py-2 px-4 rounded-lg transition-all">
+                                Finish Setup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div x-show="$wire.flash.message" x-transition class="fixed top-4 right-4 z-50">
+        <div class="bg-admin-surface border border-admin-border-subtle rounded-lg shadow-lg p-4 max-w-sm">
+            <p class="text-admin-text" x-text="$wire.flash.message"></p>
+        </div>
+    </div>
+
+    <script>
+        function enableTwoFactor() {
+            fetch('{{ route("admin.profile.two-factor.enable") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Alpine.store.profile.twoFactorData = data;
+                    Alpine.store.profile.twoFactorSecret = data.secret;
+                    Alpine.store.profile.recoveryCodes = data.recovery_codes;
+                    Alpine.store.profile.twoFactorStep = 2;
+                    Alpine.store.profile.errors = {};
+                } else {
+                    Alpine.store.profile.errors = { general: data.error };
+                }
+            })
+            .catch(error => {
+                console.error('Error enabling 2FA:', error);
+                Alpine.store.profile.errors = { general: 'Failed to enable two-factor authentication' };
+            });
+        }
+
+        function confirmTwoFactor() {
+            Alpine.store.profile.loading = true;
+            Alpine.store.profile.errors = {};
+
+            fetch('{{ route("admin.profile.two-factor.confirm") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    code: Alpine.store.profile.twoFactorCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                Alpine.store.profile.loading = false;
+                if (data.success) {
+                    Alpine.store.profile.twoFactorStep = 3;
+                    Alpine.store.profile.errors = {};
+                } else {
+                    Alpine.store.profile.errors = { code: data.error || 'Invalid code' };
+                }
+            })
+            .catch(error => {
+                Alpine.store.profile.loading = false;
+                console.error('Error confirming 2FA:', error);
+                Alpine.store.profile.errors = { code: 'Failed to verify code' };
+            });
+        }
+
+        function finishTwoFactorSetup() {
+            Alpine.store.profile.showTwoFactorModal = false;
+            Alpine.store.profile.twoFactorStep = 1;
+            Alpine.store.profile.twoFactorCode = '';
+            Alpine.store.profile.errors = {};
+            window.location.reload();
+        }
+
+        function regenerateRecoveryCodes() {
+            if (!confirm('Are you sure? This will invalidate your existing recovery codes.')) {
+                return;
+            }
+
+            fetch('{{ route("admin.profile.two-factor.regenerate-recovery-codes") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Alpine.store.profile.recoveryCodes = data.recovery_codes;
+                }
+            })
+            .catch(error => {
+                console.error('Error regenerating codes:', error);
+            });
+        }
+
+        function downloadRecoveryCodes() {
+            const codes = Alpine.store.profile.recoveryCodes.join('\\n');
+            const blob = new Blob([codes], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recovery-codes.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Initialize Alpine store for profile data
+        document.addEventListener('alpine:init', () => {
+            Alpine.store.profile = Alpine.reactive({
+                showTwoFactorModal: false,
+                twoFactorStep: 1,
+                twoFactorData: null,
+                twoFactorSecret: '',
+                twoFactorCode: '',
+                recoveryCodes: [],
+                showRecoveryCodes: false,
+                loading: false,
+                errors: {}
+            });
+        });
+    </script>
 </x-layouts::admin>

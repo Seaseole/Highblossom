@@ -38,7 +38,7 @@
                                 <div class="flex items-center">
                                     <div class="shrink-0 h-12 w-12">
                                         <div class="h-12 w-12 rounded-full bg-admin-accent flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-admin-accent/20">
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                            {{ $user->initials() }}
                                         </div>
                                     </div>
                                     <div class="ml-4">

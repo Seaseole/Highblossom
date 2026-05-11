@@ -1,6 +1,6 @@
 <?php
 
-use App\Domains\Bookings\Models\Booking;
+// use App\Domains\Bookings\Models\Booking;
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -30,14 +30,13 @@ use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 use Lubusin\Decomposer\Controllers\DecomposerController;
-use Lubusin\Decomposer\Decomposer;
 
 // Public SEO endpoints
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
-Route::get('/logo-demo', fn() => view('logo-demo'))->name('logo.demo');
+// Route::get('/logo-demo', fn() => view('logo-demo'))->name('logo.demo');
 
 // Public Pages
 Route::get('/about-us', [SiteController::class, 'aboutUs'])->name('about-us');
@@ -54,12 +53,12 @@ Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
 
 // Booking Flow
-Route::middleware('throttle:6,1')->group(function () {
-    // TODO: Migrate to controller + Blade view
-    Route::get('/bookings/{booking}/confirmation', function (Booking $booking) {
-        return view('bookings.confirmation', ['booking' => $booking]);
-    })->name('bookings.confirmation');
-});
+// Route::middleware('throttle:6,1')->group(function () {
+//    // TODO: Migrate to controller + Blade view
+//    Route::get('/bookings/{booking}/confirmation', function (Booking $booking) {
+//        return view('bookings.confirmation', ['booking' => $booking]);
+//    })->name('bookings.confirmation');
+// });
 
 // Admin Portal
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
@@ -210,7 +209,10 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::put('profile/appearance', [ProfileController::class, 'updateAppearance'])->name('profile.appearance.update');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::post('profile/two-factor/enable', [ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
+    Route::post('profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
     Route::post('profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
+    Route::get('profile/two-factor/recovery-codes', [ProfileController::class, 'getRecoveryCodes'])->name('profile.two-factor.recovery-codes');
+    Route::post('profile/two-factor/regenerate-recovery-codes', [ProfileController::class, 'regenerateRecoveryCodes'])->name('profile.two-factor.regenerate-recovery-codes');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
@@ -223,4 +225,4 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(functio
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

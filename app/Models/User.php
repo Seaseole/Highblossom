@@ -39,13 +39,16 @@ class User extends Authenticatable
      * Get the user's initials
      */
     public function initials(): string
-    {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
-            ->implode('');
-    }
+{
+    return Str::of($this->name)
+        ->trim()
+        ->replaceMatches('/\s+/', ' ')
+        ->explode(' ')
+        ->filter(fn ($word) => Str::length(trim($word)) > 0)
+        ->take(2)
+        ->map(fn ($word) => mb_strtoupper(Str::substr(trim($word), 0, 1)))
+        ->implode('');
+}
 
     /**
      * Get the user's blog posts
