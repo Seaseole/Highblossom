@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
-use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
-use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Features;
+use Laravel\Fortify\RecoveryCode;
 
 final class ProfileService
 {
     public function __construct(
-        private readonly TwoFactorAuthenticationProvider $twoFactorProvider,
-        private readonly EnableTwoFactorAuthentication $enableTwoFactor,
-        private readonly ConfirmTwoFactorAuthentication $confirmTwoFactor,
-        private readonly DisableTwoFactorAuthentication $disableTwoFactor,
+        protected TwoFactorAuthenticationProvider $provider
     ) {}
     public function updateProfile(User $user, array $data): User
     {
@@ -46,22 +49,21 @@ final class ProfileService
         return true;
     }
 
-    public function enableTwoFactor(User $user): array
+    public function enableTwoFactor(User $user): bool
     {
         if (!Features::canManageTwoFactorAuthentication()) {
-            throw new \Exception('Two-factor authentication is not enabled.');
+            return false;
         }
 
-        // Generate TOTP secret and recovery codes using Fortify's action
-        ($this->enableTwoFactor)($user);
+        $user->forceFill([
+            'two_factor_secret' => encrypt($this->provider->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                return RecoveryCode::generate();
+            })->all())),
+            'two_factor_confirmed_at' => null,
+        ])->save();
 
-        $user->refresh();
-
-        return [
-            'secret' => decrypt($user->two_factor_secret),
-            'qr_code_url' => $this->generateQrCodeUrl($user->email, decrypt($user->two_factor_secret)),
-            'recovery_codes' => $this->getRecoveryCodes($user),
-        ];
+        return true;
     }
 
     public function confirmTwoFactor(User $user, string $code): bool
@@ -70,12 +72,43 @@ final class ProfileService
             return false;
         }
 
-        try {
-            ($this->confirmTwoFactor)($user, $code);
-            return true;
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        if (!$user->two_factor_secret || 
+            !$this->provider->verify(decrypt($user->two_factor_secret), $code)) {
             return false;
         }
+
+        $user->forceFill([
+            'two_factor_confirmed_at' => now(),
+        ])->save();
+
+        return true;
+    }
+
+    public function getTwoFactorQrCodeSvg(User $user): string
+    {
+        $url = $user->twoFactorQrCodeUrl();
+
+        $builder = new Builder(
+            writer: new SvgWriter(),
+            writerOptions: [],
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 200,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin
+        );
+
+        return $builder->build()->getString();
+    }
+
+    public function regenerateRecoveryCodes(User $user): void
+    {
+        $user->forceFill([
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                return RecoveryCode::generate();
+            })->all())),
+        ])->save();
     }
 
     public function disableTwoFactor(User $user): bool
@@ -84,47 +117,13 @@ final class ProfileService
             return false;
         }
 
-        ($this->disableTwoFactor)($user);
+        $user->forceFill([
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+        ])->save();
 
         return true;
-    }
-
-    public function generateQrCodeUrl(string $email, string $secret): string
-    {
-        $appName = config('app.name', 'Highblossom Admin');
-        
-        return sprintf(
-            'otpauth://totp/%s:%s?secret=%s&issuer=%s',
-            rawurlencode($appName),
-            rawurlencode($email),
-            $secret,
-            rawurlencode($appName)
-        );
-    }
-
-    public function getRecoveryCodes(User $user): array
-    {
-        if (!$user->two_factor_recovery_codes) {
-            return [];
-        }
-
-        return json_decode(decrypt($user->two_factor_recovery_codes), true);
-    }
-
-    public function generateNewRecoveryCodes(User $user): array
-    {
-        if (!Features::canManageTwoFactorAuthentication()) {
-            throw new \Exception('Two-factor authentication is not enabled.');
-        }
-
-        ($this->enableTwoFactor)($user, true);
-
-        return $this->getRecoveryCodes($user);
-    }
-
-    public function isTwoFactorEnabled(User $user): bool
-    {
-        return !empty($user->two_factor_secret) && !is_null($user->two_factor_confirmed_at);
     }
 
     public function deleteAccount(User $user, string $password): bool

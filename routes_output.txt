@@ -1,0 +1,203 @@
+
+  GET|HEAD  / ...................................................................................................... home › SiteController@home
+  GET|HEAD  _debugbar/assets .......................................... debugbar.assets › Fruitcake\LaravelDebugbar › AssetController@getAssets
+  DELETE    _debugbar/cache/{key} .................................. debugbar.cache.delete › Fruitcake\LaravelDebugbar › CacheController@delete
+  GET|HEAD  _debugbar/clockwork/{id} ......................... debugbar.clockwork › Fruitcake\LaravelDebugbar › OpenHandlerController@clockwork
+  GET|HEAD  _debugbar/open .................................... debugbar.openhandler › Fruitcake\LaravelDebugbar › OpenHandlerController@handle
+  POST      _debugbar/queries/explain ........................ debugbar.queries.explain › Fruitcake\LaravelDebugbar › QueriesController@explain
+  GET|HEAD  _laravel-brain/api/context ........................................................ LaraMint\LaravelBrain › BrainController@context
+  POST      _laravel-brain/api/generate-rules ........................................... LaraMint\LaravelBrain › BrainController@generateRules
+  POST      _laravel-brain/api/scan .............................................................. LaraMint\LaravelBrain › BrainController@scan
+  GET|HEAD  _laravel-brain/api/source .......................................................... LaraMint\LaravelBrain › BrainController@source
+  POST      _laravel-brain/api/stress-test ................................................. LaraMint\LaravelBrain › BrainController@stressTest
+  GET|HEAD  _laravel-brain/api/stress-test/{jobId} ..................................... LaraMint\LaravelBrain › BrainController@stressTestPoll
+  GET|HEAD  _laravel-brain/{any?} ............................................................... LaraMint\LaravelBrain › BrainController@serve
+  GET|HEAD  about-us ........................................................................................ about-us › SiteController@aboutUs
+  GET|HEAD  admin/about-us ................................................................. admin.about-us.edit › Admin\AboutUsController@edit
+  PUT       admin/about-us ............................................................. admin.about-us.update › Admin\AboutUsController@update
+  GET|HEAD  admin/absences .......................................................... admin.absences.index › Admin\StaffAbsenceController@index
+  GET|HEAD  admin/absences/{absence} .................................................. admin.absences.show › Admin\StaffAbsenceController@show
+  GET|HEAD  admin/bookings ............................................................... admin.bookings.index › Admin\BookingController@index
+  GET|HEAD  admin/bookings/{booking} ....................................................... admin.bookings.show › Admin\BookingController@show
+  GET|HEAD  admin/categories .......................................................... admin.categories.index › Admin\CategoryController@index
+  POST      admin/categories .......................................................... admin.categories.store › Admin\CategoryController@store
+  GET|HEAD  admin/categories/create ................................................. admin.categories.create › Admin\CategoryController@create
+  PUT       admin/categories/{category} ............................................. admin.categories.update › Admin\CategoryController@update
+  DELETE    admin/categories/{category} ........................................... admin.categories.destroy › Admin\CategoryController@destroy
+  GET|HEAD  admin/categories/{category}/edit ............................................ admin.categories.edit › Admin\CategoryController@edit
+  GET|HEAD  admin/contact-messages ........................................ admin.contact-messages.index › Admin\ContactMessageController@index
+  GET|HEAD  admin/contact-messages/{message} ................................ admin.contact-messages.show › Admin\ContactMessageController@show
+  DELETE    admin/contact-messages/{message} .......................... admin.contact-messages.destroy › Admin\ContactMessageController@destroy
+  PATCH     admin/contact-messages/{message}/mark-read ........... admin.contact-messages.mark-read › Admin\ContactMessageController@markAsRead
+  GET|HEAD  admin/decompose ................................................. admin.decompose › Lubusin\Decomposer › DecomposerController@index
+  GET|HEAD  admin/gallery ................................................................. admin.gallery.index › Admin\GalleryController@index
+  POST      admin/gallery ................................................................. admin.gallery.store › Admin\GalleryController@store
+  GET|HEAD  admin/gallery-categories ................................... admin.gallery-categories.index › Admin\GalleryCategoryController@index
+  POST      admin/gallery-categories ................................... admin.gallery-categories.store › Admin\GalleryCategoryController@store
+  GET|HEAD  admin/gallery-categories/create .......................... admin.gallery-categories.create › Admin\GalleryCategoryController@create
+  PUT       admin/gallery-categories/{galleryCategory} ............... admin.gallery-categories.update › Admin\GalleryCategoryController@update
+  DELETE    admin/gallery-categories/{galleryCategory} ............. admin.gallery-categories.destroy › Admin\GalleryCategoryController@destroy
+  GET|HEAD  admin/gallery-categories/{galleryCategory}/edit .............. admin.gallery-categories.edit › Admin\GalleryCategoryController@edit
+  GET|HEAD  admin/gallery/create ........................................................ admin.gallery.create › Admin\GalleryController@create
+  PUT       admin/gallery/{item} ........................................................ admin.gallery.update › Admin\GalleryController@update
+  DELETE    admin/gallery/{item} ...................................................... admin.gallery.destroy › Admin\GalleryController@destroy
+  GET|HEAD  admin/gallery/{item}/edit ....................................................... admin.gallery.edit › Admin\GalleryController@edit
+  GET|HEAD  admin/glass-sub-categories .............................. admin.glass-sub-categories.index › Admin\GlassSubCategoryController@index
+  POST      admin/glass-sub-categories .............................. admin.glass-sub-categories.store › Admin\GlassSubCategoryController@store
+  GET|HEAD  admin/glass-sub-categories/by-glass-type/{glassTypeId} admin.glass-sub-categories.by-glass-type › Admin\GlassSubCategoryController…
+  GET|HEAD  admin/glass-sub-categories/create ..................... admin.glass-sub-categories.create › Admin\GlassSubCategoryController@create
+  PUT       admin/glass-sub-categories/reorder .................. admin.glass-sub-categories.reorder › Admin\GlassSubCategoryController@reorder
+  PUT       admin/glass-sub-categories/{glassSubCategory} ......... admin.glass-sub-categories.update › Admin\GlassSubCategoryController@update
+  DELETE    admin/glass-sub-categories/{glassSubCategory} ....... admin.glass-sub-categories.destroy › Admin\GlassSubCategoryController@destroy
+  GET|HEAD  admin/glass-sub-categories/{glassSubCategory}/edit ........ admin.glass-sub-categories.edit › Admin\GlassSubCategoryController@edit
+  PATCH     admin/glass-sub-categories/{glassSubCategory}/toggle-status admin.glass-sub-categories.toggle-status › Admin\GlassSubCategoryContr…
+  GET|HEAD  admin/glass-types ....................................................... admin.glass-types.index › Admin\GlassTypeController@index
+  POST      admin/glass-types ....................................................... admin.glass-types.store › Admin\GlassTypeController@store
+  GET|HEAD  admin/glass-types/create .............................................. admin.glass-types.create › Admin\GlassTypeController@create
+  PUT       admin/glass-types/{glassType} ......................................... admin.glass-types.update › Admin\GlassTypeController@update
+  DELETE    admin/glass-types/{glassType} ....................................... admin.glass-types.destroy › Admin\GlassTypeController@destroy
+  GET|HEAD  admin/glass-types/{glassType}/edit ........................................ admin.glass-types.edit › Admin\GlassTypeController@edit
+  POST      admin/image-upload ........................................................ admin.image-upload › Admin\ImageUploadController@upload
+  GET|HEAD  admin/inspections ...................................................... admin.inspections.index › Admin\InspectionController@index
+  GET|HEAD  admin/inspections/{inspection} ........................................... admin.inspections.show › Admin\InspectionController@show
+  POST      admin/log-viewer/api/clear-cache-all ......... log-viewer.files.clear-cache-all › Opcodes\LogViewer › FilesController@clearCacheAll
+  POST      admin/log-viewer/api/delete-multiple-files log-viewer.files.delete-multiple-files › Opcodes\LogViewer › FilesController@deleteMult…
+  GET|HEAD  admin/log-viewer/api/files ........................................... log-viewer.files › Opcodes\LogViewer › FilesController@index
+  DELETE    admin/log-viewer/api/files/{fileIdentifier} .................. log-viewer.files.delete › Opcodes\LogViewer › FilesController@delete
+  POST      admin/log-viewer/api/files/{fileIdentifier}/clear-cache log-viewer.files.clear-cache › Opcodes\LogViewer › FilesController@clearCa…
+  GET|HEAD  admin/log-viewer/api/files/{fileIdentifier}/download ..... log-viewer.files.download › Opcodes\LogViewer › FilesController@download
+  GET|HEAD  admin/log-viewer/api/files/{fileIdentifier}/download/request log-viewer.files.request-download › Opcodes\LogViewer › FilesControll…
+  GET|HEAD  admin/log-viewer/api/folders ..................................... log-viewer.folders › Opcodes\LogViewer › FoldersController@index
+  DELETE    admin/log-viewer/api/folders/{folderIdentifier} .......... log-viewer.folders.delete › Opcodes\LogViewer › FoldersController@delete
+  POST      admin/log-viewer/api/folders/{folderIdentifier}/clear-cache log-viewer.folders.clear-cache › Opcodes\LogViewer › FoldersController…
+  GET|HEAD  admin/log-viewer/api/folders/{folderIdentifier}/download log-viewer.folders.download › Opcodes\LogViewer › FoldersController@downl…
+  GET|HEAD  admin/log-viewer/api/folders/{folderIdentifier}/download/request log-viewer.folders.request-download › Opcodes\LogViewer › Folders…
+  GET|HEAD  admin/log-viewer/api/hosts ........................................... log-viewer.hosts › Opcodes\LogViewer › HostsController@index
+  GET|HEAD  admin/log-viewer/api/logs .............................................. log-viewer.logs › Opcodes\LogViewer › LogsController@index
+  GET|HEAD  admin/log-viewer/{view?} ................................................... log-viewer.index › Opcodes\LogViewer › IndexController
+  GET|HEAD  admin/media-library ................................................ admin.media-library.index › Admin\MediaLibraryController@index
+  POST      admin/media-library/upload ....................................... admin.media-library.upload › Admin\MediaLibraryController@upload
+  GET|HEAD  admin/posts ........................................................................ admin.posts.index › Admin\PostController@index
+  POST      admin/posts ........................................................................ admin.posts.store › Admin\PostController@store
+  GET|HEAD  admin/posts/create ............................................................... admin.posts.create › Admin\PostController@create
+  PUT       admin/posts/{post} ............................................................... admin.posts.update › Admin\PostController@update
+  DELETE    admin/posts/{post} ............................................................. admin.posts.destroy › Admin\PostController@destroy
+  GET|HEAD  admin/posts/{post}/edit .............................................................. admin.posts.edit › Admin\PostController@edit
+  GET|HEAD  admin/profile ................................................................. admin.profile.index › Admin\ProfileController@index
+  PUT       admin/profile ........................................................ admin.profile.update › Admin\ProfileController@updateProfile
+  DELETE    admin/profile ............................................................. admin.profile.destroy › Admin\ProfileController@destroy
+  PUT       admin/profile/appearance ............................... admin.profile.appearance.update › Admin\ProfileController@updateAppearance
+  PUT       admin/profile/password ..................................... admin.profile.password.update › Admin\ProfileController@updatePassword
+  GET|HEAD  admin/quotes ..................................................................... admin.quotes.index › Admin\QuoteController@index
+  GET|HEAD  admin/quotes/{quote} ............................................................... admin.quotes.show › Admin\QuoteController@show
+  DELETE    admin/quotes/{quote} ......................................................... admin.quotes.destroy › Admin\QuoteController@destroy
+  PUT       admin/quotes/{quote}/status ........................................ admin.quotes.updateStatus › Admin\QuoteController@updateStatus
+  GET|HEAD  admin/roles ........................................................................ admin.roles.index › Admin\RoleController@index
+  POST      admin/roles ........................................................................ admin.roles.store › Admin\RoleController@store
+  GET|HEAD  admin/roles/create ............................................................... admin.roles.create › Admin\RoleController@create
+  PUT       admin/roles/{role} ............................................................... admin.roles.update › Admin\RoleController@update
+  DELETE    admin/roles/{role} ............................................................. admin.roles.destroy › Admin\RoleController@destroy
+  GET|HEAD  admin/roles/{role}/edit .............................................................. admin.roles.edit › Admin\RoleController@edit
+  POST      admin/seo ............................................................................. admin.seo.store › Admin\SeoController@store
+  GET|HEAD  admin/seo/create .................................................................... admin.seo.create › Admin\SeoController@create
+  GET|HEAD  admin/seo/static-routes ....................................................... admin.seo.static-routes › Admin\SeoController@index
+  PUT       admin/seo/{id} ...................................................................... admin.seo.update › Admin\SeoController@update
+  GET|HEAD  admin/seo/{id}/edit ..................................................................... admin.seo.edit › Admin\SeoController@edit
+  GET|HEAD  admin/service-types ................................................. admin.service-types.index › Admin\ServiceTypeController@index
+  POST      admin/service-types ................................................. admin.service-types.store › Admin\ServiceTypeController@store
+  GET|HEAD  admin/service-types/create ........................................ admin.service-types.create › Admin\ServiceTypeController@create
+  PUT       admin/service-types/{serviceType} ................................. admin.service-types.update › Admin\ServiceTypeController@update
+  DELETE    admin/service-types/{serviceType} ............................... admin.service-types.destroy › Admin\ServiceTypeController@destroy
+  GET|HEAD  admin/service-types/{serviceType}/edit ................................ admin.service-types.edit › Admin\ServiceTypeController@edit
+  GET|HEAD  admin/services ............................................................... admin.services.index › Admin\ServiceController@index
+  POST      admin/services ............................................................... admin.services.store › Admin\ServiceController@store
+  GET|HEAD  admin/services/create ...................................................... admin.services.create › Admin\ServiceController@create
+  PUT       admin/services/{service} ................................................... admin.services.update › Admin\ServiceController@update
+  DELETE    admin/services/{service} ................................................. admin.services.destroy › Admin\ServiceController@destroy
+  GET|HEAD  admin/services/{service}/edit .................................................. admin.services.edit › Admin\ServiceController@edit
+  GET|HEAD  admin/settings ........................................................ admin.settings.index › Admin\CompanySettingController@index
+  PUT       admin/settings ...................................................... admin.settings.update › Admin\CompanySettingController@update
+  GET|HEAD  admin/smtp ................................................................... admin.smtp.index › Admin\SmtpSettingController@index
+  PUT       admin/smtp ................................................................. admin.smtp.update › Admin\SmtpSettingController@update
+  POST      admin/smtp/test ............................................................ admin.smtp.test › Admin\SmtpSettingController@sendTest
+  GET|HEAD  admin/tags ........................................................................... admin.tags.index › Admin\TagController@index
+  POST      admin/tags ........................................................................... admin.tags.store › Admin\TagController@store
+  GET|HEAD  admin/tags/create .................................................................. admin.tags.create › Admin\TagController@create
+  PUT       admin/tags/{tag} ................................................................... admin.tags.update › Admin\TagController@update
+  DELETE    admin/tags/{tag} ................................................................. admin.tags.destroy › Admin\TagController@destroy
+  GET|HEAD  admin/tags/{tag}/edit .................................................................. admin.tags.edit › Admin\TagController@edit
+  GET|HEAD  admin/testimonials ................................................... admin.testimonials.index › Admin\TestimonialController@index
+  POST      admin/testimonials ................................................... admin.testimonials.store › Admin\TestimonialController@store
+  GET|HEAD  admin/testimonials/create .......................................... admin.testimonials.create › Admin\TestimonialController@create
+  PUT       admin/testimonials/{testimonial} ................................... admin.testimonials.update › Admin\TestimonialController@update
+  DELETE    admin/testimonials/{testimonial} ................................. admin.testimonials.destroy › Admin\TestimonialController@destroy
+  GET|HEAD  admin/testimonials/{testimonial}/edit .................................. admin.testimonials.edit › Admin\TestimonialController@edit
+  GET|HEAD  admin/users ........................................................................ admin.users.index › Admin\UserController@index
+  POST      admin/users ........................................................................ admin.users.store › Admin\UserController@store
+  GET|HEAD  admin/users/create ............................................................... admin.users.create › Admin\UserController@create
+  PUT       admin/users/{user} ............................................................... admin.users.update › Admin\UserController@update
+  DELETE    admin/users/{user} ............................................................. admin.users.destroy › Admin\UserController@destroy
+  GET|HEAD  admin/users/{user}/edit .............................................................. admin.users.edit › Admin\UserController@edit
+  POST      admin/video-upload ........................................................ admin.video-upload › Admin\VideoUploadController@upload
+  POST      adminlte/darkmode/toggle ....................... adminlte.darkmode.toggle › JeroenNoten\LaravelAdminLte › DarkModeController@toggle
+  GET|HEAD  api/glass-types/{glassType}/sub-categories ............ api.glass-types.sub-categories › Admin\GlassTypeController@getSubCategories
+  GET|HEAD  blog ................................................................................................... blog › SiteController@blog
+  GET|HEAD  blog/{slug} ................................................................................... blog.show › SiteController@blogShow
+  GET|HEAD  bookings/{booking}/confirmation ......................................................... bookings.confirmation › routes/web.php:58
+  GET|HEAD  contact .......................................................................................... contact › SiteController@contact
+  POST      contact ............................................................................. contact.submit › SiteController@submitContact
+  GET|HEAD  dashboard ................................................................................... dashboard › Admin\DashboardController
+  POST      email/verification-notification ............... verification.send › Laravel\Fortify › EmailVerificationNotificationController@store
+  GET|HEAD  email/verify ................................... verification.notice › Laravel\Fortify › EmailVerificationPromptController@__invoke
+  GET|HEAD  email/verify/{id}/{hash} ................................... verification.verify › Laravel\Fortify › VerifyEmailController@__invoke
+  GET|HEAD  flux/editor.css .............................................................. Flux\AssetManager@editorCss › AssetManager@editorCss
+  GET|HEAD  flux/editor.js ................................................................. Flux\AssetManager@editorJs › AssetManager@editorJs
+  GET|HEAD  flux/editor.min.js ....................................................... Flux\AssetManager@editorMinJs › AssetManager@editorMinJs
+  GET|HEAD  flux/flux.js ....................................................................... Flux\AssetManager@fluxJs › AssetManager@fluxJs
+  GET|HEAD  flux/flux.min.js ............................................................. Flux\AssetManager@fluxMinJs › AssetManager@fluxMinJs
+  GET|HEAD  forgot-password ........................................... password.request › Laravel\Fortify › PasswordResetLinkController@create
+  POST      forgot-password .............................................. password.email › Laravel\Fortify › PasswordResetLinkController@store
+  GET|HEAD  gallery .......................................................................................... gallery › SiteController@gallery
+  GET|HEAD  gallery/{galleryImage} .................................................................. gallery.show › SiteController@galleryShow
+  GET|HEAD  livewire-fcaa2dee/css/{component}.css ............ vendor/livewire/livewire/src/Features/SupportCssModules/SupportCssModules.php:15
+  GET|HEAD  livewire-fcaa2dee/css/{component}.global.css ..... vendor/livewire/livewire/src/Features/SupportCssModules/SupportCssModules.php:48
+  GET|HEAD  livewire-fcaa2dee/js/{component}.js ................ vendor/livewire/livewire/src/Features/SupportJsModules/SupportJsModules.php:16
+  GET|HEAD  livewire-fcaa2dee/livewire.csp.min.js.map ............................................ Livewire\Mechanisms › FrontendAssets@cspMaps
+  GET|HEAD  livewire-fcaa2dee/livewire.js ......................................... Livewire\Mechanisms › FrontendAssets@returnJavaScriptAsFile
+  GET|HEAD  livewire-fcaa2dee/livewire.min.js.map ................................................... Livewire\Mechanisms › FrontendAssets@maps
+  GET|HEAD  livewire-fcaa2dee/preview-file/{filename} ................ livewire.preview-file › Livewire\Features › FilePreviewController@handle
+  POST      livewire-fcaa2dee/update .............................. default-livewire.update › Livewire\Mechanisms › HandleRequests@handleUpdate
+  POST      livewire-fcaa2dee/upload-file .............................. livewire.upload-file › Livewire\Features › FileUploadController@handle
+  GET|HEAD  login ............................................................. login › Laravel\Fortify › AuthenticatedSessionController@create
+  POST      login ........................................................ login.store › Laravel\Fortify › AuthenticatedSessionController@store
+  GET|HEAD  logo-demo ........................................................................................... logo.demo › routes/web.php:39
+  POST      logout ............................................................................................. logout › Auth\LogoutController
+  GET|HEAD  quote ................................................................................................ quote › SiteController@quote
+  POST      quote ................................................................................... quote.submit › SiteController@submitQuote
+  GET|HEAD  register ............................................................. register › Laravel\Fortify › RegisteredUserController@create
+  POST      register ........................................................ register.store › Laravel\Fortify › RegisteredUserController@store
+  POST      resend/webhook .................................................. resend.webhook › Resend\Laravel › WebhookController@handleWebhook
+  POST      reset-password .................................................... password.update › Laravel\Fortify › NewPasswordController@store
+  GET|HEAD  reset-password/{token} ............................................ password.reset › Laravel\Fortify › NewPasswordController@create
+  GET|HEAD  robots.txt .......................................................................................... robots › SeoController@robots
+  GET|HEAD  services ....................................................................................... services › SiteController@services
+  ANY       settings .................................................................................. Illuminate\Routing › RedirectController
+  GET|HEAD  sitemap.xml ....................................................................................... sitemap › SeoController@sitemap
+  GET|HEAD  storage/{path} ............... storage.local › vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServiceProvider.php:111
+  PUT       storage/{path} ........ storage.local.upload › vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServiceProvider.php:119
+  GET|HEAD  two-factor-challenge .......................... two-factor.login › Laravel\Fortify › TwoFactorAuthenticatedSessionController@create
+  POST      two-factor-challenge ..................... two-factor.login.store › Laravel\Fortify › TwoFactorAuthenticatedSessionController@store
+  GET|HEAD  up .................................... vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php:224
+  GET|HEAD  user/confirm-password ..................................... password.confirm › Laravel\Fortify › ConfirmablePasswordController@show
+  POST      user/confirm-password .............................. password.confirm.store › Laravel\Fortify › ConfirmablePasswordController@store
+  GET|HEAD  user/confirmed-password-status ................... password.confirmation › Laravel\Fortify › ConfirmedPasswordStatusController@show
+  POST      user/confirmed-two-factor-authentication .. two-factor.confirm › Laravel\Fortify › ConfirmedTwoFactorAuthenticationController@store
+  POST      user/two-factor-authentication ...................... two-factor.enable › Laravel\Fortify › TwoFactorAuthenticationController@store
+  DELETE    user/two-factor-authentication ................... two-factor.disable › Laravel\Fortify › TwoFactorAuthenticationController@destroy
+  GET|HEAD  user/two-factor-qr-code ..................................... two-factor.qr-code › Laravel\Fortify › TwoFactorQrCodeController@show
+  GET|HEAD  user/two-factor-recovery-codes ......................... two-factor.recovery-codes › Laravel\Fortify › RecoveryCodeController@index
+  POST      user/two-factor-recovery-codes .............. two-factor.regenerate-recovery-codes › Laravel\Fortify › RecoveryCodeController@store
+  GET|HEAD  user/two-factor-secret-key ............................ two-factor.secret-key › Laravel\Fortify › TwoFactorSecretKeyController@show
+
+                                                                                                                           Showing [199] routes
+

@@ -211,8 +211,8 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::post('profile/two-factor/enable', [ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
     Route::post('profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
     Route::post('profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
-    Route::get('profile/two-factor/recovery-codes', [ProfileController::class, 'getRecoveryCodes'])->name('profile.two-factor.recovery-codes');
-    Route::post('profile/two-factor/regenerate-recovery-codes', [ProfileController::class, 'regenerateRecoveryCodes'])->name('profile.two-factor.regenerate-recovery-codes');
+    Route::get('profile/two-factor/recovery-codes', [ProfileController::class, 'showRecoveryCodes'])->name('profile.two-factor.recovery-codes');
+    Route::post('profile/two-factor/recovery-codes', [ProfileController::class, 'regenerateRecoveryCodes'])->name('profile.two-factor.regenerate-recovery-codes');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');

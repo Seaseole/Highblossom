@@ -10,9 +10,7 @@ use App\Http\Requests\Admin\AppearanceRequest;
 use App\Http\Requests\Admin\PasswordUpdateRequest;
 use App\Http\Requests\Admin\ProfileUpdateRequest;
 use App\Services\ProfileService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Features;
 
 final class ProfileController extends Controller
@@ -23,28 +21,36 @@ final class ProfileController extends Controller
 
     public function index()
     {
+        $user = auth()->user();
+        $qrCodeSvg = null;
+
+        if ($user->two_factor_secret && !$user->two_factor_confirmed_at) {
+            $qrCodeSvg = $this->profileService->getTwoFactorQrCodeSvg($user);
+        }
+
         return view('admin.profile.index', [
-            'user' => Auth::user(),
+            'user' => $user,
+            'qrCodeSvg' => $qrCodeSvg,
         ]);
     }
 
     public function updateProfile(ProfileUpdateRequest $request)
     {
-        $this->profileService->updateProfile(Auth::user(), $request->validated());
+        $this->profileService->updateProfile(auth()->user(), $request->validated());
 
         return back()->with('success', __('messages.profile_information_updated'));
     }
 
     public function updateAppearance(AppearanceRequest $request)
     {
-        $this->profileService->updateAppearance(Auth::user(), $request->validated());
+        $this->profileService->updateAppearance(auth()->user(), $request->validated());
 
         return back()->with('success', __('messages.appearance_updated'));
     }
 
     public function updatePassword(PasswordUpdateRequest $request)
     {
-        $user = Auth::user();
+        $user = auth()->user();
         $validated = $request->validated();
 
         $success = $this->profileService->updatePassword(
@@ -60,117 +66,80 @@ final class ProfileController extends Controller
         return back()->with('success', __('messages.password_updated'));
     }
 
-    public function enableTwoFactor(Request $request): JsonResponse
+    public function enableTwoFactor()
     {
         if (!Features::canManageTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Two-factor authentication is not enabled.'], 403);
+            return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
         }
 
-        try {
-            $tfaData = $this->profileService->enableTwoFactor(Auth::user());
-            
-            return response()->json([
-                'success' => true,
-                'secret' => $tfaData['secret'],
-                'qr_code_url' => $tfaData['qr_code_url'],
-                'recovery_codes' => $tfaData['recovery_codes'],
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        $this->profileService->enableTwoFactor(auth()->user());
+
+        return back()->with('success', 'Two-factor authentication setup started. Please scan the QR code to confirm.');
     }
 
-    public function confirmTwoFactor(Request $request): JsonResponse
+    public function confirmTwoFactor(Request $request)
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Two-factor authentication is not enabled.'], 403);
-        }
-
         $request->validate([
-            'code' => 'required|string|digits:6',
+            'code' => 'required|string',
         ]);
 
-        $success = $this->profileService->confirmTwoFactor(
-            Auth::user(),
-            $request->input('code')
-        );
+        $success = $this->profileService->confirmTwoFactor(auth()->user(), $request->code);
 
-        if ($success) {
-            return response()->json([
-                'success' => true,
-                'message' => __('messages.two_factor_confirmed'),
-            ]);
+        if (!$success) {
+            return back()->withErrors(['code' => 'The provided two-factor authentication code was invalid.']);
         }
+
+        // Flash recovery codes to show them after confirmation
+        session()->flash('recovery_codes', auth()->user()->recoveryCodes());
+
+        return back()->with('success', __('messages.two_factor_enabled'));
+    }
+
+    public function disableTwoFactor()
+    {
+        if (!Features::canManageTwoFactorAuthentication()) {
+            return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
+        }
+
+        $this->profileService->disableTwoFactor(auth()->user());
+
+        return back()->with('success', __('messages.two_factor_disabled'));
+    }
+
+    public function showRecoveryCodes()
+    {
+        $user = auth()->user();
+
+        if (!$user->two_factor_secret || !$user->two_factor_confirmed_at) {
+            return response()->json(['message' => 'Two-factor authentication is not confirmed.'], 403);
+        }
+
+        $codes = $user->recoveryCodes();
 
         return response()->json([
-            'error' => 'The provided two factor authentication code was invalid.',
-        ], 422);
+            'recovery_codes' => is_array($codes) ? array_values($codes) : [],
+        ]);
     }
 
-    public function disableTwoFactor(Request $request): JsonResponse
+    public function regenerateRecoveryCodes(Request $request)
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Two-factor authentication is not enabled.'], 403);
-        }
+        $this->profileService->regenerateRecoveryCodes(auth()->user());
 
-        $request->validate([
-            'password' => 'required|string',
-        ]);
-
-        $success = $this->profileService->disableTwoFactor(Auth::user());
-
-        if ($success) {
+        if ($request->wantsJson()) {
+            $codes = auth()->user()->recoveryCodes();
             return response()->json([
-                'success' => true,
-                'message' => __('messages.two_factor_disabled'),
+                'recovery_codes' => is_array($codes) ? array_values($codes) : [],
             ]);
         }
 
-        return response()->json([
-            'error' => 'Failed to disable two-factor authentication.',
-        ], 500);
-    }
-
-    public function getRecoveryCodes(Request $request): JsonResponse
-    {
-        if (!Features::canManageTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Two-factor authentication is not enabled.'], 403);
-        }
-
-        $recoveryCodes = $this->profileService->getRecoveryCodes(Auth::user());
-
-        return response()->json([
-            'recovery_codes' => $recoveryCodes,
-        ]);
-    }
-
-    public function regenerateRecoveryCodes(Request $request): JsonResponse
-    {
-        if (!Features::canManageTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Two-factor authentication is not enabled.'], 403);
-        }
-
-        $request->validate([
-            'password' => 'required|string',
-        ]);
-
-        try {
-            $recoveryCodes = $this->profileService->generateNewRecoveryCodes(Auth::user());
-            
-            return response()->json([
-                'success' => true,
-                'recovery_codes' => $recoveryCodes,
-                'message' => 'Recovery codes regenerated successfully.',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return back()->with('success', 'Recovery codes regenerated.')
+            ->with('recovery_codes', auth()->user()->recoveryCodes());
     }
 
     public function destroy(AccountDeleteRequest $request)
     {
         $success = $this->profileService->deleteAccount(
-            Auth::user(),
+            auth()->user(),
             $request->validated()['password']
         );
 
