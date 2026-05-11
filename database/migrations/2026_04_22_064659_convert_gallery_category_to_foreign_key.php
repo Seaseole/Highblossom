@@ -19,9 +19,9 @@ return new class extends Migration
 
         // Migrate existing data from category enum to category_id
         DB::statement("
-            UPDATE gallery_images gi
+            UPDATE gallery_images
             SET gallery_category_id = (
-                SELECT id FROM gallery_categories WHERE slug = gi.category
+                SELECT id FROM gallery_categories WHERE slug = gallery_images.category
                 LIMIT 1
             )
         ");
@@ -57,9 +57,9 @@ return new class extends Migration
 
         // Migrate data back from category_id to category enum
         DB::statement("
-            UPDATE gallery_images gi
+            UPDATE gallery_images
             SET category = (
-                SELECT slug FROM gallery_categories WHERE id = gi.gallery_category_id
+                SELECT slug FROM gallery_categories WHERE id = gallery_images.gallery_category_id
                 LIMIT 1
             )
         ");
