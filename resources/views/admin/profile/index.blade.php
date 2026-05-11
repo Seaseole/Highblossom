@@ -9,8 +9,10 @@
         </div>
 
         <div x-data="{ 
-            tab: 'profile',
-            showDeleteModal: false
+            tab: '{{ session('showTwoFactorSetup') || session('showRecoveryCodes') ? 'security' : 'profile' }}',
+            showDeleteModal: false,
+            showTwoFactorSetup: {{ session('showTwoFactorSetup') ? 'true' : 'false' }},
+            showRecoveryCodes: {{ session('showRecoveryCodes') ? 'true' : 'false' }},
         }">
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
@@ -169,15 +171,74 @@
                     <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6">
                         <h3 class="text-lg font-bold text-admin-text mb-2">Two-Factor Authentication</h3>
                         <p class="text-sm text-admin-text-muted mb-6">Add an extra layer of security to your account by enabling two-factor authentication.</p>
-                        
-                        @if($user->two_factor_secret)
-                            <form action="{{ route('admin.profile.two-factor.disable') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition-all">
-                                    Disable Two-Factor Authentication
-                                </button>
-                            </form>
+
+                        @if($user->hasEnabledTwoFactorAuthentication())
+                            {{-- TFA is fully enabled and confirmed --}}
+                            <div class="flex items-center gap-2 mb-6 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+                                <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <span class="text-sm font-medium text-green-500">Two-factor authentication is enabled.</span>
+                            </div>
+
+                            <div class="flex flex-wrap gap-3">
+                                <form action="{{ route('admin.profile.two-factor.recovery-codes.regenerate') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
+                                        Regenerate Recovery Codes
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('admin.profile.two-factor.disable') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                                        Disable Two-Factor Authentication
+                                    </button>
+                                </form>
+                            </div>
+                        @elseif($user->two_factor_secret && !$user->two_factor_confirmed_at)
+                            {{-- TFA secret generated but not yet confirmed --}}
+                            <div class="flex items-center gap-2 mb-6 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                                <svg class="w-5 h-5 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <span class="text-sm font-medium text-yellow-500">Finish setting up two-factor authentication by scanning the QR code below.</span>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="flex flex-col items-center gap-4 p-6 rounded-xl bg-white">
+                                    {!! $user->twoFactorQrCodeSvg() !!}
+                                </div>
+
+                                <div class="space-y-2">
+                                    <p class="text-sm font-medium text-admin-text">Setup Key</p>
+                                    <p class="text-xs text-admin-text-muted mb-1">If you are unable to scan the QR code, enter this key manually in your authenticator app.</p>
+                                    <code class="block p-3 rounded-xl bg-admin-surface-alt text-sm text-admin-text font-mono break-all select-all">{{ decrypt($user->two_factor_secret) }}</code>
+                                </div>
+
+                                <form action="{{ route('admin.profile.two-factor.confirm') }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-admin-text-muted">Verification Code</label>
+                                        <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" class="w-full admin-form-input max-w-xs" placeholder="Enter 6-digit code">
+                                        @error('code', 'confirmTwoFactorAuthentication')
+                                            <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
+                                        Confirm & Enable
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('admin.profile.two-factor.disable') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-admin-text-muted hover:text-red-500 transition-colors">
+                                        Cancel Setup
+                                    </button>
+                                </form>
+                            </div>
                         @else
+                            {{-- TFA not enabled --}}
                             <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
@@ -185,6 +246,66 @@
                                 </button>
                             </form>
                         @endif
+                    </div>
+
+                    {{-- Recovery Codes Modal --}}
+                    <div x-show="showRecoveryCodes" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" style="display: none;">
+                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4">
+                            <h3 class="text-xl font-bold text-admin-text mb-2">Recovery Codes</h3>
+                            <p class="text-sm text-admin-text-muted mb-4">Store these recovery codes in a secure location. They can be used to recover access to your account if you lose your two-factor authentication device.</p>
+
+                            @if(session('recoveryCodes'))
+                                <div class="grid grid-cols-2 gap-2 mb-6 p-4 rounded-xl bg-admin-surface-alt font-mono text-sm">
+                                    @foreach(session('recoveryCodes') as $code)
+                                        <div class="text-admin-text select-all">{{ $code }}</div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            <button type="button" @click="showRecoveryCodes = false" class="w-full bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                                Done
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- TFA Setup Modal (shown after clicking Enable) --}}
+                    <div x-show="showTwoFactorSetup" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" style="display: none;">
+                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                            <h3 class="text-xl font-bold text-admin-text mb-2">Set Up Two-Factor Authentication</h3>
+                            <p class="text-sm text-admin-text-muted mb-6">Scan the QR code below with your authenticator app (e.g. Google Authenticator, Authy), then enter the verification code to confirm.</p>
+
+                            @if(session('twoFactorQrCode'))
+                                <div class="flex flex-col items-center gap-4 p-6 rounded-xl bg-white mb-4">
+                                    {!! session('twoFactorQrCode') !!}
+                                </div>
+
+                                @if(session('twoFactorSecret'))
+                                    <div class="space-y-2 mb-6">
+                                        <p class="text-sm font-medium text-admin-text">Setup Key</p>
+                                        <code class="block p-3 rounded-xl bg-admin-surface-alt text-sm text-admin-text font-mono break-all select-all">{{ session('twoFactorSecret') }}</code>
+                                    </div>
+                                @endif
+                            @endif
+
+                            <form action="{{ route('admin.profile.two-factor.confirm') }}" method="POST" class="space-y-4">
+                                @csrf
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-admin-text-muted">Verification Code</label>
+                                    <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" class="w-full admin-form-input" placeholder="Enter 6-digit code">
+                                    @error('code', 'confirmTwoFactorAuthentication')
+                                        <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div class="flex gap-3">
+                                    <button type="button" @click="showTwoFactorSetup = false" class="flex-1 bg-transparent text-admin-text-muted border border-admin-border py-2 px-4 rounded-xl hover:bg-admin-surface-alt transition-all">
+                                        Close
+                                    </button>
+                                    <button type="submit" class="flex-1 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
