@@ -4,29 +4,42 @@ declare(strict_types=1);
 
 namespace App\Domains\Content\Models;
 
+use App\Domains\Seo\Contracts\HasSeoInterface;
+use App\Domains\Seo\Traits\HasSeo;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-#[Fillable(['title','slug','excerpt','content','featured_image_path', 'featured_image_url','status','published_at','user_id'])]
-final class Post extends Model
+
+#[Fillable(['title','slug','excerpt','content','featured_image_path', 'featured_image_url','status','published_at','user_id', 'seo_metadata'])]
+final class Post extends Model implements HasSeoInterface
 {
-    // protected $fillable = [
-    //     'title',
-    //     'slug',
-    //     'excerpt',
-    //     'content',
-    //     'featured_image_path',
-    //     'featured_image_url',
-    //     'status',
-    //     'published_at',
-    //     'user_id',
-    // ];
+    use HasSeo;
 
     protected $casts = [
         'content' => 'array',
         'published_at' => 'datetime',
+        'seo_metadata' => 'array',
     ];
+
+    public function seoDefaults(): array
+    {
+        return [
+            'meta_title' => $this->title,
+            'meta_description' => $this->excerpt,
+            'og_image' => $this->featured_image_url,
+        ];
+    }
+
+    protected function getRouteName(): string
+    {
+        return 'blog.show';
+    }
+
+    protected function getRouteParameters(): array
+    {
+        return ['slug' => $this->slug];
+    }
 
     public function getRouteKeyName(): string
     {

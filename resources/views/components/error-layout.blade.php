@@ -62,7 +62,7 @@
     <!-- Footer -->
     <footer class="py-6 px-6 text-center">
         <p class="text-[#A1A1AA] text-sm">
-            &copy; {{ date('Y') }} {{ App\Domains\Content\Models\CompanySetting::get('company_name', 'Highblossom') }}. All rights reserved.
+            &copy; {{ date('Y') }} {{ App\Domains\Content\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
         </p>
     </footer>
 </body>
