@@ -39,7 +39,7 @@ final readonly class BuildSitemap
                 'loc' => $this->resolveRouteUrl($route->route_name),
                 'lastmod' => $route->updated_at?->format('Y-m-d'),
                 'changefreq' => $route->changefreq ?? 'monthly',
-                'priority' => number_format($route->priority ?? 0.5, 1),
+                'priority' => number_format((float) ($route->priority ?? 0.5), 1),
             ]);
         });
 
