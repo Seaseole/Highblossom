@@ -8,10 +8,25 @@
             </div>
         </div>
 
+        <style>
+            :root {
+                --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+            }
+        </style>
+
         <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{
-            tab: 'general',
+            tab: '{{ request()->query('tab', 'general') }}',
             whatsappNumbers: {{ json_encode($settings['whatsapp_additional_numbers'] ?? []) }},
             workingHours: {{ json_encode($settings['working_hours'] ?? []) }},
+
+            init() {
+                this.$watch('tab', value => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', value);
+                    window.history.replaceState({}, '', url.toString());
+                });
+            },
+
             addNumber() {
                 this.whatsappNumbers.push({ label: '', number: '' });
             },
@@ -22,24 +37,26 @@
             @csrf
             @method('PUT')
 
+            <input type="hidden" name="tab" :value="tab">
+
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
-                <button type="button" @click="tab = 'general'" :class="tab === 'general' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'general'" :class="tab === 'general' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     General Info
                 </button>
-                <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Business Hours
                 </button>
-                <button type="button" @click="tab = 'assets'" :class="tab === 'assets' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'assets'" :class="tab === 'assets' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Assets & Branding
                 </button>
-                <button type="button" @click="tab = 'localization'" :class="tab === 'localization' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'localization'" :class="tab === 'localization' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Localization
                 </button>
-                <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Social & WhatsApp
                 </button>
-                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Notifications
                 </button>
             </div>
@@ -48,7 +65,11 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
                     <!-- General Tab -->
-                    <div x-show="tab === 'general'" class="space-y-6">
+                    <div x-show="tab === 'general'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-2">
@@ -86,7 +107,11 @@
                     </div>
 
                     <!-- Business Hours Tab -->
-                    <div x-show="tab === 'hours'" class="space-y-6" style="display: none;">
+                    <div x-show="tab === 'hours'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <h3 class="text-lg font-bold text-admin-text">Weekly Business Hours</h3>
                             <div class="space-y-4">
@@ -132,7 +157,11 @@
                     </div>
 
                     <!-- Assets Tab -->
-                    <div x-show="tab === 'assets'" class="space-y-6" style="display: none;">
+                    <div x-show="tab === 'assets'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div class="space-y-4">
@@ -154,7 +183,7 @@
                                         <input type="file" name="business_logo" id="business-logo-input" class="absolute inset-0 opacity-0 cursor-pointer">
                                     </div>
                                     @if($settings['business_logo'])
-                                        <button type="button" id="remove-logo-btn" class="w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2">
+                                        <button type="button" id="remove-logo-btn" class="w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2 active:scale-[0.97]">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -185,7 +214,11 @@
                     </div>
 
                     <!-- Localization Tab -->
-                    <div x-show="tab === 'localization'" class="space-y-6" style="display: none;">
+                    <div x-show="tab === 'localization'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-2">
@@ -223,7 +256,11 @@
                     </div>
 
                     <!-- Social Tab -->
-                    <div x-show="tab === 'social'" class="space-y-6" style="display: none;">
+                    <div x-show="tab === 'social'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <h3 class="text-lg font-bold text-admin-text">WhatsApp Numbers</h3>
                             <div class="grid grid-cols-1 gap-4">
@@ -245,7 +282,7 @@
                                             <div class="flex-1 space-y-1">
                                                 <input type="text" :name="`whatsapp_additional_numbers[${index}][number]`" x-model="item.number" placeholder="Phone Number" class="w-full admin-form-input text-sm py-2">
                                             </div>
-                                            <button type="button" @click="removeNumber(index)" class="p-2 text-admin-text-muted hover:text-admin-accent transition-colors">
+                                            <button type="button" @click="removeNumber(index)" class="p-2 text-admin-text-muted hover:text-admin-accent transition-colors active:scale-[0.97]">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -274,7 +311,11 @@
                     </div>
 
                     <!-- Notifications Tab -->
-                    <div x-show="tab === 'notifications'" class="space-y-6" style="display: none;">
+                    <div x-show="tab === 'notifications'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
                             <h3 class="text-lg font-bold text-admin-text">Quote Notifications</h3>
                             <div class="md:col-span-2 space-y-2">
@@ -294,7 +335,7 @@
                             Changes saved here will reflect immediately across the public website. Some changes might require a browser refresh due to server-side caching.
                         </p>
                         <div class="pt-4 border-t border-admin-border-subtle">
-                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
                                 Save All Changes
                             </button>
                         </div>

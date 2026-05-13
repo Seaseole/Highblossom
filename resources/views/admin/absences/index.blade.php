@@ -7,7 +7,7 @@
 
         {{-- Table --}}
         <div class="admin-glass-card rounded-3xl shadow-black/20 overflow-hidden">
-            <table class="min-w-full divide-y divide-admin-border-subtle">
+            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
                 <thead>
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Staff</th>

@@ -26,6 +26,28 @@ final class CompanySettingController
     {
         $this->settingService->update($request->validated(), $request);
 
-        return redirect()->back()->with('success', __('messages.settings_saved'));
+        $redirect = redirect()->back();
+
+        if ($request->has('tab')) {
+            $redirect->withInput(['tab' => $request->input('tab')]);
+            // Better yet, just append it to the URL if we can, 
+            // but redirect()->back() usually doesn't allow easy param appending.
+            // Let's use redirect()->to() with the previous URL + tab if it exists.
+            $previousUrl = url()->previous();
+            $tab = $request->input('tab');
+            
+            if (str_contains($previousUrl, '?')) {
+                $previousUrl = preg_replace('/tab=[^&]+/', "tab=$tab", $previousUrl);
+                if (!str_contains($previousUrl, "tab=$tab")) {
+                    $previousUrl .= "&tab=$tab";
+                }
+            } else {
+                $previousUrl .= "?tab=$tab";
+            }
+            
+            return redirect()->to($previousUrl)->with('success', __('messages.settings_saved'));
+        }
+
+        return $redirect->with('success', __('messages.settings_saved'));
     }
 }

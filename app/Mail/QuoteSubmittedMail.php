@@ -21,8 +21,7 @@ final class QuoteSubmittedMail extends Mailable implements ShouldQueue
         public readonly string $recipientType = 'admin',
         public readonly ?string $primaryPhone = null,
         public readonly ?string $primaryEmail = null
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

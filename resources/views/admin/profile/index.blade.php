@@ -9,6 +9,9 @@
         </div>
 
         <style>
+            :root {
+                --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+            }
             @keyframes caret-blink {
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0; }
@@ -27,6 +30,12 @@
             confirmCode: '',
 
             init() {
+                this.$watch('tab', value => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', value);
+                    window.history.replaceState({}, '', url.toString());
+                });
+
                 if (this.recoveryCodes.length > 0) {
                     this.showRecoveryCodesModal = true;
                 }
@@ -98,13 +107,13 @@
         }">
             <!-- Tabs Navigation -->
             <div class="flex border-b border-admin-border-subtle space-x-8">
-                <button type="button" @click="tab = 'profile'" :class="tab === 'profile' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'profile'" :class="tab === 'profile' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Profile
                 </button>
-                <button type="button" @click="tab = 'appearance'" :class="tab === 'appearance' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'appearance'" :class="tab === 'appearance' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Appearance
                 </button>
-                <button type="button" @click="tab = 'security'" :class="tab === 'security' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-all duration-300">
+                <button type="button" @click="tab = 'security'" :class="tab === 'security' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Security
                 </button>
             </div>
@@ -112,7 +121,11 @@
             <!-- Tab Contents -->
             <div class="mt-8">
                 <!-- Profile Tab -->
-                <div x-show="tab === 'profile'" class="space-y-6">
+                <div x-show="tab === 'profile'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="space-y-6">
                     <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6">
                         <h3 class="text-lg font-bold text-admin-text mb-6">Profile Information</h3>
                         <form action="{{ route('admin.profile.update') }}" method="POST" class="space-y-6">
@@ -137,7 +150,7 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
                                     Save Profile
                                 </button>
                             </div>
@@ -148,14 +161,18 @@
                     <div class="bg-admin-surface rounded-2xl border border-red-500/20 p-6">
                         <h3 class="text-lg font-bold text-red-500 mb-2">Delete Account</h3>
                         <p class="text-sm text-admin-text-muted mb-4">Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.</p>
-                        <button type="button" @click="showDeleteModal = true" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                        <button type="button" @click="showDeleteModal = true" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition-all active:scale-[0.97]">
                             Delete Account
                         </button>
                     </div>
                 </div>
 
                 <!-- Appearance Tab -->
-                <div x-show="tab === 'appearance'" class="space-y-6" style="display: none;">
+                <div x-show="tab === 'appearance'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="space-y-6" style="display: none;">
                     <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6">
                         <h3 class="text-lg font-bold text-admin-text mb-6">Appearance Settings</h3>
                         <form action="{{ route('admin.profile.appearance.update') }}" method="POST" class="space-y-6">
@@ -203,7 +220,7 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
                                     Save Appearance
                                 </button>
                             </div>
@@ -212,7 +229,11 @@
                 </div>
 
                 <!-- Security Tab -->
-                <div x-show="tab === 'security'" class="space-y-6" style="display: none;">
+                <div x-show="tab === 'security'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="space-y-6" style="display: none;">
                     <!-- Password -->
                     <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6">
                         <h3 class="text-lg font-bold text-admin-text mb-6">Update Password</h3>
@@ -242,7 +263,7 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
                                     Update Password
                                 </button>
                             </div>
@@ -258,7 +279,7 @@
                             {{-- Step 1: Enable --}}
                             <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all">
+                                <button type="submit" class="bg-admin-accent hover:bg-admin-accent/90 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
                                     Enable Two-Factor Authentication
                                 </button>
                             </form>
@@ -378,7 +399,14 @@
 
     <!-- Delete Account Modal -->
     <div x-show="showDeleteModal" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" style="display: none;">
-        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4">
+        <div x-show="showDeleteModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4">
             <h3 class="text-xl font-bold text-admin-text mb-2">Delete Account</h3>
             <p class="text-sm text-admin-text-muted mb-6">Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be undone.</p>
             
@@ -415,7 +443,14 @@
          class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" 
          style="display: none;"
          @keydown.escape.window="showRecoveryCodesModal = false">
-        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4 shadow-2xl">
+        <div x-show="showRecoveryCodesModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 max-w-md w-full mx-4 shadow-2xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-admin-text">Recovery Codes</h3>
                 <button @click="showRecoveryCodesModal = false" class="text-admin-text-muted hover:text-admin-text">

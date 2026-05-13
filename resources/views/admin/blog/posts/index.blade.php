@@ -24,7 +24,7 @@
                 </thead>
                 <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($posts as $post)
-                        <tr class="transition-colors duration-200">
+                        <tr class="transition-colors duration-200 cursor-pointer hover:bg-admin-surface-alt" onclick="window.location='{{ route('admin.posts.edit', $post) }}'">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-admin-text">{{ $post->title }}</div>
                                 <div class="text-sm text-admin-text-muted">{{ $post->slug }}</div>

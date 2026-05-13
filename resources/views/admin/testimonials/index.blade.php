@@ -11,7 +11,7 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-admin-border-subtle">
+            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
                 <thead>
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Name</th>
@@ -22,7 +22,7 @@
                 </thead>
                 <tbody class="divide-y divide-admin-border-subtle">
                     @forelse($testimonials as $testimonial)
-                        <tr class="transition-colors duration-200">
+                        <tr class="transition-colors duration-200 cursor-pointer hover:bg-admin-surface-alt" onclick="window.location='{{ route('admin.testimonials.edit', $testimonial) }}'">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-admin-text">{{ $testimonial->name }}</div>
                                 <div class="text-sm text-admin-text-muted truncate max-w-xs">{{ $testimonial->content }}</div>

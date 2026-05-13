@@ -18,8 +18,8 @@
             </a>
         </div>
 
-        <div class="admin-table admin-glass-card shadow-2xl shadow-black/20">
-            <table class="min-w-full divide-y divide-admin-border-subtle">
+        <div class='admin-table admin-glass-card shadow-2xl shadow-black/20 overflow-x-auto'>
+            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
                 <thead class="bg-admin-accent/5">
                     <tr>
                         <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Name</th>

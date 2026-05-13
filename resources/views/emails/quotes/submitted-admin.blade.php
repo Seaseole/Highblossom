@@ -1,288 +1,179 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
     <title>New Quote Request - {{ $companyName }}</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #1a1a1a;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
-            background: #f8f9fa;
-        }
-        
-        @media (max-width: 640px) {
-            body {
-                padding: 12px;
-            }
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-            color: white;
-            padding: 32px 24px;
-            text-align: center;
-            border-radius: 12px 12px 0 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g opacity="0.1"><rect width="60" height="60" fill="white"/><path d="M30 15c-8.284 0-15 6.716-15 15 6.716 15 15 15-6.716 15-15zm0 25c-8.284 0-15 6.716-15 15 6.716 15 15 15-6.716 15-15z" fill="white"/></g></svg>') center/60px;
-            opacity: 0.05;
-        }
-        
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.025em;
-        }
-        
-        .content {
-            background: white;
-            padding: 32px 24px;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        
-        .section {
-            margin-bottom: 24px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #DC2626;
-        }
-        
-        .section-title {
-            font-weight: 600;
-            color: #DC2626;
-            margin-bottom: 12px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .field {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-        
-        .field-label {
-            font-weight: 500;
-            color: #6b7280;
-            min-width: 120px;
-            flex-shrink: 0;
-        }
-        
-        .field-value {
-            color: #1a1a1a;
-            word-break: break-word;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.025em;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        
-        .badge::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
-            transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        
-        .badge-mobile {
-            background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-            color: white;
-            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
-        }
-        
-        .status-pending {
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            letter-spacing: 0.025em;
-            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .status-pending::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
-            transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        
-        .footer {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .action-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 150ms cubic-bezier(0.32, 0.72, 0, 1), background-color 200ms cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.15), 0 1px 2px rgba(220, 38, 38, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
-            transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        
-        .action-button:hover {
-            background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 4px 8px rgba(185, 28, 28, 0.25), 0 2px 4px rgba(185, 28, 28, 0.15);
-        }
-        
-        .action-button:active {
-            transform: translateY(0) scale(0.98);
+    <style type="text/css">
+        /* Basic Reset */
+        body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; height: 100% !important; background-color: #F8F9FA; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
+        table { border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+        a { text-decoration: none; }
+
+        /* Mobile Adjustments */
+        @media only screen and (max-width: 600px) {
+            .container { width: 100% !important; padding: 10px !important; }
+            .stack { display: block !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+            .mobile-hide { display: none !important; }
+            .mobile-padding { padding-top: 20px !important; }
+            .h1 { font-size: 24px !important; }
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1 class="logo-text">{{ $companyName }}</h1>
-        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">New Quote Request Received</p>
-    </div>
-    <div class="content">
-        <div class="section">
-            <div class="section-title">Customer Information</div>
-            <div class="field">
-                <span class="field-label">Name:</span>
-                <span class="field-value">{{ $quote->name }}</span>
-            </div>
-            <div class="field">
-                <span class="field-label">Phone:</span>
-                <span class="field-value">{{ $quote->phone }}</span>
-            </div>
-            @if ($quote->email)
-            <div class="field">
-                <span class="field-label">Email:</span>
-                <span class="field-value">{{ $quote->email }}</span>
-            </div>
-            @endif
-        </div>
+<body style="background-color: #F8F9FA; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F8F9FA;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table width="600" border="0" cellspacing="0" cellpadding="0" class="container" style="width: 600px; background-color: #ffffff; border: 1px solid #E5E7EB; border-radius: 4px; overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td bgcolor="#111827" style="padding: 40px 40px; border-bottom: 4px solid #DC2626;">
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <h1 style="color: #ffffff; font-size: 20px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 2px;">{{ $companyName }}</h1>
+                                        <p style="color: #9CA3AF; font-size: 12px; font-weight: 500; margin: 8px 0 0; text-transform: uppercase; letter-spacing: 1px;">Admin Notification: New Quote Request</p>
+                                    </td>
+                                    <td align="right" style="color: #DC2626; font-size: 14px; font-weight: 700;">
+                                        #{{ $quote->id }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-        <div class="section">
-            <div class="section-title">Vehicle Details</div>
-            <div class="field">
-                <span class="field-label">Type:</span>
-                <span class="field-value">{{ ucfirst($quote->vehicle_type) }}</span>
-            </div>
-            @if ($quote->make_model)
-            <div class="field">
-                <span class="field-label">Make/Model:</span>
-                <span class="field-value">{{ $quote->make_model }}</span>
-            </div>
-            @endif
-            @if ($quote->reg_number)
-            <div class="field">
-                <span class="field-label">Registration:</span>
-                <span class="field-value">{{ $quote->reg_number }}</span>
-            </div>
-            @endif
-            @if ($quote->year)
-            <div class="field">
-                <span class="field-label">Year:</span>
-                <span class="field-value">{{ $quote->year }}</span>
-            </div>
-            @endif
-        </div>
+                    <!-- Body Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <!-- Customer Info -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td style="border-bottom: 1px solid #E5E7EB; padding-bottom: 12px;">
+                                        <h2 style="font-size: 14px; font-weight: 700; color: #111827; margin: 0; text-transform: uppercase;">Customer Information</h2>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 16px;">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td width="100" style="font-size: 12px; color: #6B7280; font-weight: 600; padding-bottom: 8px;">NAME</td>
+                                                <td style="font-size: 14px; color: #111827; font-weight: 500; padding-bottom: 8px;">{{ $quote->name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td width="100" style="font-size: 12px; color: #6B7280; font-weight: 600; padding-bottom: 8px;">PHONE</td>
+                                                <td style="font-size: 14px; color: #111827; font-weight: 500; padding-bottom: 8px;">{{ $quote->phone }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td width="100" style="font-size: 12px; color: #6B7280; font-weight: 600; padding-bottom: 8px;">EMAIL</td>
+                                                <td style="font-size: 14px; color: #111827; font-weight: 500; padding-bottom: 8px;">{{ $quote->email ?? 'N/A' }}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
 
-        <div class="section">
-            <div class="section-title">Service Requested</div>
-            <div class="field">
-                <span class="field-label">Glass Type:</span>
-                <span class="field-value">{{ $quote->glassType?->name ?? 'N/A' }}</span>
-            </div>
-            <div class="field">
-                <span class="field-label">Service Type:</span>
-                <span class="field-value">{{ $quote->serviceType?->name ?? 'N/A' }}</span>
-            </div>
-            @if ($quote->mobile_service)
-            <div class="field">
-                <span class="field-label">Service Type:</span>
-                <span class="badge badge-mobile">Mobile Service Requested</span>
-            </div>
-            @endif
-        </div>
+                            <!-- Vehicle Details -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px; background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 4px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h2 style="font-size: 12px; font-weight: 700; color: #6B7280; margin: 0 0 16px; text-transform: uppercase;">Vehicle Specifications</h2>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td width="50%" class="stack" valign="top">
+                                                    <p style="font-size: 11px; color: #9CA3AF; margin: 0 0 4px; font-weight: 600;">MAKE & MODEL</p>
+                                                    <p style="font-size: 15px; color: #111827; margin: 0; font-weight: 700;">{{ $quote->make_model ?? 'Not specified' }}</p>
+                                                </td>
+                                                <td width="50%" class="stack mobile-padding" valign="top">
+                                                    <p style="font-size: 11px; color: #9CA3AF; margin: 0 0 4px; font-weight: 600;">YEAR / REG</p>
+                                                    <p style="font-size: 15px; color: #111827; margin: 0; font-weight: 700;">{{ $quote->year ?? '----' }} / {{ $quote->reg_number ?? '----' }}</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
 
-        <div class="section">
-            <div class="section-title">Quote Details</div>
-            <div class="field">
-                <span class="field-label">Quote ID:</span>
-                <span class="field-value">#{{ $quote->id }}</span>
-            </div>
-            <div class="field">
-                <span class="field-label">Status:</span>
-                <span class="badge status-pending">{{ ucfirst($quote->status) }}</span>
-            </div>
-            <div class="field">
-                <span class="field-label">Submitted:</span>
-                <span class="field-value">{{ $quote->created_at->format('F j, Y \a\t g:i A') }}</span>
-            </div>
-        </div>
-    </div>
-    <div class="footer">
-        <p style="margin: 0 0 16px;">This quote request requires immediate attention. Please review the details above and contact the customer within 24 hours.</p>
-        <a href="#" class="action-button">View Quote in Admin Panel</a>
-    </div>
+                            <!-- Service Details -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td style="border-bottom: 1px solid #E5E7EB; padding-bottom: 12px;">
+                                        <h2 style="font-size: 14px; font-weight: 700; color: #111827; margin: 0; text-transform: uppercase;">Workshop Requirements</h2>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 16px;">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding-bottom: 16px;">
+                                                    <p style="font-size: 12px; color: #6B7280; margin: 0 0 4px; font-weight: 600;">GLASS TYPE</p>
+                                                    <p style="font-size: 14px; color: #111827; margin: 0; font-weight: 600;">{{ $quote->full_glass_description }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 16px;">
+                                                    <p style="font-size: 12px; color: #6B7280; margin: 0 0 4px; font-weight: 600;">SERVICE TYPE</p>
+                                                    <p style="font-size: 14px; color: #111827; margin: 0; font-weight: 600;">{{ $quote->serviceType?->name ?? 'N/A' }}</p>
+                                                </td>
+                                            </tr>
+                                            @if($quote->mobile_service)
+                                            <tr>
+                                                <td style="padding-bottom: 16px;">
+                                                    <span style="background-color: #FEE2E2; color: #DC2626; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 2px; text-transform: uppercase;">Mobile Service Requested</span>
+                                                </td>
+                                            </tr>
+                                            @endif
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            @if($quote->message)
+                            <!-- User Message -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td style="background-color: #F3F4F6; padding: 24px; border-radius: 4px; border-left: 4px solid #9CA3AF;">
+                                        <p style="font-size: 12px; color: #6B7280; margin: 0 0 8px; font-weight: 600; text-transform: uppercase;">Message from Customer</p>
+                                        <p style="font-size: 14px; color: #374151; margin: 0; font-style: italic; line-height: 1.5;">"{{ $quote->message }}"</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            @endif
+
+                            <!-- Reference Image -->
+                            @if($quote->image_path)
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 40px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ url('storage/' . $quote->image_path) }}" target="_blank" style="display: block; padding: 12px 24px; border: 2px solid #111827; color: #111827; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 0;">View Reference Image</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            @endif
+
+                            <!-- CTA -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" bgcolor="#DC2626" style="border-radius: 4px;">
+                                        <a href="{{ route('admin.quotes.show', $quote->id) }}" target="_blank" style="display: block; padding: 18px 24px; color: #ffffff; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Access Admin Portal</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td bgcolor="#F9FAFB" style="padding: 32px 40px; border-top: 1px solid #E5E7EB; text-align: center;">
+                            <p style="color: #9CA3AF; font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">&copy; {{ date('Y') }} {{ $companyName }} PTY LTD. All rights reserved.</p>
+                            <p style="color: #9CA3AF; font-size: 10px; margin: 8px 0 0;">This is a system-generated notification. Please do not reply to this email.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

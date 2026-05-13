@@ -152,8 +152,13 @@
                 </div>
 
                 <div class="flex flex-col gap-3">
-                    <button type="submit" class="admin-action-btn admin-action-btn-primary w-full justify-center py-4 shadow-lg shadow-admin-accent/20 focus:ring-admin-accent">
+                    <button type="submit" class="admin-action-btn admin-action-btn-primary w-full justify-center py-4 shadow-lg shadow-admin-accent/20 focus:ring-admin-accent active:scale-[0.97] transition-all">
                         <span class="text-xs font-bold uppercase tracking-[0.2em]">Update Service</span>
+                    </button>
+                    <button type="button" 
+                        onclick="if(confirm('Are you sure you want to delete this service?')) { document.getElementById('delete-service-form').submit(); }"
+                        class="admin-action-btn admin-action-btn-danger w-full justify-center py-3 active:scale-[0.97] transition-all">
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Delete Service</span>
                     </button>
                     <a href="{{ route('admin.services.index') }}" class="admin-action-btn admin-action-btn-ghost w-full justify-center py-3">
                         <span class="text-[10px] font-bold uppercase tracking-widest">Discard Changes</span>
@@ -162,6 +167,11 @@
             </div>
         </form>
     </div>
+
+    <form id="delete-service-form" action="{{ route('admin.services.destroy', $service) }}" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
 
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>

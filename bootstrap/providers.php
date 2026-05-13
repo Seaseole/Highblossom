@@ -8,4 +8,5 @@ return [
     AppServiceProvider::class,
     FortifyServiceProvider::class,
     SeoServiceProvider::class,
+    \App\Providers\EventServiceProvider::class,
 ];

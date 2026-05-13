@@ -11,7 +11,7 @@
         </div>
 
         <div class="admin-table">
-            <table class="min-w-full divide-y divide-admin-border-subtle">
+            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
                 <thead>
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Name</th>
