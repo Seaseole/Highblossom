@@ -32,6 +32,7 @@
         "opcodesio/log-viewer": "^3.24",
         "php-ffmpeg/php-ffmpeg": "*",
         "resend/resend-laravel": "^1.3",
+        "spatie/laravel-passkeys": "^1.7",
         "spatie/laravel-permission": "^7.3"
     },
     "require-dev": {

@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <style>
         @keyframes fade-in-up {
@@ -173,6 +173,19 @@
                             </button>
                         </div>
                     </form>
+
+                    <div class="relative my-8 animate-fade-in-up delay-500">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-[#E4E4E7]"></div>
+                        </div>
+                        <div class="relative flex justify-center text-xs uppercase">
+                            <span class="bg-white/70 backdrop-blur-md px-4 text-[#A1A1AA] font-bold tracking-widest">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div class="animate-fade-in-up delay-500">
+                        <x-authenticate-passkey />
+                    </div>
 
                     <div class="mt-10 text-center animate-fade-in-up delay-500">
                         <p class="text-[#71717A] font-medium">

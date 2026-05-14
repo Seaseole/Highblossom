@@ -116,6 +116,9 @@
                 <button type="button" @click="tab = 'security'" :class="tab === 'security' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Security
                 </button>
+                <button type="button" @click="tab = 'passkeys'" :class="tab === 'passkeys' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
+                    Passkeys
+                </button>
             </div>
 
             <!-- Tab Contents -->
@@ -394,6 +397,15 @@
                             </div>
                         @endif
                     </div>
+                </div>
+
+                <!-- Passkeys Tab -->
+                <div x-show="tab === 'passkeys'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="space-y-6" style="display: none;">
+                    <livewire:passkeys />
                 </div>
             </div>
 

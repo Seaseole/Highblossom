@@ -221,6 +221,8 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
 // Public API endpoints for quote form
 Route::get('api/glass-types/{glassType}/sub-categories', [GlassTypeController::class, 'getSubCategories'])->name('api.glass-types.sub-categories');
 
+Route::passkeys();
+
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });

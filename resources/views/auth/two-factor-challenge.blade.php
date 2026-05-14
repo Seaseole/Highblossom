@@ -119,7 +119,11 @@
                         <p class="text-[#71717A]">Enter the 6-digit code from your app</p>
                     </div>
 
-                    <form method="POST" action="{{ route('two-factor.login') }}" class="space-y-8" x-data="{ code: '' }" x-cloak>
+                    <form method="POST" action="{{ route('two-factor.login') }}" id="two-factor-form" class="space-y-8" 
+                        x-data="{ code: '', submitting: false }" 
+                        x-init="$nextTick(() => { $refs.codeInput.focus() }); $watch('code', value => { if (value.length === 6 && !submitting) { submitting = true; $nextTick(() => { $el.submit() }) } })" 
+                        @submit="submitting = true"
+                        x-cloak>
                         @csrf
 
                         <div class="relative animate-fade-in-up delay-200">
@@ -131,6 +135,7 @@
                                 type="text"
                                 name="code"
                                 x-model="code"
+                                x-ref="codeInput"
                                 maxlength="6"
                                 required
                                 autofocus
@@ -139,16 +144,18 @@
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-text z-10"
                                 autocomplete="one-time-code"
                                 @input="code = code.replace(/\D/g, '').slice(0, 6)"
+                                :readonly="submitting"
                             >
 
                             <!-- Visual Representation -->
-                            <div class="flex justify-between gap-2 sm:gap-3 relative z-0">
+                            <div class="flex justify-between gap-2 sm:gap-3 relative z-0" :class="{ 'opacity-50 pointer-events-none transition-opacity duration-300': submitting }">
                                 <template x-for="i in [0,1,2,3,4,5]" :key="i">
                                     <div 
                                         class="w-12 h-16 flex items-center justify-center text-3xl font-bold bg-white/50 border transition-all duration-300 rounded-2xl shadow-sm"
                                         :class="{
-                                            'border-[#DC2626] ring-4 ring-[#DC2626]/10': code.length === i,
-                                            'border-[#E4E4E7]': code.length !== i,
+                                            'border-[#DC2626] ring-4 ring-[#DC2626]/10': code.length === i && !submitting,
+                                            'border-[#E4E4E7]': code.length !== i && !@json($errors->has('code')) || submitting,
+                                            'border-red-500 ring-4 ring-red-500/10': @json($errors->has('code')) && !submitting,
                                             'text-[#18181B]': code[i],
                                             'text-transparent': !code[i]
                                         }"
@@ -156,28 +163,34 @@
                                         <span x-text="code[i] || ''" class="relative z-10"></span>
                                         
                                         <!-- Blinking Caret -->
-                                        <div x-show="code.length === i" 
+                                        <div x-show="code.length === i && !submitting" 
                                              class="absolute w-[2px] h-8 bg-[#DC2626] caret-blink">
                                         </div>
                                     </div>
                                 </template>
                             </div>
+
+                            <!-- Loading Indicator -->
+                            <div x-show="submitting" x-transition class="mt-8 flex flex-col items-center justify-center gap-3 animate-fade-in-up">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 animate-spin text-[#DC2626]" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-sm font-bold text-[#DC2626] uppercase tracking-[0.2em]">Verifying Code...</span>
+                                </div>
+                            </div>
                             
                             @error('code')
-                                <p class="mt-4 text-sm text-[#DC2626] font-medium text-center">{{ $message }}</p>
+                                <div x-show="!submitting" class="mt-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 animate-fade-in-up">
+                                    <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm text-red-700 font-medium leading-tight">{{ $message }}</p>
+                                </div>
                             @enderror
-                        </div>
-
-                        <div class="animate-fade-in-up delay-300 pt-2">
-                            <button
-                                type="submit"
-                                class="w-full bg-[#DC2626] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#B91C1C] focus:outline-none focus:ring-4 focus:ring-[#DC2626]/20 transition-all duration-300 active:scale-[0.98] shadow-xl shadow-[#DC2626]/20 flex items-center justify-center gap-2"
-                            >
-                                <span>Verify Code</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 2.944V12m0 0l4.992-4.992M12 12l-4.992-4.992"></path>
-                                </svg>
-                            </button>
                         </div>
                     </form>
 
