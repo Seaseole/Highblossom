@@ -50,6 +50,11 @@ final class GalleryImage extends Model
         return $this->belongsTo(GalleryCategory::class, 'gallery_category_id');
     }
 
+    public function media()
+    {
+        return $this->hasOne(MediaRegistry::class, 'path', 'image_path');
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         if (!$this->image_path) {

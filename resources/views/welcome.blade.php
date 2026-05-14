@@ -298,7 +298,7 @@
                         <div class="lg:col-span-2 lg:row-span-2 relative group overflow-hidden rounded-2xl">
                             <img alt="{{ $featuredGalleryImages->first()->title }}"
                                 class="w-full h-full object-cover min-h-[400px] lg:min-h-full transition-transform duration-700 group-hover:scale-105"
-                                src="{{ asset($featuredGalleryImages->first()->image_path) }}" loading="lazy">
+                                src="{{ $featuredGalleryImages->first()->image_url }}" loading="lazy">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/30 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                                 <div
@@ -318,7 +318,7 @@
                         <div class="relative group overflow-hidden rounded-2xl">
                             <img alt="{{ $image->title }}"
                                 class="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105"
-                                src="{{ asset($image->image_path) }}" loading="lazy">
+                                src="{{ $image->image_url }}" loading="lazy">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                 <div

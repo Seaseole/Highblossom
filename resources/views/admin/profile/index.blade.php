@@ -140,14 +140,32 @@
                                     <label class="text-sm font-medium text-admin-text-muted">Name</label>
                                     <input type="text" name="name" value="{{ $user->name }}" class="w-full admin-form-input">
                                     @error('name')
-                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
+                                        <div class="mt-2 space-y-1">
+                                            @foreach($errors->get('name') as $error)
+                                                <p class="text-sm text-admin-accent font-medium flex items-start gap-1.5">
+                                                    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>{{ $error }}</span>
+                                                </p>
+                                            @endforeach
+                                        </div>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-admin-text-muted">Email</label>
                                     <input type="email" name="email" value="{{ $user->email }}" class="w-full admin-form-input">
                                     @error('email')
-                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
+                                        <div class="mt-2 space-y-1">
+                                            @foreach($errors->get('email') as $error)
+                                                <p class="text-sm text-admin-accent font-medium flex items-start gap-1.5">
+                                                    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>{{ $error }}</span>
+                                                </p>
+                                            @endforeach
+                                        </div>
                                     @enderror
                                 </div>
                             </div>
@@ -249,19 +267,45 @@
                                     <label class="text-sm font-medium text-admin-text-muted">Current Password</label>
                                     <input type="password" name="current_password" class="w-full admin-form-input">
                                     @error('current_password')
-                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
+                                        <div class="mt-2 space-y-1">
+                                            @foreach($errors->get('current_password') as $error)
+                                                <p class="text-sm text-admin-accent font-medium flex items-start gap-1.5">
+                                                    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>{{ $error }}</span>
+                                                </p>
+                                            @endforeach
+                                        </div>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text-muted">New Password</label>
-                                    <input type="password" name="password" class="w-full admin-form-input">
+                                    <div class="flex items-center justify-between">
+                                        <label for="admin_password" class="text-sm font-medium text-admin-text-muted">New Password</label>
+                                        <button type="button" data-generate-password="admin_password" data-confirm-target="admin_password_confirmation" class="text-[10px] font-bold text-admin-accent uppercase tracking-wider hover:opacity-80 transition-opacity flex items-center gap-1 group">
+                                            <svg class="w-3 h-3 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            <span>Generate Secure</span>
+                                        </button>
+                                    </div>
+                                    <input type="password" id="admin_password" name="password" autocomplete="new-password" passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}" class="w-full admin-form-input">
                                     @error('password')
-                                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
+                                        <div class="mt-2 space-y-1">
+                                            @foreach($errors->get('password') as $error)
+                                                <p class="text-sm text-admin-accent font-medium flex items-start gap-1.5">
+                                                    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>{{ $error }}</span>
+                                                </p>
+                                            @endforeach
+                                        </div>
                                     @enderror
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text-muted">Confirm Password</label>
-                                    <input type="password" name="password_confirmation" class="w-full admin-form-input">
+                                    <label for="admin_password_confirmation" class="text-sm font-medium text-admin-text-muted">Confirm Password</label>
+                                    <input type="password" id="admin_password_confirmation" name="password_confirmation" autocomplete="new-password" passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}" class="w-full admin-form-input">
                                 </div>
                             </div>
 

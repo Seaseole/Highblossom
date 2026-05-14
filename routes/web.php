@@ -196,6 +196,8 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     // Media Library
     Route::get('media-library', [MediaLibraryController::class, 'index'])->name('media-library.index');
     Route::post('media-library/upload', [MediaLibraryController::class, 'upload'])->name('media-library.upload');
+    Route::get('media-library/{image}', [MediaLibraryController::class, 'show'])->name('media-library.show');
+    Route::delete('media-library/{image}', [MediaLibraryController::class, 'destroy'])->name('media-library.destroy');
 
     // Image Upload (AJAX)
     Route::post('image-upload', [ImageUploadController::class, 'upload'])->name('image-upload');

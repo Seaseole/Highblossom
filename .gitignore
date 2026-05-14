@@ -35,3 +35,4 @@ CLAUDE.md
 .cursor/rules/laravel-brain.mdc
 .junie/guidelines.md
 .windsurf/workflows/review.md
+database/seeders/GalleryJourneySeeder.php

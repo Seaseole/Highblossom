@@ -42,7 +42,7 @@
         }">
             @csrf
             @method('PUT')
-            <input type="hidden" name="image_path" id="image-path" x-ref="imagePathInput" value="{{ $item->image_url ?? '' }}">
+            <input type="hidden" name="image_path" id="image-path" x-ref="imagePathInput" value="{{ $item->image_path ?? '' }}">
             <input type="hidden" name="remove_image" x-ref="removeImageInput" value="0">
 
             {{-- Main Form Area --}}

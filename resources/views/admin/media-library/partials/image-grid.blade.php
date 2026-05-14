@@ -15,7 +15,7 @@
     @foreach($images as $image)
         <button
             type="button"
-            @click="window.dispatchEvent(new CustomEvent('image-selected', { detail: { url: '{{ $image->image_url }}' }}))"
+            @click="$dispatch('open-image-preview', { id: {{ $image->id }} })"
             class="group relative aspect-square rounded-xl overflow-hidden border-2 border-admin-border hover:border-admin-accent hover:shadow-lg hover:shadow-admin-accent/20 transition-all active:scale-95"
         >
             <img src="{{ $image->image_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">

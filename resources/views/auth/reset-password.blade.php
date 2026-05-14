@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <style>
         @keyframes fade-in-up {
@@ -122,33 +122,65 @@
                                 value="{{ old('email') }}"
                             >
                             @error('email')
-                                <p class="mt-2 text-sm text-[#DC2626] font-medium px-1">{{ $message }}</p>
+                                <div class="mt-2 space-y-1 px-1">
+                                    @foreach($errors->get('email') as $error)
+                                        <p class="text-sm text-[#DC2626] font-medium flex items-start gap-1.5">
+                                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>{{ $error }}</span>
+                                        </p>
+                                    @endforeach
+                                </div>
                             @enderror
                         </div>
 
                         <div class="animate-fade-in-up delay-300">
-                            <label for="password" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest mb-2 px-1">New Password</label>
+                                <div class="flex items-center justify-between mb-2 px-1 h-5">
+                                    <label for="password" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">New Password</label>
+                                    <button type="button" data-generate-password="password" data-confirm-target="password_confirmation" class="text-[10px] font-bold text-[#DC2626] uppercase tracking-wider hover:text-[#B91C1C] transition-colors flex items-center gap-1 group">
+                                        <svg class="w-3 h-3 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span>Generate</span>
+                                    </button>
+                                </div>
                             <input
                                 id="password"
                                 type="password"
                                 name="password"
                                 class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
                                 placeholder="••••••••"
+                                autocomplete="new-password"
+                                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                                 required
                             >
                             @error('password')
-                                <p class="mt-2 text-sm text-[#DC2626] font-medium px-1">{{ $message }}</p>
+                                <div class="mt-2 space-y-1 px-1">
+                                    @foreach($errors->get('password') as $error)
+                                        <p class="text-sm text-[#DC2626] font-medium flex items-start gap-1.5">
+                                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>{{ $error }}</span>
+                                        </p>
+                                    @endforeach
+                                </div>
                             @enderror
                         </div>
 
                         <div class="animate-fade-in-up delay-400">
-                            <label for="password_confirmation" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest mb-2 px-1">Confirm Password</label>
+                                <div class="flex items-center mb-2 px-1 h-5">
+                                    <label for="password_confirmation" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">Confirm Password</label>
+                                </div>
                             <input
                                 id="password_confirmation"
                                 type="password"
                                 name="password_confirmation"
                                 class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
                                 placeholder="••••••••"
+                                autocomplete="new-password"
+                                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                                 required
                             >
                         </div>

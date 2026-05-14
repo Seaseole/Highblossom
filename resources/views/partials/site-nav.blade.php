@@ -1,4 +1,4 @@
-<nav class="fixed top-0 w-full z-50 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5">
+<nav class="fixed top-0 w-full z-40 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5">
     <div class="flex justify-between items-center px-6 lg:px-8 py-4 max-w-[1400px] mx-auto">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="hover:opacity-80 transition-opacity">
@@ -82,12 +82,13 @@
             </button>
         </div>
     </div>
+</nav>
 
-    {{-- Mobile Menu --}}
-    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-full max-w-sm h-screen bg-[#121218] border-l border-white/10 z-50 hidden md:hidden">
-        <div class="flex flex-col h-full">
+{{-- Mobile Menu --}}
+<div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-full max-w-sm h-screen h-[100dvh] bg-[#121218] border-l border-white/10 z-60 hidden md:hidden">
+            <div class="flex flex-col h-full">
             {{-- Mobile Header --}}
-            <div class="flex justify-between items-center px-6 py-4 border-b border-white/10">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-white/10 flex-shrink-0">
                 <span class="text-lg font-bold text-[#FAFAFA] font-headline">Menu</span>
                 <button id="mobile-menu-close" class="p-2 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors" aria-label="Close menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +98,7 @@
             </div>
 
             {{-- Mobile Links --}}
-            <div class="flex-1 flex flex-col px-6 py-8 gap-6">
+            <div class="flex-1 flex flex-col px-6 py-8 gap-6 overflow-y-auto">
                 <a href="{{ route('home') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('home') ? 'text-[#DC2626]' : '' }}">
                     Home
                 </a>
@@ -122,7 +123,7 @@
             </div>
 
             {{-- Mobile Footer --}}
-            <div class="px-6 py-6 border-t border-white/10">
+            <div class="px-6 py-6 border-t border-white/10 flex-shrink-0">
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ route('dashboard') }}" onclick="closeMobileMenu()" class="flex items-center gap-3 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors">
@@ -144,27 +145,22 @@
         </div>
     </div>
 
-    {{-- Mobile Menu Overlay --}}
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden"></div>
-</nav>
+{{-- Mobile Menu Overlay --}}
+<div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black/60 z-50 md:hidden"></div>
 
 @push('scripts')
 <script>
     function closeMobileMenu() {
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-        if (mobileMenu) {
-            mobileMenu.classList.remove('open');
-            setTimeout(() => {
-                mobileMenu.classList.add('hidden');
-            }, 300);
-        }
-        if (mobileMenuOverlay) {
-            setTimeout(() => {
-                mobileMenuOverlay.classList.add('hidden');
-            }, 300);
-        }
+        
+        if (mobileMenu) mobileMenu.classList.remove('open');
+        if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('open');
+        
         document.body.style.overflow = '';
+        
+        // Optional: add back hidden after transition if you want total removal from render tree
+        // but visibility: hidden in CSS is usually enough.
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -174,25 +170,19 @@
         const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
         function openMobileMenu() {
-            mobileMenu.classList.remove('hidden');
-            setTimeout(() => {
-                mobileMenu.classList.add('open');
-            }, 10);
-            mobileMenuOverlay.classList.remove('hidden');
+            if (mobileMenu) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => mobileMenu.classList.add('open'), 10);
+            }
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.classList.add('open');
+            }
             document.body.style.overflow = 'hidden';
         }
 
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', openMobileMenu);
-        }
-
-        if (mobileMenuClose) {
-            mobileMenuClose.addEventListener('click', closeMobileMenu);
-        }
-
-        if (mobileMenuOverlay) {
-            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-        }
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+        if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+        if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
     });
 </script>
 @endpush
