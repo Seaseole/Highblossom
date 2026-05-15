@@ -19,15 +19,30 @@ final class AdminSidebar extends Component
         $this->mobileMenuOpen = false;
     }
 
-    public function toggleTheme(): void
+    public function toggleTheme(?string $newTheme = null): void
     {
-        // Cycle through: auto -> light -> dark -> auto
-        $this->theme = match ($this->theme) {
-            'auto' => 'light',
-            'light' => 'dark',
-            'dark' => 'auto',
-            default => 'auto',
-        };
+        if ($newTheme) {
+            $this->setTheme($newTheme);
+        } else {
+            // Cycle through: auto -> light -> dark -> auto
+            $newTheme = match ($this->theme) {
+                'auto' => 'light',
+                'light' => 'dark',
+                'dark' => 'auto',
+                default => 'auto',
+            };
+            $this->setTheme($newTheme);
+        }
+    }
+
+    // public function updatedTheme(string $value): void
+    // {
+    //     $this->setTheme($value);
+    // }
+
+    private function setTheme(string $theme): void
+    {
+        $this->theme = $theme;
 
         if (Auth::check()) {
             Auth::user()->update([
@@ -35,7 +50,7 @@ final class AdminSidebar extends Component
             ]);
         }
 
-        $this->dispatch('theme-changed', theme: $this->theme);
+        $this->dispatch('theme-updated', theme: $this->theme);
     }
 
     public function isEffectiveDark(): bool
@@ -43,7 +58,7 @@ final class AdminSidebar extends Component
         return match ($this->theme) {
             'dark' => true,
             'light' => false,
-            default => request()->hasHeader('Sec-CH-UA-Platform') 
+            default => request()->hasHeader('Sec-CH-UA-Platform')
                 ? false // Server-side fallback
                 : true, // Will be resolved client-side
         };

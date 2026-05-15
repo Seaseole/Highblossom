@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\CompanySetting;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+#[Singleton(name:"company_settings")]
 final class CompanySettingService
 {
     private const SIMPLE_FIELDS = [

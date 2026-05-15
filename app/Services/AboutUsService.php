@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\AboutUsContent;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+#[Singleton(name:"about_us")]
 final class AboutUsService
 {
     public function getOrCreateContent(): AboutUsContent

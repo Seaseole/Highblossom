@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Container\Attributes\Singleton;
 
+#[Singleton(name:"users")]
 final class UserService
 {
     public function create(array $data): User

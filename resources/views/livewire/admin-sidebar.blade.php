@@ -189,20 +189,35 @@
     };
 @endphp
 
-<div x-data="{ theme: @entangle('theme'), mobileMenuOpen: @entangle('mobileMenuOpen') }" x-init="
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-        const updateTheme = () => {
-            if (theme === 'dark' || (theme === 'auto' && prefersDark.matches)) {
+<div x-data="{ 
+        mobileMenuOpen: false,
+        theme: '{{ $theme }}',
+        applyTheme(val) {
+            console.log('Applying theme:', val);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = val === 'dark' || (val === 'auto' && prefersDark);
+            
+            if (isDark) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
-            localStorage.setItem('theme', theme);
-        };
-        $watch('theme', updateTheme);
-        updateTheme();
-        prefersDark.addEventListener('change', () => { if (theme === 'auto') updateTheme(); });
-    " class="relative">
+            
+            localStorage.setItem('theme', val);
+        },
+        toggleThemeLocally() {
+            this.theme = this.theme === 'auto' ? 'light' : (this.theme === 'light' ? 'dark' : 'auto');
+            this.$wire.toggleTheme(this.theme);
+        }
+    }" 
+    
+    x-init="
+        $watch('theme', val => applyTheme(val));
+        
+        // Ensure initial state matches Livewire
+        applyTheme(theme);
+    "
+    class="relative">
     
     {{-- Mobile Menu Button --}}
     <button @click="mobileMenuOpen = true" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-admin-surface border border-admin-border rounded-xl shadow-2xl hover:bg-admin-surface-alt transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]">
@@ -286,25 +301,28 @@
         <div class="flex flex-col gap-2 p-4 border-t border-admin-border">
             {{-- Theme Toggle --}}
             <button 
-                wire:click="toggleTheme" 
+                wire:ignore
+                @click="toggleThemeLocally()"
                 class="flex items-center gap-3 w-full py-2 px-4 rounded-xl bg-admin-surface-alt border border-admin-border hover:bg-admin-surface hover:border-[#DC2626]/30 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
             >
-                @if($theme === 'light')
+                <div x-show="theme === 'light'" {!! $theme !== 'light' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Light Mode</span>
-                @elseif($theme === 'dark')
+                </div>
+                <div x-show="theme === 'dark'" {!! $theme !== 'dark' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Dark Mode</span>
-                @else
+                </div>
+                <div x-show="theme === 'auto'" {!! $theme !== 'auto' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span class="text-admin-text-muted whitespace-nowrap">Auto Mode</span>
-                @endif
+                </div>
             </button>
 
             {{-- Profile Dropdown --}}
@@ -425,25 +443,28 @@
         <div class="flex flex-col gap-2 p-4 border-t border-admin-border">
             {{-- Theme Toggle --}}
             <button 
-                wire:click="toggleTheme" 
+               wire:ignore
+               @click="toggleThemeLocally()"
                 class="flex items-center gap-3 w-full py-2.5 px-4 rounded-xl bg-admin-surface-alt border border-admin-border hover:bg-admin-surface hover:border-[#DC2626]/30 transition-all duration-200 active:scale-[0.98]"
             >
-                @if($theme === 'light')
+                <div x-show="theme === 'light'" {!! $theme !== 'light' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Light Mode</span>
-                @elseif($theme === 'dark')
+                </div>
+                <div x-show="theme === 'dark'" {!! $theme !== 'dark' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Dark Mode</span>
-                @else
+                </div>
+                <div x-show="theme === 'auto'" {!! $theme !== 'auto' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span class="text-admin-text-muted whitespace-nowrap">Auto Mode</span>
-                @endif
+                </div>
             </button>
 
             {{-- Profile --}}
@@ -470,22 +491,3 @@
         </div>
     </aside>
 </div>
-
-@script
-<script>
-    // Listen for theme changes from Livewire
-    document.addEventListener('theme-changed', (event) => {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-        const isDark = event.detail.theme === 'dark' || (event.detail.theme === 'auto' && prefersDark.matches);
-
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-
-        // Store in localStorage for persistence across page loads
-        localStorage.setItem('theme', event.detail.theme);
-    });
-</script>
-@endscript

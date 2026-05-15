@@ -166,8 +166,8 @@
 
 .btn-ghost {
     background: transparent;
-    color: #FAFAFA;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-admin-text);
+    border: 1px solid var(--color-admin-border);
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -180,6 +180,11 @@
     cursor: pointer;
 }
 
+.btn-ghost:not(.dark) {
+    color: #374151;
+    border-color: rgba(17, 24, 39, 0.15);
+}
+
 @media (min-width: 768px) {
     .btn-ghost {
         padding: 0.875rem 2rem;
@@ -187,16 +192,21 @@
 }
 
 .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--color-admin-surface-alt);
+    border-color: var(--color-admin-border);
     transform: translateY(-2px);
+}
+
+.btn-ghost:hover:not(.dark) {
+    background: rgba(17, 24, 39, 0.05);
+    border-color: rgba(17, 24, 39, 0.25);
 }
 
 /* Medium Ghost Button for Mobile */
 .btn-ghost-md {
     background: transparent;
-    color: #FAFAFA;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-admin-text);
+    border: 1px solid var(--color-admin-border);
     padding: 0.625rem 1.25rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -209,6 +219,11 @@
     cursor: pointer;
 }
 
+.btn-ghost-md:not(.dark) {
+    color: #374151;
+    border-color: rgba(17, 24, 39, 0.15);
+}
+
 @media (min-width: 768px) {
     .btn-ghost-md {
         padding: 0.875rem 2rem;
@@ -217,9 +232,14 @@
 }
 
 .btn-ghost-md:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--color-admin-surface-alt);
+    border-color: var(--color-admin-border);
     transform: translateY(-2px);
+}
+
+.btn-ghost-md:hover:not(.dark) {
+    background: rgba(17, 24, 39, 0.05);
+    border-color: rgba(17, 24, 39, 0.25);
 }
 
 .btn-ghost-md:active {
@@ -282,32 +302,32 @@
     border-radius: 1px;
 }
 
-/* Premium Form Inputs - Dark Theme */
+/* Premium Form Inputs - Theme Aware */
 .form-input-premium {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-admin-input-bg);
+    border: 1px solid var(--color-admin-input-border);
     border-radius: 0.75rem;
     padding: 0.875rem 1rem;
-    color: #FAFAFA;
+    color: var(--color-admin-text);
     font-size: 0.875rem;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-input-premium::placeholder {
-    color: #71717A;
+    color: var(--color-admin-text-muted);
 }
 
 .form-input-premium:focus {
     outline: none;
     border-color: rgba(220, 38, 38, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-admin-surface);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .form-input-premium option {
-    background: #16161D;
-    color: #FAFAFA;
+    background: var(--color-admin-surface);
+    color: var(--color-admin-text);
 }
 
 .form-input-premium option:checked {
