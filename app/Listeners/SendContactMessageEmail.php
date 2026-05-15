@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Domains\Content\Models\CompanySetting;
+use App\Models\CompanySetting;
 use App\Events\ContactMessageReceived;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;

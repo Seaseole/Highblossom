@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Bookings\Models\Quote;
+use App\Models\Quote;
 use App\Http\Requests\Admin\QuoteStatusRequest;
 use App\Services\QuoteService;
 use Illuminate\Http\Request;

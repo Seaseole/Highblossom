@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\GlassSubCategory;
+use App\Models\GlassSubCategory;
 use App\Http\Requests\Admin\GlassSubCategoryRequest;
 use App\Services\GlassSubCategoryService;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +26,7 @@ final class GlassSubCategoryController
 
     public function create(): View
     {
-        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->with('subCategories')->get();
+        $glassTypes = \App\Models\GlassType::active()->ordered()->with('subCategories')->get();
         
         return view('admin.glass-sub-categories.create', compact('glassTypes'));
     }
@@ -42,7 +42,7 @@ final class GlassSubCategoryController
 
     public function edit(GlassSubCategory $glassSubCategory): View
     {
-        $glassTypes = \App\Domains\Content\Models\GlassType::active()->ordered()->with('subCategories')->get();
+        $glassTypes = \App\Models\GlassType::active()->ordered()->with('subCategories')->get();
         
         return view('admin.glass-sub-categories.edit', compact('glassSubCategory', 'glassTypes'));
     }

@@ -1,6 +1,6 @@
 <?php
 
-// use App\Domains\Bookings\Models\Booking;
+// use App\Models\Booking;
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -64,6 +64,8 @@ Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('bookings', [BookingController::class, 'index'])->middleware('can:view bookings')->name('bookings.index');
     Route::get('bookings/{booking}', [BookingController::class, 'show'])->middleware('can:view bookings')->name('bookings.show');
+    Route::patch('bookings/{booking}/update-status', [BookingController::class, 'updateStatus'])->middleware('can:update bookings')->name('bookings.update-status');
+    Route::delete('bookings/{booking}', [BookingController::class, 'destroy'])->middleware('can:update bookings')->name('bookings.destroy');
 
     Route::get('inspections', [InspectionController::class, 'index'])->middleware('can:view inspections')->name('inspections.index');
     Route::get('inspections/{inspection}', [InspectionController::class, 'show'])->middleware('can:view inspections')->name('inspections.show');

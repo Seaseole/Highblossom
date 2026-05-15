@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Domains\Bookings\Models\Inspection;
-use App\Domains\Bookings\Models\StaffAbsence;
-use App\Infrastructure\Services\AvailabilityService;
+use App\Models\Inspection;
+use App\Models\StaffAbsence;
+use App\Services\AvailabilityService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Date;

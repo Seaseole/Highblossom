@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Domains\Bookings\Models\Inspection;
+use App\Models\Inspection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ class InspectionFactory extends Factory
     {
         $scheduledAt = now()->addDay()->setHour(10)->setMinute(0)->setSecond(0);
         return [
-            'booking_id' => \App\Domains\Bookings\Models\Booking::factory(),
+            'booking_id' => \App\Models\Booking::factory(),
             'staff_id' => \App\Models\User::factory(),
             'scheduled_at' => $scheduledAt,
             'ended_at' => $scheduledAt->copy()->addHour(),

@@ -1,5 +1,5 @@
 @php
-/** @var \App\Domains\Seo\DataTransferObjects\SeoMetadata $seoMetadata */
+/** @var \App\Services\DataTransferObjects\SeoMetadata $seoMetadata */
 @endphp
 
 {{-- Basic Meta Tags --}}

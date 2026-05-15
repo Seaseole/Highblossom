@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Actions\Content\RelocateTempUploadsAction;
-use App\Domains\Content\Models\Post;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 final class PostService

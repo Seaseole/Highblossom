@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Content\Models\CompanySetting;
-use App\Domains\Content\Models\GalleryImage;
-use App\Domains\Content\Models\Service;
-use App\Domains\Content\Models\Testimonial;
+use App\Models\CompanySetting;
+use App\Models\GalleryImage;
+use App\Models\Service;
+use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
 
 class CompanyDataSeeder extends Seeder

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\GalleryImage;
+use App\Models\GalleryImage;
 use App\Http\Requests\Admin\MediaLibraryRequest;
 use App\Services\MediaLibraryService;
 use Illuminate\Http\JsonResponse;

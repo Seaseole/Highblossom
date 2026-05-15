@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\GalleryImage;
+use App\Models\GalleryImage;
 use App\Services\MediaRegistryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\MediaRegistry;
-use App\Domains\Content\Models\MediaUsage;
+use App\Models\MediaRegistry;
+use App\Models\MediaUsage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Content\Models\GalleryCategory;
+use App\Models\GalleryCategory;
 use Illuminate\Database\Seeder;
 
 class GalleryCategorySeeder extends Seeder

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\Category;
+use App\Models\Category;
 use Illuminate\Support\Str;
 
 final class CategoryService

@@ -3,9 +3,9 @@
 namespace App\Livewire;
 
 
-use App\Domains\Content\Models\Category;
-use App\Domains\Content\Models\Post;
-use App\Domains\Content\Models\Tag;
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;

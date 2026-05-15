@@ -13,8 +13,8 @@
             class="bg-[#16161D]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-[#0A0A0F]/50 p-8 md:p-12 text-center animate-error-entrance"
         >
             @php
-                $businessLogo = App\Domains\Content\Models\CompanySetting::get('business_logo', '');
-                $logoText = App\Domains\Content\Models\CompanySetting::get('logo_text', 'Highblossom');
+                $businessLogo = App\Models\CompanySetting::get('business_logo', '');
+                $logoText = App\Models\CompanySetting::get('logo_text', 'Highblossom');
             @endphp
 
             @if($businessLogo)

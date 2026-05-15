@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\GlassSubCategory;
-use App\Domains\Content\Models\GlassType;
+use App\Models\GlassSubCategory;
+use App\Models\GlassType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 

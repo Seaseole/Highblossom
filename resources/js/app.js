@@ -1,3 +1,7 @@
+import Alpine from 'alpinejs'
+window.Alpine = Alpine
+Alpine.start()
+
 // Simple vanilla JS helpers for public site
 import {
     browserSupportsWebAuthn,

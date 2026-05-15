@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\GlassType;
+use App\Models\GlassType;
 use App\Http\Requests\Admin\GlassTypeRequest;
 use App\Services\GlassSubCategoryService;
 use App\Services\GlassTypeService;

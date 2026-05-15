@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Seo\Models\SeoStaticRoute;
+use App\Models\SeoStaticRoute;
 use Illuminate\Database\Seeder;
 
 class SeoStaticRouteSeeder extends Seeder

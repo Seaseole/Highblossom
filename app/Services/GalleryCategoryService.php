@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\GalleryCategory;
-use App\Domains\Content\Models\GalleryImage;
+use App\Models\GalleryCategory;
+use App\Models\GalleryImage;
 use Illuminate\Support\Str;
 
 final class GalleryCategoryService

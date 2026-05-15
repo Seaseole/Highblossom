@@ -2,8 +2,8 @@
 
 namespace App\Livewire\BlogPosts;
 
-use App\Domains\Content\Models\Category;
-use App\Domains\Content\Models\Tag;
+use App\Models\Category;
+use App\Models\Tag;
 use Livewire\Component;
 
 final class ActiveFilters extends Component

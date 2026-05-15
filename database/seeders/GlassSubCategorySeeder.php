@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Content\Models\GlassType;
-use App\Domains\Content\Models\GlassSubCategory;
+use App\Models\GlassType;
+use App\Models\GlassSubCategory;
 use Illuminate\Database\Seeder;
 
 class GlassSubCategorySeeder extends Seeder

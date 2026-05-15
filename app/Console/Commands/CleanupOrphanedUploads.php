@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Domains\Content\Models\Post;
+use App\Models\Post;
 use App\Services\Content\ContentBlockCleanupService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

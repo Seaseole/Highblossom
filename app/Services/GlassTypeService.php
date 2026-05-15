@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\GlassType;
+use App\Models\GlassType;
 use Illuminate\Support\Str;
 
 final class GlassTypeService

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Domains\Bookings\Models\StaffAbsence;
+use App\Models\StaffAbsence;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

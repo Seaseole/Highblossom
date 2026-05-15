@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Content\Models\AboutUsContent;
+use App\Models\AboutUsContent;
 use Illuminate\Database\Seeder;
 
 class AboutUsContentSeeder extends Seeder

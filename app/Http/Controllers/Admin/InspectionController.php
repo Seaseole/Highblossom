@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Bookings\Models\Inspection;
+use App\Models\Inspection;
 use Illuminate\View\View;
 
 final class InspectionController

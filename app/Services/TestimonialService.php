@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Content\Models\Testimonial;
+use App\Models\Testimonial;
 
 final class TestimonialService
 {

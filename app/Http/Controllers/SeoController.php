@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Domains\Seo\Actions\BuildSitemap;
-use App\Domains\Seo\Actions\GenerateRobotsTxt;
+use App\Actions\Seo\BuildSitemap;
+use App\Actions\Seo\GenerateRobotsTxt;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;

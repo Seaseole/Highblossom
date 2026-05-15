@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\ServiceType;
+use App\Models\ServiceType;
 use App\Http\Requests\Admin\ServiceTypeRequest;
 use App\Services\ServiceTypeService;
 use Illuminate\Http\RedirectResponse;

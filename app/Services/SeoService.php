@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Seo\Models\SeoStaticRoute;
+use App\Models\SeoStaticRoute;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 

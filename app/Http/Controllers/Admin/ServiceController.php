@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\Service;
+use App\Models\Service;
 use App\Http\Requests\Admin\ServiceRequest;
 use App\Services\ServiceService;
 use Illuminate\View\View;

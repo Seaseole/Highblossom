@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\ContactMessage;
+use App\Models\ContactMessage;
 use App\Services\ContactMessageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

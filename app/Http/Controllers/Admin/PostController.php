@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\Category;
-use App\Domains\Content\Models\Post;
-use App\Domains\Content\Models\Tag;
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
 use App\Http\Requests\Content\StoreBlockContentRequest;
 use App\Services\PostService;
 use Illuminate\View\View;

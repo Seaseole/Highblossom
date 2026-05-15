@@ -51,6 +51,8 @@
 </head>
 <body class="min-h-[100dvh] bg-[#F9FAFB] text-[#18181B] font-body selection:bg-[#DC2626] selection:text-white antialiased">
     <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh] overflow-hidden">
+        <!-- Toast Notifications -->
+        <x-ui.toaster />
         <!-- Left Column - Branding -->
         <div class="hidden lg:flex flex-col justify-center items-center p-12 bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#F43F5E] relative overflow-hidden">
             <!-- Background Decoration -->
@@ -128,18 +130,6 @@
                                 autofocus
                                 value="{{ old('name') }}"
                             >
-                            @error('name')
-                                <div class="mt-2 space-y-1 px-1">
-                                    @foreach($errors->get('name') as $error)
-                                        <p class="text-sm text-[#DC2626] font-medium flex items-start gap-1.5">
-                                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <span>{{ $error }}</span>
-                                        </p>
-                                    @endforeach
-                                </div>
-                            @enderror
                         </div>
 
                         <div class="animate-fade-in-up delay-300">
@@ -153,18 +143,6 @@
                                 required
                                 value="{{ old('email') }}"
                             >
-                            @error('email')
-                                <div class="mt-2 space-y-1 px-1">
-                                    @foreach($errors->get('email') as $error)
-                                        <p class="text-sm text-[#DC2626] font-medium flex items-start gap-1.5">
-                                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <span>{{ $error }}</span>
-                                        </p>
-                                    @endforeach
-                                </div>
-                            @enderror
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -187,18 +165,6 @@
                                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                                     required
                                 >
-                                @error('password')
-                                    <div class="mt-2 space-y-1 px-1">
-                                        @foreach($errors->get('password') as $error)
-                                            <p class="text-sm text-[#DC2626] font-medium flex items-start gap-1.5">
-                                                <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span>{{ $error }}</span>
-                                            </p>
-                                        @endforeach
-                                    </div>
-                                @enderror
                             </div>
 
                             <div class="animate-fade-in-up delay-400">

@@ -130,9 +130,9 @@ return [
         \Illuminate\Pagination\Paginator::class,
         \Illuminate\Support\Collection::class,
         \Illuminate\Database\Eloquent\Collection::class,
-        \App\Domains\Content\Models\Post::class,
-        \App\Domains\Content\Models\Category::class,
-        \App\Domains\Content\Models\Tag::class,
+        \App\Models\Post::class,
+        \App\Models\Category::class,
+        \App\Models\Tag::class,
         \App\Models\User::class,
     ],
 

@@ -71,6 +71,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage users',
             'manage roles',
             'access admin panel',
+
+            //dashboard
+            'view dashboard',
+
         ];
 
         // Create permissions
@@ -85,14 +89,30 @@ class RolesAndPermissionsSeeder extends Seeder
         // Create Admin role
         $adminRole = Role::findOrCreate('Admin');
         $adminRole->givePermissionTo([
-            'view blog', 'create blog', 'update blog', 'delete blog', 'publish blog',
-            'view bookings', 'create bookings', 'update bookings', 'delete bookings',
-            'view inspections', 'create inspections', 'update inspections', 'delete inspections',
-            'view gallery', 'manage gallery',
-            'view services', 'manage services',
+            'view blog',
+            'create blog',
+            'update blog',
+            'delete blog',
+            'publish blog',
+            'view bookings',
+            'create bookings',
+            'update bookings',
+            'delete bookings',
+            'view inspections',
+            'create inspections',
+            'update inspections',
+            'delete inspections',
+            'view gallery',
+            'manage gallery',
+            'view services',
+            'manage services',
             'view settings',
-            'manage pages', 'manage categories', 'manage tags', 'manage testimonials',
-            'view contact messages', 'manage contact numbers',
+            'manage pages',
+            'manage categories',
+            'manage tags',
+            'manage testimonials',
+            'view contact messages',
+            'manage contact numbers',
             'manage absences',
             'access admin panel',
         ]);
@@ -100,9 +120,14 @@ class RolesAndPermissionsSeeder extends Seeder
         // Create Staff role
         $staffRole = Role::findOrCreate('Staff');
         $staffRole->givePermissionTo([
-            'view blog', 'create blog', 'update blog',
-            'view bookings', 'create bookings', 'update bookings',
-            'view inspections', 'create inspections',
+            'view blog',
+            'create blog',
+            'update blog',
+            'view bookings',
+            'create bookings',
+            'update bookings',
+            'view inspections',
+            'create inspections',
             'view gallery',
             'view services',
             'access admin panel',
@@ -110,6 +135,11 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create User role
         $userRole = Role::findOrCreate('User');
+        $userRole->givePermissionTo([
+            'view dashboard',
+            'access admin panel',
+            'view services',
+        ]);
 
         // Assign Super Admin role to the first user
         $user = User::first();

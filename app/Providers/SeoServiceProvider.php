@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Domains\Seo\Services\SeoInjectionService;
+use App\Services\SeoInjectionService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 

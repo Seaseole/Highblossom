@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Content\Models\GlassType;
+use App\Models\GlassType;
 use Illuminate\Database\Seeder;
 
 class GlassTypeSeeder extends Seeder

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Bookings\Models\Booking;
-use App\Domains\Bookings\Models\Inspection;
-use App\Domains\Bookings\Models\Quote;
+use App\Models\Booking;
+use App\Models\Inspection;
+use App\Models\Quote;
 use App\Models\User;
 use Illuminate\View\View;
 

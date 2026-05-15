@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Content\Models\GalleryCategory;
+use App\Models\GalleryCategory;
 use App\Http\Requests\Admin\GalleryCategoryRequest;
 use App\Services\GalleryCategoryService;
 use Illuminate\Http\RedirectResponse;

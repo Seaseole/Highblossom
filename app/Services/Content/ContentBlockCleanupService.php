@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Content;
 
-use App\Domains\Content\Models\Post;
+use App\Models\Post;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Finder\Finder;

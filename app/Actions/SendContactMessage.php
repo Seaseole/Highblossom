@@ -2,7 +2,7 @@
 
 namespace App\Actions;
 
-use App\Domains\Content\Models\ContactMessage;
+use App\Models\ContactMessage;
 use App\Events\ContactMessageReceived;
 use App\Http\Requests\ContactFormRequest;
 use App\Services\IdempotencyService;

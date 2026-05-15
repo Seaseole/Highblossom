@@ -21,9 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(
-            \App\Infrastructure\Contracts\AvailabilityServiceInterface::class,
-            \App\Infrastructure\Services\AvailabilityService::class
+        $this->app->singleton(
+            \App\Services\Contracts\AvailabilityServiceInterface::class,
+            \App\Services\AvailabilityService::class
         );
     }
 
@@ -41,14 +41,14 @@ class AppServiceProvider extends ServiceProvider
         // Share company settings globally with fallback defaults
         try {
             $settings = [
-                'companyName' => \App\Domains\Content\Models\CompanySetting::get('company_name', 'Highblossom PTY LTD'),
-                'logoText' => \App\Domains\Content\Models\CompanySetting::get('logo_text', 'Highblossom'),
-                'primaryEmail' => \App\Domains\Content\Models\CompanySetting::get('primary_email', 'info@highblossom.co.bw'),
-                'companyAddress' => \App\Domains\Content\Models\CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
-                'primaryPhone' => \App\Domains\Content\Models\CompanySetting::get('primary_phone', '+267 123 4567'),
-                'whatsappDefault' => \App\Domains\Content\Models\CompanySetting::get('whatsapp_number_default', '+267 123 4567'),
-                'whatsappAdditional' => \App\Domains\Content\Models\CompanySetting::get('whatsapp_additional_numbers', []),
-                'workingHours' => \App\Domains\Content\Models\CompanySetting::get('working_hours', [
+                'companyName' => \App\Models\CompanySetting::get('company_name', 'Highblossom PTY LTD'),
+                'logoText' => \App\Models\CompanySetting::get('logo_text', 'Highblossom'),
+                'primaryEmail' => \App\Models\CompanySetting::get('primary_email', 'info@highblossom.co.bw'),
+                'companyAddress' => \App\Models\CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
+                'primaryPhone' => \App\Models\CompanySetting::get('primary_phone', '+267 123 4567'),
+                'whatsappDefault' => \App\Models\CompanySetting::get('whatsapp_number_default', '+267 123 4567'),
+                'whatsappAdditional' => \App\Models\CompanySetting::get('whatsapp_additional_numbers', []),
+                'workingHours' => \App\Models\CompanySetting::get('working_hours', [
                     'monday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
                     'tuesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
                     'wednesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
@@ -57,19 +57,19 @@ class AppServiceProvider extends ServiceProvider
                     'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => false],
                     'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
                 ]),
-                'timeFormatDisplay' => \App\Domains\Content\Models\CompanySetting::get('time_format_display', '12'),
-                'businessLogo' => \App\Domains\Content\Models\CompanySetting::get('business_logo', ''),
-                'favicon' => \App\Domains\Content\Models\CompanySetting::get('favicon', ''),
-                'googleMapsApiKey' => \App\Domains\Content\Models\CompanySetting::get('google_maps_api_key', ''),
-                'mapDirectionsLink' => \App\Domains\Content\Models\CompanySetting::get('map_directions_link', 'https://maps.app.goo.gl/KJip8MytQrPrULg58'),
-                'timezone' => \App\Domains\Content\Models\CompanySetting::get('timezone', 'Africa/Gaborone'),
-                'locale' => \App\Domains\Content\Models\CompanySetting::get('locale', 'en_GB'),
-                'dateFormat' => \App\Domains\Content\Models\CompanySetting::get('date_format', 'd/M/Y'),
-                'timeFormat' => \App\Domains\Content\Models\CompanySetting::get('time_format', 'H:i'),
-                'currencySymbol' => \App\Domains\Content\Models\CompanySetting::get('currency_symbol', 'P'),
-                'facebookUrl' => \App\Domains\Content\Models\CompanySetting::get('facebook_url', ''),
-                'instagramUrl' => \App\Domains\Content\Models\CompanySetting::get('instagram_url', ''),
-                'linkedinUrl' => \App\Domains\Content\Models\CompanySetting::get('linkedin_url', ''),
+                'timeFormatDisplay' => \App\Models\CompanySetting::get('time_format_display', '12'),
+                'businessLogo' => \App\Models\CompanySetting::get('business_logo', ''),
+                'favicon' => \App\Models\CompanySetting::get('favicon', ''),
+                'googleMapsApiKey' => \App\Models\CompanySetting::get('google_maps_api_key', ''),
+                'mapDirectionsLink' => \App\Models\CompanySetting::get('map_directions_link', 'https://maps.app.goo.gl/KJip8MytQrPrULg58'),
+                'timezone' => \App\Models\CompanySetting::get('timezone', 'Africa/Gaborone'),
+                'locale' => \App\Models\CompanySetting::get('locale', 'en_GB'),
+                'dateFormat' => \App\Models\CompanySetting::get('date_format', 'd/M/Y'),
+                'timeFormat' => \App\Models\CompanySetting::get('time_format', 'H:i'),
+                'currencySymbol' => \App\Models\CompanySetting::get('currency_symbol', 'P'),
+                'facebookUrl' => \App\Models\CompanySetting::get('facebook_url', ''),
+                'instagramUrl' => \App\Models\CompanySetting::get('instagram_url', ''),
+                'linkedinUrl' => \App\Models\CompanySetting::get('linkedin_url', ''),
             ];
 
             foreach ($settings as $key => $value) {

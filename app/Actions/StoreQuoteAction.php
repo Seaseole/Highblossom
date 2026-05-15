@@ -3,8 +3,8 @@
 namespace App\Actions;
 
 use App\Actions\SendQuoteEmailNotificationsAction;
-use App\Domains\Bookings\Models\Quote;
-use App\Domains\Content\Models\CompanySetting;
+use App\Models\Quote;
+use App\Models\CompanySetting;
 use App\Mail\QuoteSubmittedMail;
 use App\Services\IdempotencyService;
 use Illuminate\Http\Request;

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Domains\Content\Models\ContactMessage;
+use App\Models\ContactMessage;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 

@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title }} - {{ App\Domains\Content\Models\CompanySetting::get('company_name', 'Highblossom') }}</title>
+    <title>{{ $title }} - {{ App\Models\CompanySetting::get('company_name', 'Highblossom') }}</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     
     <!-- Fonts -->
@@ -36,8 +36,8 @@
     <div class="py-8 px-6">
         <a href="/" class="inline-flex items-center gap-3 group">
             @php
-                $businessLogo = App\Domains\Content\Models\CompanySetting::get('business_logo', '');
-                $logoText = App\Domains\Content\Models\CompanySetting::get('logo_text', 'Highblossom');
+                $businessLogo = App\Models\CompanySetting::get('business_logo', '');
+                $logoText = App\Models\CompanySetting::get('logo_text', 'Highblossom');
             @endphp
             
             @if($businessLogo)
@@ -62,7 +62,7 @@
     <!-- Footer -->
     <footer class="py-6 px-6 text-center">
         <p class="text-[#A1A1AA] text-sm">
-            &copy; {{ date('Y') }} {{ App\Domains\Content\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
+            &copy; {{ date('Y') }} {{ App\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
         </p>
     </footer>
 </body>

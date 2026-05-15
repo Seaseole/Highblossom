@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domains\Bookings\Models\Quote;
+use App\Models\Quote;
 
 final class QuoteService
 {
