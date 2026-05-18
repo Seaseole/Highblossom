@@ -189,45 +189,19 @@
     };
 @endphp
 
-<div x-data="{ 
-        mobileMenuOpen: false,
-        theme: '{{ $theme }}',
-        applyTheme(val) {
-            console.log('Applying theme:', val);
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = val === 'dark' || (val === 'auto' && prefersDark);
-            
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            
-            localStorage.setItem('theme', val);
-        },
-        toggleThemeLocally() {
-            this.theme = this.theme === 'auto' ? 'light' : (this.theme === 'light' ? 'dark' : 'auto');
-            this.$wire.toggleTheme(this.theme);
-        }
-    }" 
-    
-    x-init="
-        $watch('theme', val => applyTheme(val));
-        
-        // Ensure initial state matches Livewire
-        applyTheme(theme);
-    "
-    class="relative">
+<div class="relative">
     
     {{-- Mobile Menu Button --}}
-    <button @click="mobileMenuOpen = true" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-admin-surface border border-admin-border rounded-xl shadow-2xl hover:bg-admin-surface-alt transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]">
+    <button wire:click="openMobileMenu" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-admin-surface border border-admin-border rounded-xl shadow-2xl hover:bg-admin-surface-alt transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]">
         <svg class="w-6 h-6 text-admin-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
 
     {{-- Mobile Overlay --}}
-    <div x-show="mobileMenuOpen" x-transition:enter="transition-opacity duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="mobileMenuOpen = false" class="lg:hidden fixed inset-0 bg-admin-bg/95 backdrop-blur-3xl z-40" style="display: none;"></div>
+    @if($mobileMenuOpen)
+    <div wire:click="closeMobileMenu" class="lg:hidden fixed inset-0 bg-admin-bg/95 backdrop-blur-3xl z-40"></div>
+    @endif
 
     {{-- Desktop Sidebar --}}
     <flux:sidebar collapsible class="hidden lg:flex">
@@ -301,28 +275,31 @@
         <div class="flex flex-col gap-2 p-4 border-t border-admin-border">
             {{-- Theme Toggle --}}
             <button 
-                wire:ignore
-                @click="toggleThemeLocally()"
+                wire:click="toggleTheme"
                 class="flex items-center gap-3 w-full py-2 px-4 rounded-xl bg-admin-surface-alt border border-admin-border hover:bg-admin-surface hover:border-[#DC2626]/30 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
             >
-                <div x-show="theme === 'light'" {!! $theme !== 'light' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @if($theme === 'light')
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Light Mode</span>
                 </div>
-                <div x-show="theme === 'dark'" {!! $theme !== 'dark' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @elseif($theme === 'dark')
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Dark Mode</span>
                 </div>
-                <div x-show="theme === 'auto'" {!! $theme !== 'auto' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @else
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span class="text-admin-text-muted whitespace-nowrap">Auto Mode</span>
                 </div>
+                @endif
             </button>
 
             {{-- Profile Dropdown --}}
@@ -367,16 +344,9 @@
     </flux:sidebar>
 
     {{-- Mobile Sidebar --}}
+    @if($mobileMenuOpen)
     <aside 
-        x-show="mobileMenuOpen" 
-        x-transition:enter="transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" 
-        x-transition:enter-start="-translate-x-full" 
-        x-transition:enter-end="translate-x-0" 
-        x-transition:leave="transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]" 
-        x-transition:leave-start="translate-x-0" 
-        x-transition:leave-end="-translate-x-full" 
         class="lg:hidden fixed inset-y-0 left-0 w-72 bg-admin-surface border-r border-admin-border shadow-2xl flex flex-col z-50 backdrop-blur-3xl"
-        style="display: none;"
     >
         {{-- Logo --}}
         <div class="p-4 border-b border-admin-border flex items-center justify-between">
@@ -388,7 +358,7 @@
                 </div>
                 <h1 class="text-xl font-bold text-admin-text">Highblossom Admin</h1>
             </div>
-            <button @click="mobileMenuOpen = false" class="p-2 rounded-lg hover:bg-admin-surface-alt transition-colors">
+            <button wire:click="closeMobileMenu" class="p-2 rounded-lg hover:bg-admin-surface-alt transition-colors">
                 <svg class="w-5 h-5 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -415,7 +385,7 @@
                         @php
                             $isActive = $isRouteActive($route);
                         @endphp
-                        <a href="{{ $getRouteName($route) }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $isActive ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
+                        <a href="{{ $getRouteName($route) }}" wire:click="closeMobileMenu" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $isActive ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getMobileIcon($route) }}" />
                             </svg>
@@ -430,7 +400,7 @@
                 <div class="px-4 mb-2">
                     <span class="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Account</span>
                 </div>
-                <a href="{{ route('admin.profile.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $currentRoute === 'admin.profile.index' ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
+                <a href="{{ route('admin.profile.index') }}" wire:click="closeMobileMenu" class="flex items-center gap-3 py-2.5 px-4 rounded-xl {{ $currentRoute === 'admin.profile.index' ? 'bg-admin-accent/10 border border-admin-accent/30 text-admin-accent font-semibold' : 'text-admin-text-muted hover:bg-admin-surface-alt hover:text-admin-text' }} transition-all duration-200">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -443,28 +413,31 @@
         <div class="flex flex-col gap-2 p-4 border-t border-admin-border">
             {{-- Theme Toggle --}}
             <button 
-               wire:ignore
-               @click="toggleThemeLocally()"
+               wire:click="toggleTheme"
                 class="flex items-center gap-3 w-full py-2.5 px-4 rounded-xl bg-admin-surface-alt border border-admin-border hover:bg-admin-surface hover:border-[#DC2626]/30 transition-all duration-200 active:scale-[0.98]"
             >
-                <div x-show="theme === 'light'" {!! $theme !== 'light' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @if($theme === 'light')
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Light Mode</span>
                 </div>
-                <div x-show="theme === 'dark'" {!! $theme !== 'dark' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @elseif($theme === 'dark')
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                     <span class="text-admin-text whitespace-nowrap">Dark Mode</span>
                 </div>
-                <div x-show="theme === 'auto'" {!! $theme !== 'auto' ? 'style="display: none;"' : '' !!} class="flex items-center gap-3 w-full">
+                @else
+                <div class="flex items-center gap-3 w-full">
                     <svg class="w-5 h-5 text-admin-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span class="text-admin-text-muted whitespace-nowrap">Auto Mode</span>
                 </div>
+                @endif
             </button>
 
             {{-- Profile --}}
@@ -490,4 +463,5 @@
             </form>
         </div>
     </aside>
+    @endif
 </div>

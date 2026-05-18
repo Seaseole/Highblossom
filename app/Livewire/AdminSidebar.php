@@ -51,6 +51,17 @@ final class AdminSidebar extends Component
         }
 
         $this->dispatch('theme-updated', theme: $this->theme);
+
+        $this->js(<<<JS
+            const theme = '{$this->theme}';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (theme === 'auto' && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('theme', theme);
+        JS);
     }
 
     public function isEffectiveDark(): bool

@@ -108,19 +108,14 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+    }
 
-        Password::defaults(function () {
-            $rule = Password::min(8);
-
-            return app()->isProduction()
-                ? $rule->min(12)
-                    ->max(64)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-                    // ->uncompromised()
-                : $rule;
-        });
+    public static function passwordRules(): Password
+    {
+        return Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols();
     }
 }

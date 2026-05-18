@@ -1,12 +1,12 @@
-@import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
+@import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-    --font-headline: 'Cabinet Grotesk', sans-serif;
-    --font-body: 'Geist', sans-serif;
+    --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-headline: "Cabinet Grotesk", sans-serif;
+    --font-body: "Geist", sans-serif;
 
     --color-primary: #73081d;
     --color-on-primary: #ffffff;
@@ -60,7 +60,7 @@
     --color-admin-border-subtle: #f3f4f6;
     --color-admin-input-bg: #ffffff;
     --color-admin-input-border: #d1d5db;
-    --color-admin-accent: #DC2626;
+    --color-admin-accent: #dc2626;
 
     /* Custom Design Engineering Easings */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -80,16 +80,16 @@
         --color-surface-container-high: #303030;
 
         /* Admin Semantic Colors - Dark */
-        --color-admin-bg: #0A0A0F;
-        --color-admin-text: #FAFAFA;
-        --color-admin-text-muted: #A1A1AA;
-        --color-admin-surface: #16161D;
+        --color-admin-bg: #0a0a0f;
+        --color-admin-text: #fafafa;
+        --color-admin-text-muted: #a1a1aa;
+        --color-admin-surface: #16161d;
         --color-admin-surface-alt: #1a1a24;
         --color-admin-border: rgba(255, 255, 255, 0.1);
         --color-admin-border-subtle: rgba(255, 255, 255, 0.05);
         --color-admin-input-bg: rgba(255, 255, 255, 0.05);
         --color-admin-input-border: rgba(255, 255, 255, 0.1);
-        --color-admin-accent: #DC2626;
+        --color-admin-accent: #dc2626;
     }
 }
 
@@ -99,7 +99,7 @@
 
 /* Premium Button System */
 .btn-premium {
-    background: #DC2626;
+    background: #dc2626;
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
@@ -121,7 +121,7 @@
 }
 
 .btn-premium:hover {
-    background: #B91C1C;
+    background: #b91c1c;
     box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
     transform: translateY(-2px);
 }
@@ -132,7 +132,7 @@
 
 /* Medium Premium Button for Mobile */
 .btn-premium-md {
-    background: #DC2626;
+    background: #dc2626;
     color: white;
     padding: 0.625rem 1.25rem;
     border-radius: 9999px;
@@ -155,7 +155,7 @@
 }
 
 .btn-premium-md:hover {
-    background: #B91C1C;
+    background: #b91c1c;
     box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
     transform: translateY(-2px);
 }
@@ -180,10 +180,10 @@
     cursor: pointer;
 }
 
-.btn-ghost:not(.dark) {
+/* .btn-ghost:not(.dark) {
     color: #374151;
     border-color: rgba(17, 24, 39, 0.15);
-}
+} */
 
 @media (min-width: 768px) {
     .btn-ghost {
@@ -197,31 +197,24 @@
     transform: translateY(-2px);
 }
 
-.btn-ghost:hover:not(.dark) {
-    background: rgba(17, 24, 39, 0.05);
-    border-color: rgba(17, 24, 39, 0.25);
-}
-
 /* Medium Ghost Button for Mobile */
 .btn-ghost-md {
-    background: transparent;
-    color: var(--color-admin-text);
-    border: 1px solid var(--color-admin-border);
-    padding: 0.625rem 1.25rem;
-    border-radius: 9999px;
-    font-weight: 600;
-    font-size: 0.8125rem;
+    color: rgb(250, 250, 250);
     letter-spacing: 0.01em;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
     cursor: pointer;
-}
-
-.btn-ghost-md:not(.dark) {
-    color: #374151;
-    border-color: rgba(17, 24, 39, 0.15);
+    align-items: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    display: inline-flex;
+    background: 0px 0px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.1);
+    border-image: initial;
+    border-radius: 9999px;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 768px) {
@@ -250,7 +243,9 @@
 .mobile-menu {
     transform: translateX(100%);
     visibility: hidden;
-    transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1), visibility 400ms ease;
+    transition:
+        transform 400ms cubic-bezier(0.32, 0.72, 0, 1),
+        visibility 400ms ease;
 }
 
 .mobile-menu.open {
@@ -263,7 +258,7 @@
     visibility: hidden;
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
-    transition: 
+    transition:
         opacity 300ms ease,
         visibility 300ms ease,
         backdrop-filter 300ms ease;
@@ -288,17 +283,17 @@
 }
 
 .nav-link.active {
-    color: #DC2626;
+    color: #dc2626;
 }
 
 .nav-link.active::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -4px;
     left: 0;
     right: 0;
     height: 2px;
-    background: #DC2626;
+    background: #dc2626;
     border-radius: 1px;
 }
 
@@ -331,7 +326,7 @@
 }
 
 .form-input-premium option:checked {
-    background: #DC2626;
+    background: #dc2626;
     color: white;
 }
 
@@ -371,7 +366,7 @@
 
 .admin-nav-item.active {
     background: rgba(220, 38, 38, 0.2);
-    color: #DC2626;
+    color: #dc2626;
     box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
 }
 
@@ -447,7 +442,7 @@
 }
 
 .admin-form-input option:checked {
-    background: #DC2626;
+    background: #dc2626;
     color: white;
 }
 
@@ -463,7 +458,7 @@
 
 .admin-badge-active {
     background: rgba(34, 197, 94, 0.2);
-    color: #22C55E;
+    color: #22c55e;
     border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
@@ -475,25 +470,25 @@
 
 .admin-badge-warning {
     background: rgba(245, 158, 11, 0.15);
-    color: #F59E0B;
+    color: #f59e0b;
     border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .admin-badge-info {
     background: rgba(59, 130, 246, 0.15);
-    color: #60A5FA;
+    color: #60a5fa;
     border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .admin-badge-danger {
     background: rgba(220, 38, 38, 0.15);
-    color: #DC2626;
+    color: #dc2626;
     border: 1px solid rgba(220, 38, 38, 0.25);
 }
 
 .admin-badge-muted {
     background: rgba(113, 113, 122, 0.15);
-    color: #A1A1AA;
+    color: #a1a1aa;
     border: 1px solid rgba(113, 113, 122, 0.25);
 }
 
@@ -519,7 +514,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-admin-text);
-    font-family: 'Cabinet Grotesk', sans-serif;
+    font-family: "Cabinet Grotesk", sans-serif;
 }
 
 /* Admin Action Buttons */
@@ -535,20 +530,20 @@
 }
 
 .admin-action-btn-primary {
-    background: #DC2626;
+    background: #dc2626;
     color: white;
     border: none;
 }
 
 .admin-action-btn-primary:hover {
-    background: #B91C1C;
+    background: #b91c1c;
     box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
     transform: translateY(-2px);
 }
 
 .admin-action-btn-secondary {
     background: transparent;
-    color: #DC2626;
+    color: #dc2626;
     border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
@@ -574,7 +569,12 @@
 
 .prose {
     /* Headings */
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         color: white;
         font-weight: 700;
         margin-top: 1.5em;
@@ -582,12 +582,24 @@
         line-height: 1.2;
     }
 
-    h1 { font-size: 2.25rem; }
-    h2 { font-size: 1.875rem; }
-    h3 { font-size: 1.5rem; }
-    h4 { font-size: 1.25rem; }
-    h5 { font-size: 1.125rem; }
-    h6 { font-size: 1rem; }
+    h1 {
+        font-size: 2.25rem;
+    }
+    h2 {
+        font-size: 1.875rem;
+    }
+    h3 {
+        font-size: 1.5rem;
+    }
+    h4 {
+        font-size: 1.25rem;
+    }
+    h5 {
+        font-size: 1.125rem;
+    }
+    h6 {
+        font-size: 1rem;
+    }
 
     /* Paragraphs */
     p {
@@ -598,18 +610,19 @@
 
     /* Links */
     a {
-        color: #DC2626;
+        color: #dc2626;
         text-decoration: underline;
         text-decoration-thickness: 1px;
         text-underline-offset: 2px;
     }
 
     a:hover {
-        color: #B91C1C;
+        color: #b91c1c;
     }
 
     /* Lists */
-    ul, ol {
+    ul,
+    ol {
         margin-left: 1.5em;
         margin-bottom: 1em;
     }
@@ -629,7 +642,7 @@
 
     /* Blockquotes */
     blockquote {
-        border-left: 4px solid #DC2626;
+        border-left: 4px solid #dc2626;
         padding-left: 1em;
         margin: 1.5em 0;
         font-style: italic;
@@ -639,7 +652,7 @@
     /* Code */
     code {
         background: rgba(220, 38, 38, 0.1);
-        color: #DC2626;
+        color: #dc2626;
         padding: 0.2em 0.4em;
         border-radius: 4px;
         font-size: 0.875em;
@@ -667,7 +680,8 @@
         margin: 1.5em 0;
     }
 
-    th, td {
+    th,
+    td {
         border: 1px solid var(--color-admin-border);
         padding: 0.75em;
         text-align: left;
@@ -692,13 +706,15 @@
     }
 
     /* Strong/Bold */
-    strong, b {
+    strong,
+    b {
         color: rgb(220, 220, 220);
         font-weight: 700;
     }
 
     /* Emphasis/Italic */
-    em, i {
+    em,
+    i {
         font-style: italic;
     }
 
@@ -758,7 +774,7 @@
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke: #71717A;
+    stroke: #71717a;
     stroke-width: 1.5;
     transform: translate3d(0, 0, 0);
     transition: all 0.2s ease;
@@ -780,16 +796,16 @@
 }
 
 .ui-checkbox-wrapper:hover .ui-checkbox-check svg {
-    stroke: #DC2626;
+    stroke: #dc2626;
 }
 
 .group:hover .ui-checkbox-check svg {
-    stroke: #DC2626;
+    stroke: #dc2626;
 }
 
 /* Checked state */
 .ui-checkbox-input:checked + .ui-checkbox-check svg {
-    stroke: #DC2626;
+    stroke: #dc2626;
 }
 
 .ui-checkbox-input:checked + .ui-checkbox-check svg path {
@@ -817,14 +833,14 @@
 
 /* Focus state for accessibility */
 .ui-checkbox-input:focus-visible + .ui-checkbox-check {
-    outline: 2px solid #DC2626;
+    outline: 2px solid #dc2626;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
 /* Label styling */
 .ui-checkbox-label {
-    color: #A1A1AA;
+    color: #a1a1aa;
     font-size: 0.875rem;
     transition: color 0.2s ease;
     user-select: none;
@@ -832,7 +848,7 @@
 
 .ui-checkbox-wrapper:hover .ui-checkbox-label,
 .group:hover .ui-checkbox-label {
-    color: #FAFAFA;
+    color: #fafafa;
 }
 
 /* Disabled state */
@@ -842,24 +858,40 @@
 }
 
 .ui-checkbox-input:disabled + .ui-checkbox-check svg {
-    stroke: #4B5563;
+    stroke: #4b5563;
 }
 
 .ui-checkbox-input:disabled ~ .ui-checkbox-label {
     opacity: 0.5;
     cursor: not-allowed;
 }
-    .feather-overlay {
-        background:
-            radial-gradient(circle at 14% 15%, rgba(255, 255, 255, 0.16), transparent 18%),
-            radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.1), transparent 14%),
-            radial-gradient(circle at 50% 100%, rgba(10, 10, 15, 0.72), transparent 42%),
-            radial-gradient(circle at 50% 50%, rgba(10, 10, 15, 0.16), transparent 45%);
-        mix-blend-mode: soft-light;
-        opacity: 0.92;
-        pointer-events: none;
-    }
+.feather-overlay {
+    background:
+        radial-gradient(
+            circle at 14% 15%,
+            rgba(255, 255, 255, 0.16),
+            transparent 18%
+        ),
+        radial-gradient(
+            circle at 86% 14%,
+            rgba(255, 255, 255, 0.1),
+            transparent 14%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(10, 10, 15, 0.72),
+            transparent 42%
+        ),
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(10, 10, 15, 0.16),
+            transparent 45%
+        );
+    mix-blend-mode: soft-light;
+    opacity: 0.92;
+    pointer-events: none;
+}
 
-    .js-scroll-with-image [data-scroll-text] {
-        will-change: transform;
-    }
+.js-scroll-with-image [data-scroll-text] {
+    will-change: transform;
+}

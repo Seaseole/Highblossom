@@ -144,7 +144,9 @@
                                 value="{{ old('email') }}"
                             >
                         </div>
-
+                                 @php
+                                    $pwRules = App\Providers\AppServiceProvider::passwordRules()
+                                @endphp
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="animate-fade-in-up delay-400">
                                 <div class="flex items-center justify-between mb-2 px-1 h-5">
@@ -162,27 +164,30 @@
                                     name="password"
                                     class="w-full px-5 py-3.5 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
                                     placeholder="••••••••"
-                                    passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                                    passwordrules="{{ $pwRules->toPasswordRulesString() }}"
+                                    autocomplete="new-password"
                                     required
                                 >
                             </div>
-
+                            <div id="pw-hint" class="text-[10px] text-[#A1A1AA] italic hidden"></div>
                             <div class="animate-fade-in-up delay-400">
                                 <div class="flex items-center mb-2 px-1 h-5">
                                     <label for="password_confirmation" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">Confirm</label>
                                 </div>
+                                
                                 <input
                                     id="password_confirmation"
                                     type="password"
                                     name="password_confirmation"
                                     class="w-full px-5 py-3.5 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
                                     placeholder="••••••••"
-                                    passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                                    passwordrules="{{ $pwRules->toPasswordRulesString() }}"
+                                    autocomplete="new-password"
                                     required
                                 >
                             </div>
                         </div>
-
+                        {{ dump($pwRules->toPasswordRulesString()) }}
                         <div class="animate-fade-in-up delay-500 px-1">
                             <div class="light-checkbox">
                                 <x-ui.checkbox name="terms" id="terms" required>
@@ -223,3 +228,20 @@
     </div>
 </body>
 </html>
+<script>
+  document.getElementById('password','password_confirmation').addEventListener('input', function () {
+    const val = this.value;
+    const hint = document.getElementById('pw-hint');
+    const errors = [];
+
+    if (val.length < 8)             errors.push('At least 8 characters');
+    if (val.length > 12)            errors.push('At most 12 characters');
+    if (!/[a-z]/.test(val))         errors.push('One lowercase letter');
+    if (!/[A-Z]/.test(val))         errors.push('One uppercase letter');
+    if (!/[0-9]/.test(val))         errors.push('One number');
+    if (!/[^a-zA-Z0-9]/.test(val))  errors.push('One symbol');
+
+    hint.textContent = errors.join(' · ');
+    hint.classList.toggle('hidden', errors.length === 0);
+});
+</script>
