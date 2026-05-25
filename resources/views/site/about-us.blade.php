@@ -36,9 +36,51 @@
                         @endif
                     @endif
 
-                    <div class="prose prose-invert prose-lg max-w-none text-[#A1A1AA] leading-relaxed">
+                    <div class="prose prose-invert prose-lg max-w-none text-[#A1A1AA] leading-relaxed mb-20">
                         {!! $content->body !!}
                     </div>
+
+                    {{-- Team Section --}}
+                    @if($staff->isNotEmpty())
+                        <div class="mt-20 border-t border-white/5 pt-20">
+                            <div class="mb-12">
+                                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-[0.2em] mb-3">Excellence in Motion</div>
+                                <h2 class="text-3xl md:text-5xl font-bold text-[#FAFAFA] font-headline tracking-tight">Our Master Craftsmen</h2>
+                                <p class="text-[#A1A1AA] mt-4 max-w-xl">Meet the dedicated professionals who bring precision and care to every installation, ensuring your vehicle remains safe and beautiful.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                                @foreach($staff as $member)
+                                    <div class="group relative bg-[#121218] rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 hover:border-[#DC2626]/20">
+                                        {{-- Image Container --}}
+                                        <div class="relative h-[400px] overflow-hidden">
+                                            <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" 
+                                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                                        </div>
+
+                                        {{-- Content --}}
+                                        <div class="p-8 relative">
+                                            <div class="mb-4">
+                                                <h3 class="text-2xl font-bold text-[#FAFAFA] font-headline group-hover:text-[#DC2626] transition-colors">{{ $member->name }}</h3>
+                                                <div class="text-[#DC2626] text-xs font-bold uppercase tracking-widest mt-1">{{ $member->role }}</div>
+                                            </div>
+                                            
+                                            @if($member->bio)
+                                                <p class="text-[#A1A1AA] text-sm leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                                                    {{ $member->bio }}
+                                                </p>
+                                            @endif
+
+                                            <div class="mt-6 flex gap-3">
+                                                <div class="w-8 h-[2px] bg-[#DC2626] rounded-full group-hover:w-12 transition-all"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Right Column (30%) - Vision & Mission -->

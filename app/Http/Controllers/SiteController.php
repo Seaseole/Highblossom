@@ -41,7 +41,9 @@ class SiteController extends Controller
             abort(404);
         }
 
-        return view('site.about-us', compact('content'));
+        $staff = \App\Models\Staff::where('is_active', true)->orderBy('order')->get();
+
+        return view('site.about-us', compact('content', 'staff'));
     }
 
     public function services(Request $request)
