@@ -355,10 +355,32 @@
                                     <input type="text" name="announcement_text" value="{{ old('announcement_text', $settings['announcement_text']) }}" class="w-full admin-form-input" placeholder="e.g. Office Closed on Monday for public holiday! | Promo: Get 10% off on all glass orders this week!">
                                     <p class="text-[10px] text-admin-text-muted">The text that will scroll on the public announcement bar. Keep it concise, or use '|' to separate multiple announcements.</p>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-2" x-data="{
+                                    announcementLink: '{{ old('announcement_link', $settings['announcement_link']) }}',
+                                    isCustom: {{ filter_var(old('announcement_link', $settings['announcement_link']), FILTER_VALIDATE_URL) ? 'true' : 'false' }}
+                                }">
                                     <label class="text-sm font-medium text-admin-text">Announcement Link / Promo URL (Optional)</label>
-                                    <input type="url" name="announcement_link" value="{{ old('announcement_link', $settings['announcement_link']) }}" class="w-full admin-form-input" placeholder="e.g. {{ route('contact') }} or custom URL">
-                                    <p class="text-[10px] text-admin-text-muted">Clicking the announcement bar will navigate visitors to this URL (e.g. a contact, quote, or blog page).</p>
+                                    <div class="flex gap-2">
+                                        <select x-model="isCustom" class="w-1/3 admin-form-input">
+                                            <option :value="false">Select Page</option>
+                                            <option :value="true">Custom URL</option>
+                                        </select>
+                                        
+                                        <!-- Page Dropdown -->
+                                        <select name="announcement_link" x-show="!isCustom" x-model="announcementLink" class="w-full admin-form-input">
+                                            <option value="{{ route('home') }}">Home</option>
+                                            <option value="{{ route('about-us') }}">About Us</option>
+                                            <option value="{{ route('services') }}">Services</option>
+                                            <option value="{{ route('gallery') }}">Gallery</option>
+                                            <option value="{{ route('quote') }}">Quote Form</option>
+                                            <option value="{{ route('contact') }}">Contact Us</option>
+                                            <option value="{{ route('blog') }}">Blog</option>
+                                        </select>
+                                        
+                                        <!-- Custom URL Input -->
+                                        <input type="url" name="announcement_link" x-show="isCustom" x-model="announcementLink" class="w-full admin-form-input" placeholder="e.g. https://example.com">
+                                    </div>
+                                    <p class="text-[10px] text-admin-text-muted">Clicking the announcement bar will navigate visitors to this URL.</p>
                                 </div>
                             </div>
                         </div>
