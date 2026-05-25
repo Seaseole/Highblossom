@@ -1,44 +1,53 @@
 <x-layouts::admin title="Create Partner">
-    <div class="p-8 max-w-xl mx-auto">
-        <div class="mb-8 text-center">
-            <h1 class="text-4xl font-bold tracking-tight text-admin-text font-headline mb-3">Add Partner</h1>
-            <p class="text-admin-text-muted">Introduce a new trusted partner to the ecosystem.</p>
+    <div class="p-8 max-w-xl mx-auto space-y-10">
+        {{-- Header Section --}}
+        <div class="space-y-1">
+            <div class="flex items-center gap-3 text-admin-text-muted mb-2">
+                <a href="{{ route('admin.partners.index') }}" class="hover:text-admin-accent transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                </a>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] font-body">Partners / New</span>
+            </div>
+            <h1 class="text-4xl font-bold tracking-tight text-admin-text font-headline leading-none">Add Partner</h1>
+            <p class="text-admin-text-muted text-sm">Introduce a new trusted partner to the ecosystem.</p>
         </div>
 
         <form action="{{ route('admin.partners.store') }}" method="POST" enctype="multipart/form-data" 
-              class="bg-admin-surface border border-admin-border-subtle rounded-3xl p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] space-y-8">
+              class="admin-glass-card p-8 rounded-3xl shadow-2xl shadow-black/20 space-y-8"
+              x-data="{ imagePreview: null, handleFileSelect(event) { const file = event.target.files[0]; if (file) this.imagePreview = URL.createObjectURL(file); } }">
             @csrf
 
             <div class="space-y-6">
-                <div>
-                    <label class="block text-[10px] font-bold text-admin-text-muted uppercase tracking-widest mb-2">Partner Name</label>
-                    <input type="text" name="name" 
-                           class="w-full bg-admin-surface-alt border-admin-border-subtle rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all" 
-                           placeholder="Enter partner name" required>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body ml-1">Partner Name</label>
+                    <input type="text" name="name" class="admin-form-input text-lg font-bold" placeholder="e.g. Global Construct Corp" required>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-admin-text-muted uppercase tracking-widest mb-2">Logo Upload</label>
-                    <div class="group relative">
-                        <input type="file" name="logo" 
-                               class="w-full file:mr-4 file:py-2 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DC2626] file:text-white hover:file:bg-[#B91C1C] transition-all bg-admin-surface-alt border border-admin-border-subtle rounded-xl p-2 cursor-pointer" required>
+                <div class="space-y-4">
+                    <label class="text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body ml-1">Partner Logo</label>
+                    <div class="relative admin-form-input min-h-[160px] flex flex-col items-center justify-center border-dashed border-2 border-admin-border-subtle cursor-pointer hover:border-admin-accent/50 transition-colors" @click="$refs.logoInput.click()">
+                        <template x-if="!imagePreview">
+                            <div class="flex flex-col items-center text-center p-6">
+                                <svg class="w-8 h-8 text-admin-text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <span class="text-[10px] font-bold uppercase tracking-widest">Select Image</span>
+                            </div>
+                        </template>
+                        <template x-if="imagePreview">
+                            <img :src="imagePreview" class="max-h-[140px] object-contain">
+                        </template>
+                        <input type="file" name="logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect" required>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-admin-text-muted uppercase tracking-widest mb-2">Website URL</label>
-                    <input type="url" name="website_url" 
-                           class="w-full bg-admin-surface-alt border-admin-border-subtle rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all" 
-                           placeholder="https://">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body ml-1">Website URL</label>
+                    <input type="url" name="website_url" class="admin-form-input text-sm" placeholder="https://">
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-admin-border-subtle flex justify-end gap-3">
+            <div class="pt-6 border-t border-admin-border-subtle flex justify-end gap-3">
                 <a href="{{ route('admin.partners.index') }}" class="px-6 py-3 rounded-xl font-bold text-admin-text-muted hover:text-admin-text transition-colors">Cancel</a>
-                <button type="submit" 
-                        class="px-8 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">
-                    Save Partner
-                </button>
+                <button type="submit" class="px-8 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-lg shadow-[#DC2626]/20 transition-all active:scale-[0.98]">Save Partner</button>
             </div>
         </form>
     </div>

@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\SmtpSettingController;
 use App\Http\Controllers\Admin\StaffAbsenceController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
@@ -123,6 +124,13 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('tags/{tag}/edit', [TagController::class, 'edit'])->middleware('can:update blog')->name('tags.edit');
     Route::put('tags/{tag}', [TagController::class, 'update'])->middleware('can:update blog')->name('tags.update');
     Route::delete('tags/{tag}', [TagController::class, 'destroy'])->middleware('can:delete blog')->name('tags.destroy');
+
+    Route::get('staff', [StaffController::class, 'index'])->middleware('can:manage settings')->name('staff.index');
+    Route::get('staff/create', [StaffController::class, 'create'])->middleware('can:manage settings')->name('staff.create');
+    Route::post('staff', [StaffController::class, 'store'])->middleware('can:manage settings')->name('staff.store');
+    Route::get('staff/{staff}/edit', [StaffController::class, 'edit'])->middleware('can:manage settings')->name('staff.edit');
+    Route::put('staff/{staff}', [StaffController::class, 'update'])->middleware('can:manage settings')->name('staff.update');
+    Route::delete('staff/{staff}', [StaffController::class, 'destroy'])->middleware('can:manage settings')->name('staff.destroy');
 
     Route::get('partners', [PartnerController::class, 'index'])->middleware('can:manage settings')->name('partners.index');
     Route::get('partners/create', [PartnerController::class, 'create'])->middleware('can:manage settings')->name('partners.create');
