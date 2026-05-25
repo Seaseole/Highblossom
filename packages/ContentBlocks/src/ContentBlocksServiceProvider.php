@@ -2,33 +2,33 @@
 
 namespace Highblossom\ContentBlocks;
 
+use Highblossom\ContentBlocks\Blocks\AccordionBlock;
+use Highblossom\ContentBlocks\Blocks\AlertBlock;
+use Highblossom\ContentBlocks\Blocks\CarouselBlock;
+use Highblossom\ContentBlocks\Blocks\CodeBlock;
+use Highblossom\ContentBlocks\Blocks\ColumnsBlock;
+use Highblossom\ContentBlocks\Blocks\CountdownBlock;
+use Highblossom\ContentBlocks\Blocks\CTABlock;
+use Highblossom\ContentBlocks\Blocks\DividerBlock;
+use Highblossom\ContentBlocks\Blocks\EmbedBlock;
+use Highblossom\ContentBlocks\Blocks\FormBlock;
+use Highblossom\ContentBlocks\Blocks\GalleryBlock;
+use Highblossom\ContentBlocks\Blocks\HeadingBlock;
+use Highblossom\ContentBlocks\Blocks\HtmlBlock;
+use Highblossom\ContentBlocks\Blocks\ImageBlock;
+use Highblossom\ContentBlocks\Blocks\ListBlock;
+use Highblossom\ContentBlocks\Blocks\ParagraphBlock;
+use Highblossom\ContentBlocks\Blocks\PollBlock;
+use Highblossom\ContentBlocks\Blocks\QuoteBlock;
+use Highblossom\ContentBlocks\Blocks\TableBlock;
+use Highblossom\ContentBlocks\Blocks\TabsBlock;
+use Highblossom\ContentBlocks\Blocks\VideoBlock;
 use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Highblossom\ContentBlocks\Services\BlockRenderer;
 use Highblossom\ContentBlocks\Services\HtmlSanitizer;
 use Highblossom\ContentBlocks\Services\OEmbedResolver;
-use Highblossom\ContentBlocks\Blocks\ParagraphBlock;
-use Highblossom\ContentBlocks\Blocks\ImageBlock;
-use Highblossom\ContentBlocks\Blocks\HeadingBlock;
-use Highblossom\ContentBlocks\Blocks\QuoteBlock;
-use Highblossom\ContentBlocks\Blocks\CodeBlock;
-use Highblossom\ContentBlocks\Blocks\ListBlock;
-use Highblossom\ContentBlocks\Blocks\CTABlock;
-use Highblossom\ContentBlocks\Blocks\VideoBlock;
-use Highblossom\ContentBlocks\Blocks\DividerBlock;
-use Highblossom\ContentBlocks\Blocks\AlertBlock;
-use Highblossom\ContentBlocks\Blocks\HtmlBlock;
-use Highblossom\ContentBlocks\Blocks\EmbedBlock;
-use Highblossom\ContentBlocks\Blocks\AccordionBlock;
-use Highblossom\ContentBlocks\Blocks\TableBlock;
-use Highblossom\ContentBlocks\Blocks\GalleryBlock;
-use Highblossom\ContentBlocks\Blocks\FormBlock;
-use Highblossom\ContentBlocks\Blocks\ColumnsBlock;
-use Highblossom\ContentBlocks\Blocks\TabsBlock;
-use Highblossom\ContentBlocks\Blocks\CarouselBlock;
-use Highblossom\ContentBlocks\Blocks\CountdownBlock;
-use Highblossom\ContentBlocks\Blocks\PollBlock;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\ServiceProvider;
 
 class ContentBlocksServiceProvider extends ServiceProvider
 {
@@ -50,7 +50,7 @@ class ContentBlocksServiceProvider extends ServiceProvider
     {
         // Register BlockRegistry as singleton
         $this->app->singleton(BlockRegistry::class, function ($app) {
-            return new BlockRegistry();
+            return new BlockRegistry;
         });
 
         // Register BlockRenderer as singleton
@@ -171,19 +171,18 @@ class ContentBlocksServiceProvider extends ServiceProvider
             $parts = array_map('trim', explode(',', $inner, 2));
             $type = $parts[0] ?? '';
             $attributes = $parts[1] ?? '[]';
+
             return "<?php echo app('Highblossom\\ContentBlocks\\Services\\BlockRegistry')->render({$type}, {$attributes}); ?>";
         });
     }
 
     /**
      * Get the directive name for a block type.
-     *
-     * @param string $type
-     * @return string
      */
     protected function getDirectiveName(string $type): string
     {
         $prefix = config('content-blocks.directive_prefix', 'cb');
-        return $prefix . ucfirst($type);
+
+        return $prefix.ucfirst($type);
     }
 }

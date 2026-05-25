@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Contracts\HasSeoInterface;
 use App\Models\Concerns\HasSeo;
+use App\Models\Contracts\HasSeoInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
-#[Fillable(['title','slug','excerpt','content','featured_image_path', 'featured_image_url','status','published_at','user_id', 'seo_metadata'])]
+#[Fillable(['title', 'slug', 'excerpt', 'content', 'featured_image_path', 'featured_image_url', 'status', 'published_at', 'user_id', 'seo_metadata'])]
 final class Post extends Model implements HasSeoInterface
 {
     use HasSeo;
@@ -58,7 +59,7 @@ final class Post extends Model implements HasSeoInterface
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function scopePublished($query)
@@ -84,7 +85,7 @@ final class Post extends Model implements HasSeoInterface
         }
 
         if ($this->featured_image_path) {
-            return asset('storage/' . $this->featured_image_path);
+            return asset('storage/'.$this->featured_image_path);
         }
 
         return null;
@@ -94,15 +95,15 @@ final class Post extends Model implements HasSeoInterface
     {
         parent::boot();
 
-        static::creating(function ($post) {
+        self::creating(function ($post) {
             if (empty($post->slug)) {
-                $post->slug = \Illuminate\Support\Str::slug($post->title);
+                $post->slug = Str::slug($post->title);
             }
         });
 
-        static::updating(function ($post) {
+        self::updating(function ($post) {
             if ($post->isDirty('title') && empty($post->slug)) {
-                $post->slug = \Illuminate\Support\Str::slug($post->title);
+                $post->slug = Str::slug($post->title);
             }
         });
     }

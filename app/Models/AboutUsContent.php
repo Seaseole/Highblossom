@@ -24,6 +24,6 @@ final class AboutUsContent extends Model
 
     public static function active(): ?self
     {
-        return static::where('is_active', true)->first();
+        return self::where('is_active', true)->first();
     }
 }

@@ -82,27 +82,23 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-24 bg-gradient-to-b from-[#0A0A0F] to-[#121218] border-t border-white/5">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Performance Metrics</div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-card rounded-2xl p-8 text-center">
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-2">Vehicles Serviced</div>
-                    <div class="text-5xl font-bold text-[#FAFAFA] font-headline">2,500<span class="text-[#DC2626]">+</span></div>
+    @if (!empty($galleryMetrics))
+        <section class="py-24 bg-gradient-to-b from-[#0A0A0F] to-[#121218] border-t border-white/5">
+            <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">Performance Metrics</div>
                 </div>
-                <div class="glass-card rounded-2xl p-8 text-center">
-                    <div class="text-[#A1A1AA] text-sm font-semibold uppercase tracking-wider mb-2">Heavy Machines</div>
-                    <div class="text-5xl font-bold text-[#FAFAFA] font-headline">150<span class="text-[#DC2626]">+</span></div>
-                </div>
-                <div class="glass-card rounded-2xl p-8 text-center">
-                    <div class="text-[#A1A1AA] text-sm font-semibold uppercase tracking-wider mb-2">Fleet Accounts</div>
-                    <div class="text-5xl font-bold text-[#FAFAFA] font-headline">45<span class="text-[#DC2626]">+</span></div>
+                <div class="grid grid-cols-1 {{ count($galleryMetrics) >= 3 ? 'md:grid-cols-3' : (count($galleryMetrics) === 2 ? 'md:grid-cols-2' : '') }} gap-6">
+                    @foreach ($galleryMetrics as $metric)
+                        <div class="glass-card rounded-2xl p-8 text-center">
+                            <div class="text-[#A1A1AA] text-sm font-semibold uppercase tracking-wider mb-2">{{ $metric['label'] }}</div>
+                            <div class="text-5xl font-bold text-[#FAFAFA] font-headline">{{ $metric['value'] }}<span class="text-[#DC2626]">{{ $metric['suffix'] }}</span></div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <!-- Lightbox -->
     <div id="lightbox" class="fixed inset-0 z-50 hidden">

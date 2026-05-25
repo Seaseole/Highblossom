@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\GlassType;
-use App\Models\ServiceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -70,7 +68,7 @@ class Quote extends Model
      */
     public function glassSubCategory()
     {
-        return $this->belongsTo(\App\Models\GlassSubCategory::class);
+        return $this->belongsTo(GlassSubCategory::class);
     }
 
     /**
@@ -81,7 +79,7 @@ class Quote extends Model
         if ($this->glassSubCategory) {
             return $this->glassSubCategory->full_name;
         }
-        
+
         return $this->glassType ? $this->glassType->name : 'Unknown';
     }
 }

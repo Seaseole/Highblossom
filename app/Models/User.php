@@ -21,7 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements HasPasskeys
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable, InteractsWithPasskeys;
+    use HasFactory, HasRoles, InteractsWithPasskeys, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -40,16 +40,16 @@ class User extends Authenticatable implements HasPasskeys
      * Get the user's initials
      */
     public function initials(): string
-{
-    return Str::of($this->name)
-        ->trim()
-        ->replaceMatches('/\s+/', ' ')
-        ->explode(' ')
-        ->filter(fn ($word) => Str::length(trim($word)) > 0)
-        ->take(2)
-        ->map(fn ($word) => mb_strtoupper(Str::substr(trim($word), 0, 1)))
-        ->implode('');
-}
+    {
+        return Str::of($this->name)
+            ->trim()
+            ->replaceMatches('/\s+/', ' ')
+            ->explode(' ')
+            ->filter(fn ($word) => Str::length(trim($word)) > 0)
+            ->take(2)
+            ->map(fn ($word) => mb_strtoupper(Str::substr(trim($word), 0, 1)))
+            ->implode('');
+    }
 
     /**
      * Get the user's blog posts

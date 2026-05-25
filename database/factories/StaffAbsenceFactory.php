@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\StaffAbsence;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class StaffAbsenceFactory extends Factory
 {
     protected $model = StaffAbsence::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,7 +21,7 @@ class StaffAbsenceFactory extends Factory
     public function definition(): array
     {
         return [
-            'staff_id' => \App\Models\User::factory(),
+            'staff_id' => User::factory(),
             'starts_at' => now()->addDay()->setHour(8)->setMinute(0),
             'ends_at' => now()->addDay()->setHour(17)->setMinute(0),
             'reason' => $this->faker->sentence(),

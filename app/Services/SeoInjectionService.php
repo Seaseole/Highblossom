@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Contracts\HasSeoInterface;
-use App\Services\DataTransferObjects\SeoMetadata;
 use App\Models\SeoStaticRoute;
-use Illuminate\Support\Facades\View;
+use App\Services\DataTransferObjects\SeoMetadata;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 final class SeoInjectionService
 {
@@ -75,7 +75,7 @@ final class SeoInjectionService
 
         // Build full title with site name
         if ($enhanced['meta_title'] !== null && $enhanced['meta_title'] !== '') {
-            $enhanced['meta_title'] = $enhanced['meta_title'] . ' ' . $this->separator . ' ' . $this->siteName;
+            $enhanced['meta_title'] = $enhanced['meta_title'].' '.$this->separator.' '.$this->siteName;
         } else {
             $enhanced['meta_title'] = $this->siteName;
         }

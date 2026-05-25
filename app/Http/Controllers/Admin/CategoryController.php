@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Category;
 use App\Http\Requests\Admin\CategoryRequest;
+use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\View\View;
 

@@ -59,7 +59,7 @@ final class ServiceService
     {
         $imagePath = $request->input('image_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             return $imagePath;
         }
 

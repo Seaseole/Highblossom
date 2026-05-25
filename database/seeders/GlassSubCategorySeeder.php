@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\GlassType;
 use App\Models\GlassSubCategory;
+use App\Models\GlassType;
 use Illuminate\Database\Seeder;
 
 class GlassSubCategorySeeder extends Seeder
@@ -85,7 +85,7 @@ class GlassSubCategorySeeder extends Seeder
         ];
 
         foreach ($subCategories as $glassTypeSlug => $categories) {
-            if (!$glassTypes->has($glassTypeSlug)) {
+            if (! $glassTypes->has($glassTypeSlug)) {
                 continue;
             }
 

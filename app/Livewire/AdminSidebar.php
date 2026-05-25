@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Component;
 
 final class AdminSidebar extends Component
@@ -85,7 +86,7 @@ final class AdminSidebar extends Component
         $this->mobileMenuOpen = true;
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.admin-sidebar');
     }

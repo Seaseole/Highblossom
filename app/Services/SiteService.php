@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\CompanySetting;
 use App\Models\GalleryImage;
-use App\Models\GalleryCategory;
 use App\Models\Service;
 use App\Models\Testimonial;
 
@@ -33,16 +32,16 @@ final readonly class SiteService
     public function getContactData(): array
     {
         $workingHours = CompanySetting::get('working_hours', []);
-        
+
         return [
             'primaryPhone' => CompanySetting::get('primary_phone', '+267 123 4567'),
             'primaryEmail' => CompanySetting::get('primary_email', 'sales@highblossom.net'),
             'workingHours' => $workingHours,
             'timeFormatDisplay' => CompanySetting::get('time_format_display', '12'),
-            'hasWorkingHours' => is_array($workingHours) && !empty($workingHours) && isset($workingHours['monday']),
+            'hasWorkingHours' => is_array($workingHours) && ! empty($workingHours) && isset($workingHours['monday']),
             'dayOrder' => [
-                'monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 
-                'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'
+                'monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday',
+                'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday',
             ],
             'companyName' => CompanySetting::get('company_name', 'Highblossom PTY LTD'),
             'companyAddress' => CompanySetting::get('address', 'Plot 123, Broadhurst, Gaborone, Botswana'),

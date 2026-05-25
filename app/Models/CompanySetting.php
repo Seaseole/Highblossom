@@ -23,7 +23,7 @@ final class CompanySetting extends Model
     {
         return Cache::rememberForever("company_setting.{$key}", function () use ($key, $default) {
             $setting = static::where('key', $key)->first();
-            
+
             if ($setting === null) {
                 return $default;
             }
@@ -39,7 +39,7 @@ final class CompanySetting extends Model
 
     public static function set(string $key, mixed $value, string $type = 'text'): void
     {
-        static::updateOrCreate(
+        self::updateOrCreate(
             ['key' => $key],
             [
                 'value' => is_array($value) ? json_encode($value) : $value,

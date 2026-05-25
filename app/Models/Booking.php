@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class Booking extends Model
 {
@@ -13,11 +14,12 @@ final class Booking extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\BookingFactory::new();
+        return BookingFactory::new();
     }
+
     protected $fillable = [
-        'user_id', 'client_name', 'client_email', 'client_phone', 
-        'vehicle_details', 'status', 'total_price'
+        'user_id', 'client_name', 'client_email', 'client_phone',
+        'vehicle_details', 'status', 'total_price',
     ];
 
     protected $casts = [
@@ -26,7 +28,7 @@ final class Booking extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function inspection(): HasOne

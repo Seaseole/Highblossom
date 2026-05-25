@@ -2,16 +2,15 @@
 
 namespace App\Livewire;
 
-
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Contracts\View\View;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 final class BlogPosts extends Component
 {
@@ -19,15 +18,15 @@ final class BlogPosts extends Component
 
     #[Url]
     public string $search = '';
-    
+
     #[Url]
     public ?string $categorySlug = null;
-    
+
     #[Url]
     public ?string $tagSlug = null;
-    
+
     public int $perPage = 9;
-    
+
     public function mount(string $search = '', ?string $categorySlug = null, ?string $tagSlug = null): void
     {
         $this->search = $search;
@@ -44,10 +43,10 @@ final class BlogPosts extends Component
     public function posts()
     {
         $query = Post::published()->with('categories', 'tags', 'author');
-        
+
         if ($this->search) {
-            $query->where('title', 'like', '%' . $this->search . '%')
-                ->orWhere('excerpt', 'like', '%' . $this->search . '%');
+            $query->where('title', 'like', '%'.$this->search.'%')
+                ->orWhere('excerpt', 'like', '%'.$this->search.'%');
         }
 
         if ($this->categorySlug) {
@@ -61,14 +60,14 @@ final class BlogPosts extends Component
         }
 
         // Debug: Log the SQL query
-        \Log::debug('BlogPosts SQL: ' . $query->latest()->toSql());
-        \Log::debug('BlogPosts bindings: ' . json_encode($query->latest()->getBindings()));
+        \Log::debug('BlogPosts SQL: '.$query->latest()->toSql());
+        \Log::debug('BlogPosts bindings: '.json_encode($query->latest()->getBindings()));
 
         $result = $query->latest()->paginate($this->perPage);
-        
+
         // Debug: Log the count
-        \Log::debug('BlogPosts count: ' . $result->total());
-        
+        \Log::debug('BlogPosts count: '.$result->total());
+
         return $result;
     }
 

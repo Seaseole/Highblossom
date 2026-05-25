@@ -3,7 +3,7 @@
 return [
     'title' => 'Dashboard',
     'welcome' => 'Welcome back. Here\'s what\'s happening today.',
-    
+
     // Stats cards
     'bookings' => 'Bookings',
     'total_bookings' => 'Total bookings',
@@ -12,13 +12,13 @@ return [
     'users' => 'Users',
     'active_users' => 'Active users',
     'quotes' => 'Quotes',
-    
+
     // Quote statuses
     'pending' => 'Pending',
     'contacted' => 'Contacted',
     'completed' => 'Completed',
     'cancelled' => 'Cancelled',
-    
+
     // Recent activity
     'recent_activity' => 'Recent Activity',
     'view_all' => 'View All',

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\GlassType;
 use App\Http\Requests\Admin\GlassTypeRequest;
+use App\Models\GlassType;
 use App\Services\GlassSubCategoryService;
 use App\Services\GlassTypeService;
 use Illuminate\Http\JsonResponse;

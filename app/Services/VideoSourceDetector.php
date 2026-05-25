@@ -214,6 +214,7 @@ final class VideoSourceDetector
             if ($resolved !== null) {
                 $this->resolvedFacebookUrls[$src] = $resolved;
             }
+
             return true;
         }
 
@@ -223,6 +224,7 @@ final class VideoSourceDetector
             if ($resolved !== null) {
                 $this->resolvedFacebookUrls[$src] = $resolved;
             }
+
             return true;
         }
 
@@ -303,7 +305,7 @@ final class VideoSourceDetector
                     // Handle relative URLs
                     if (str_starts_with($location, '/')) {
                         $parsedUrl = parse_url($url);
-                        $location = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $location;
+                        $location = $parsedUrl['scheme'].'://'.$parsedUrl['host'].$location;
                     }
 
                     Log::debug('Facebook share URL resolved', [

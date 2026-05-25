@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Content;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +13,7 @@ final class RelocateTempUploadsAction
     /**
      * Relocate uploaded files from temp storage to permanent storage.
      *
-     * @param array $contentBlocks The content blocks array containing file URLs
+     * @param  array  $contentBlocks  The content blocks array containing file URLs
      * @return array Updated content blocks with relocated file URLs
      */
     public function execute(array $contentBlocks): array
@@ -26,15 +27,13 @@ final class RelocateTempUploadsAction
     /**
      * Recursively process all blocks and relocate files.
      *
-     * @param array $blocks
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @return array
+     * @param  Filesystem  $tempDisk
+     * @param  Filesystem  $publicDisk
      */
     private function processBlocks(array $blocks, $tempDisk, $publicDisk): array
     {
         foreach ($blocks as &$block) {
-            if (!is_array($block) || !isset($block['type'])) {
+            if (! is_array($block) || ! isset($block['type'])) {
                 continue;
             }
 
@@ -61,6 +60,7 @@ final class RelocateTempUploadsAction
     private function processImageBlock(array $attributes, $tempDisk, $publicDisk): array
     {
         $attributes['src'] = $this->relocateFile($attributes['src'] ?? '', $tempDisk, $publicDisk, 'uploads/images');
+
         return $attributes;
     }
 
@@ -71,7 +71,7 @@ final class RelocateTempUploadsAction
     {
         $attributes['src'] = $this->relocateFile($attributes['src'] ?? '', $tempDisk, $publicDisk, 'uploads/videos');
         $attributes['poster'] = $this->relocateFile($attributes['poster'] ?? '', $tempDisk, $publicDisk, 'uploads/videos/thumbnails');
-        
+
         return $attributes;
     }
 
@@ -107,7 +107,8 @@ final class RelocateTempUploadsAction
 
             if ($newPath) {
                 Log::info("Relocated file from temp: {$tempPath} -> {$newPath}");
-                return asset('storage/' . $newPath);
+
+                return asset('storage/'.$newPath);
             }
         }
 
@@ -117,10 +118,8 @@ final class RelocateTempUploadsAction
     /**
      * Process columns block with nested blocks.
      *
-     * @param array $attributes
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @return array
+     * @param  Filesystem  $tempDisk
+     * @param  Filesystem  $publicDisk
      */
     private function processColumnsBlock(array $attributes, $tempDisk, $publicDisk): array
     {
@@ -138,10 +137,6 @@ final class RelocateTempUploadsAction
 
     /**
      * Extract storage path from URL if it matches the given disk.
-     *
-     * @param string $url
-     * @param string $diskName
-     * @return string|null
      */
     private function extractStoragePath(string $url, string $diskName): ?string
     {
@@ -155,13 +150,14 @@ final class RelocateTempUploadsAction
             // Check if URL contains temp path patterns
             if (str_contains($url, '/temp/')) {
                 $parts = explode('/temp/', $url);
+
                 return $parts[1] ?? null;
             }
 
             // Check if it's a direct temp path
             $tempPrefix = storage_path('app/temp');
             if (str_starts_with($url, $tempPrefix)) {
-                return str_replace($tempPrefix . '/', '', $url);
+                return str_replace($tempPrefix.'/', '', $url);
             }
         }
 
@@ -171,10 +167,8 @@ final class RelocateTempUploadsAction
     /**
      * Move a file from temp to permanent storage.
      *
-     * @param string $tempPath
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $tempDisk
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $publicDisk
-     * @param string $destinationDir
+     * @param  Filesystem  $tempDisk
+     * @param  Filesystem  $publicDisk
      * @return string|null The new relative path or null on failure
      */
     private function moveToPermanent(
@@ -185,11 +179,11 @@ final class RelocateTempUploadsAction
     ): ?string {
         try {
             $filename = basename($tempPath);
-            $newPath = $destinationDir . '/' . $filename;
+            $newPath = $destinationDir.'/'.$filename;
 
             // Ensure destination directory exists
             $dirPath = dirname($publicDisk->path($newPath));
-            if (!is_dir($dirPath)) {
+            if (! is_dir($dirPath)) {
                 mkdir($dirPath, 0755, true);
             }
 

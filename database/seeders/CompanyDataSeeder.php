@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CompanySetting;
-use App\Models\GalleryImage;
 use App\Models\Service;
 use App\Models\Testimonial;
 use Illuminate\Database\Seeder;

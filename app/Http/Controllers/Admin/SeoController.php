@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\SeoStaticRoute;
 use App\Http\Requests\Admin\SeoStaticRouteRequest;
+use App\Models\SeoStaticRoute;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;

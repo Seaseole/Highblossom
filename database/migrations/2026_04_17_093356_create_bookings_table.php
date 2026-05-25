@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending')->index();
             $table->decimal('total_price', 10, 2)->default(0.00);
             $table->timestamps();
-            
+
             $table->index(['status', 'created_at']); // Optimization for dashboard lists
         });
     }

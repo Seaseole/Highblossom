@@ -28,6 +28,7 @@ final class RoleController
     public function create(): View
     {
         $permissions = Permission::all();
+
         return view('admin.roles.create', compact('permissions'));
     }
 
@@ -44,6 +45,7 @@ final class RoleController
     {
         $permissions = Permission::all();
         $role->load('permissions');
+
         return view('admin.roles.edit', compact('role', 'permissions'));
     }
 
@@ -60,7 +62,7 @@ final class RoleController
     {
         $success = $this->roleService->delete($role);
 
-        if (!$success) {
+        if (! $success) {
             return redirect()
                 ->route('admin.roles.index')
                 ->with('error', __('messages.unauthorized'));

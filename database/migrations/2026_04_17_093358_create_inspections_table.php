@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('location');
             $table->enum('type', ['mobile', 'workshop'])->index();
             $table->timestamps();
-            
+
             $table->index(['scheduled_at', 'ended_at', 'staff_id']); // Critical for availability checks
         });
     }

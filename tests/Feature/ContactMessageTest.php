@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Events\ContactMessageReceived;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;

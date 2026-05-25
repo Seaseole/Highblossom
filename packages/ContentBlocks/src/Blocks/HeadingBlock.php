@@ -39,9 +39,6 @@ class HeadingBlock extends AbstractBlock
 
     /**
      * Normalize the level to integer (1-6).
-     *
-     * @param string|int $level
-     * @return int
      */
     protected function normalizeLevel(string|int $level): int
     {
@@ -69,9 +66,6 @@ class HeadingBlock extends AbstractBlock
 
     /**
      * Get the data to pass to the view.
-     *
-     * @param array $attributes
-     * @return array
      */
     protected function getViewData(array $attributes): array
     {

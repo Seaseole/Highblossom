@@ -59,6 +59,9 @@
                 <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
                     Notifications
                 </button>
+                <button type="button" @click="tab = 'announcements'" :class="tab === 'announcements' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
+                    Announcements
+                </button>
             </div>
 
             <!-- Tab Contents -->
@@ -322,6 +325,41 @@
                                 <label class="text-sm font-medium text-admin-text">Quote Notification Emails</label>
                                 <textarea name="quote_notification_emails" rows="3" class="w-full admin-form-input">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
                                 <p class="text-[10px] text-admin-text-muted">Enter comma-separated email addresses for staff who should receive quote notifications. If empty, notifications will be sent to the primary email.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Announcements Tab -->
+                    <div x-show="tab === 'announcements'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="space-y-6" style="display: none;">
+                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
+                            <h3 class="text-lg font-bold text-admin-text">Announcement Text Ticker</h3>
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-admin-text">Status</label>
+                                    <div class="flex items-center gap-2">
+                                        <x-ui.checkbox
+                                            name="announcement_active"
+                                            value="1"
+                                            :checked="$settings['announcement_active'] ?? false"
+                                            label="Enable Announcement Ticker Bar"
+                                        />
+                                    </div>
+                                    <p class="text-[10px] text-admin-text-muted">When checked, the ticker will show up at the very top of all public pages.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-admin-text">Announcement Text</label>
+                                    <input type="text" name="announcement_text" value="{{ old('announcement_text', $settings['announcement_text']) }}" class="w-full admin-form-input" placeholder="e.g. Office Closed on Monday for public holiday! | Promo: Get 10% off on all glass orders this week!">
+                                    <p class="text-[10px] text-admin-text-muted">The text that will scroll on the public announcement bar. Keep it concise, or use '|' to separate multiple announcements.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-admin-text">Announcement Link / Promo URL (Optional)</label>
+                                    <input type="url" name="announcement_link" value="{{ old('announcement_link', $settings['announcement_link']) }}" class="w-full admin-form-input" placeholder="e.g. {{ route('contact') }} or custom URL">
+                                    <p class="text-[10px] text-admin-text-muted">Clicking the announcement bar will navigate visitors to this URL (e.g. a contact, quote, or blog page).</p>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -41,7 +41,7 @@ class IdempotencyService
      */
     public function generateKey(array $data, string $salt = ''): string
     {
-        $hashInput = json_encode($data) . $salt . microtime(true);
+        $hashInput = json_encode($data).$salt.microtime(true);
 
         return hash('sha256', $hashInput);
     }
@@ -66,6 +66,6 @@ class IdempotencyService
 
     private function getCacheKey(string $token): string
     {
-        return self::CACHE_PREFIX . $token;
+        return self::CACHE_PREFIX.$token;
     }
 }

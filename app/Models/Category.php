@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 final class Category extends Model
 {
@@ -24,15 +25,15 @@ final class Category extends Model
     {
         parent::boot();
 
-        static::creating(function ($category) {
+        self::creating(function ($category) {
             if (empty($category->slug)) {
-                $category->slug = \Illuminate\Support\Str::slug($category->name);
+                $category->slug = Str::slug($category->name);
             }
         });
 
-        static::updating(function ($category) {
+        self::updating(function ($category) {
             if ($category->isDirty('name') && empty($category->slug)) {
-                $category->slug = \Illuminate\Support\Str::slug($category->name);
+                $category->slug = Str::slug($category->name);
             }
         });
     }

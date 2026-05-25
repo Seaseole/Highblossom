@@ -10,14 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-#[Singleton(name:"about_us")]
+#[Singleton(name: 'about_us')]
 final class AboutUsService
 {
     public function getOrCreateContent(): AboutUsContent
     {
         $content = AboutUsContent::first();
 
-        if (!$content) {
+        if (! $content) {
             $content = AboutUsContent::create([
                 'title' => 'About Highblossom',
                 'subtitle' => '',
@@ -63,11 +63,12 @@ final class AboutUsService
 
         $imagePath = $request->input('hero_image_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             if ($content->hero_image && $content->hero_image !== $imagePath) {
                 Storage::disk('public')->delete($content->hero_image);
             }
             $content->hero_image = $imagePath;
+
             return;
         }
 
@@ -81,7 +82,7 @@ final class AboutUsService
                     $content->hero_image = $file->store('about-us', 'public');
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to store hero image: ' . $e->getMessage());
+                Log::error('Failed to store hero image: '.$e->getMessage());
             }
         }
     }

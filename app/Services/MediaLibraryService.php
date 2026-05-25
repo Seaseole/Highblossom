@@ -14,7 +14,7 @@ final class MediaLibraryService
     {
         $imagePath = $this->resolveImagePath($request);
 
-        if (!$imagePath) {
+        if (! $imagePath) {
             throw new \RuntimeException('No image provided.');
         }
 
@@ -31,7 +31,7 @@ final class MediaLibraryService
     {
         $imagePath = $request->input('image_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             return $imagePath;
         }
 
@@ -42,7 +42,7 @@ final class MediaLibraryService
                     return $file->store('gallery', 'public');
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to store media library image: ' . $e->getMessage());
+                Log::error('Failed to store media library image: '.$e->getMessage());
                 throw new \RuntimeException('Failed to upload image.');
             }
         }

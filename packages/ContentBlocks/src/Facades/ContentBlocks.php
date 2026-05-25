@@ -2,6 +2,7 @@
 
 namespace Highblossom\ContentBlocks\Facades;
 
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -12,17 +13,15 @@ use Illuminate\Support\Facades\Facade;
  * @method static array types()
  * @method static string render(string $type, array $attributes = [])
  *
- * @see \Highblossom\ContentBlocks\Services\BlockRegistry
+ * @see BlockRegistry
  */
 class ContentBlocks extends Facade
 {
     /**
      * Get the registered name of the component.
-     *
-     * @return string
      */
     protected static function getFacadeAccessor(): string
     {
-        return \Highblossom\ContentBlocks\Services\BlockRegistry::class;
+        return BlockRegistry::class;
     }
 }

@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Inspection;
 use App\Models\StaffAbsence;
-use App\Services\AvailabilityService;
 use App\Models\User;
+use App\Services\AvailabilityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Date;
 use Tests\TestCase;
@@ -19,14 +19,14 @@ class AvailabilityServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new AvailabilityService();
+        $this->service = new AvailabilityService;
     }
 
     public function test_it_allows_available_slots(): void
     {
         // Monday at 10 AM (assuming Monday isn't a weekend)
         $monday = Date::parse('next Monday 10:00:00');
-        
+
         $this->assertTrue($this->service->isSlotAvailable($monday));
     }
 
@@ -57,7 +57,7 @@ class AvailabilityServiceTest extends TestCase
     public function test_it_disallows_slots_with_existing_inspections(): void
     {
         $monday = Date::parse('next Monday 10:00:00');
-        
+
         Inspection::factory()->create([
             'scheduled_at' => $monday,
         ]);

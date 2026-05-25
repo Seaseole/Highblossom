@@ -124,6 +124,8 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::delete('tags/{tag}', [TagController::class, 'destroy'])->middleware('can:delete blog')->name('tags.destroy');
 
     Route::get('gallery', [GalleryController::class, 'index'])->middleware('can:view gallery')->name('gallery.index');
+    Route::get('gallery/settings', [CompanySettingController::class, 'gallerySettings'])->middleware('can:manage gallery')->name('gallery-settings.index');
+    Route::put('gallery/settings', [CompanySettingController::class, 'updateGallerySettings'])->middleware('can:manage gallery')->name('gallery-settings.update');
     Route::get('gallery/create', [GalleryController::class, 'create'])->middleware('can:manage gallery')->name('gallery.create');
     Route::post('gallery', [GalleryController::class, 'store'])->middleware('can:manage gallery')->name('gallery.store');
     Route::get('gallery/{item}/edit', [GalleryController::class, 'edit'])->middleware('can:manage gallery')->name('gallery.edit');

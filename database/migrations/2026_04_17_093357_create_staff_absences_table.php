@@ -18,7 +18,7 @@ return new class extends Migration
             $table->dateTime('ends_at')->index();
             $table->string('reason')->nullable();
             $table->timestamps();
-            
+
             $table->index(['starts_at', 'ends_at', 'staff_id']); // Critical for availability checks
         });
     }

@@ -20,7 +20,7 @@ class QuoteFormRequest extends FormRequest
             'vehicle_type' => 'required|string|in:sedan,suv,truck,van,heavy,fleet,other',
             'make_model' => 'nullable|string|max:255',
             'reg_number' => 'nullable|string|max:20',
-            'year' => 'nullable|integer|min:1980|max:' . (date('Y') + 1),
+            'year' => 'nullable|integer|min:1980|max:'.(date('Y') + 1),
             'glass_type_id' => 'required|exists:glass_types,id',
             'glass_sub_category_id' => 'nullable|exists:glass_sub_categories,id',
             'service_type_id' => 'required|exists:service_types,id',

@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Models\CompanySetting;
 use App\Events\ContactMessageReceived;
+use App\Models\CompanySetting;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;

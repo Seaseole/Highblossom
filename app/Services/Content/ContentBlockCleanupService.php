@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Content;
 
 use App\Models\Post;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Finder\Finder;
@@ -14,7 +15,6 @@ final class ContentBlockCleanupService
     /**
      * Clean up orphaned temp upload files not referenced in any post content.
      *
-     * @param int $retentionHours
      * @return array{deleted: int, skipped: int}
      */
     public function cleanupOrphanedUploads(int $retentionHours = 24): array
@@ -33,7 +33,7 @@ final class ContentBlockCleanupService
 
         foreach ($files as $file) {
             $result = $this->shouldDeleteOrphanedFile($file, $cutoffDate, $disk, $referencedPaths);
-            
+
             if ($result === 'deleted') {
                 $deletedCount++;
             } else {
@@ -47,13 +47,13 @@ final class ContentBlockCleanupService
     /**
      * Determine if an orphaned file should be deleted and delete it if so.
      */
-    private function shouldDeleteOrphanedFile(string $file, \Illuminate\Support\Carbon $cutoffDate, $disk, array $referencedPaths): string
+    private function shouldDeleteOrphanedFile(string $file, Carbon $cutoffDate, $disk, array $referencedPaths): string
     {
-        $filePath = 'temp://' . $file;
+        $filePath = 'temp://'.$file;
         $fileTimestamp = $disk->lastModified($file);
         $fileDate = \DateTime::createFromFormat('U', (string) $fileTimestamp);
 
-        if (!$fileDate || $fileDate >= $cutoffDate) {
+        if (! $fileDate || $fileDate >= $cutoffDate) {
             return 'skipped';
         }
 
@@ -66,10 +66,12 @@ final class ContentBlockCleanupService
                 'file' => $file,
                 'age_hours' => $cutoffDate->diffInHours($fileDate),
             ]);
+
             return 'deleted';
         }
 
         Log::warning('ContentBlocks: Failed to delete orphaned temp file', ['file' => $file]);
+
         return 'error';
     }
 
@@ -82,11 +84,11 @@ final class ContentBlockCleanupService
         $tempDisk = Storage::disk('temp');
         $tempPath = $tempDisk->path('');
 
-        if (!is_dir($tempPath)) {
+        if (! is_dir($tempPath)) {
             return ['deleted' => 0, 'errors' => 0];
         }
 
-        $finder = new Finder();
+        $finder = new Finder;
         $finder->files()
             ->in($tempPath)
             ->date("< {$cutoffTime->format('Y-m-d H:i:s')}");
@@ -113,6 +115,7 @@ final class ContentBlockCleanupService
         try {
             if ($tempDisk->delete($relativePath)) {
                 Log::info("Cleaned up old temp file: {$relativePath}");
+
                 return true;
             }
             Log::warning("Failed to delete temp file: {$relativePath}");
@@ -136,7 +139,7 @@ final class ContentBlockCleanupService
 
         Post::whereNotNull('content')->chunk(100, function ($posts) use (&$paths) {
             foreach ($posts as $post) {
-                if (!is_array($post->content)) {
+                if (! is_array($post->content)) {
                     continue;
                 }
 
@@ -154,7 +157,7 @@ final class ContentBlockCleanupService
      */
     private function extractFilePathsFromBlock(array $block, array &$paths): void
     {
-        if (!isset($block['attributes']) || !is_array($block['attributes'])) {
+        if (! isset($block['attributes']) || ! is_array($block['attributes'])) {
             return;
         }
 
@@ -170,6 +173,7 @@ final class ContentBlockCleanupService
     {
         if (is_string($value)) {
             $this->collectTempPath($value, $paths);
+
             return;
         }
 

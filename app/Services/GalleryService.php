@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\GalleryImage;
-use App\Services\MediaRegistryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,7 +39,7 @@ final class GalleryService
         $oldPath = $item->image_path;
         $newPath = $this->resolveImagePath($request, $oldPath);
 
-        if (!isset($newPath)) {
+        if (! isset($newPath)) {
             unset($data['image_path']);
         } else {
             $data['image_path'] = $newPath;
@@ -70,7 +69,7 @@ final class GalleryService
     public function delete(GalleryImage $item): void
     {
         $this->mediaRegistryService->unregister($item, 'image_path');
-        
+
         // This is a naive cleanup. Real logic should use MediaRegistryService::forceDelete if usage count is 0
         if ($item->image_path) {
             Storage::disk('public')->delete($item->image_path);
@@ -86,12 +85,13 @@ final class GalleryService
             if ($existingPath && $existingPath !== 'placeholder.gif') {
                 Storage::disk('public')->delete($existingPath);
             }
+
             return null;
         }
 
         $imagePath = $request->input('image_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             return $imagePath;
         }
 

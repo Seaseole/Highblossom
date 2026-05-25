@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\SeoStaticRoute;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Collection;
 
 final class SeoService
 {
@@ -79,7 +78,7 @@ final class SeoService
         ];
 
         foreach ($fields as $field) {
-            $result[$field] = !empty($data[$field]) ? $data[$field] : null;
+            $result[$field] = ! empty($data[$field]) ? $data[$field] : null;
         }
 
         return $result;

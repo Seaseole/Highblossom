@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\StaffAbsenceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,8 +13,9 @@ final class StaffAbsence extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\StaffAbsenceFactory::new();
+        return StaffAbsenceFactory::new();
     }
+
     protected $fillable = ['staff_id', 'starts_at', 'ends_at', 'reason'];
 
     protected $casts = [
@@ -23,6 +25,6 @@ final class StaffAbsence extends Model
 
     public function staff(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'staff_id');
+        return $this->belongsTo(User::class, 'staff_id');
     }
 }

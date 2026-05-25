@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Tag;
 use App\Http\Requests\Admin\TagRequest;
+use App\Models\Tag;
 use App\Services\TagService;
 use Illuminate\View\View;
 

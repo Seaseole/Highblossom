@@ -64,7 +64,7 @@ final class EnvEditor
             $lines[] = "{$key}={$newValue}";
         }
 
-        file_put_contents($this->path, implode(PHP_EOL, $lines) . PHP_EOL);
+        file_put_contents($this->path, implode(PHP_EOL, $lines).PHP_EOL);
     }
 
     public function all(): array
@@ -105,7 +105,7 @@ final class EnvEditor
     private function quote(string $value): string
     {
         if (str_contains($value, ' ') || str_contains($value, '#')) {
-            return '"' . $value . '"';
+            return '"'.$value.'"';
         }
 
         return $value;

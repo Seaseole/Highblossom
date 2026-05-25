@@ -1,5 +1,88 @@
-<nav class="fixed top-0 w-full z-40 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5">
-    <div class="flex justify-between items-center px-6 lg:px-8 py-4 max-w-[1400px] mx-auto">
+<nav id="public-main-nav" class="fixed top-0 w-full z-40 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5 flex flex-col">
+    @if($announcementActive && !empty($announcementText))
+        <script>
+            if (sessionStorage.getItem('dismissed_announcement') === 'true') {
+                document.write('<style>#announcement-ticker-bar { display: none !important; }</style>');
+            }
+        </script>
+        <style>
+            .announcement-gradient {
+                background: linear-gradient(90deg, #73081d 0%, #dc2626 50%, #73081d 100%);
+            }
+            .ticker-container {
+                position: relative;
+                display: flex;
+                overflow: hidden;
+                width: 100%;
+            }
+            .ticker-wrapper {
+                display: flex;
+                white-space: nowrap;
+                animation: marquee-scroll 25s linear infinite;
+                will-change: transform;
+            }
+            .ticker-wrapper:hover {
+                animation-play-state: paused;
+            }
+            .ticker-item {
+                display: inline-flex;
+                align-items: center;
+            }
+            @keyframes marquee-scroll {
+                0% { transform: translate3d(0, 0, 0); }
+                100% { transform: translate3d(-33.333%, 0, 0); }
+            }
+            .shimmer-glow::after {
+                content: '';
+                position: absolute;
+                top: 0; right: 0; bottom: 0; left: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 50%, transparent);
+                transform: translateX(-100%);
+                animation: shimmer-swipe 8s infinite;
+            }
+            @keyframes shimmer-swipe {
+                0% { transform: translateX(-100%); }
+                35%, 100% { transform: translateX(100%); }
+            }
+        </style>
+        <div id="announcement-ticker-bar" class="w-full announcement-gradient border-b border-white/10 text-white py-1.5 px-4 relative overflow-hidden transition-all duration-300 ease-out select-none flex items-center shimmer-glow" style="height: 34px;">
+            <div class="max-w-[1400px] mx-auto w-full flex items-center justify-between gap-4 z-10">
+                <!-- Label on left -->
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <span class="material-symbols-outlined text-[15px] text-white/90 animate-pulse">campaign</span>
+                    <span class="text-[9px] tracking-widest font-black uppercase bg-white/10 border border-white/20 px-1.5 py-0.5 rounded text-white font-headline">Notice</span>
+                </div>
+                
+                <!-- Scrolling marquee container -->
+                <div class="flex-1 overflow-hidden relative mx-2 h-5 flex items-center">
+                    <div class="ticker-container">
+                        <div class="ticker-wrapper">
+                            @for ($i = 0; $i < 3; $i++)
+                                <div class="ticker-item text-[11px] font-medium tracking-wide text-white">
+                                    @if($announcementLink)
+                                        <a href="{{ $announcementLink }}" class="flex items-center gap-1 hover:text-white/80 transition-colors">
+                                            <span>{{ $announcementText }}</span>
+                                            <span class="material-symbols-outlined text-[12px] opacity-80">arrow_forward</span>
+                                        </a>
+                                    @else
+                                        <span>{{ $announcementText }}</span>
+                                    @endif
+                                    <span class="text-white/40 mx-4 select-none">•</span>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Close Button on right -->
+                <button type="button" id="close-announcement-btn" class="text-white/60 hover:text-white transition-colors p-0.5 flex-shrink-0 relative group" aria-label="Close announcement">
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <div class="flex justify-between items-center px-6 lg:px-8 py-4 max-w-[1400px] mx-auto w-full">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="hover:opacity-80 transition-opacity">
             <x-logo-trust-badge 
@@ -183,6 +266,24 @@
         if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
         if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
         if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+        // Close Announcement Bar
+        const closeAnnouncementBtn = document.getElementById('close-announcement-btn');
+        if (closeAnnouncementBtn) {
+            closeAnnouncementBtn.addEventListener('click', function() {
+                const bar = document.getElementById('announcement-ticker-bar');
+                if (bar) {
+                    bar.style.height = '0px';
+                    bar.style.paddingTop = '0px';
+                    bar.style.paddingBottom = '0px';
+                    bar.style.opacity = '0';
+                    bar.style.borderBottomWidth = '0px';
+                    
+                    // Set session flag to keep it closed for current session
+                    sessionStorage.setItem('dismissed_announcement', 'true');
+                }
+            });
+        }
     });
 </script>
 @endpush

@@ -27,7 +27,7 @@ final class GlassSubCategoryService
     public function getByGlassType(GlassType|int $glassType): Collection
     {
         $glassTypeId = $glassType instanceof GlassType ? $glassType->id : $glassType;
-        
+
         return GlassSubCategory::where('glass_type_id', $glassTypeId)
             ->active()
             ->ordered()
@@ -41,7 +41,7 @@ final class GlassSubCategoryService
     {
         return GlassSubCategory::with('glassType')
             ->active()
-            ->whereHas('glassType', fn($query) => $query->active())
+            ->whereHas('glassType', fn ($query) => $query->active())
             ->ordered()
             ->get();
     }
@@ -59,9 +59,9 @@ final class GlassSubCategoryService
         // Ensure unique slug
         $originalSlug = $data['slug'];
         $counter = 1;
-        
+
         while (GlassSubCategory::where('slug', $data['slug'])->exists()) {
-            $data['slug'] = $originalSlug . '-' . $counter;
+            $data['slug'] = $originalSlug.'-'.$counter;
             $counter++;
         }
 
@@ -74,7 +74,7 @@ final class GlassSubCategoryService
     public function update(GlassSubCategory $glassSubCategory, array $data): GlassSubCategory
     {
         // Generate slug if name changed and slug not provided
-        if (isset($data['name']) && !isset($data['slug'])) {
+        if (isset($data['name']) && ! isset($data['slug'])) {
             $data['slug'] = str($data['name'])->slug()->toString();
         }
 
@@ -82,16 +82,17 @@ final class GlassSubCategoryService
         if (isset($data['slug'])) {
             $originalSlug = $data['slug'];
             $counter = 1;
-            
+
             while (GlassSubCategory::where('slug', $data['slug'])
                 ->where('id', '!=', $glassSubCategory->id)
                 ->exists()) {
-                $data['slug'] = $originalSlug . '-' . $counter;
+                $data['slug'] = $originalSlug.'-'.$counter;
                 $counter++;
             }
         }
 
         $glassSubCategory->update($data);
+
         return $glassSubCategory->fresh();
     }
 
@@ -113,7 +114,8 @@ final class GlassSubCategoryService
      */
     public function toggleStatus(GlassSubCategory $glassSubCategory): GlassSubCategory
     {
-        $glassSubCategory->update(['is_active' => !$glassSubCategory->is_active]);
+        $glassSubCategory->update(['is_active' => ! $glassSubCategory->is_active]);
+
         return $glassSubCategory->fresh();
     }
 
@@ -139,11 +141,11 @@ final class GlassSubCategoryService
 
         foreach ($subCategories as $subCategory) {
             $glassTypeName = $subCategory->glassType->name;
-            
-            if (!isset($grouped[$glassTypeName])) {
+
+            if (! isset($grouped[$glassTypeName])) {
                 $grouped[$glassTypeName] = [];
             }
-            
+
             $grouped[$glassTypeName][$subCategory->id] = $subCategory->name;
         }
 

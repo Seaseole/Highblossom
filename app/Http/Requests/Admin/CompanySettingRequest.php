@@ -46,6 +46,13 @@ final class CompanySettingRequest extends FormRequest
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'quote_notification_emails' => ['nullable', 'string', 'max:500'],
+            'announcement_active' => ['nullable', 'boolean'],
+            'announcement_text' => ['nullable', 'string', 'max:500'],
+            'announcement_link' => ['nullable', 'url', 'max:500'],
+            'gallery_metrics' => ['nullable', 'array', 'max:6'],
+            'gallery_metrics.*.label' => ['required', 'string', 'max:80'],
+            'gallery_metrics.*.value' => ['required', 'string', 'max:20'],
+            'gallery_metrics.*.suffix' => ['nullable', 'string', 'max:10'],
         ];
     }
 }

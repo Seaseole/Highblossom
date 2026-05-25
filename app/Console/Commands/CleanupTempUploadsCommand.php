@@ -6,9 +6,6 @@ namespace App\Console\Commands;
 
 use App\Services\Content\ContentBlockCleanupService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Finder\Finder;
 
 final class CleanupTempUploadsCommand extends Command
 {
@@ -46,7 +43,7 @@ final class CleanupTempUploadsCommand extends Command
         if ($results['deleted'] > 0) {
             $this->info("Cleaned up {$results['deleted']} temp file(s).");
         } else {
-            $this->info("No temp files found to clean up.");
+            $this->info('No temp files found to clean up.');
         }
 
         if ($results['errors'] > 0) {

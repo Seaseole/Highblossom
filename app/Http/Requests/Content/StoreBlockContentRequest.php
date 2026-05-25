@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests\Content;
 
 use Highblossom\ContentBlocks\Services\BlockRegistry;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
 final class StoreBlockContentRequest extends FormRequest
@@ -21,7 +23,7 @@ final class StoreBlockContentRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -44,9 +46,6 @@ final class StoreBlockContentRequest extends FormRequest
 
     /**
      * Configure the validator instance.
-     *
-     * @param \Illuminate\Validation\Validator $validator
-     * @return void
      */
     public function withValidator(Validator $validator): void
     {
@@ -57,9 +56,6 @@ final class StoreBlockContentRequest extends FormRequest
 
     /**
      * Validate that content blocks have valid types and attributes.
-     *
-     * @param \Illuminate\Validation\Validator $validator
-     * @return void
      */
     private function validateContentBlocks(Validator $validator): void
     {
@@ -71,7 +67,7 @@ final class StoreBlockContentRequest extends FormRequest
 
         $blocks = json_decode($content, true);
 
-        if (!is_array($blocks)) {
+        if (! is_array($blocks)) {
             $validator->errors()->add('content', 'Content must be a valid JSON array.');
 
             return;
@@ -83,38 +79,43 @@ final class StoreBlockContentRequest extends FormRequest
             $blockKey = "content.{$index}";
 
             // Check block structure
-            if (!is_array($block)) {
+            if (! is_array($block)) {
                 $validator->errors()->add($blockKey, "Block at position {$index} must be an array.");
+
                 continue;
             }
 
             // Check type exists
-            if (!isset($block['type'])) {
+            if (! isset($block['type'])) {
                 $validator->errors()->add("{$blockKey}.type", "Block at position {$index} is missing required 'type' field.");
+
                 continue;
             }
 
             $type = $block['type'];
 
-            if (!is_string($type) || empty($type)) {
+            if (! is_string($type) || empty($type)) {
                 $validator->errors()->add("{$blockKey}.type", "Block at position {$index} has invalid 'type' value.");
+
                 continue;
             }
 
             // Check type is registered
-            if (!$registry->has($type)) {
+            if (! $registry->has($type)) {
                 $validTypes = $registry->types();
                 $validator->errors()->add(
                     "{$blockKey}.type",
-                    "Block type '{$type}' at position {$index} is not registered. Valid types: " . implode(', ', $validTypes)
+                    "Block type '{$type}' at position {$index} is not registered. Valid types: ".implode(', ', $validTypes)
                 );
+
                 continue;
             }
 
             // Check attributes is array
             $attributes = $block['attributes'] ?? [];
-            if (!is_array($attributes)) {
+            if (! is_array($attributes)) {
                 $validator->errors()->add("{$blockKey}.attributes", "Block at position {$index} must have 'attributes' as an array.");
+
                 continue;
             }
 
@@ -122,7 +123,7 @@ final class StoreBlockContentRequest extends FormRequest
             $blockService = $registry->get($type);
             $blockRules = $blockService->getValidationRules();
 
-            if (!empty($blockRules)) {
+            if (! empty($blockRules)) {
                 $blockValidator = \Illuminate\Support\Facades\Validator::make($attributes, $blockRules);
 
                 if ($blockValidator->fails()) {
@@ -149,7 +150,7 @@ final class StoreBlockContentRequest extends FormRequest
             : [];
 
         // Generate slug from title
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']);
+        $validated['slug'] = Str::slug($validated['title']);
 
         // Set published_at if publishing
         if ($validated['status'] === 'published' && empty($validated['published_at'])) {

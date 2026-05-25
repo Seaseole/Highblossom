@@ -66,7 +66,7 @@ final class PostService
 
     private function relocateContentImages(array &$data): void
     {
-        if (!empty($data['content'])) {
+        if (! empty($data['content'])) {
             $data['content'] = $this->relocateAction->execute($data['content']);
         }
     }

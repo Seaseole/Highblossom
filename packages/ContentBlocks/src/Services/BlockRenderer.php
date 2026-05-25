@@ -5,7 +5,9 @@ namespace Highblossom\ContentBlocks\Services;
 class BlockRenderer
 {
     protected BlockRegistry $registry;
+
     protected int $maxDepth = 10;
+
     protected int $currentDepth = 0;
 
     public function __construct(BlockRegistry $registry)
@@ -15,10 +17,6 @@ class BlockRenderer
 
     /**
      * Render a block by type with attributes.
-     *
-     * @param string $type
-     * @param array $attributes
-     * @return string
      */
     public function render(string $type, array $attributes = []): string
     {
@@ -27,9 +25,6 @@ class BlockRenderer
 
     /**
      * Render multiple blocks.
-     *
-     * @param array $blocks
-     * @return string
      */
     public function renderMany(array $blocks): string
     {
@@ -40,10 +35,6 @@ class BlockRenderer
 
     /**
      * Render a block with depth tracking for nested blocks.
-     *
-     * @param string $type
-     * @param array $attributes
-     * @return string
      */
     public function renderWithDepth(string $type, array $attributes = []): string
     {
@@ -60,13 +51,11 @@ class BlockRenderer
 
     /**
      * Set the maximum nesting depth.
-     *
-     * @param int $depth
-     * @return self
      */
     public function setMaxDepth(int $depth): self
     {
         $this->maxDepth = $depth;
+
         return $this;
     }
 }

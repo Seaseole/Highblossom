@@ -9,7 +9,9 @@ use Livewire\Component;
 final class ActiveFilters extends Component
 {
     public string $search = '';
+
     public ?string $categorySlug = null;
+
     public ?string $tagSlug = null;
 
     public function mount(string $search = '', ?string $categorySlug = null, ?string $tagSlug = null): void

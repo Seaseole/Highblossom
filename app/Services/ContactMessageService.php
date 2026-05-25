@@ -10,7 +10,7 @@ final class ContactMessageService
 {
     public function markAsRead(ContactMessage $message): ContactMessage
     {
-        if (!$message->is_read) {
+        if (! $message->is_read) {
             $message->markAsRead();
         }
 

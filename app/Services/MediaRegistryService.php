@@ -6,8 +6,8 @@ namespace App\Services;
 
 use App\Models\MediaRegistry;
 use App\Models\MediaUsage;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 final class MediaRegistryService
 {
@@ -40,7 +40,7 @@ final class MediaRegistryService
     {
         $registry = MediaRegistry::find($mediaRegistryId);
 
-        if (!$registry) {
+        if (! $registry) {
             return false;
         }
 
@@ -49,6 +49,7 @@ final class MediaRegistryService
         }
 
         Storage::disk('public')->delete($registry->path);
+
         return $registry->delete();
     }
 }

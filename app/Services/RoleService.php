@@ -12,7 +12,7 @@ final class RoleService
     {
         $role = Role::create(['name' => $data['name']]);
 
-        if (!empty($data['permissions'])) {
+        if (! empty($data['permissions'])) {
             $role->syncPermissions($data['permissions']);
         }
 

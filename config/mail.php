@@ -111,8 +111,8 @@ return [
     */
 
     'reply_to' => [
-    'address' =>env('MAIL_REPLY_TO','example@example.com' ) ,
-    'name' => 'App Name',
+        'address' => env('MAIL_REPLY_TO', 'example@example.com'),
+        'name' => 'App Name',
     ],
 
     'from' => [

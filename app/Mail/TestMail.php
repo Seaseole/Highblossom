@@ -13,7 +13,7 @@ class TestMail extends Mailable
     public function build()
     {
         return $this->from('noreply@example.com')
-                    ->subject('Test Email')
-                    ->view('emails.contact'); // Using existing view
+            ->subject('Test Email')
+            ->view('emails.contact'); // Using existing view
     }
 }

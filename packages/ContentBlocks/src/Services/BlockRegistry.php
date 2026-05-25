@@ -16,10 +16,6 @@ class BlockRegistry
 
     /**
      * Register a block type.
-     *
-     * @param string $type
-     * @param BlockInterface $block
-     * @return self
      */
     public function register(string $type, BlockInterface $block): self
     {
@@ -30,9 +26,6 @@ class BlockRegistry
 
     /**
      * Get a block by type.
-     *
-     * @param string $type
-     * @return BlockInterface|null
      */
     public function get(string $type): ?BlockInterface
     {
@@ -41,9 +34,6 @@ class BlockRegistry
 
     /**
      * Check if a block type is registered.
-     *
-     * @param string $type
-     * @return bool
      */
     public function has(string $type): bool
     {
@@ -52,8 +42,6 @@ class BlockRegistry
 
     /**
      * Get all registered block types.
-     *
-     * @return Collection
      */
     public function all(): Collection
     {
@@ -62,8 +50,6 @@ class BlockRegistry
 
     /**
      * Get all registered block type names.
-     *
-     * @return array
      */
     public function types(): array
     {
@@ -72,16 +58,12 @@ class BlockRegistry
 
     /**
      * Render a block by type with attributes.
-     *
-     * @param string $type
-     * @param array $attributes
-     * @return string
      */
     public function render(string $type, array $attributes = []): string
     {
         $block = $this->get($type);
 
-        if (!$block) {
+        if (! $block) {
             return $this->renderUnknownBlock($type, $attributes);
         }
 
@@ -90,10 +72,6 @@ class BlockRegistry
 
     /**
      * Render an unknown block fallback.
-     *
-     * @param string $type
-     * @param array $attributes
-     * @return string
      */
     protected function renderUnknownBlock(string $type, array $attributes): string
     {
@@ -103,8 +81,7 @@ class BlockRegistry
     /**
      * Render a block from variadic arguments (type, attributes).
      *
-     * @param mixed ...$args
-     * @return string
+     * @param  mixed  ...$args
      */
     public function renderArray(...$args): string
     {

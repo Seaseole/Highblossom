@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Enums\VideoSourceType;
+use App\Services\VideoSourceDetector;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -154,7 +160,8 @@ final class BlockBuilder extends Component
     public function uploadImageForBlock(int $blockIndex): void
     {
         if (empty($this->imageUpload)) {
-            \Illuminate\Support\Facades\Log::error('uploadImageForBlock called with empty imageUpload');
+            Log::error('uploadImageForBlock called with empty imageUpload');
+
             return;
         }
 
@@ -166,13 +173,14 @@ final class BlockBuilder extends Component
         $path = $this->imageUpload->store('uploads/images', 'temp');
 
         if (empty($path)) {
-            \Illuminate\Support\Facades\Log::error('Image store returned empty path');
+            Log::error('Image store returned empty path');
+
             return;
         }
 
-        $url = 'temp://' . $path;
+        $url = 'temp://'.$path;
 
-        \Illuminate\Support\Facades\Log::debug('uploadImageForBlock', [
+        Log::debug('uploadImageForBlock', [
             'blockIndex' => $blockIndex,
             'path' => $path,
             'url' => $url,
@@ -182,12 +190,12 @@ final class BlockBuilder extends Component
         if (isset($this->blocks[$blockIndex])) {
             $this->blocks[$blockIndex]['attributes']['src'] = $url;
             $this->dispatchBlocksUpdated();
-            \Illuminate\Support\Facades\Log::debug('Image src set successfully', [
+            Log::debug('Image src set successfully', [
                 'index' => $blockIndex,
                 'src' => $url,
             ]);
         } else {
-            \Illuminate\Support\Facades\Log::error('Failed to set image src - invalid block index', [
+            Log::error('Failed to set image src - invalid block index', [
                 'blockIndex' => $blockIndex,
                 'blocks' => $this->blocks,
             ]);
@@ -213,17 +221,17 @@ final class BlockBuilder extends Component
         $this->validate([
             'videoUpload' => 'required|file|max:61440|mimes:mp4,webm,mov,avi',
         ]);
-        
+
         // Store video file in temp disk - will be relocated to permanent on post save
         $path = $this->videoUpload->store('uploads/videos', 'temp');
-        $videoUrl = 'temp://' . $path;
+        $videoUrl = 'temp://'.$path;
         $thumbnailUrl = null;
 
         // Generate thumbnail using FFmpeg directly from temp location
-        $fullPath = storage_path('app/temp/' . $path);
+        $fullPath = storage_path('app/temp/'.$path);
         if (file_exists($fullPath)) {
             try {
-                $ffmpeg = \FFMpeg\FFMpeg::create([
+                $ffmpeg = FFMpeg::create([
                     'ffmpeg.binaries' => 'C:\\ffmpeg\\bin\\ffmpeg.exe',
                     'ffprobe.binaries' => 'C:\\ffmpeg\\bin\\ffprobe.exe',
                     'timeout' => 3600,
@@ -232,21 +240,21 @@ final class BlockBuilder extends Component
 
                 // Create thumbnail directory in temp
                 $thumbnailDir = storage_path('app/temp/uploads/videos/thumbnails');
-                if (!is_dir($thumbnailDir)) {
+                if (! is_dir($thumbnailDir)) {
                     mkdir($thumbnailDir, 0755, true);
                 }
 
                 // Generate thumbnail filename
-                $thumbnailFilename = 'thumb_' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
-                $thumbnailFullPath = $thumbnailDir . '/' . $thumbnailFilename;
+                $thumbnailFilename = 'thumb_'.pathinfo($path, PATHINFO_FILENAME).'.jpg';
+                $thumbnailFullPath = $thumbnailDir.'/'.$thumbnailFilename;
 
                 // Extract frame at 1 second mark
-                $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+                $frame = $video->frame(TimeCode::fromSeconds(1));
                 $frame->save($thumbnailFullPath);
 
-                $thumbnailUrl = 'temp://uploads/videos/thumbnails/' . $thumbnailFilename;
+                $thumbnailUrl = 'temp://uploads/videos/thumbnails/'.$thumbnailFilename;
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('Video thumbnail generation failed: ' . $e->getMessage());
+                Log::warning('Video thumbnail generation failed: '.$e->getMessage());
                 $thumbnailUrl = null;
             }
         }
@@ -294,10 +302,10 @@ final class BlockBuilder extends Component
      */
     public function detectVideoUrl(string $url): array
     {
-        $detector = app(\App\Services\VideoSourceDetector::class);
+        $detector = app(VideoSourceDetector::class);
         $sourceType = $detector->detect($url);
 
-        if ($sourceType === \App\Enums\VideoSourceType::UNKNOWN) {
+        if ($sourceType === VideoSourceType::UNKNOWN) {
             return [
                 'valid' => false,
                 'error' => 'Unrecognized video URL. Supported: YouTube, Vimeo, Dailymotion, Facebook, or direct video files.',
@@ -318,7 +326,7 @@ final class BlockBuilder extends Component
         ];
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.block-builder');
     }

@@ -28,7 +28,7 @@ final readonly class GenerateRobotsTxt
         $lines = array_merge($lines, $this->getDynamicDisallowedPaths());
 
         $lines[] = '';
-        $lines[] = 'Sitemap: ' . $this->sitemapUrl;
+        $lines[] = 'Sitemap: '.$this->sitemapUrl;
 
         return implode(PHP_EOL, $lines);
     }
@@ -45,7 +45,8 @@ final readonly class GenerateRobotsTxt
             ->map(function ($route) {
                 try {
                     $path = parse_url(route($route->route_name), PHP_URL_PATH);
-                    return ($path !== null && $path !== '/') ? 'Disallow: ' . $path : null;
+
+                    return ($path !== null && $path !== '/') ? 'Disallow: '.$path : null;
                 } catch (\Exception) {
                     return null;
                 }

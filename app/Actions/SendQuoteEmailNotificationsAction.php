@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Models\Quote;
-use App\Models\CompanySetting;
 use App\Mail\QuoteSubmittedMail;
+use App\Models\CompanySetting;
+use App\Models\Quote;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 

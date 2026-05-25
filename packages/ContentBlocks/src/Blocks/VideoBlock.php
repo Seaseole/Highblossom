@@ -130,7 +130,7 @@ class VideoBlock extends AbstractBlock
             'youtube' => "https://www.youtube.com/embed/{$videoId}",
             'vimeo' => "https://player.vimeo.com/video/{$videoId}",
             'dailymotion' => "https://www.dailymotion.com/embed/video/{$videoId}",
-            'facebook' => "https://www.facebook.com/plugins/video.php?href=" . urlencode($src) . "&show_text=0",
+            'facebook' => 'https://www.facebook.com/plugins/video.php?href='.urlencode($src).'&show_text=0',
             default => null,
         };
     }
@@ -168,6 +168,7 @@ class VideoBlock extends AbstractBlock
         // Check if it's a URL from the current domain
         if (str_starts_with($src, 'http://') || str_starts_with($src, 'https://')) {
             $host = parse_url($src, PHP_URL_HOST);
+
             return $host === request()->getHost();
         }
 

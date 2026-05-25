@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Mail\TestEmail;
-use App\Services\EnvEditor;
 use Illuminate\Support\Facades\Mail;
 
 final class SmtpSettingService
@@ -29,7 +28,8 @@ final class SmtpSettingService
     public function sendTestEmail(string $email): bool
     {
         try {
-            Mail::to($email)->send(new TestEmail());
+            Mail::to($email)->send(new TestEmail);
+
             return true;
         } catch (\Exception $e) {
             return false;

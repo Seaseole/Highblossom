@@ -2,9 +2,9 @@
 
 namespace App\Actions;
 
-use App\Models\ContactMessage;
 use App\Events\ContactMessageReceived;
 use App\Http\Requests\ContactFormRequest;
+use App\Models\ContactMessage;
 use App\Services\IdempotencyService;
 
 class SendContactMessage

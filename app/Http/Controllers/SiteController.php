@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\SendContactMessage;
 use App\Actions\StoreQuoteAction;
+use App\Http\Requests\ContactFormRequest;
+use App\Http\Requests\QuoteFormRequest;
 use App\Models\AboutUsContent;
 use App\Models\CompanySetting;
 use App\Models\GalleryCategory;
@@ -13,8 +15,6 @@ use App\Models\GlassType;
 use App\Models\Post;
 use App\Models\Service;
 use App\Models\ServiceType;
-use App\Http\Requests\ContactFormRequest;
-use App\Http\Requests\QuoteFormRequest;
 use App\Services\ContactNumberService;
 use App\Services\SiteService;
 use Illuminate\Http\Request;
@@ -27,6 +27,7 @@ class SiteController extends Controller
         protected SiteService $siteService,
         protected SendContactMessage $sendContactMessage
     ) {}
+
     public function home()
     {
         return view('welcome', $this->siteService->getHomeData());
@@ -70,8 +71,9 @@ class SiteController extends Controller
 
         $images = $query->paginate($perPage, ['*'], 'page', $page);
         $categories = GalleryCategory::active()->ordered()->with([])->get();
+        $galleryMetrics = CompanySetting::get('gallery_metrics', []);
 
-        return view('site.gallery', compact('images', 'categories', 'category'));
+        return view('site.gallery', compact('images', 'categories', 'category', 'galleryMetrics'));
     }
 
     public function galleryShow(GalleryImage $galleryImage)
@@ -107,12 +109,10 @@ class SiteController extends Controller
         $whatsappAdditional = CompanySetting::get('whatsapp_additional_numbers', []);
         $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
 
-      
         $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
         $serviceTypes = ServiceType::active()->ordered()->with([])->get();
         $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
 
-        
         $contactNumbers = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
 
         return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes', 'glassSubCategories'));

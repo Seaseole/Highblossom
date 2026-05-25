@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Service;
 use App\Http\Requests\Admin\ServiceRequest;
+use App\Models\Service;
 use App\Services\ServiceService;
 use Illuminate\View\View;
 

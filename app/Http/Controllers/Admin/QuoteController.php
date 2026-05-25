@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Quote;
 use App\Http\Requests\Admin\QuoteStatusRequest;
+use App\Models\Quote;
 use App\Services\QuoteService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;

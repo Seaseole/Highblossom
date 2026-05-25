@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('quotes', function (Blueprint $table) {
             $table->foreignId('glass_sub_category_id')->nullable()->after('glass_type_id')->constrained()->onDelete('set null');
-            
+
             // Index for performance
             $table->index('glass_sub_category_id');
         });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\InspectionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,11 +13,12 @@ final class Inspection extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\InspectionFactory::new();
+        return InspectionFactory::new();
     }
+
     protected $fillable = [
-        'booking_id', 'staff_id', 'scheduled_at', 'ended_at', 
-        'location', 'type'
+        'booking_id', 'staff_id', 'scheduled_at', 'ended_at',
+        'location', 'type',
     ];
 
     protected $casts = [
@@ -31,6 +33,6 @@ final class Inspection extends Model
 
     public function staff(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'staff_id');
+        return $this->belongsTo(User::class, 'staff_id');
     }
 }

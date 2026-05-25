@@ -36,7 +36,7 @@ final class GlassSubCategory extends Model
      */
     public function quotes(): HasMany
     {
-        return $this->hasMany(\App\Models\Quote::class, 'glass_sub_category_id');
+        return $this->hasMany(Quote::class, 'glass_sub_category_id');
     }
 
     /**
@@ -79,13 +79,13 @@ final class GlassSubCategory extends Model
         parent::boot();
 
         // Automatically generate slug from name
-        static::creating(function ($glassSubCategory) {
+        self::creating(function ($glassSubCategory) {
             if (empty($glassSubCategory->slug)) {
                 $glassSubCategory->slug = str($glassSubCategory->name)->slug()->toString();
             }
         });
 
-        static::updating(function ($glassSubCategory) {
+        self::updating(function ($glassSubCategory) {
             if ($glassSubCategory->isDirty('name') && empty($glassSubCategory->slug)) {
                 $glassSubCategory->slug = str($glassSubCategory->name)->slug()->toString();
             }

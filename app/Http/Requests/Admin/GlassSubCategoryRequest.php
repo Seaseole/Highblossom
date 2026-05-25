@@ -66,7 +66,7 @@ final class GlassSubCategoryRequest extends FormRequest
         }
 
         // Auto-generate slug from name if not provided
-        if (empty($this->slug) && !empty($this->name)) {
+        if (empty($this->slug) && ! empty($this->name)) {
             $this->merge([
                 'slug' => str($this->name)->slug()->toString(),
             ]);

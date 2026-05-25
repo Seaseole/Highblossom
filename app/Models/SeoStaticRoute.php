@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 final class SeoStaticRoute extends Model
 {
-
     protected $fillable = [
         'route_name',
         'meta_title',

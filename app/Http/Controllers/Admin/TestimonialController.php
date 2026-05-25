@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Testimonial;
 use App\Http\Requests\Admin\TestimonialRequest;
+use App\Models\Testimonial;
 use App\Services\TestimonialService;
 use Illuminate\View\View;
 

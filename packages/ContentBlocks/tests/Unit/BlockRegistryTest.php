@@ -2,8 +2,8 @@
 
 namespace Highblossom\ContentBlocks\Tests\Unit;
 
-use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Highblossom\ContentBlocks\Blocks\ParagraphBlock;
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Orchestra\Testbench\TestCase;
 
 class BlockRegistryTest extends TestCase
@@ -13,12 +13,12 @@ class BlockRegistryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = new BlockRegistry();
+        $this->registry = new BlockRegistry;
     }
 
     public function test_can_register_block()
     {
-        $block = new ParagraphBlock();
+        $block = new ParagraphBlock;
         $this->registry->register('paragraph', $block);
 
         $this->assertTrue($this->registry->has('paragraph'));
@@ -27,7 +27,7 @@ class BlockRegistryTest extends TestCase
 
     public function test_can_get_all_blocks()
     {
-        $block1 = new ParagraphBlock();
+        $block1 = new ParagraphBlock;
         $this->registry->register('paragraph', $block1);
 
         $blocks = $this->registry->all();
@@ -38,7 +38,7 @@ class BlockRegistryTest extends TestCase
 
     public function test_can_get_block_types()
     {
-        $this->registry->register('paragraph', new ParagraphBlock());
+        $this->registry->register('paragraph', new ParagraphBlock);
 
         $types = $this->registry->types();
 

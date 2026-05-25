@@ -5,8 +5,8 @@ namespace Highblossom\ContentBlocks\Services;
 use Highblossom\ContentBlocks\Contracts\BlockInterface;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 abstract class AbstractBlock implements BlockInterface
 {
@@ -14,15 +14,12 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Render the block with the given attributes.
-     *
-     * @param array $attributes
-     * @return string
      */
     public function render(array $attributes = []): string
     {
         $attributes = $this->normalizeAttributes($attributes);
 
-        if (!$this->validate($attributes)) {
+        if (! $this->validate($attributes)) {
             return $this->renderError($attributes);
         }
 
@@ -41,9 +38,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Validate the block attributes.
-     *
-     * @param array $attributes
-     * @return bool
      */
     public function validate(array $attributes): bool
     {
@@ -64,9 +58,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Build and return the view for this block.
-     *
-     * @param array $attributes
-     * @return string
      */
     protected function buildView(array $attributes): string
     {
@@ -78,8 +69,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Get the view name for this block.
-     *
-     * @return string
      */
     protected function getViewName(): string
     {
@@ -88,9 +77,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Get the data to pass to the view.
-     *
-     * @param array $attributes
-     * @return array
      */
     protected function getViewData(array $attributes): array
     {
@@ -99,9 +85,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Normalize attributes by merging with defaults and type casting.
-     *
-     * @param array $attributes
-     * @return array
      */
     protected function normalizeAttributes(array $attributes): array
     {
@@ -113,9 +96,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Cast attributes to their proper types.
-     *
-     * @param array $attributes
-     * @return array
      */
     protected function castAttributes(array $attributes): array
     {
@@ -132,10 +112,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Cast a single attribute to its type.
-     *
-     * @param string $type
-     * @param mixed $value
-     * @return mixed
      */
     protected function castAttribute(string $type, mixed $value): mixed
     {
@@ -151,8 +127,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Get the attribute type casts.
-     *
-     * @return array
      */
     protected function getAttributeCasts(): array
     {
@@ -161,9 +135,6 @@ abstract class AbstractBlock implements BlockInterface
 
     /**
      * Render an error state for invalid attributes.
-     *
-     * @param array $attributes
-     * @return string
      */
     protected function renderError(array $attributes): string
     {

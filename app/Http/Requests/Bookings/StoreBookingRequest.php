@@ -26,10 +26,10 @@ final class StoreBookingRequest extends FormRequest
             'client_phone' => ['required', 'string', 'max:20'],
             'vehicle_details' => ['required', 'string'],
             'scheduled_at' => [
-                'required', 
-                'date', 
+                'required',
+                'date',
                 'after:now',
-                Rule::prohibitedIf(fn() => $this->isWeekend())
+                Rule::prohibitedIf(fn () => $this->isWeekend()),
             ],
             'location' => ['required', Rule::in(['mobile', 'workshop'])],
         ];

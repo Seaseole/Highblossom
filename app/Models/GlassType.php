@@ -52,6 +52,6 @@ final class GlassType extends Model
      */
     public function quotes(): HasMany
     {
-        return $this->hasMany(\App\Models\Quote::class);
+        return $this->hasMany(Quote::class);
     }
 }

@@ -42,7 +42,7 @@ final class GalleryImage extends Model
 
     public function scopeByCategory($query, $category)
     {
-        return $query->whereHas('category', fn($q) => $q->where('slug', $category));
+        return $query->whereHas('category', fn ($q) => $q->where('slug', $category));
     }
 
     public function category()
@@ -57,10 +57,10 @@ final class GalleryImage extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image_path) {
+        if (! $this->image_path) {
             return null;
         }
 
-        return asset('storage/' . $this->image_path);
+        return asset('storage/'.$this->image_path);
     }
 }

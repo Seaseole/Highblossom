@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\ServiceType;
 use App\Http\Requests\Admin\ServiceTypeRequest;
+use App\Models\ServiceType;
 use App\Services\ServiceTypeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;

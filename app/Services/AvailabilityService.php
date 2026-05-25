@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Services\Contracts\AvailabilityServiceInterface;
 use App\Models\Inspection;
 use App\Models\StaffAbsence;
-use Carbon\CarbonInterface;
+use App\Services\Contracts\AvailabilityServiceInterface;
 use Illuminate\Support\Facades\Date;
 
 final class AvailabilityService implements AvailabilityServiceInterface
@@ -30,6 +29,6 @@ final class AvailabilityService implements AvailabilityServiceInterface
 
         // Rule: Check for existing inspections at the same time
         // Simple logic for now: one inspection per slot
-        return !Inspection::where('scheduled_at', $date)->exists();
+        return ! Inspection::where('scheduled_at', $date)->exists();
     }
 }

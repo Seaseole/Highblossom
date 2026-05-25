@@ -18,13 +18,13 @@ final class OEmbedResolver
 
     public function resolve(string $url): ?array
     {
-        if (!$this->isValidUrl($url)) {
+        if (! $this->isValidUrl($url)) {
             return null;
         }
 
         $provider = $this->findProviderForUrl($url);
 
-        if (!$provider) {
+        if (! $provider) {
             return null;
         }
 
@@ -38,11 +38,12 @@ final class OEmbedResolver
                 'maxheight' => config('content-blocks.oembed.max_height', 600),
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('ContentBlocks: oEmbed request failed', [
                     'url' => $url,
                     'status' => $response->status(),
                 ]);
+
                 return null;
             }
 
@@ -62,6 +63,7 @@ final class OEmbedResolver
                 'url' => $url,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }

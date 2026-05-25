@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Booking;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class BookingController
@@ -21,7 +23,7 @@ final class BookingController
         return view('admin.bookings.show', compact('booking'));
     }
 
-    public function updateStatus(\Illuminate\Http\Request $request, Booking $booking): \Illuminate\Http\RedirectResponse
+    public function updateStatus(Request $request, Booking $booking): RedirectResponse
     {
         $request->validate([
             'status' => 'required|in:pending,confirmed,completed,cancelled',
@@ -32,7 +34,7 @@ final class BookingController
         return back()->with('success', 'Booking status updated successfully.');
     }
 
-    public function destroy(Booking $booking): \Illuminate\Http\RedirectResponse
+    public function destroy(Booking $booking): RedirectResponse
     {
         $booking->delete();
 

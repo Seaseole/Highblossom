@@ -1,5 +1,12 @@
 <?php
 
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 return [
@@ -126,14 +133,14 @@ return [
     */
 
     'serializable_classes' => [
-        \Illuminate\Pagination\LengthAwarePaginator::class,
-        \Illuminate\Pagination\Paginator::class,
-        \Illuminate\Support\Collection::class,
-        \Illuminate\Database\Eloquent\Collection::class,
-        \App\Models\Post::class,
-        \App\Models\Category::class,
-        \App\Models\Tag::class,
-        \App\Models\User::class,
+        LengthAwarePaginator::class,
+        Paginator::class,
+        Collection::class,
+        Illuminate\Database\Eloquent\Collection::class,
+        Post::class,
+        Category::class,
+        Tag::class,
+        User::class,
     ],
 
 ];

@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Models\GalleryImage;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -102,13 +103,13 @@ final class MediaPicker extends Component
     public function deleteImage(int $imageId): void
     {
         $image = GalleryImage::findOrFail($imageId);
-        
+
         if ($image->image_path) {
             Storage::disk('public')->delete($image->image_path);
         }
-        
+
         $image->delete();
-        
+
         $this->dispatch('notify', message: 'Image deleted successfully', type: 'success');
     }
 
@@ -121,13 +122,13 @@ final class MediaPicker extends Component
     {
         return GalleryImage::query()
             ->when($this->category !== 'all', fn ($q) => $q->where('category', $this->category))
-            ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
+            ->when($this->search, fn ($q) => $q->where('title', 'like', '%'.$this->search.'%'))
             ->active()
             ->orderBy('created_at', 'desc')
             ->paginate(12);
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.media-picker');
     }

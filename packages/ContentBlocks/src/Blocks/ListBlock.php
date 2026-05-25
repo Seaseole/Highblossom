@@ -40,9 +40,6 @@ class ListBlock extends AbstractBlock
 
     /**
      * Normalize list type to ordered/unordered.
-     *
-     * @param string $type
-     * @return string
      */
     protected function normalizeType(string $type): string
     {
@@ -55,9 +52,6 @@ class ListBlock extends AbstractBlock
 
     /**
      * Get the data to pass to the view.
-     *
-     * @param array $attributes
-     * @return array
      */
     protected function getViewData(array $attributes): array
     {

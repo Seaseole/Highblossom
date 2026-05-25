@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 final class Tag extends Model
 {
@@ -23,15 +24,15 @@ final class Tag extends Model
     {
         parent::boot();
 
-        static::creating(function ($tag) {
+        self::creating(function ($tag) {
             if (empty($tag->slug)) {
-                $tag->slug = \Illuminate\Support\Str::slug($tag->name);
+                $tag->slug = Str::slug($tag->name);
             }
         });
 
-        static::updating(function ($tag) {
+        self::updating(function ($tag) {
             if ($tag->isDirty('name') && empty($tag->slug)) {
-                $tag->slug = \Illuminate\Support\Str::slug($tag->name);
+                $tag->slug = Str::slug($tag->name);
             }
         });
     }

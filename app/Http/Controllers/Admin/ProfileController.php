@@ -24,7 +24,7 @@ final class ProfileController extends Controller
         $user = auth()->user();
         $qrCodeSvg = null;
 
-        if ($user->two_factor_secret && !$user->two_factor_confirmed_at) {
+        if ($user->two_factor_secret && ! $user->two_factor_confirmed_at) {
             $qrCodeSvg = $this->profileService->getTwoFactorQrCodeSvg($user);
         }
 
@@ -59,7 +59,7 @@ final class ProfileController extends Controller
             $validated['password']
         );
 
-        if (!$success) {
+        if (! $success) {
             return back()->withErrors(['current_password' => __('validation.current_password')]);
         }
 
@@ -68,7 +68,7 @@ final class ProfileController extends Controller
 
     public function enableTwoFactor()
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
         }
 
@@ -85,7 +85,7 @@ final class ProfileController extends Controller
 
         $success = $this->profileService->confirmTwoFactor(auth()->user(), $request->code);
 
-        if (!$success) {
+        if (! $success) {
             return back()->withErrors(['code' => 'The provided two-factor authentication code was invalid.']);
         }
 
@@ -97,7 +97,7 @@ final class ProfileController extends Controller
 
     public function disableTwoFactor()
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
         }
 
@@ -110,7 +110,7 @@ final class ProfileController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->two_factor_secret || !$user->two_factor_confirmed_at) {
+        if (! $user->two_factor_secret || ! $user->two_factor_confirmed_at) {
             return response()->json(['message' => 'Two-factor authentication is not confirmed.'], 403);
         }
 
@@ -127,6 +127,7 @@ final class ProfileController extends Controller
 
         if ($request->wantsJson()) {
             $codes = auth()->user()->recoveryCodes();
+
             return response()->json([
                 'recovery_codes' => is_array($codes) ? array_values($codes) : [],
             ]);
@@ -143,7 +144,7 @@ final class ProfileController extends Controller
             $request->validated()['password']
         );
 
-        if (!$success) {
+        if (! $success) {
             return back()->withErrors(['password' => __('validation.current_password')]);
         }
 

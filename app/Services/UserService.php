@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Container\Attributes\Singleton;
 
-#[Singleton(name:"users")]
+#[Singleton(name: 'users')]
 final class UserService
 {
     public function create(array $data): User
@@ -18,7 +18,7 @@ final class UserService
             'password' => bcrypt($data['password']),
         ]);
 
-        if (!empty($data['roles'])) {
+        if (! empty($data['roles'])) {
             $user->syncRoles($data['roles']);
         }
 
@@ -32,7 +32,7 @@ final class UserService
             'email' => $data['email'],
         ]);
 
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $user->update(['password' => bcrypt($data['password'])]);
         }
 

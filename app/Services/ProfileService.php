@@ -8,8 +8,6 @@ use App\Models\User;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\Label\Font\OpenSans;
-use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Support\Collection;
@@ -24,6 +22,7 @@ final class ProfileService
     public function __construct(
         protected TwoFactorAuthenticationProvider $provider
     ) {}
+
     public function updateProfile(User $user, array $data): User
     {
         $user->update($data);
@@ -40,7 +39,7 @@ final class ProfileService
 
     public function updatePassword(User $user, string $currentPassword, string $newPassword): bool
     {
-        if (!Hash::check($currentPassword, $user->password)) {
+        if (! Hash::check($currentPassword, $user->password)) {
             return false;
         }
 
@@ -51,7 +50,7 @@ final class ProfileService
 
     public function enableTwoFactor(User $user): bool
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return false;
         }
 
@@ -68,12 +67,12 @@ final class ProfileService
 
     public function confirmTwoFactor(User $user, string $code): bool
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return false;
         }
 
-        if (!$user->two_factor_secret || 
-            !$this->provider->verify(decrypt($user->two_factor_secret), $code)) {
+        if (! $user->two_factor_secret ||
+            ! $this->provider->verify(decrypt($user->two_factor_secret), $code)) {
             return false;
         }
 
@@ -89,7 +88,7 @@ final class ProfileService
         $url = $user->twoFactorQrCodeUrl();
 
         $builder = new Builder(
-            writer: new SvgWriter(),
+            writer: new SvgWriter,
             writerOptions: [],
             data: $url,
             encoding: new Encoding('UTF-8'),
@@ -113,7 +112,7 @@ final class ProfileService
 
     public function disableTwoFactor(User $user): bool
     {
-        if (!Features::canManageTwoFactorAuthentication()) {
+        if (! Features::canManageTwoFactorAuthentication()) {
             return false;
         }
 
@@ -128,7 +127,7 @@ final class ProfileService
 
     public function deleteAccount(User $user, string $password): bool
     {
-        if (!Hash::check($password, $user->password)) {
+        if (! Hash::check($password, $user->password)) {
             return false;
         }
 

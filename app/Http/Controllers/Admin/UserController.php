@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
@@ -34,6 +34,7 @@ final class UserController
     public function create(): View
     {
         $roles = Role::all();
+
         return view('admin.users.create', compact('roles'));
     }
 
@@ -50,6 +51,7 @@ final class UserController
     {
         $roles = Role::all();
         $user->load('roles');
+
         return view('admin.users.edit', compact('user', 'roles'));
     }
 

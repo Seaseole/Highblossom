@@ -2,14 +2,10 @@
 
 namespace App\Actions;
 
-use App\Actions\SendQuoteEmailNotificationsAction;
 use App\Models\Quote;
-use App\Models\CompanySetting;
-use App\Mail\QuoteSubmittedMail;
 use App\Services\IdempotencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class StoreQuoteAction
 {
@@ -29,7 +25,7 @@ class StoreQuoteAction
         try {
             $imagePath = $this->handleImageUpload($request);
             $this->markIdempotencyProcessed($request);
-            
+
             $quote = $this->createQuote($request, $imagePath);
             $this->sendEmailNotificationsAction->execute($quote);
 
@@ -39,7 +35,7 @@ class StoreQuoteAction
                 'quote' => $quote,
             ];
         } catch (\Exception $e) {
-            Log::error('Quote submission error: ' . $e->getMessage());
+            Log::error('Quote submission error: '.$e->getMessage());
 
             return [
                 'success' => false,
@@ -55,7 +51,7 @@ class StoreQuoteAction
     {
         $token = $request->input('_idempotency_token');
 
-        if (!empty($token) && $this->idempotencyService->isProcessed($token)) {
+        if (! empty($token) && $this->idempotencyService->isProcessed($token)) {
             return [
                 'success' => true,
                 'duplicate' => true,
@@ -72,7 +68,7 @@ class StoreQuoteAction
     private function markIdempotencyProcessed(Request $request): void
     {
         $token = $request->input('_idempotency_token');
-        if (!empty($token)) {
+        if (! empty($token)) {
             $this->idempotencyService->markProcessed($token);
         }
     }
@@ -83,7 +79,7 @@ class StoreQuoteAction
     private function handleImageUpload(Request $request): ?string
     {
         // Use AJAX uploaded path if provided
-        if (!empty($request->input('image_path'))) {
+        if (! empty($request->input('image_path'))) {
             return $request->input('image_path');
         }
 
@@ -95,7 +91,7 @@ class StoreQuoteAction
                     return $file->store('quotes', 'public');
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to store quote image: ' . $e->getMessage());
+                Log::error('Failed to store quote image: '.$e->getMessage());
             }
         }
 

@@ -9,7 +9,7 @@ use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-#[Singleton(name:"company_settings")]
+#[Singleton(name: 'company_settings')]
 final class CompanySettingService
 {
     private const SIMPLE_FIELDS = [
@@ -17,6 +17,7 @@ final class CompanySettingService
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
+        'announcement_text', 'announcement_link',
     ];
 
     private const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -27,6 +28,7 @@ final class CompanySettingService
         $this->handleFaviconUpload($request);
         $this->saveSimpleFields($data);
         $this->saveJsonFields($data);
+        CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
     }
 
     private function handleLogoUpload(Request $request): void
@@ -44,7 +46,7 @@ final class CompanySettingService
 
         $imagePath = $request->input('business_logo_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             $oldLogo = CompanySetting::get('business_logo', '');
             if ($oldLogo && $oldLogo !== $imagePath) {
                 Storage::disk('public')->delete($oldLogo);
@@ -64,7 +66,7 @@ final class CompanySettingService
     {
         $imagePath = $request->input('favicon_path');
 
-        if (!empty($imagePath)) {
+        if (! empty($imagePath)) {
             $oldFavicon = CompanySetting::get('favicon', '');
             if ($oldFavicon && $oldFavicon !== $imagePath) {
                 Storage::disk('public')->delete($oldFavicon);
@@ -93,12 +95,13 @@ final class CompanySettingService
     {
         CompanySetting::set('whatsapp_additional_numbers', $data['whatsapp_additional_numbers'] ?? [], 'json');
         CompanySetting::set('working_hours', $this->prepareWorkingHours($data['working_hours'] ?? []), 'json');
+        CompanySetting::set('gallery_metrics', $data['gallery_metrics'] ?? [], 'json');
     }
 
     private function prepareWorkingHours(array $workingHours): array
     {
         foreach (self::DAY_KEYS as $day) {
-            if (!isset($workingHours[$day])) {
+            if (! isset($workingHours[$day])) {
                 $workingHours[$day] = ['open' => null, 'close' => null, 'is_closed' => false];
             } else {
                 $workingHours[$day]['is_closed'] = isset($workingHours[$day]['is_closed']);
@@ -133,6 +136,14 @@ final class CompanySettingService
             'instagram_url' => CompanySetting::get('instagram_url', 'https://instagram.com'),
             'linkedin_url' => CompanySetting::get('linkedin_url', 'https://linkedin.com'),
             'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
+            'announcement_active' => CompanySetting::get('announcement_active', false),
+            'announcement_text' => CompanySetting::get('announcement_text', ''),
+            'announcement_link' => CompanySetting::get('announcement_link', ''),
+            'gallery_metrics' => CompanySetting::get('gallery_metrics', [
+                ['label' => 'Vehicles Serviced', 'value' => '2,500', 'suffix' => '+'],
+                ['label' => 'Heavy Machines', 'value' => '150', 'suffix' => '+'],
+                ['label' => 'Fleet Accounts', 'value' => '45', 'suffix' => '+'],
+            ]),
         ];
     }
 
