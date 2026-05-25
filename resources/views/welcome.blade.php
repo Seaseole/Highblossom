@@ -10,7 +10,7 @@
         </div>
 
         {{-- Hero Content --}}
-        <div class="relative z-10 flex-grow flex items-center justify-center w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 text-center">
+        <div class="relative z-10 flex-grow flex items-center justify-center w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 pb-12 text-center">
             <div class="max-w-4xl mx-auto">
                 {{-- Trust Badge --}}
                 <div

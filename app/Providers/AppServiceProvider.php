@@ -73,9 +73,8 @@ class AppServiceProvider extends ServiceProvider
                 'facebookUrl' => CompanySetting::get('facebook_url', ''),
                 'instagramUrl' => CompanySetting::get('instagram_url', ''),
                 'linkedinUrl' => CompanySetting::get('linkedin_url', ''),
-                'announcementActive' => CompanySetting::get('announcement_active', false),
-                'announcementText' => CompanySetting::get('announcement_text', ''),
-                'announcementLink' => CompanySetting::get('announcement_link', ''),
+                'announcementActive' => (bool) CompanySetting::get('announcement_active', false),
+                'announcements' => CompanySetting::get('announcements', []),
             ];
 
             foreach ($settings as $key => $value) {
@@ -89,8 +88,7 @@ class AppServiceProvider extends ServiceProvider
             View::share('companyAddress', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana');
             View::share('primaryPhone', '+267 123 4567');
             View::share('announcementActive', false);
-            View::share('announcementText', '');
-            View::share('announcementLink', '');
+            View::share('announcements', []);
         }
 
         Model::preventLazyLoading(! app()->isProduction());

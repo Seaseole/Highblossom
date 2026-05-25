@@ -334,53 +334,35 @@
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
+                         class="space-y-6" style="display: none;"
+                         x-data="{
+                            announcements: {{ json_encode($settings['announcements']) }},
+                            add() { this.announcements.push({ text: '', link: '' }); },
+                            remove(index) { this.announcements.splice(index, 1); }
+                         }">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <h3 class="text-lg font-bold text-admin-text">Announcement Text Ticker</h3>
-                            <div class="space-y-6">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Status</label>
-                                    <div class="flex items-center gap-2">
-                                        <x-ui.checkbox
-                                            name="announcement_active"
-                                            value="1"
-                                            :checked="$settings['announcement_active'] ?? false"
-                                            label="Enable Announcement Ticker Bar"
-                                        />
-                                    </div>
-                                    <p class="text-[10px] text-admin-text-muted">When checked, the ticker will show up at the very top of all public pages.</p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Announcement Text</label>
-                                    <input type="text" name="announcement_text" value="{{ old('announcement_text', $settings['announcement_text']) }}" class="w-full admin-form-input" placeholder="e.g. Office Closed on Monday for public holiday! | Promo: Get 10% off on all glass orders this week!">
-                                    <p class="text-[10px] text-admin-text-muted">The text that will scroll on the public announcement bar. Keep it concise, or use '|' to separate multiple announcements.</p>
-                                </div>
-                                <div class="space-y-2" x-data="{
-                                    announcementLink: '{{ old('announcement_link', $settings['announcement_link']) }}',
-                                    isCustom: {{ filter_var(old('announcement_link', $settings['announcement_link']), FILTER_VALIDATE_URL) ? 'true' : 'false' }}
-                                }">
-                                    <label class="text-sm font-medium text-admin-text">Announcement Link / Promo URL (Optional)</label>
-                                    <div class="flex gap-2">
-                                        <select x-model="isCustom" class="w-1/3 admin-form-input">
-                                            <option :value="false">Select Page</option>
-                                            <option :value="true">Custom URL</option>
-                                        </select>
-                                        
-                                        <!-- Page Dropdown -->
-                                        <select name="announcement_link" x-show="!isCustom" x-model="announcementLink" class="w-full admin-form-input">
-                                            <option value="{{ route('home') }}">Home</option>
-                                            <option value="{{ route('about-us') }}">About Us</option>
-                                            <option value="{{ route('services') }}">Services</option>
-                                            <option value="{{ route('gallery') }}">Gallery</option>
-                                            <option value="{{ route('quote') }}">Quote Form</option>
-                                            <option value="{{ route('contact') }}">Contact Us</option>
-                                            <option value="{{ route('blog') }}">Blog</option>
-                                        </select>
-                                        
-                                        <!-- Custom URL Input -->
-                                        <input type="url" name="announcement_link" x-show="isCustom" x-model="announcementLink" class="w-full admin-form-input" placeholder="e.g. https://example.com">
-                                    </div>
-                                    <p class="text-[10px] text-admin-text-muted">Clicking the announcement bar will navigate visitors to this URL.</p>
+                            <h3 class="text-lg font-bold text-admin-text">Manage Announcements</h3>
+                            <div class="space-y-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="announcement_active" value="1" {{ ($settings['announcement_active'] ?? false) ? 'checked' : '' }} class="admin-checkbox">
+                                    <span class="text-sm font-medium text-admin-text">Enable Announcement Ticker Bar</span>
+                                </label>
+                                
+                                <div class="space-y-4">
+                                    <template x-for="(announcement, index) in announcements" :key="index">
+                                        <div class="flex gap-4 p-4 bg-admin-surface-alt rounded-xl border border-admin-border-subtle">
+                                            <div class="flex-1 space-y-3">
+                                                <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full admin-form-input" placeholder="Announcement text">
+                                                <input type="url" :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full admin-form-input" placeholder="Link (Optional)">
+                                            </div>
+                                            <button type="button" @click="remove(index)" class="text-admin-text-muted hover:text-red-500 transition-colors">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <button type="button" @click="add()" class="w-full py-3 border-2 border-dashed border-admin-border-subtle rounded-xl text-admin-text-muted hover:text-admin-accent hover:border-admin-accent transition-colors">
+                                        + Add Announcement
+                                    </button>
                                 </div>
                             </div>
                         </div>

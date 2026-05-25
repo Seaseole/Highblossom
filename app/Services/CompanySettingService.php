@@ -17,7 +17,6 @@ final class CompanySettingService
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
-        'announcement_text', 'announcement_link',
     ];
 
     private const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -96,6 +95,7 @@ final class CompanySettingService
         CompanySetting::set('whatsapp_additional_numbers', $data['whatsapp_additional_numbers'] ?? [], 'json');
         CompanySetting::set('working_hours', $this->prepareWorkingHours($data['working_hours'] ?? []), 'json');
         CompanySetting::set('gallery_metrics', $data['gallery_metrics'] ?? [], 'json');
+        CompanySetting::set('announcements', $data['announcements'] ?? [], 'json');
     }
 
     private function prepareWorkingHours(array $workingHours): array
@@ -137,8 +137,7 @@ final class CompanySettingService
             'linkedin_url' => CompanySetting::get('linkedin_url', 'https://linkedin.com'),
             'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
             'announcement_active' => CompanySetting::get('announcement_active', false),
-            'announcement_text' => CompanySetting::get('announcement_text', ''),
-            'announcement_link' => CompanySetting::get('announcement_link', ''),
+            'announcements' => CompanySetting::get('announcements', []),
             'gallery_metrics' => CompanySetting::get('gallery_metrics', [
                 ['label' => 'Vehicles Serviced', 'value' => '2,500', 'suffix' => '+'],
                 ['label' => 'Heavy Machines', 'value' => '150', 'suffix' => '+'],

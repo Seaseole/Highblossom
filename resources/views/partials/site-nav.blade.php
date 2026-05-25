@@ -1,11 +1,10 @@
-<nav id="public-main-nav" class="fixed top-0 w-full z-40 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5 flex flex-col">
-    @if($announcementActive && !empty($announcementText))
-        <script>
-            if (sessionStorage.getItem('dismissed_announcement') === 'true') {
-                document.write('<style>#announcement-ticker-bar { display: none !important; }</style>');
-            }
-        </script>
-        <style>
+<nav id="public-main-nav" class="sticky top-0 w-full z-40 bg-[#0A0A0F]/90 backdrop-blur-xl border-b border-white/5 flex flex-col">
+    @php
+        $isAnnounceActive = $announcementActive ?? \App\Models\CompanySetting::get('announcement_active', false);
+        $announceList = $announcements ?? \App\Models\CompanySetting::get('announcements', []);
+    @endphp
+@if($isAnnounceActive && !empty($announceList))
+    <style>
             .announcement-gradient {
                 background: linear-gradient(90deg, #73081d 0%, #dc2626 50%, #73081d 100%);
             }
@@ -18,7 +17,7 @@
             .ticker-wrapper {
                 display: flex;
                 white-space: nowrap;
-                animation: marquee-scroll 25s linear infinite;
+                animation: marquee-scroll 30s linear infinite;
                 will-change: transform;
             }
             .ticker-wrapper:hover {
@@ -45,7 +44,7 @@
                 35%, 100% { transform: translateX(100%); }
             }
         </style>
-        <div id="announcement-ticker-bar" class="w-full announcement-gradient border-b border-white/10 text-white py-1.5 px-4 relative overflow-hidden transition-all duration-300 ease-out select-none flex items-center shimmer-glow" style="height: 34px;">
+        <div id="announcement-ticker-bar" class="w-full announcement-gradient border-b border-white/10 text-white py-1.5 px-4 relative overflow-hidden transition-all duration-300 ease-out select-none flex items-center shimmer-glow" style="height: 34px; min-height: 34px;">
             <div class="max-w-[1400px] mx-auto w-full flex items-center justify-between gap-4 z-10">
                 <!-- Label on left -->
                 <div class="flex items-center gap-1.5 flex-shrink-0">
@@ -58,17 +57,18 @@
                     <div class="ticker-container">
                         <div class="ticker-wrapper">
                             @for ($i = 0; $i < 3; $i++)
-                                <div class="ticker-item text-[11px] font-medium tracking-wide text-white">
-                                    @if($announcementLink)
-                                        <a href="{{ $announcementLink }}" class="flex items-center gap-1 hover:text-white/80 transition-colors">
-                                            <span>{{ $announcementText }}</span>
-                                            <span class="material-symbols-outlined text-[12px] opacity-80">arrow_forward</span>
-                                        </a>
-                                    @else
-                                        <span>{{ $announcementText }}</span>
-                                    @endif
-                                    <span class="text-white/40 mx-4 select-none">•</span>
-                                </div>
+                                @foreach($announceList as $announcement)
+                                    <div class="ticker-item text-[11px] font-medium tracking-wide text-white mx-4">
+                                        @if(!empty($announcement['link']))
+                                            <a href="{{ $announcement['link'] }}" class="flex items-center gap-1 hover:text-white/80 transition-colors">
+                                                <span>{{ $announcement['text'] }}</span>
+                                                <span class="material-symbols-outlined text-[12px] opacity-80">arrow_forward</span>
+                                            </a>
+                                        @else
+                                            <span>{{ $announcement['text'] }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
                             @endfor
                         </div>
                     </div>
