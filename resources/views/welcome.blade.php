@@ -1,6 +1,4 @@
-<x-layouts::site :title="
-// $companyName.
-        ' | Precision Automotive Glass'">
+<x-layouts::site title="Highblossom | Precision Automotive Glass">
     <!-- Hero Section - Cinematic Dark -->
     <header class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
         {{-- Background Image with Overlay --}}
@@ -348,78 +346,47 @@
     <!-- Why Choose Us Section -->
     <section class="py-24 lg:py-32 bg-[#0A0A0F]">
         <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            {{-- Section Header --}}
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('site.home.why_choose_label') }}</div>
                 <h2 class="text-4xl md:text-5xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
                     {{ __('site.home.why_choose_title') }}
                 </h2>
-                <p class="text-[#FAFAFA] text-lg">
-                    {{ __('site.home.why_choose_subtitle') }}
-                </p>
+            </div>
+            
+            {{-- Process Section --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+                <div class="text-center p-8 glass-card rounded-2xl">
+                    <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 text-[#DC2626] font-bold text-2xl">1</div>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] mb-3">Consultation</h3>
+                    <p class="text-[#FAFAFA] text-sm">We assess your vehicle needs with precision and offer a transparent, free, no-obligation quote.</p>
+                </div>
+                <div class="text-center p-8 glass-card rounded-2xl">
+                    <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 text-[#DC2626] font-bold text-2xl">2</div>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] mb-3">Precision Fabrication</h3>
+                    <p class="text-[#FAFAFA] text-sm">Our expert technicians prepare your high-quality glass using state-of-the-art tools and materials.</p>
+                </div>
+                <div class="text-center p-8 glass-card rounded-2xl">
+                    <div class="w-16 h-16 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 text-[#DC2626] font-bold text-2xl">3</div>
+                    <h3 class="text-xl font-bold text-[#FAFAFA] mb-3">Quality Installation</h3>
+                    <p class="text-[#FAFAFA] text-sm">We provide expert mobile installation, ensuring your vehicle's safety with a lifetime workmanship warranty.</p>
+                </div>
             </div>
 
-            {{-- Features Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {{-- Feature 1 --}}
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.safety_first') }}</h3>
-                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
-                        {{ __('site.home.safety_first_description') }}
-                    </p>
-                </div>
-
-                {{-- Feature 2 --}}
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.same_day_service_feature') }}</h3>
-                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
-                        {{ __('site.home.same_day_service_description') }}
-                    </p>
-                </div>
-
-                {{-- Feature 3 --}}
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.expert_craftsmanship') }}</h3>
-                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
-                        {{ __('site.home.expert_craftsmanship_description') }}
-                    </p>
-                </div>
-
-                {{-- Feature 4 --}}
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-3">{{ __('site.home.mobile_service') }}</h3>
-                    <p class="text-[#FAFAFA] text-sm leading-relaxed">
-                        {{ __('site.home.mobile_service_description') }}
-                    </p>
+            {{-- Trusted By Section --}}
+            @php $partners = \App\Models\Partner::where('is_active', true)->orderBy('order')->get(); @endphp
+            @if($partners->isNotEmpty())
+            <div class="mt-32 border-t border-white/5 pt-20">
+                <p class="text-center text-[#A1A1AA] text-[10px] font-bold uppercase tracking-[0.2em] mb-12">Proudly Trusted By</p>
+                <div class="flex flex-wrap justify-center items-center gap-x-16 gap-y-12">
+                    @foreach($partners as $partner)
+                        <div class="group relative">
+                            <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" 
+                                 class="h-8 md:h-10 object-contain opacity-50 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-105">
+                        </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
         </div>
     </section>
 

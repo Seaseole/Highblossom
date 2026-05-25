@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\GlassTypeController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\InspectionController;
 use App\Http\Controllers\Admin\MediaLibraryController;
+use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\QuoteController;
@@ -122,6 +123,13 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('tags/{tag}/edit', [TagController::class, 'edit'])->middleware('can:update blog')->name('tags.edit');
     Route::put('tags/{tag}', [TagController::class, 'update'])->middleware('can:update blog')->name('tags.update');
     Route::delete('tags/{tag}', [TagController::class, 'destroy'])->middleware('can:delete blog')->name('tags.destroy');
+
+    Route::get('partners', [PartnerController::class, 'index'])->middleware('can:manage settings')->name('partners.index');
+    Route::get('partners/create', [PartnerController::class, 'create'])->middleware('can:manage settings')->name('partners.create');
+    Route::post('partners', [PartnerController::class, 'store'])->middleware('can:manage settings')->name('partners.store');
+    Route::get('partners/{partner}/edit', [PartnerController::class, 'edit'])->middleware('can:manage settings')->name('partners.edit');
+    Route::put('partners/{partner}', [PartnerController::class, 'update'])->middleware('can:manage settings')->name('partners.update');
+    Route::delete('partners/{partner}', [PartnerController::class, 'destroy'])->middleware('can:manage settings')->name('partners.destroy');
 
     Route::get('gallery', [GalleryController::class, 'index'])->middleware('can:view gallery')->name('gallery.index');
     Route::get('gallery/settings', [CompanySettingController::class, 'gallerySettings'])->middleware('can:manage gallery')->name('gallery-settings.index');
