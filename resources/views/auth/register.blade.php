@@ -187,7 +187,6 @@
                                 >
                             </div>
                         </div>
-                        {{ dump($pwRules->toPasswordRulesString()) }}
                         <div class="animate-fade-in-up delay-500 px-1">
                             <div class="light-checkbox">
                                 <x-ui.checkbox name="terms" id="terms" required>
