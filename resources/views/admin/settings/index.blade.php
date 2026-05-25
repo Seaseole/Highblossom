@@ -336,8 +336,11 @@
                          x-transition:enter-end="opacity-100 translate-y-0"
                          class="space-y-6" style="display: none;"
                          x-data="{
-                            announcements: {{ json_encode($settings['announcements']) }},
-                            add() { this.announcements.push({ text: '', link: '' }); },
+                            announcements: {{ json_encode(array_map(function($a) { 
+                                $a['isCustom'] = filter_var($a['link'], FILTER_VALIDATE_URL) ? true : false;
+                                return $a;
+                            }, $settings['announcements'])) }},
+                            add() { this.announcements.push({ text: '', link: '', isCustom: false }); },
                             remove(index) { this.announcements.splice(index, 1); }
                          }">
                         <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
@@ -350,12 +353,33 @@
                                 
                                 <div class="space-y-4">
                                     <template x-for="(announcement, index) in announcements" :key="index">
-                                        <div class="flex gap-4 p-4 bg-admin-surface-alt rounded-xl border border-admin-border-subtle">
+                                        <div class="flex gap-4 p-4 bg-admin-surface-alt rounded-xl border border-admin-border-subtle items-start">
                                             <div class="flex-1 space-y-3">
                                                 <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full admin-form-input" placeholder="Announcement text">
-                                                <input type="url" :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full admin-form-input" placeholder="Link (Optional)">
+                                                
+                                                <div class="flex gap-2">
+                                                    <select x-model="announcement.isCustom" class="w-1/3 admin-form-input text-xs py-2">
+                                                        <option :value="false">Select Page</option>
+                                                        <option :value="true">Custom URL</option>
+                                                    </select>
+                                                    
+                                                    <!-- Page Dropdown -->
+                                                    <select :name="`announcements[${index}][link]`" x-show="!announcement.isCustom" x-model="announcement.link" class="w-full admin-form-input text-xs py-2">
+                                                        <option value="">No Link</option>
+                                                        <option value="{{ route('home') }}">Home</option>
+                                                        <option value="{{ route('about-us') }}">About Us</option>
+                                                        <option value="{{ route('services') }}">Services</option>
+                                                        <option value="{{ route('gallery') }}">Gallery</option>
+                                                        <option value="{{ route('quote') }}">Quote Form</option>
+                                                        <option value="{{ route('contact') }}">Contact Us</option>
+                                                        <option value="{{ route('blog') }}">Blog</option>
+                                                    </select>
+                                                    
+                                                    <!-- Custom URL Input -->
+                                                    <input type="url" :name="`announcements[${index}][link]`" x-show="announcement.isCustom" x-model="announcement.link" class="w-full admin-form-input text-xs py-2" placeholder="https://example.com">
+                                                </div>
                                             </div>
-                                            <button type="button" @click="remove(index)" class="text-admin-text-muted hover:text-red-500 transition-colors">
+                                            <button type="button" @click="remove(index)" class="mt-2 text-admin-text-muted hover:text-red-500 transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         </div>
