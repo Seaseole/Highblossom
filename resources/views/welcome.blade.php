@@ -159,7 +159,7 @@
                         {{ __('site.home.services_title') }}
                     </h2>
                 </div>
-                <a href="{{ route('services') }}" class="btn-ghost">
+                <a href="{{ route('services') }}" class="btn-ghost-md">
                     <span>{{ __('site.home.services_view_all') }}</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -279,7 +279,7 @@
                         {{ __('site.home.gallery_title') }}
                     </h2>
                 </div>
-                <a href="{{ route('gallery') }}" class="btn-ghost">
+                <a href="{{ route('gallery') }}" class="btn-ghost-md">
                     <span>{{ __('site.home.gallery_view_full') }}</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
