@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\StaffAbsenceController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\SeoController;
@@ -236,6 +237,9 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('profile/two-factor/recovery-codes', [ProfileController::class, 'showRecoveryCodes'])->name('profile.two-factor.recovery-codes');
     Route::post('profile/two-factor/recovery-codes', [ProfileController::class, 'regenerateRecoveryCodes'])->name('profile.two-factor.regenerate-recovery-codes');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Theme
+    Route::post('theme', [ThemeController::class, 'store'])->name('theme.store');
 
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
 });

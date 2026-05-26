@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\PartnerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Partner extends Model
 {
-    /** @use HasFactory<\Database\Factories\PartnerFactory> */
+    /** @use HasFactory<PartnerFactory> */
     use HasFactory;
 
     protected $fillable = ['name', 'logo_path', 'website_url', 'order', 'is_active'];
@@ -18,6 +20,6 @@ class Partner extends Model
 
     public function getLogoUrlAttribute(): string
     {
-        return \Illuminate\Support\Facades\Storage::url($this->logo_path);
+        return Storage::url($this->logo_path);
     }
 }

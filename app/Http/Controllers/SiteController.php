@@ -15,6 +15,7 @@ use App\Models\GlassType;
 use App\Models\Post;
 use App\Models\Service;
 use App\Models\ServiceType;
+use App\Models\Staff;
 use App\Services\ContactNumberService;
 use App\Services\SiteService;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class SiteController extends Controller
             abort(404);
         }
 
-        $staff = \App\Models\Staff::where('is_active', true)->orderBy('order')->get();
+        $staff = Staff::where('is_active', true)->orderBy('order')->get();
 
         return view('site.about-us', compact('content', 'staff'));
     }

@@ -8,14 +8,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 final class PartnerController extends Controller
 {
     public function index(): View
     {
         $partners = Partner::orderBy('order')->get();
+
         return view('admin.partners.index', compact('partners'));
     }
 
@@ -33,7 +34,7 @@ final class PartnerController extends Controller
         ]);
 
         $path = $request->file('logo')->store('partners', 'public');
-        
+
         Partner::create([
             'name' => $validated['name'],
             'logo_path' => $path,
@@ -73,6 +74,7 @@ final class PartnerController extends Controller
     {
         Storage::disk('public')->delete($partner->logo_path);
         $partner->delete();
+
         return redirect()->route('admin.partners.index')->with('success', 'Partner removed.');
     }
 }

@@ -16,7 +16,7 @@ class QuoteFormRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'email' => 'required|nullable|email|max:255',
             'vehicle_type' => 'required|string|in:sedan,suv,truck,van,heavy,fleet,other',
             'make_model' => 'nullable|string|max:255',
             'reg_number' => 'nullable|string|max:20',

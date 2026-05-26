@@ -22,7 +22,15 @@
                 <div class="lg:col-span-2">
                     <div class="glass-card rounded-2xl p-8 md:p-12">
                         <form action="{{ route('quote.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-10"
-                            x-data="{ isSubmitting: false, isUploading: false, hasImage: false }"
+                            x-data="{ 
+                                isSubmitting: false, 
+                                isUploading: false, 
+                                hasImage: false,
+                                showErrors: true,
+                                init() {
+                                    setTimeout(() => this.showErrors = false, 5000);
+                                }
+                            }"
                             @submit.prevent="if (!isSubmitting && !isUploading) { isSubmitting = true; $el.submit(); }">
                             @csrf
                             <input type="hidden" name="_idempotency_token" value="{{ session()->get('quote_token', md5(uniqid())) }}">
@@ -43,22 +51,34 @@
                                 </div>
                                 <div class="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label for="name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.full_name_label') }} *</label>
+                                        <label for="name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.full_name_label') }} <span style="color: red">*</span></label>
                                         <input type="text" id="name" name="name" required
-                                            class="form-input-premium"
-                                            placeholder="John Doe">
+                                            class="form-input-premium @error('name') border-red-500 @enderror"
+                                            placeholder="John Doe"
+                                            oninput=this.value=this.value.replace(/[^a-zA-Z ]/g,'')">
+                                        @error('name')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div>
-                                        <label for="phone" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.phone_number_label') }} *</label>
+                                        <label for="phone" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.phone_number_label') }} <span style="color: red">*</span></label>
                                         <input type="tel" id="phone" name="phone" required
-                                            class="form-input-premium"
-                                            placeholder="+267 XX XXX XXX">
+                                            class="form-input-premium @error('phone') border-red-500 @enderror"
+                                            placeholder="267 XX XXX XXX"
+                                            oninput=this.value=this.value.replace(/[^0-9]/g,'')>
+                                        @error('phone')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="md:col-span-2">
-                                        <label for="email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.email_address_label') }}</label>
-                                        <input type="email" id="email" name="email"
-                                            class="form-input-premium"
-                                            placeholder="john@example.com">
+                                        <label for="email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.email_address_label') }} <span style="color: red">*</span></label>
+                                        <input type="email" id="email" name="email" required
+                                            class="form-input-premium @error('email') border-red-500 @enderror"
+                                            placeholder="john@example.com"
+                                            oninput=this.value=this.value.replace(/[^a-zA-Z0-9._%+-@]/g,'')>
+                                        @error('email')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -78,8 +98,8 @@
                                 </div>
                                 <div class="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label for="vehicle_type" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.vehicle_type') }} *</label>
-                                        <select id="vehicle_type" name="vehicle_type" required class="form-input-premium">
+                                        <label for="vehicle_type" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.vehicle_type') }} <span style="color: red">*</span></label>
+                                        <select id="vehicle_type" name="vehicle_type" required class="form-input-premium @error('vehicle_type') border-red-500 @enderror">
                                             <option value="">{{ __('quote.select_type') }}</option>
                                             <option value="sedan">Sedan / Hatchback</option>
                                             <option value="suv">SUV / 4x4</option>
@@ -89,6 +109,9 @@
                                             <option value="fleet">Fleet Vehicle</option>
                                             <option value="other">Other</option>
                                         </select>
+                                        @error('vehicle_type')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div>
                                         <label for="make_model" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.make_model') }}</label>
@@ -100,7 +123,8 @@
                                         <label for="reg_number" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.registration_number') }}</label>
                                         <input type="text" id="reg_number" name="reg_number"
                                             class="form-input-premium"
-                                            placeholder="e.g., B 123 ABC">
+                                            placeholder="e.g., B 123 ABC"
+                                            oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div>
                                         <label for="year" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.vehicle_year') }}</label>
@@ -125,7 +149,7 @@
                                     </div>
                                 </div>
 
-                                <div class="grid md:grid-cols-2 gap-6" x-data="{ 
+                                <div class="grid md:grid-cols-2 gap-6" x-data="{
                                         selectedGlassType: null,
                                         subCategories: [],
                                         loading: false,
@@ -134,10 +158,10 @@
                                                 this.subCategories = [];
                                                 return;
                                             }
-                                            
+
                                             this.loading = true;
                                             this.subCategories = [];
-                                            
+
                                             loadSubCategories(glassTypeId)
                                                 .then(subCategories => {
                                                     this.subCategories = subCategories;
@@ -151,12 +175,12 @@
                                         }
                                     }">
                                     <div>
-                                        <label for="glass_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.glass_type') }} *</label>
-                                        <select 
-                                            id="glass_type_id" 
-                                            name="glass_type_id" 
-                                            required 
-                                            class="form-input-premium"
+                                        <label for="glass_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.glass_type') }} <span style="color: red">*</span></label>
+                                        <select
+                                            id="glass_type_id"
+                                            name="glass_type_id"
+                                            required
+                                            class="form-input-premium @error('glass_type_id') border-red-500 @enderror"
                                             x-model="selectedGlassType"
                                             @change="loadSubCategories($event.target.value)"
                                         >
@@ -165,17 +189,20 @@
                                             <option value="{{ $glassType->id }}">{{ $glassType->name }}</option>
                                             @endforeach
                                         </select>
+                                        @error('glass_type_id')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div>
                                         <label for="glass_sub_category_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">
-                                            {{ __('quote.glass_sub_category') }} 
+                                            {{ __('quote.glass_sub_category') }}
                                             <span class="text-xs text-[#71717A] font-normal" x-show="!selectedGlassType">(select glass type first)</span>
                                             <span class="text-red-500" x-show="selectedGlassType && subCategories.length === 0 && !loading">*</span>
                                         </label>
-                                        <select 
-                                            id="glass_sub_category_id" 
-                                            name="glass_sub_category_id" 
-                                            class="form-input-premium"
+                                        <select
+                                            id="glass_sub_category_id"
+                                            name="glass_sub_category_id"
+                                            class="form-input-premium @error('glass_sub_category_id') border-red-500 @enderror"
                                             :disabled="!selectedGlassType || loading"
                                             x-show="selectedGlassType"
                                             :required="subCategories.length > 0"
@@ -185,6 +212,9 @@
                                                 <option :value="subCategory.id" x-text="subCategory.name"></option>
                                             </template>
                                         </select>
+                                        @error('glass_sub_category_id')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                         <div x-show="loading" class="flex items-center gap-2 mt-2">
                                             <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -197,13 +227,16 @@
 
                                 <div class="grid md:grid-cols-1 gap-6">
                                     <div>
-                                        <label for="service_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.service_type') }} *</label>
-                                        <select id="service_type_id" name="service_type_id" required class="form-input-premium">
+                                        <label for="service_type_id" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('quote.service_type') }} <span style="color: red">*</span></label>
+                                        <select id="service_type_id" name="service_type_id" required class="form-input-premium @error('service_type_id') border-red-500 @enderror">
                                             <option value="">{{ __('quote.select_service') }}</option>
                                             @foreach($serviceTypes as $serviceType)
                                             <option value="{{ $serviceType->id }}">{{ $serviceType->name }}</option>
                                             @endforeach
                                         </select>
+                                        @error('service_type_id')
+                                            <p x-show="showErrors" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -225,12 +258,12 @@
                                 <div class="mb-6">
                                     <h3 class="text-lg font-medium text-[#FAFAFA] mb-2">{{ __('quote.visual_assessment') }}</h3>
                                     <p class="text-sm text-[#71717A] mb-4">{{ __('quote.upload_description') }}</p>
-                                    
+
                                     <input type="hidden" name="image_path" id="quote-image-path">
-                                    
+
                                     <div id="quote-image-preview" class="mb-4"></div>
                                     <div id="quote-image-progress"></div>
-                                    
+
                                     <div class="mt-4 flex justify-center rounded-lg border border-dashed border-white/20 px-6 py-10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
                                         <div class="text-center">
                                             <svg class="mx-auto h-12 w-12 text-[#DC2626]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

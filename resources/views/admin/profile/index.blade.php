@@ -204,7 +204,7 @@
                                 <label class="text-sm font-medium text-admin-text-muted">Theme Preference</label>
                                 <div class="grid grid-cols-3 gap-4">
                                     <label class="relative cursor-pointer">
-                                        <input type="radio" name="theme_preference" value="light" {{ $user->theme_preference === 'light' ? 'checked' : '' }} class="peer sr-only">
+                                        <input type="radio" name="theme" value="light" {{ $user->theme?->value === 'light' ? 'checked' : '' }} class="peer sr-only">
                                         <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@
                                         </div>
                                     </label>
                                     <label class="relative cursor-pointer">
-                                        <input type="radio" name="theme_preference" value="dark" {{ $user->theme_preference === 'dark' ? 'checked' : '' }} class="peer sr-only">
+                                        <input type="radio" name="theme" value="dark" {{ $user->theme?->value === 'dark' ? 'checked' : '' }} class="peer sr-only">
                                         <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@
                                         </div>
                                     </label>
                                     <label class="relative cursor-pointer">
-                                        <input type="radio" name="theme_preference" value="auto" {{ $user->theme_preference === 'auto' || !$user->theme_preference ? 'checked' : '' }} class="peer sr-only">
+                                        <input type="radio" name="theme" value="auto" {{ $user->theme?->value === 'auto' || !$user->theme?->value ? 'checked' : '' }} class="peer sr-only">
                                         <div class="p-4 rounded-xl border-2 border-admin-border-subtle peer-checked:border-admin-accent peer-checked:bg-admin-accent/10 transition-all">
                                             <div class="text-center">
                                                 <svg class="w-8 h-8 mx-auto mb-2 text-admin-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">

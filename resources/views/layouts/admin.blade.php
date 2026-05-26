@@ -12,23 +12,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    @fluxAppearance
-    @livewireStyles
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="{{ asset('vendor/ckeditor/ckeditor.js') }}"></script>
 
-    {{-- Instant Dark Mode Script --}}
+    {{-- Seed localStorage BEFORE @fluxAppearance reads it, so Flux honours the backend preference --}}
     <script>
         (function() {
-            const theme = @json(auth()->user()?->theme_preference) || localStorage.getItem('theme') || 'auto';
+            const theme = @json($theme);
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            // Apply class immediately to prevent FOUT
             if (theme === 'dark' || (theme === 'auto' && prefersDark)) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
+            // Sync both our key and Flux's key so they stay in agreement
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('flux.appearance', theme === 'auto' ? 'system' : theme);
         })();
     </script>
+
+    @fluxAppearance
+    @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('vendor/ckeditor/ckeditor.js') }}"></script>
 
     <style>
         /* Base background colors to prevent flash */

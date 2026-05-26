@@ -8,14 +8,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 final class StaffController extends Controller
 {
     public function index(): View
     {
         $staff = Staff::orderBy('order')->get();
+
         return view('admin.staff.index', compact('staff'));
     }
 
@@ -34,7 +35,7 @@ final class StaffController extends Controller
         ]);
 
         $path = $request->file('photo')->store('staff', 'public');
-        
+
         Staff::create([
             'name' => $validated['name'],
             'role' => $validated['role'],
@@ -60,7 +61,9 @@ final class StaffController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($staff->photo_path) Storage::disk('public')->delete($staff->photo_path);
+            if ($staff->photo_path) {
+                Storage::disk('public')->delete($staff->photo_path);
+            }
             $staff->photo_path = $request->file('photo')->store('staff', 'public');
         }
 
@@ -75,8 +78,11 @@ final class StaffController extends Controller
 
     public function destroy(Staff $staff): RedirectResponse
     {
-        if ($staff->photo_path) Storage::disk('public')->delete($staff->photo_path);
+        if ($staff->photo_path) {
+            Storage::disk('public')->delete($staff->photo_path);
+        }
         $staff->delete();
+
         return redirect()->route('admin.staff.index')->with('success', 'Staff member removed.');
     }
 }

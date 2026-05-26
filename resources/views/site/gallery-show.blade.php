@@ -99,7 +99,7 @@
                         </h2>
                     </div>
                     <a href="{{ route('gallery', ['category' => $galleryImage->category]) }}" class="hidden md:flex items-center gap-2 text-[#A1A1AA] hover:text-[#DC2626] transition-colors font-semibold">
-                        <span>{{ __('gallery-show.view_all') }} {{ str_replace('_', ' ', ucfirst($galleryImage->category)) }}</span>
+                        <span>{{ __('gallery-show.view_all') }} {{ str_replace('_', ' ', ucfirst($galleryImage->category->name)) }}</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -120,7 +120,7 @@
                             <h3 class="text-[#FAFAFA] font-bold font-headline group-hover:text-[#DC2626] transition-colors">
                                 {{ $related->title }}
                             </h3>
-                            <p class="text-sm text-[#A1A1AA] mt-1">{{ str_replace('_', ' ', ucfirst($related->category)) }}</p>
+                            <p class="text-sm text-[#A1A1AA] mt-1">{{ str_replace('_', ' ', ucfirst($related->category->name)) }}</p>
                         </a>
                     @endforeach
                 </div>

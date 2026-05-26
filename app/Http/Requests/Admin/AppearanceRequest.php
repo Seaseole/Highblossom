@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\Theme;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class AppearanceRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ final class AppearanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'theme_preference' => ['required', 'in:light,dark,auto'],
+            'theme' => ['required', Rule::enum(Theme::class)],
         ];
     }
 }

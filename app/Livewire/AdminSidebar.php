@@ -16,7 +16,7 @@ final class AdminSidebar extends Component
 
     public function mount(): void
     {
-        $this->theme = Auth::check() ? Auth::user()->theme_preference ?? 'auto' : 'auto';
+        $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
         $this->mobileMenuOpen = false;
     }
 
@@ -47,7 +47,7 @@ final class AdminSidebar extends Component
 
         if (Auth::check()) {
             Auth::user()->update([
-                'theme_preference' => $this->theme,
+                'theme' => $this->theme,
             ]);
         }
 
@@ -62,6 +62,7 @@ final class AdminSidebar extends Component
                 document.documentElement.classList.remove('dark');
             }
             localStorage.setItem('theme', theme);
+            localStorage.setItem('flux.appearance', theme === 'auto' ? 'system' : theme);
         JS);
     }
 
