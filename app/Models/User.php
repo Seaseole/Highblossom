@@ -17,7 +17,7 @@ use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
 use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'theme'])]
+#[Fillable(['name', 'email', 'password', 'theme', 'terms_accepted_at', 'privacy_accepted_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements HasPasskeys
 {
@@ -33,6 +33,8 @@ class User extends Authenticatable implements HasPasskeys
     {
         return [
             'email_verified_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
+            'privacy_accepted_at' => 'datetime',
             'password' => 'hashed',
             'theme' => Theme::class,
         ];

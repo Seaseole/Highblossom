@@ -50,6 +50,8 @@ Route::get('/quote', [SiteController::class, 'quote'])->name('quote');
 Route::post('/quote', [SiteController::class, 'submitQuote'])->middleware('throttle:3,1')->name('quote.submit');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->middleware('throttle:3,1')->name('contact.submit');
+Route::get('/terms', fn() => view('terms'))->name('terms');
+Route::get('/privacy', fn() => view('privacy'))->name('privacy');
 
 // Blog
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');

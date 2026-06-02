@@ -231,10 +231,10 @@
                     © {{ date('Y') }} {{ $companyName }}. All rights reserved.
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="{{ route('home') }}" class="text-[#71717A] hover:text-[#FAFAFA] transition-colors text-sm">
+                    <a href="{{ route('privacy') }}" class="text-[#71717A] hover:text-[#FAFAFA] transition-colors text-sm">
                         Privacy Policy
                     </a>
-                    <a href="{{ route('home') }}" class="text-[#71717A] hover:text-[#FAFAFA] transition-colors text-sm">
+                    <a href="{{ route('terms') }}" class="text-[#71717A] hover:text-[#FAFAFA] transition-colors text-sm">
                         Terms of Service
                     </a>
                 </div>

@@ -61,6 +61,7 @@
 
     @include('partials.site-footer')
     @include('partials.whatsapp-fab')
+    @include('partials.cookie-consent')
 
     <!-- Custom Toast Notification -->
     <x-ui.toaster />

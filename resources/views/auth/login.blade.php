@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ __('auth.login.title') }} - {{ config('app.name') }}</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <style>
         @keyframes fade-in-up {
             from {
@@ -65,7 +65,7 @@
                     <rect width="100" height="100" fill="url(#grid-light)"/>
                 </svg>
             </div>
-            
+
             <!-- Floating Orbs -->
             <div class="absolute top-[-10%] left-[-10%] w-80 h-80 bg-white/20 rounded-full blur-[100px] animate-pulse"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-black/10 rounded-full blur-[100px]"></div>
@@ -77,15 +77,15 @@
                         <span class="text-5xl font-bold text-white drop-shadow-lg transform group-hover:scale-110 transition-transform duration-500">H</span>
                     </div>
                 </div>
-                
+
                 <h1 class="text-6xl font-bold text-white mb-6 tracking-tighter font-headline animate-fade-in-up delay-100 leading-none">
                     {{ $companyName ?? config('app.name') }}
                 </h1>
-                
+
                 <p class="text-xl text-white/80 leading-relaxed animate-fade-in-up delay-200 font-medium">
                     {{ __('auth.login.welcome_back') }}
                 </p>
-                
+
                 <div class="mt-12 flex gap-4 justify-center animate-fade-in-up delay-300">
                     <div class="h-1 w-12 bg-white/30 rounded-full"></div>
                     <div class="h-1 w-4 bg-white/30 rounded-full"></div>
@@ -130,6 +130,7 @@
                                 autocomplete="username"
                                 value="{{ old('email') }}"
                             >
+                        </div>
                         <div class="animate-fade-in-up delay-300">
                             <div class="flex items-center justify-between mb-2 px-1">
                                 <label for="password" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">{{ __('auth.login.password_label') }}</label>
@@ -189,7 +190,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Footer Info -->
                 <p class="mt-8 text-center text-xs text-[#A1A1AA] font-medium uppercase tracking-[0.2em] animate-fade-in-up delay-500">
                     &copy; {{ date('Y') }} {{ App\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
