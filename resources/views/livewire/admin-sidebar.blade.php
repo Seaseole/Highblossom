@@ -271,6 +271,9 @@
                                     wire:navigate
                                 >
                                     {{ $getRouteLabel($route) }}
+                                    @if($route === 'admin.users')
+                                        <flux:badge size="sm" class="ml-auto uppercase text-[0.75rem] font-semibold">{{ $userCount }}</flux:badge>
+                                    @endif
                                 </flux:sidebar.item>
                             @endforeach
                         </flux:sidebar.group>
@@ -398,6 +401,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getMobileIcon($route) }}" />
                             </svg>
                             <span class="whitespace-nowrap">{{ $getRouteLabel($route) }}</span>
+                            @if($route === 'admin.users')
+                                <span class="ml-auto text-[0.75rem] uppercase font-semibold bg-admin-surface-alt text-admin-text-muted px-2 py-0.5 rounded">{{ $userCount }}</span>
+                            @endif
                         </a>
                     @endforeach
                 @endif

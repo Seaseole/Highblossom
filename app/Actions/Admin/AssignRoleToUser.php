@@ -5,7 +5,7 @@ namespace App\Actions\Admin;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
-class AssignRoleToUser
+final class AssignRoleToUser
 {
     /**
      * Assign a role to a user.

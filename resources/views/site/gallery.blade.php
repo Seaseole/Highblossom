@@ -70,7 +70,7 @@
             <!-- Load More -->
             @if ($images->hasMorePages())
             <div class="text-center mt-16">
-                <a href="{{ route('gallery', array_merge(request()->all(), ['page' => $images->currentPage() + 1])) }}" class="btn-premium">
+                <a href="{{ route('gallery', array_merge(request()->all(), ['page' => $images->currentPage() + 1])) }}" class="btn-glass text-lg px-8 py-4">
                     <span>Load More Projects</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

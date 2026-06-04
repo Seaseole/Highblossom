@@ -35,8 +35,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-
         LogViewer::auth(function ($request) {
             return $request->user() && $request->user()->hasRole('Super Admin');
         });
@@ -46,7 +44,6 @@ class AppServiceProvider extends ServiceProvider
                 ->mixedCase()
                 ->numbers()
                 ->symbols();
-
         });
 
         $this->configureDefaults();
@@ -122,18 +119,18 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
-//        DB::prohibitDestructiveCommands(
-//            app()->isProduction(),
-//        );
+        //        DB::prohibitDestructiveCommands(
+        //            app()->isProduction(),
+        //        );
     }
 
-//    public static function passwordRules(): Password
-//    {
-//        return Password::min(12)
-//            ->letters()
-//            ->required()
-//            ->mixedCase()
-//            ->numbers()
-//            ->symbols();
-//    }
+    //    public static function passwordRules(): Password
+    //    {
+    //        return Password::min(12)
+    //            ->letters()
+    //            ->required()
+    //            ->mixedCase()
+    //            ->numbers()
+    //            ->symbols();
+    //    }
 }

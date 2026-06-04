@@ -14,10 +14,13 @@ final class AdminSidebar extends Component
 
     public bool $mobileMenuOpen = false;
 
+    public int $userCount = 0;
+
     public function mount(): void
     {
         $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
         $this->mobileMenuOpen = false;
+        $this->userCount = \App\Models\User::count();
     }
 
     public function toggleTheme(?string $newTheme = null): void
