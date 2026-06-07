@@ -165,6 +165,8 @@
                                     class="w-full px-5 py-3.5 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
                                     placeholder="••••••••"
                                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                                    data-min="12"
+                                    data-max="64"
                                     autocomplete="new-password"
                                     required
                                 >
@@ -227,13 +229,15 @@
 </body>
 </html>
 <script>
-  document.getElementById('password','password_confirmation').addEventListener('input', function () {
+  document.getElementById('password').addEventListener('input', function () {
     const val = this.value;
+    const min = parseInt(this.dataset.min);
+    const max = parseInt(this.dataset.max);
     const hint = document.getElementById('pw-hint');
     const errors = [];
 
-    if (val.length < 12)             errors.push('At least 12 characters');
-    if (val.length > 64)            errors.push('At most 64 characters');
+    if (val.length < min)             errors.push('At least ' + min + ' characters');
+    if (val.length > max)             errors.push('At most ' + max + ' characters');
     if (!/[a-z]/.test(val))         errors.push('One lowercase letter');
     if (!/[A-Z]/.test(val))         errors.push('One uppercase letter');
     if (!/[0-9]/.test(val))         errors.push('One number');
