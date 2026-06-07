@@ -38,13 +38,6 @@ class AppServiceProvider extends ServiceProvider
         LogViewer::auth(function ($request) {
             return $request->user() && $request->user()->hasRole('Super Admin');
         });
-        Password::defaults(function () {
-            return Password::min(12)
-                ->max(64)
-                ->mixedCase()
-                ->numbers()
-                ->symbols();
-        });
 
         $this->configureDefaults();
 
@@ -119,9 +112,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
-        //        DB::prohibitDestructiveCommands(
-        //            app()->isProduction(),
-        //        );
+                DB::prohibitDestructiveCommands(
+                    app()->isProduction(),
+                );
     }
 
     //    public static function passwordRules(): Password

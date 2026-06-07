@@ -232,8 +232,8 @@
     const hint = document.getElementById('pw-hint');
     const errors = [];
 
-    if (val.length < 8)             errors.push('At least 8 characters');
-    if (val.length > 12)            errors.push('At most 12 characters');
+    if (val.length < 12)             errors.push('At least 12 characters');
+    if (val.length > 64)            errors.push('At most 64 characters');
     if (!/[a-z]/.test(val))         errors.push('One lowercase letter');
     if (!/[A-Z]/.test(val))         errors.push('One uppercase letter');
     if (!/[0-9]/.test(val))         errors.push('One number');

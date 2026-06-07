@@ -18,6 +18,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'employee'=>$this->employeeRules($userId),
         ];
     }
 
@@ -46,6 +47,20 @@ trait ProfileValidationRules
             $userId === null
                 ? Rule::unique(User::class)
                 : Rule::unique(User::class)->ignore($userId),
+        ];
+    }
+
+    /**
+     * Get employee details validated
+     *
+     * This method is not used yet.
+     *
+     * @return array
+     */
+    public function employeeRules(?int $userId = null): array
+    {
+        return [
+
         ];
     }
 }
