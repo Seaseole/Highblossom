@@ -1,173 +1,127 @@
 <x-layouts::admin title="About Us Content">
-    <div class="space-y-8">
+    <div class="max-w-5xl mx-auto space-y-8 py-10">
         <!-- Header -->
         <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-admin-text font-headline">About Us</h1>
-                <p class="text-admin-text-muted mt-1 text-sm">Manage your About Us page content.</p>
+            <div class="space-y-1">
+                <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">About Us</h1>
+                <p class="text-gray-500 dark:text-gray-400">Manage your About Us page content.</p>
             </div>
         </div>
 
-        <form action="{{ route('admin.about-us.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" id="aboutUsForm">
+        <form action="{{ route('admin.about-us.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8" id="aboutUsForm">
             @csrf
             @method('PUT')
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
+                    <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-admin-text">Title</label>
-                            <input type="text" name="title" value="{{ old('title', $content->title) }}" required class="w-full admin-form-input">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                            <input type="text" name="title" value="{{ old('title', $content->title) }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                             @error('title')
-                                <p class="text-sm text-admin-accent">{{ $message }}</p>
+                                <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-admin-text">Subtitle</label>
-                            <input type="text" name="subtitle" value="{{ old('subtitle', $content->subtitle) }}" class="w-full admin-form-input">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Subtitle</label>
+                            <input type="text" name="subtitle" value="{{ old('subtitle', $content->subtitle) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                             @error('subtitle')
-                                <p class="text-sm text-admin-accent">{{ $message }}</p>
+                                <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2" x-data="{
                             editorId: 'body-editor',
-                            editorInstance: null,
                             initEditor() {
                                 this.$nextTick(() => {
-                                    if (CKEDITOR.instances[this.editorId]) {
-                                        CKEDITOR.instances[this.editorId].destroy(true);
-                                    }
-                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
-                                        customConfig: '/vendor/ckeditor/config.js',
-                                        height: 200,
-                                    });
-                                    this.editorInstance.on('change', () => {
-                                        document.querySelector('textarea[name=body]').value = this.editorInstance.getData();
-                                    });
-                                    this.editorInstance.on('key', () => {
-                                        document.querySelector('textarea[name=body]').value = this.editorInstance.getData();
-                                    });
+                                    if (CKEDITOR.instances[this.editorId]) CKEDITOR.instances[this.editorId].destroy(true);
+                                    const instance = CKEDITOR.replace(this.editorId, { height: 200 });
+                                    instance.on('change', () => { document.querySelector('textarea[name=body]').value = instance.getData(); });
                                 });
                             }
                         }" x-init="initEditor()">
-                            <label class="text-sm font-medium text-admin-text">Body</label>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Body</label>
                             <textarea name="body" id="body-editor" rows="8" required>{{ old('body', $content->body) }}</textarea>
                             @error('body')
-                                <p class="text-sm text-admin-accent">{{ $message }}</p>
+                                <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2" x-data="{
                             editorId: 'mission-editor',
-                            editorInstance: null,
                             initEditor() {
                                 this.$nextTick(() => {
-                                    if (CKEDITOR.instances[this.editorId]) {
-                                        CKEDITOR.instances[this.editorId].destroy(true);
-                                    }
-                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
-                                        customConfig: '/vendor/ckeditor/config.js',
-                                        height: 150,
-                                    });
-                                    this.editorInstance.on('change', () => {
-                                        document.querySelector('textarea[name=mission]').value = this.editorInstance.getData();
-                                    });
-                                    this.editorInstance.on('key', () => {
-                                        document.querySelector('textarea[name=mission]').value = this.editorInstance.getData();
-                                    });
+                                    if (CKEDITOR.instances[this.editorId]) CKEDITOR.instances[this.editorId].destroy(true);
+                                    const instance = CKEDITOR.replace(this.editorId, { height: 150 });
+                                    instance.on('change', () => { document.querySelector('textarea[name=mission]').value = instance.getData(); });
                                 });
                             }
                         }" x-init="initEditor()">
-                            <label class="text-sm font-medium text-admin-text">Mission</label>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Mission</label>
                             <textarea name="mission" id="mission-editor" rows="3">{{ old('mission', $content->mission) }}</textarea>
                             @error('mission')
-                                <p class="text-sm text-admin-accent">{{ $message }}</p>
+                                <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2" x-data="{
                             editorId: 'vision-editor',
-                            editorInstance: null,
                             initEditor() {
                                 this.$nextTick(() => {
-                                    if (CKEDITOR.instances[this.editorId]) {
-                                        CKEDITOR.instances[this.editorId].destroy(true);
-                                    }
-                                    this.editorInstance = CKEDITOR.replace(this.editorId, {
-                                        customConfig: '/vendor/ckeditor/config.js',
-                                        height: 150,
-                                    });
-                                    this.editorInstance.on('change', () => {
-                                        document.querySelector('textarea[name=vision]').value = this.editorInstance.getData();
-                                    });
-                                    this.editorInstance.on('key', () => {
-                                        document.querySelector('textarea[name=vision]').value = this.editorInstance.getData();
-                                    });
+                                    if (CKEDITOR.instances[this.editorId]) CKEDITOR.instances[this.editorId].destroy(true);
+                                    const instance = CKEDITOR.replace(this.editorId, { height: 150 });
+                                    instance.on('change', () => { document.querySelector('textarea[name=vision]').value = instance.getData(); });
                                 });
                             }
                         }" x-init="initEditor()">
-                            <label class="text-sm font-medium text-admin-text">Vision</label>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Vision</label>
                             <textarea name="vision" id="vision-editor" rows="3">{{ old('vision', $content->vision) }}</textarea>
                             @error('vision')
-                                <p class="text-sm text-admin-accent">{{ $message }}</p>
+                                <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                        <h3 class="font-bold text-admin-text">Status</h3>
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" name="is_active" value="1" {{ old('is_active', $content->is_active) ? 'checked' : '' }} class="w-4 h-4 rounded border-admin-border bg-admin-surface-alt text-admin-accent focus:ring-admin-accent">
-                            <span class="text-sm text-admin-text-muted">Active (visible on site)</span>
-                        </div>
+                    <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Status</h3>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" {{ old('is_active', $content->is_active) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Active (visible on site)</span>
+                        </label>
 
-                        <div class="pt-4 border-t border-admin-border-subtle space-y-2">
-                            <label class="text-sm font-medium text-admin-text">Hero Image</label>
+                        <div class="pt-4 border-t border-gray-100 dark:border-white/10 space-y-4">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Hero Image</label>
                             <input type="hidden" name="hero_image_path" id="hero-image-path" value="{{ $content->hero_image ?? '' }}">
                             <input type="hidden" name="remove_hero_image" id="remove-hero-image" value="0">
                             
-                            <div id="hero-image-preview" class="mb-3">
+                            <div id="hero-image-preview" class="space-y-4">
                                 @if($content->hero_image)
-                                    <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-admin-border-subtle">
+                                    <div class="relative w-full aspect-video rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10">
                                         <img src="{{ Storage::url($content->hero_image) }}" alt="Hero" class="w-full h-full object-cover">
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm">
-                                            <div class="flex flex-col items-center text-white">
-                                                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                                </svg>
-                                                <span class="font-semibold text-sm">Change Image</span>
-                                            </div>
-                                        </div>
                                     </div>
                                 @endif
                             </div>
                             
                             <div id="hero-image-progress"></div>
                             
-                            <div class="flex flex-col items-center justify-center p-6 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-xl group hover:border-admin-accent/50 transition-all cursor-pointer relative overflow-hidden">
-                                <svg class="w-8 h-8 text-admin-text-muted mb-2 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-xs text-admin-text-muted">Click to upload</p>
+                            <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all">
+                                <span class="text-xs text-gray-500">Click to upload image</span>
                                 <input type="file" name="hero_image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                             </div>
+                            
                             @if($content->hero_image)
-                                <button type="button" id="remove-hero-image-btn" class="w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
+                                <button type="button" id="remove-hero-image-btn" class="w-full text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors">
                                     Remove Image
                                 </button>
                             @endif
-                            <p class="text-[10px] text-admin-text-muted">Recommended: 1920x600, max 2MB</p>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Recommended: 1920x600, max 2MB</p>
                         </div>
 
-                        <div class="pt-4 border-t border-admin-border-subtle">
-                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.98]">
+                        <div class="pt-4 border-t border-gray-100 dark:border-white/10">
+                            <button type="submit" class="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
                                 Save Changes
                             </button>
                         </div>
@@ -176,54 +130,33 @@
             </div>
         </form>
     </div>
-
+    
     <script src="{{ asset('js/image-upload.js') }}"></script>
     <script>
         (function() {
             const initAboutUs = function() {
-                // Function to attach remove button handler
                 function attachRemoveButtonHandler() {
                     const removeHeroImageBtn = document.getElementById('remove-hero-image-btn');
                     if (removeHeroImageBtn) {
-                        // Use onclick to avoid multiple bindings if initialized twice
                         removeHeroImageBtn.onclick = function(e) {
                             e.stopPropagation();
                             e.preventDefault();
-
-                            if (!confirm('Are you sure you want to remove the hero image?')) {
-                                return;
-                            }
-
-                            // Set removal flag
+                            if (!confirm('Are you sure you want to remove the hero image?')) return;
                             const removeInput = document.getElementById('remove-hero-image');
                             const pathInput = document.getElementById('hero-image-path');
                             if (removeInput) removeInput.value = '1';
                             if (pathInput) pathInput.value = '';
-
-                            // Reset preview to empty state
                             const preview = document.getElementById('hero-image-preview');
                             if (preview) preview.innerHTML = '';
-
-                            // Clear progress
                             const progress = document.getElementById('hero-image-progress');
                             if (progress) progress.innerHTML = '';
-
-                            // Remove the remove button
                             removeHeroImageBtn.remove();
-
-                            // Submit the form to process the removal
                             const form = document.getElementById('aboutUsForm');
-                            if (form) {
-                                form.submit();
-                            }
+                            if (form) form.submit();
                         };
                     }
                 }
-
-                // Attach handler to initial button if it exists
                 attachRemoveButtonHandler();
-
-                // Initialize Image Uploader
                 if (typeof ImageUploader !== 'undefined') {
                     new ImageUploader({
                         fileInput: document.querySelector('input[name="hero_image"]'),
@@ -232,48 +165,28 @@
                         hiddenInput: document.getElementById('hero-image-path'),
                         uploadUrl: '{{ route("admin.image-upload") }}',
                         csrfToken: '{{ csrf_token() }}',
-                        maxSize: 2 * 1024 * 1024, // 2MB
+                        maxSize: 2 * 1024 * 1024,
                         acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
                         onUploadComplete: function(response) {
-                            // Reset removal flag if new image uploaded
                             const removeInput = document.getElementById('remove-hero-image');
                             if (removeInput) removeInput.value = '0';
-
-                            // Create and insert remove button if it doesn't exist
                             if (!document.getElementById('remove-hero-image-btn')) {
                                 const fileInput = document.querySelector('input[name="hero_image"]');
                                 if (fileInput) {
                                     const uploadDiv = fileInput.closest('div');
-                                    
                                     const newBtn = document.createElement('button');
                                     newBtn.type = 'button';
                                     newBtn.id = 'remove-hero-image-btn';
-                                    newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
-                                    newBtn.innerHTML = `
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Remove Image
-                                    `;
-                                    
-                                    // Insert button after the upload div
+                                    newBtn.className = 'w-full text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors';
+                                    newBtn.innerHTML = 'Remove Image';
                                     uploadDiv.insertAdjacentElement('afterend', newBtn);
-
-                                    // Re-attach click handler to new button
                                     attachRemoveButtonHandler();
                                 }
                             }
-
-                            console.log('Image uploaded successfully:', response);
-                        },
-                        onUploadError: function(message) {
-                            console.error('Upload error:', message);
                         }
                     });
                 }
             };
-
-            // Execute initialization
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initAboutUs);
             } else {
@@ -282,79 +195,13 @@
         })();
     </script>
     <style>
-        .cke_chrome {
-            border-color: var(--color-admin-border-subtle) !important;
-            border-radius: 12px !important;
-        }
-        .cke_top {
-            background-color: var(--color-admin-surface) !important;
-            border-bottom-color: var(--color-admin-border-subtle) !important;
-            border-radius: 12px 12px 0 0 !important;
-        }
-        .cke_bottom {
-            background-color: var(--color-admin-surface) !important;
-            border-top-color: var(--color-admin-border-subtle) !important;
-            border-radius: 0 0 12px 12px !important;
-        }
-        .cke_toolgroup {
-            background-color: var(--color-admin-bg) !important;
-            border-color: var(--color-admin-border-subtle) !important;
-            border-radius: 6px !important;
-        }
-        .cke_button {
-            color: var(--color-admin-text-muted) !important;
-        }
-        .cke_button:hover {
-            color: var(--color-admin-text) !important;
-        }
-        .cke_button_on {
-            background-color: var(--color-admin-accent) !important;
-            color: var(--color-admin-text) !important;
-        }
-        .cke_combo {
-            background-color: var(--color-admin-bg) !important;
-            border-color: var(--color-admin-border-subtle) !important;
-        }
-        .cke_combo_text {
-            color: var(--color-admin-text-muted) !important;
-        }
-        .cke_combo_arrow {
-            color: var(--color-admin-text-muted) !important;
-        }
-        .cke_contents {
-            background-color: var(--color-admin-bg) !important;
-            border-radius: 0 0 12px 12px !important;
-        }
-        .cke_editable {
-            color: var(--color-admin-text) !important;
-            padding: 15px !important;
-            padding-right: 25px !important;
-        }
-        .cke_editable a {
-            color: var(--color-admin-accent) !important;
-        }
-        .cke_path_item {
-            color: var(--color-admin-text-muted) !important;
-        }
-        .cke_path_item:hover {
-            color: var(--color-admin-text) !important;
-        }
-        .cke_wysiwyg_frame {
-            background-color: var(--color-admin-bg) !important;
-        }
-        /* Custom scrollbar styling */
-        .cke_wysiwyg_frame::-webkit-scrollbar {
-            width: 8px;
-        }
-        .cke_wysiwyg_frame::-webkit-scrollbar-track {
-            background: var(--color-admin-bg);
-        }
-        .cke_wysiwyg_frame::-webkit-scrollbar-thumb {
-            background: var(--color-admin-border);
-            border-radius: 4px;
-        }
-        .cke_wysiwyg_frame::-webkit-scrollbar-thumb:hover {
-            background: var(--color-admin-text-muted);
-        }
+        .cke_chrome { border-color: #e5e7eb !important; border-radius: 12px !important; }
+        .dark .cke_chrome { border-color: rgba(255, 255, 255, 0.1) !important; }
+        .cke_top { background-color: #f9fafb !important; border-bottom-color: #e5e7eb !important; border-radius: 12px 12px 0 0 !important; }
+        .dark .cke_top { background-color: rgba(255, 255, 255, 0.05) !important; border-bottom-color: rgba(255, 255, 255, 0.1) !important; }
+        .cke_contents { background-color: #ffffff !important; border-radius: 0 0 12px 12px !important; }
+        .dark .cke_contents { background-color: #0A0A0F !important; }
+        .cke_editable { color: #111827 !important; padding: 15px !important; }
+        .dark .cke_editable { color: #f9fafb !important; }
     </style>
 </x-layouts::admin>

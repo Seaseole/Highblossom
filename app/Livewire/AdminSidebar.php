@@ -16,11 +16,14 @@ final class AdminSidebar extends Component
 
     public int $userCount = 0;
 
+    public ?string $logoUrl = null;
+
     public function mount(): void
     {
         $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
         $this->mobileMenuOpen = false;
         $this->userCount = \App\Models\User::count();
+        $this->logoUrl = \App\Models\CompanySetting::first()?->business_logo ? \Illuminate\Support\Facades\Storage::url(\App\Models\CompanySetting::first()->business_logo) : null;
     }
 
     public function toggleTheme(?string $newTheme = null): void

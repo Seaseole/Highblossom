@@ -1,5 +1,5 @@
 <div x-data="{ open: false }" 
-     x-init="setTimeout(() => { if (!localStorage.getItem('cookieConsent')) open = true }, 1000)"
+     x-init="setTimeout(() => { if (!document.cookie.split('; ').some(c => c.startsWith('cookieConsent='))) open = true }, 1000)"
      x-show="open"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0 translate-y-full"
@@ -19,11 +19,11 @@
         </p>
         
         <div class="flex flex-col gap-3">
-            <button @click="open = false; localStorage.setItem('cookieConsent', 'true')"
+            <button @click="open = false; document.cookie = 'cookieConsent=true; max-age=31536000; path=/; SameSite=Lax'"
                     class="w-full py-3 px-6 rounded-full bg-[#DC2626] hover:bg-[#B91C1C] text-[#FAFAFA] font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_30px_rgba(220,38,38,0.4)]">
                 Accept All
             </button>
-            <button @click="open = false"
+            <button @click="open = false; document.cookie = 'cookieConsent=false; max-age=31536000; path=/; SameSite=Lax'"
                     class="w-full py-3 px-6 rounded-full bg-white/5 hover:bg-white/10 text-[#FAFAFA] font-semibold text-sm transition-all">
                 Decline
             </button>

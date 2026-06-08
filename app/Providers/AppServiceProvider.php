@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rules\Password;
 use Opcodes\LogViewer\Facades\LogViewer;
 
 class AppServiceProvider extends ServiceProvider
@@ -112,9 +111,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
-                DB::prohibitDestructiveCommands(
-                    app()->isProduction(),
-                );
+        DB::prohibitDestructiveCommands(
+            app()->isProduction(),
+        );
     }
 
     //    public static function passwordRules(): Password

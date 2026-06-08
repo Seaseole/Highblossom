@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('auth.login.title') }} - {{ config('app.name') }}</title>
 
     <!-- Fonts -->
@@ -155,7 +156,7 @@
                             </div>
                         </div>
 
-                        <div class="animate-fade-in-up delay-500 pt-2">
+                        <div class="animate-fade-in-up delay-500 pt-2 flex flex-col gap-4">
                             <button
                                 type="submit"
                                 class="w-full bg-[#DC2626] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#B91C1C] focus:outline-none focus:ring-4 focus:ring-[#DC2626]/20 transition-all duration-300 active:scale-[0.98] shadow-xl shadow-[#DC2626]/20 group flex items-center justify-center gap-2"
@@ -165,21 +166,48 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                                 </svg>
                             </button>
+
+                            <div class="relative flex items-center py-2">
+                                <div class="flex-grow border-t border-[#E4E4E7]"></div>
+                                <span class="flex-shrink mx-4 text-xs font-bold text-[#A1A1AA] uppercase tracking-widest">Or</span>
+                                <div class="flex-grow border-t border-[#E4E4E7]"></div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onclick="signInWithPasskey()"
+                                class="w-full bg-white border-2 border-[#E4E4E7] text-[#18181B] py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#F9FAFB] hover:border-[#DC2626]/30 focus:outline-none focus:ring-4 focus:ring-[#DC2626]/10 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 group"
+                            >
+                                <svg class="w-6 h-6 text-[#71717A] group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                                <span>Sign in with Passkey</span>
+                            </button>
                         </div>
                     </form>
 
-                    <div class="relative my-8 animate-fade-in-up delay-500">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-[#E4E4E7]"></div>
-                        </div>
-                        <div class="relative flex justify-center text-xs uppercase">
-                            <span class="bg-white/70 backdrop-blur-md px-4 text-[#A1A1AA] font-bold tracking-widest">Or continue with</span>
-                        </div>
-                    </div>
+                    <script>
+                        async function signInWithPasskey() {
+                            console.log('Starting passkey login...');
+                            try {
+                                const response = await window.Passkeys.verify();
+                                console.log('Passkey login successful', response);
+                                
+                                // Manual redirect if the library doesn't handle it
+                                if (response && response.redirect) {
+                                    window.location.href = response.redirect;
+                                }
+                            } catch (e) {
+                                console.error('Passkey login failed', e);
+                                // Only alert if it's not a user cancellation
+                                if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
+                                    alert('Failed to sign in with passkey. Please try again or use your password.');
+                                }
+                            }
+                        }
+                    </script>
 
-                    <div class="animate-fade-in-up delay-500">
-                        <x-authenticate-passkey />
-                    </div>
+
 
                     <div class="mt-10 text-center animate-fade-in-up delay-500">
                         <p class="text-[#71717A] font-medium">

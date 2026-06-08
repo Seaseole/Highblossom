@@ -1,538 +1,231 @@
 <x-layouts::admin title="Company Settings">
-    <div class="space-y-8">
+    <div class="max-w-5xl mx-auto space-y-10 py-10" x-data="{
+        tab: '{{ request()->query('tab', 'general') }}',
+        whatsappNumbers: {{ json_encode($settings['whatsapp_additional_numbers'] ?? []) }},
+        workingHours: {{ json_encode($settings['working_hours'] ?? []) }},
+        announcements: {{ json_encode($settings['announcements'] ?? []) }},
+        init() {
+            this.$watch('tab', value => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', value);
+                window.history.replaceState({}, '', url.toString());
+            });
+        },
+        addNumber() { this.whatsappNumbers.push({ label: '', number: '' }); },
+        removeNumber(index) { this.whatsappNumbers.splice(index, 1); },
+        addAnnouncement() { this.announcements.push({ text: '', link: '' }); },
+        removeAnnouncement(index) { this.announcements.splice(index, 1); }
+    }">
         <!-- Header -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-admin-text font-headline">Company Settings</h1>
-                <p class="text-admin-text-muted mt-1 text-sm">Manage your business information and dynamic variables.</p>
-            </div>
+        <div class="space-y-1">
+            <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Company Settings</h1>
+            <p class="text-gray-500 dark:text-gray-400">Manage your business information and dynamic variables.</p>
         </div>
 
-        <style>
-            :root {
-                --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-            }
-        </style>
-
-        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{
-            tab: '{{ request()->query('tab', 'general') }}',
-            whatsappNumbers: {{ json_encode($settings['whatsapp_additional_numbers'] ?? []) }},
-            workingHours: {{ json_encode($settings['working_hours'] ?? []) }},
-
-            init() {
-                this.$watch('tab', value => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', value);
-                    window.history.replaceState({}, '', url.toString());
-                });
-            },
-
-            addNumber() {
-                this.whatsappNumbers.push({ label: '', number: '' });
-            },
-            removeNumber(index) {
-                this.whatsappNumbers.splice(index, 1);
-            }
-        }">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
             @csrf
             @method('PUT')
-
             <input type="hidden" name="tab" :value="tab">
 
             <!-- Tabs Navigation -->
-            <div class="flex border-b border-admin-border-subtle space-x-8">
-                <button type="button" @click="tab = 'general'" :class="tab === 'general' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    General Info
-                </button>
-                <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Business Hours
-                </button>
-                <button type="button" @click="tab = 'assets'" :class="tab === 'assets' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Assets & Branding
-                </button>
-                <button type="button" @click="tab = 'localization'" :class="tab === 'localization' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Localization
-                </button>
-                <button type="button" @click="tab = 'social'" :class="tab === 'social' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Social & WhatsApp
-                </button>
-                <button type="button" @click="tab = 'notifications'" :class="tab === 'notifications' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Notifications
-                </button>
-                <button type="button" @click="tab = 'announcements'" :class="tab === 'announcements' ? 'border-admin-accent text-admin-text' : 'border-transparent text-admin-text-muted hover:text-admin-text'" class="pb-4 border-b-2 font-medium transition-colors duration-200" style="transition-timing-function: var(--ease-out);">
-                    Announcements
-                </button>
+            <div class="flex border-b border-gray-200 dark:border-white/10 space-x-1">
+                @foreach([
+                    'general' => 'General', 
+                    'hours' => 'Hours', 
+                    'assets' => 'Branding', 
+                    'localization' => 'Locale', 
+                    'social' => 'Social',
+                    'notifications' => 'Notifications',
+                    'announcements' => 'Announcements'
+                ] as $key => $label)
+                    <button type="button" 
+                            @click="tab = '{{ $key }}'" 
+                            :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'" 
+                            class="pb-4 px-1 border-b-2 font-medium transition-colors text-sm">
+                        {{ $label }}
+                    </button>
+                @endforeach
             </div>
 
             <!-- Tab Contents -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- General Tab -->
-                    <div x-show="tab === 'general'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Business Name</label>
-                                    <input type="text" name="company_name" value="{{ old('company_name', $settings['company_name']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Logo Text</label>
-                                    <input type="text" name="logo_text" value="{{ old('logo_text', $settings['logo_text']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Primary Email</label>
-                                    <input type="email" name="primary_email" value="{{ old('primary_email', $settings['primary_email']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Primary Phone</label>
-                                    <input type="text" name="primary_phone" value="{{ old('primary_phone', $settings['primary_phone']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="md:col-span-2 space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Business Address</label>
-                                    <textarea name="address" rows="3" class="w-full admin-form-input">{{ old('address', $settings['address']) }}</textarea>
-                                </div>
-                                <div class="md:col-span-2 space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Google Maps API Key</label>
-                                    <input type="text" name="google_maps_api_key" value="{{ old('google_maps_api_key', $settings['google_maps_api_key']) }}" class="w-full admin-form-input">
-                                    <p class="text-[10px] text-admin-text-muted">Required for map iframe embed. Get from Google Cloud Console.</p>
-                                </div>
-                                <div class="md:col-span-2 space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Google Maps Directions Link</label>
-                                    <input type="url" name="map_directions_link" value="{{ old('map_directions_link', $settings['map_directions_link']) }}" class="w-full admin-form-input">
-                                    <p class="text-[10px] text-admin-text-muted">Share link from Google Maps (e.g., https://maps.app.goo.gl/xxxxx)</p>
-                                </div>
-                            </div>
+            <div class="space-y-8">
+                <!-- General Tab -->
+                <div x-show="tab === 'general'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">General Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Name</label>
+                            <input type="text" name="company_name" value="{{ old('company_name', $settings['company_name']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                         </div>
-                    </div>
-
-                    <!-- Business Hours Tab -->
-                    <div x-show="tab === 'hours'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <h3 class="text-lg font-bold text-admin-text">Weekly Business Hours</h3>
-                            <div class="space-y-4">
-                                @php
-                                    $days = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
-                                @endphp
-                                @foreach($days as $key => $label)
-                                    <div class="flex items-center gap-4 p-4 bg-admin-surface-alt rounded-xl">
-                                        <div class="w-32">
-                                            <label class="text-sm font-medium text-admin-text">{{ $label }}</label>
-                                        </div>
-                                        <x-ui.checkbox
-                                            name="working_hours[{{ $key }}][is_closed]"
-                                            x-model="workingHours.{{ $key }}.is_closed"
-                                            value="1"
-                                            :checked="$settings['working_hours'][$key]['is_closed'] ?? false"
-                                            label="Closed"
-                                        />
-                                        <div class="flex-1 flex gap-4">
-                                            <div class="flex-1 space-y-1">
-                                                <label class="text-xs text-admin-text-muted">Open</label>
-                                                <input type="time"
-                                                    :name="`working_hours[{{ $key }}][open]`"
-                                                    x-model="workingHours.{{ $key }}.open"
-                                                    value="{{ $settings['working_hours'][$key]['open'] ?? '' }}"
-                                                    :disabled="workingHours.{{ $key }}.is_closed"
-                                                    class="w-full admin-form-input text-sm py-2 disabled:opacity-50">
-                                            </div>
-                                            <div class="flex-1 space-y-1">
-                                                <label class="text-xs text-admin-text-muted">Close</label>
-                                                <input type="time"
-                                                    :name="`working_hours[{{ $key }}][close]`"
-                                                    x-model="workingHours.{{ $key }}.close"
-                                                    value="{{ $settings['working_hours'][$key]['close'] ?? '' }}"
-                                                    :disabled="workingHours.{{ $key }}.is_closed"
-                                                    class="w-full admin-form-input text-sm py-2 disabled:opacity-50">
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Logo Text</label>
+                            <input type="text" name="logo_text" value="{{ old('logo_text', $settings['logo_text']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                         </div>
-                    </div>
-
-                    <!-- Assets Tab -->
-                    <div x-show="tab === 'assets'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="space-y-4">
-                                    <label class="text-sm font-medium text-admin-text">Business Logo</label>
-                                    <input type="hidden" name="business_logo_path" id="business-logo-path" value="{{ $settings['business_logo'] ?? '' }}">
-                                    <input type="hidden" name="remove_business_logo" id="remove-business-logo" value="0">
-                                    <div id="business-logo-progress" class="mb-3"></div>
-                                    <div id="business-logo-container" class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-admin-accent/50 transition-all cursor-pointer relative overflow-hidden">
-                                        <div id="business-logo-preview" class="flex flex-col items-center w-full">
-                                            @if($settings['business_logo'])
-                                                <img src="{{ Storage::url($settings['business_logo']) }}" class="h-20 object-contain mb-4" id="business-logo-img">
-                                            @else
-                                                <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
-                                            @endif
-                                        </div>
-                                        <input type="file" name="business_logo" id="business-logo-input" class="absolute inset-0 opacity-0 cursor-pointer">
-                                    </div>
-                                    @if($settings['business_logo'])
-                                        <button type="button" id="remove-logo-btn" class="w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2 active:scale-[0.97]">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Remove Logo
-                                        </button>
-                                    @endif
-                                    <p class="text-[10px] text-admin-text-muted">Recommended: PNG or SVG, max 2MB.</p>
-                                </div>
-                                <div class="space-y-4">
-                                    <label class="text-sm font-medium text-admin-text">Favicon</label>
-                                    <input type="hidden" name="favicon_path" id="favicon-path" value="{{ $settings['favicon'] ?? '' }}">
-                                    <div id="favicon-progress" class="mb-3"></div>
-                                    <div class="flex flex-col items-center justify-center p-8 bg-admin-surface-alt border-2 border-dashed border-admin-border-subtle rounded-2xl group hover:border-admin-accent/50 transition-all cursor-pointer relative overflow-hidden">
-                                        @if($settings['favicon'])
-                                            <img src="{{ Storage::url($settings['favicon']) }}" class="h-10 object-contain mb-4">
-                                        @else
-                                            <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.643-1.643a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-1.643 1.643M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        @endif
-                                        <p class="text-xs text-admin-text-muted">Click to upload favicon</p>
-                                        <input type="file" name="favicon" id="favicon-input" class="absolute inset-0 opacity-0 cursor-pointer">
-                                    </div>
-                                    <p class="text-[10px] text-admin-text-muted">Recommended: ICO or PNG, max 1MB.</p>
-                                </div>
-                            </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Email</label>
+                            <input type="email" name="primary_email" value="{{ old('primary_email', $settings['primary_email']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                         </div>
-                    </div>
-
-                    <!-- Localization Tab -->
-                    <div x-show="tab === 'localization'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Timezone</label>
-                                    <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Locale</label>
-                                    <input type="text" name="locale" value="{{ old('locale', $settings['locale']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Date Format</label>
-                                    <input type="text" name="date_format" value="{{ old('date_format', $settings['date_format']) }}" class="w-full admin-form-input">
-                                    <p class="text-[10px] text-admin-text-muted">Example: d/m/Y, M j, Y</p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Time Format</label>
-                                    <input type="text" name="time_format" value="{{ old('time_format', $settings['time_format']) }}" class="w-full admin-form-input">
-                                    <p class="text-[10px] text-admin-text-muted">Example: H:i, h:i A</p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Time Display Format (Public)</label>
-                                    <select name="time_format_display" class="w-full admin-form-input">
-                                        <option value="12" {{ old('time_format_display', $settings['time_format_display']) == '12' ? 'selected' : '' }}>12-hour (8:00 AM - 5:30 PM)</option>
-                                        <option value="24" {{ old('time_format_display', $settings['time_format_display']) == '24' ? 'selected' : '' }}>24-hour (08:00 - 17:30)</option>
-                                    </select>
-                                    <p class="text-[10px] text-admin-text-muted">Format for displaying working hours on public pages</p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Currency Symbol</label>
-                                    <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full admin-form-input">
-                                </div>
-                            </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Phone</label>
+                            <input type="text" name="primary_phone" value="{{ old('primary_phone', $settings['primary_phone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                         </div>
-                    </div>
-
-                    <!-- Social Tab -->
-                    <div x-show="tab === 'social'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <h3 class="text-lg font-bold text-admin-text">WhatsApp Numbers</h3>
-                            <div class="grid grid-cols-1 gap-4">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Default WhatsApp</label>
-                                    <input type="text" name="whatsapp_number_default" value="{{ old('whatsapp_number_default', $settings['whatsapp_number_default']) }}" class="w-full admin-form-input">
-                                </div>
-
-                                <div class="space-y-4 pt-4 border-t border-admin-border-subtle">
-                                    <div class="flex items-center justify-between">
-                                        <label class="text-sm font-medium text-admin-text">Additional Numbers</label>
-                                        <button type="button" @click="addNumber()" class="text-xs text-admin-accent hover:underline">+ Add Number</button>
-                                    </div>
-                                    <template x-for="(item, index) in whatsappNumbers" :key="index">
-                                        <div class="flex gap-4 items-start">
-                                            <div class="flex-1 space-y-1">
-                                                <input type="text" :name="`whatsapp_additional_numbers[${index}][label]`" x-model="item.label" placeholder="Label (e.g. Sales)" class="w-full admin-form-input text-sm py-2">
-                                            </div>
-                                            <div class="flex-1 space-y-1">
-                                                <input type="text" :name="`whatsapp_additional_numbers[${index}][number]`" x-model="item.number" placeholder="Phone Number" class="w-full admin-form-input text-sm py-2">
-                                            </div>
-                                            <button type="button" @click="removeNumber(index)" class="p-2 text-admin-text-muted hover:text-admin-accent transition-colors active:scale-[0.97]">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <h3 class="text-lg font-bold text-admin-text pt-8 border-t border-admin-border-subtle">Social Media Links</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Facebook URL</label>
-                                    <input type="url" name="facebook_url" value="{{ old('facebook_url', $settings['facebook_url']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">Instagram URL</label>
-                                    <input type="url" name="instagram_url" value="{{ old('instagram_url', $settings['instagram_url']) }}" class="w-full admin-form-input">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-admin-text">LinkedIn URL</label>
-                                    <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $settings['linkedin_url']) }}" class="w-full admin-form-input">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notifications Tab -->
-                    <div x-show="tab === 'notifications'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <h3 class="text-lg font-bold text-admin-text">Quote Notifications</h3>
-                            <div class="md:col-span-2 space-y-2">
-                                <label class="text-sm font-medium text-admin-text">Quote Notification Emails</label>
-                                <textarea name="quote_notification_emails" rows="3" class="w-full admin-form-input">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
-                                <p class="text-[10px] text-admin-text-muted">Enter comma-separated email addresses for staff who should receive quote notifications. If empty, notifications will be sent to the primary email.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Announcements Tab -->
-                    <div x-show="tab === 'announcements'" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-6" style="display: none;"
-                         x-data="{
-                            announcements: {{ json_encode(array_map(function($a) { 
-                                $a['isCustom'] = filter_var($a['link'], FILTER_VALIDATE_URL) ? true : false;
-                                return $a;
-                            }, $settings['announcements'])) }},
-                            add() { this.announcements.push({ text: '', link: '', isCustom: false }); },
-                            remove(index) { this.announcements.splice(index, 1); }
-                         }">
-                        <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-6">
-                            <h3 class="text-lg font-bold text-admin-text">Manage Announcements</h3>
-                            <div class="space-y-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="announcement_active" value="1" {{ ($settings['announcement_active'] ?? false) ? 'checked' : '' }} class="admin-checkbox">
-                                    <span class="text-sm font-medium text-admin-text">Enable Announcement Ticker Bar</span>
-                                </label>
-                                
-                                <div class="space-y-4">
-                                    <template x-for="(announcement, index) in announcements" :key="index">
-                                        <div class="flex gap-4 p-4 bg-admin-surface-alt rounded-xl border border-admin-border-subtle items-start">
-                                            <div class="flex-1 space-y-3">
-                                                <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full admin-form-input" placeholder="Announcement text">
-                                                
-                                                <div class="flex gap-2">
-                                                    <select x-model="announcement.isCustom" class="w-1/3 admin-form-input text-xs py-2">
-                                                        <option :value="false">Select Page</option>
-                                                        <option :value="true">Custom URL</option>
-                                                    </select>
-                                                    
-                                                    <!-- Page Dropdown -->
-                                                    <select :name="`announcements[${index}][link]`" x-show="!announcement.isCustom" x-model="announcement.link" class="w-full admin-form-input text-xs py-2">
-                                                        <option value="">No Link</option>
-                                                        <option value="{{ route('home') }}">Home</option>
-                                                        <option value="{{ route('about-us') }}">About Us</option>
-                                                        <option value="{{ route('services') }}">Services</option>
-                                                        <option value="{{ route('gallery') }}">Gallery</option>
-                                                        <option value="{{ route('quote') }}">Quote Form</option>
-                                                        <option value="{{ route('contact') }}">Contact Us</option>
-                                                        <option value="{{ route('blog') }}">Blog</option>
-                                                    </select>
-                                                    
-                                                    <!-- Custom URL Input -->
-                                                    <input type="url" :name="`announcements[${index}][link]`" x-show="announcement.isCustom" x-model="announcement.link" class="w-full admin-form-input text-xs py-2" placeholder="https://example.com">
-                                                </div>
-                                            </div>
-                                            <button type="button" @click="remove(index)" class="mt-2 text-admin-text-muted hover:text-red-500 transition-colors">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            </button>
-                                        </div>
-                                    </template>
-                                    <button type="button" @click="add()" class="w-full py-3 border-2 border-dashed border-admin-border-subtle rounded-xl text-admin-text-muted hover:text-admin-accent hover:border-admin-accent transition-colors">
-                                        + Add Announcement
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Address</label>
+                            <textarea name="address" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">{{ old('address', $settings['address']) }}</textarea>
                         </div>
                     </div>
                 </div>
 
-                <!-- Info Sidebar -->
-                <div class="space-y-6">
-                    <div class="bg-admin-surface rounded-2xl border border-admin-border-subtle p-6 space-y-4">
-                        <h3 class="font-bold text-admin-text">Deployment Info</h3>
-                        <p class="text-xs text-admin-text-muted leading-relaxed">
-                            Changes saved here will reflect immediately across the public website. Some changes might require a browser refresh due to server-side caching.
-                        </p>
-                        <div class="pt-4 border-t border-admin-border-subtle">
-                            <button type="submit" class="w-full py-4 bg-admin-accent hover:bg-admin-accent/90 text-white font-bold rounded-xl shadow-lg shadow-admin-accent/20 transition-all active:scale-[0.97]">
-                                Save All Changes
-                            </button>
+                <!-- Business Hours Tab -->
+                <div x-show="tab === 'hours'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Weekly Business Hours</h3>
+                    <div class="space-y-4">
+                        @php
+                            $days = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
+                        @endphp
+                        @foreach($days as $key => $label)
+                            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                <div class="w-32">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="working_hours[{{ $key }}][is_closed]" value="1" {{ ($settings['working_hours'][$key]['is_closed'] ?? false) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">
+                                    <span class="text-sm text-gray-500">Closed</span>
+                                </div>
+                                <div class="flex-1 flex gap-4">
+                                    <input type="time" name="working_hours[{{ $key }}][open]" value="{{ $settings['working_hours'][$key]['open'] ?? '' }}" class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none">
+                                    <input type="time" name="working_hours[{{ $key }}][close]" value="{{ $settings['working_hours'][$key]['close'] ?? '' }}" class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none">
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <!-- Branding Tab -->
+                <div x-show="tab === 'assets'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;"
+                     x-data="{ 
+                        logoPreview: '{{ $settings['business_logo'] ? Storage::url($settings['business_logo']) : null }}',
+                        faviconPreview: '{{ $settings['favicon'] ? Storage::url($settings['favicon']) : null }}',
+                        handleFileSelect(event, previewKey) {
+                            const file = event.target.files[0];
+                            if (file) this[previewKey] = URL.createObjectURL(file);
+                        }
+                     }">
+                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Branding</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Logo</label>
+                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="$refs.logoInput.click()">
+                                <template x-if="logoPreview">
+                                    <img :src="logoPreview" class="max-h-[140px] object-contain">
+                                </template>
+                                <template x-if="!logoPreview">
+                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload logo</span>
+                                </template>
+                             </div>
+                             <input type="file" name="business_logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'logoPreview')">
+                        </div>
+                        <div class="space-y-4">
+                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Favicon</label>
+                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="$refs.faviconInput.click()">
+                                <template x-if="faviconPreview">
+                                    <img :src="faviconPreview" class="max-h-[140px] object-contain">
+                                </template>
+                                <template x-if="!faviconPreview">
+                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload favicon</span>
+                                </template>
+                             </div>
+                             <input type="file" name="favicon" x-ref="faviconInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'faviconPreview')">
+                        </div>
+                     </div>
+                </div>
+
+                <!-- Locale Tab -->
+                <div x-show="tab === 'localization'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Locale Settings</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
+                            <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Currency Symbol</label>
+                            <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
                         </div>
                     </div>
+                </div>
+
+                <!-- Social Tab -->
+                <div x-show="tab === 'social'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Social Links</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</label>
+                            <input type="url" name="facebook_url" value="{{ old('facebook_url', $settings['facebook_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Instagram</label>
+                            <input type="url" name="instagram_url" value="{{ old('instagram_url', $settings['instagram_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div x-show="tab === 'notifications'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quote Notification Emails</label>
+                        <textarea name="quote_notification_emails" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Announcements Tab -->
+                <div x-show="tab === 'announcements'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
+                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Announcements</h3>
+                     <template x-for="(announcement, index) in announcements" :key="index">
+                        <div class="flex gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                            <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm" placeholder="Text">
+                            <input type="text" :name="`announcements[${index}][link]`" x-model="announcement.link" class="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm" placeholder="Link">
+                            <button type="button" @click="removeAnnouncement(index)" class="text-red-500">Remove</button>
+                        </div>
+                     </template>
+                     <button type="button" @click="addAnnouncement()" class="text-sm text-gray-900 dark:text-white font-medium">+ Add Announcement</button>
+                </div>
+
+                <div class="pt-6 border-t border-gray-100 dark:border-white/10">
+                    <button type="submit" class="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
+                        Save All Changes
+                    </button>
                 </div>
             </div>
         </form>
     </div>
-
-    <script src="{{ asset('js/image-upload.js') }}"></script>
-    <script>
-        (function() {
-            const initSettings = function() {
-                // Function to attach remove button handler
-                function attachRemoveButtonHandler() {
-                    const removeLogoBtn = document.getElementById('remove-logo-btn');
-                    if (removeLogoBtn) {
-                        removeLogoBtn.onclick = function(e) {
-                            e.stopPropagation();
-                            e.preventDefault();
-
-                            if (!confirm('Are you sure you want to remove the business logo?')) {
-                                return;
-                            }
-
-                            // Set removal flag
-                            const removeInput = document.getElementById('remove-business-logo');
-                            const pathInput = document.getElementById('business-logo-path');
-                            if (removeInput) removeInput.value = '1';
-                            if (pathInput) pathInput.value = '';
-
-                            // Reset preview to empty state
-                            const preview = document.getElementById('business-logo-preview');
-                            if (preview) {
-                                preview.innerHTML = `
-                                    <svg class="w-10 h-10 text-admin-text-muted mb-4 group-hover:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="business-logo-placeholder">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p class="text-xs text-admin-text-muted" id="business-logo-text">Click to upload or drag and drop</p>
-                                `;
-                            }
-
-                            // Clear progress
-                            const progress = document.getElementById('business-logo-progress');
-                            if (progress) progress.innerHTML = '';
-
-                            // Remove the remove button
-                            removeLogoBtn.remove();
-
-                            // Submit the form to process the removal
-                            const form = document.querySelector('form[action="{{ route("admin.settings.update") }}"]');
-                            if (form) {
-                                form.submit();
-                            }
-                        };
-                    }
-                }
-
-                // Attach handler to initial button if it exists
-                attachRemoveButtonHandler();
-
-                if (typeof ImageUploader !== 'undefined') {
-                    // Business Logo Uploader
-                    new ImageUploader({
-                        fileInput: document.getElementById('business-logo-input'),
-                        previewContainer: document.getElementById('business-logo-preview'),
-                        progressContainer: document.getElementById('business-logo-progress'),
-                        hiddenInput: document.getElementById('business-logo-path'),
-                        uploadUrl: '{{ route("admin.image-upload") }}',
-                        csrfToken: '{{ csrf_token() }}',
-                        maxSize: 2 * 1024 * 1024, // 2MB
-                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'],
-                        onUploadComplete: function(response) {
-                            // Reset removal flag if new image uploaded
-                            const removeInput = document.getElementById('remove-business-logo');
-                            if (removeInput) removeInput.value = '0';
-                            
-                            // Create and insert remove button if it doesn't exist
-                            if (!document.getElementById('remove-logo-btn')) {
-                                const container = document.getElementById('business-logo-container');
-                                if (container) {
-                                    const newBtn = document.createElement('button');
-                                    newBtn.type = 'button';
-                                    newBtn.id = 'remove-logo-btn';
-                                    newBtn.className = 'w-full px-4 py-2 text-xs font-medium text-admin-text-muted hover:text-admin-accent border border-admin-border-subtle hover:border-admin-accent rounded-lg transition-all flex items-center justify-center gap-2';
-                                    newBtn.innerHTML = `
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Remove Logo
-                                    `;
-                                    container.parentNode.insertBefore(newBtn, container.nextSibling);
-                                    
-                                    // Re-attach click handler to new button
-                                    attachRemoveButtonHandler();
-                                }
-                            }
-                            
-                            console.log('Logo uploaded successfully:', response);
-                        },
-                        onUploadError: function(message) {
-                            console.error('Upload error:', message);
-                        }
-                    });
-
-                    // Favicon Uploader
-                    new ImageUploader({
-                        fileInput: document.getElementById('favicon-input'),
-                        previewContainer: document.querySelector('[x-show="tab === \'assets\'"]'),
-                        progressContainer: document.getElementById('favicon-progress'),
-                        hiddenInput: document.getElementById('favicon-path'),
-                        uploadUrl: '{{ route("admin.image-upload") }}',
-                        csrfToken: '{{ csrf_token() }}',
-                        maxSize: 1 * 1024 * 1024, // 1MB
-                        acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'],
-                        onUploadComplete: function(response) {
-                            console.log('Favicon uploaded successfully:', response);
-                        },
-                        onUploadError: function(message) {
-                            console.error('Upload error:', message);
-                        }
-                    });
-                }
-            };
-
-            // Execute initialization
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initSettings);
-            } else {
-                initSettings();
-            }
-        })();
-    </script>
 </x-layouts::admin>

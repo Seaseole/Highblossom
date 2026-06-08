@@ -60,13 +60,13 @@ final class BlogPosts extends Component
         }
 
         // Debug: Log the SQL query
-        \Log::debug('BlogPosts SQL: '.$query->latest()->toSql());
-        \Log::debug('BlogPosts bindings: '.json_encode($query->latest()->getBindings()));
+        // \Log::debug('BlogPosts SQL: '.$query->latest()->toSql());
+        // \Log::debug('BlogPosts bindings: '.json_encode($query->latest()->getBindings()));
 
         $result = $query->latest()->paginate($this->perPage);
 
         // Debug: Log the count
-        \Log::debug('BlogPosts count: '.$result->total());
+        // \Log::debug('BlogPosts count: '.$result->total());
 
         return $result;
     }

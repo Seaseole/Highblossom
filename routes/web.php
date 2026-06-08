@@ -246,10 +246,10 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
 });
 
-// Public API endpoints for quote form
-Route::get('api/glass-types/{glassType}/sub-categories', [GlassTypeController::class, 'getSubCategories'])->name('api.glass-types.sub-categories');
 
-Route::passkeys();
+// Passkeys Routes
+// Removed manual routes to let standalone package handle it
+
 
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

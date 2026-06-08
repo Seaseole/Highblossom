@@ -38,20 +38,20 @@
     <style>
         /* Base background colors to prevent flash */
         html {
-            background-color: #f8f9fa; /* --color-admin-bg (light) */
+            background-color: #FFFFFF; /* White */
         }
         html.dark {
-            background-color: #0A0A0F; /* --color-admin-bg (dark) */
+            background-color: #0A0A0F; /* Dark Background */
         }
     </style>
 </head>
-<body class="min-h-[100dvh] bg-admin-bg text-admin-text font-body antialiased">
+<body class="min-h-[100dvh] bg-white dark:bg-[#0A0A0F] text-gray-900 dark:text-gray-100 font-sans antialiased">
     <div class="flex min-h-[100dvh]">
         <!-- Livewire Admin Sidebar -->
         <livewire:admin-sidebar />
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-auto admin-main">
+        <main class="flex-1 overflow-auto admin-main bg-white dark:bg-[#0A0A0F]">
             <div class="p-8">
                 {{ $slot }}
             </div>

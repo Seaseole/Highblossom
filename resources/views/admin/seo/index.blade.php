@@ -1,69 +1,55 @@
 <x-layouts::admin title="SEO Static Routes">
-    <div class="p-6">
-        <div class="admin-section-header">
-            <h1 class="admin-section-title">Static Route SEO Management</h1>
+    <div class="max-w-5xl mx-auto space-y-8 py-10">
+        <!-- Header -->
+        <div class="space-y-1">
+            <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">SEO Static Routes</h1>
+            <p class="text-gray-500 dark:text-gray-400">Manage SEO meta tags for static routes.</p>
         </div>
 
-        <div class="admin-table">
-            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
+        <!-- Table -->
+        <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+            <table class="w-full min-w-[800px]">
                 <thead>
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Route</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Meta Title</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">Priority</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">Actions</th>
+                    <tr class="border-b border-gray-100 dark:border-white/10">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Route</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Meta Title</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Priority</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-admin-border-subtle">
-                    @forelse($routes as $index => $route)
-                        <tr class="transition-colors duration-200">
+                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                    @forelse($routes as $route)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors duration-200">
                             <td class="px-6 py-4">
-                                <div class="font-medium text-admin-text">{{ $route['route_label'] }}</div>
-                                <div class="text-sm text-admin-text-muted">{{ $route['route_name'] }}</div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $route['route_label'] }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ $route['route_name'] }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $route['meta_title'] ?: 'Not set' }}
                             </td>
                             <td class="px-6 py-4">
-                                @if($route['meta_title'])
-                                    <div class="text-sm text-admin-text truncate max-w-xs">{{ $route['meta_title'] }}</div>
-                                @else
-                                    <span class="text-sm text-admin-text-muted italic">Not set</span>
-                                @endif
+                                @php
+                                    $statusClasses = $route['no_index'] ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400' : ($route['exists'] ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400');
+                                    $statusText = $route['no_index'] ? 'No Index' : ($route['exists'] ? 'Configured' : 'Default');
+                                @endphp
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClasses }}">
+                                    {{ $statusText }}
+                                </span>
                             </td>
-                            <td class="px-6 py-4">
-                                @if($route['no_index'])
-                                    <span class="admin-badge admin-badge-inactive">
-                                        No Index
-                                    </span>
-                                @elseif($route['exists'])
-                                    <span class="admin-badge admin-badge-active">
-                                        Configured
-                                    </span>
-                                @else
-                                    <span class="admin-badge admin-badge-muted">
-                                        Default
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm text-admin-text">{{ $route['priority'] }}</span>
-                                <span class="text-sm text-admin-text-muted">({{ $route['changefreq'] }})</span>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $route['priority'] }} <span class="text-xs text-gray-500">({{ $route['changefreq'] }})</span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @if($route['exists'])
-                                    <a href="{{ route('admin.seo.edit', $route['id']) }}" class="admin-action-btn admin-action-btn-secondary">
-                                        Edit
-                                    </a>
-                                @else
-                                    <a href="{{ route('admin.seo.create', ['route_name' => $route['route_name']]) }}" class="admin-action-btn admin-action-btn-secondary">
-                                        Configure
-                                    </a>
-                                @endif
+                                <a href="{{ route($route['exists'] ? 'admin.seo.edit' : 'admin.seo.create', $route['exists'] ? $route['id'] : ['route_name' => $route['route_name']]) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:opacity-75 transition-opacity">
+                                    {{ $route['exists'] ? 'Edit' : 'Configure' }}
+                                </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-admin-text-muted">
-                                No static routes configured. Check config/seo.php to define routes.
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                No static routes configured.
                             </td>
                         </tr>
                     @endforelse

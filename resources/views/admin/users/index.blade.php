@@ -1,71 +1,60 @@
 <x-layouts::admin title="{{ __('admin-users.title') }}">
-    <div class="p-6">
-        <div class="admin-section-header">
-            <h1 class="admin-section-title">{{ __('admin-users.title') }}</h1>
+    <div class="max-w-5xl mx-auto space-y-8 py-10">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-1">
+                <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">{{ __('admin-users.title') }}</h1>
+                <p class="text-gray-500 dark:text-gray-400">Manage user accounts and permissions.</p>
+            </div>
+            
             <div class="flex items-center gap-4">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="w-64">
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="{{ __('admin-users.search_placeholder') }}"
-                        class="admin-form-input"
-                    >
+                <form method="GET" action="{{ route('admin.users.index') }}">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('admin-users.search_placeholder') }}" class="bg-white dark:bg-[#0A0A0F] border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                 </form>
-                <a href="{{ route('admin.users.create') }}" class="admin-action-btn admin-action-btn-primary">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>{{ __('admin-users.create') }}</span>
+                <a href="{{ route('admin.users.create') }}" class="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
+                    {{ __('admin-users.create') }}
                 </a>
             </div>
         </div>
 
-        <div class="admin-table">
-            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
+        <!-- Table -->
+        <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+            <table class="w-full min-w-[800px]">
                 <thead>
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.user') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.email') }}</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.roles') }}</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-admin-text uppercase tracking-wider">{{ __('admin-users.actions') }}</th>
+                    <tr class="border-b border-gray-100 dark:border-white/10">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-users.user') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-users.email') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-users.roles') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-users.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-admin-border-subtle">
+                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
                     @foreach($users as $user)
-                        <tr class="transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="shrink-0 h-12 w-12">
-                                        <div class="h-12 w-12 rounded-full bg-admin-accent flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-admin-accent/20">
-                                            {{ $user->initials() }}
-                                        </div>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors duration-200">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 rounded-full bg-gray-900 dark:bg-white flex items-center justify-center text-white dark:text-gray-900 font-bold text-sm">
+                                        {{ $user->initials() }}
                                     </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-admin-text">{{ $user->name }}</div>
-                                        <div class="text-sm text-admin-text-muted">{{ $user->email }}</div>
-                                    </div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-admin-text-muted">
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                 {{ $user->email }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 <div class="flex flex-wrap gap-2">
                                     @forelse($user->roles as $role)
-                                        <span class="admin-badge admin-badge-role">
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-gray-300">
                                             {{ $role->name }}
                                         </span>
                                     @empty
-                                        <span class="text-sm text-admin-text-muted italic">{{ __('admin-users.no_roles') }}</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400 italic">{{ __('admin-users.no_roles') }}</span>
                                     @endforelse
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="admin-action-btn admin-action-btn-secondary">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:opacity-75 transition-opacity">
                                     {{ __('admin-users.edit_button') }}
                                 </a>
                             </td>
@@ -75,7 +64,7 @@
             </table>
         </div>
 
-        <div class="mt-6">
+        <div class="mt-4">
             {{ $users->links() }}
         </div>
     </div>

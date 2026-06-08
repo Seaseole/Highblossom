@@ -1,127 +1,78 @@
 <x-layouts::admin title="Gallery">
-    <div class="p-8 max-w-7xl mx-auto space-y-8">
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div class="max-w-7xl mx-auto space-y-8 py-10">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="space-y-1">
-                <h1 class="text-4xl font-bold tracking-tight text-admin-text font-headline leading-none">
-                    Gallery
-                </h1>
-                <p class="text-admin-text-muted text-sm max-w-lg">
-                    Manage the showcase of architectural glass and aluminum installations.
-                </p>
+                <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Gallery</h1>
+                <p class="text-gray-500 dark:text-gray-400">Manage your showcase of architectural glass and aluminum installations.</p>
             </div>
             
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.gallery-settings.index') }}" class="admin-action-btn admin-action-btn-ghost group">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span>Gallery Settings</span>
+                <a href="{{ route('admin.gallery-settings.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                    Gallery Settings
                 </a>
-                <a href="{{ route('admin.gallery.create') }}" class="admin-action-btn admin-action-btn-primary group">
-                    <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Create Gallery Item</span>
+                <a href="{{ route('admin.gallery.create') }}" class="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
+                    Create Gallery Item
                 </a>
             </div>
         </div>
 
-        <div class="admin-table admin-glass-card shadow-2xl shadow-black/20 overflow-x-auto">
-            <table class='w-full min-w-[800px] divide-y divide-admin-border-subtle'>
-                <thead class="bg-admin-accent/5">
-                    <tr>
-                        <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Image</th>
-                        <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Details</th>
-                        <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Category</th>
-                        <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Location</th>
-                        <th scope="col" class="px-8 py-5 text-left text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Status</th>
-                        <th scope="col" class="px-8 py-5 text-right text-[10px] font-bold text-admin-text-muted uppercase tracking-[0.2em] font-body">Actions</th>
+        <!-- Table -->
+        <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+            <table class="w-full min-w-[800px]">
+                <thead>
+                    <tr class="border-b border-gray-100 dark:border-white/10">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Image</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-admin-border-subtle">
+                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
                     @forelse($items as $item)
-                        <tr class="group hover:bg-admin-accent/5 transition-all duration-300 ease-out-expo">
-                            <td class="px-8 py-6 whitespace-nowrap">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors duration-200">
+                            <td class="px-6 py-4">
                                 @if($item->image_path)
-                                    <div class="relative w-16 h-16 group/img">
-                                        <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover rounded-xl border border-admin-border-subtle grayscale group-hover/img:grayscale-0 transition-all duration-500">
-                                        <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10"></div>
+                                    <div class="w-16 h-16 rounded-xl overflow-hidden border border-gray-200 dark:border-white/10">
+                                        <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
                                     </div>
                                 @else
-                                    <div class="w-16 h-16 bg-admin-surface-alt rounded-xl border border-admin-border-subtle flex items-center justify-center">
-                                        <svg class="w-8 h-8 text-admin-text-muted/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
+                                    <div class="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-xl flex items-center justify-center text-gray-400">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-8 py-6">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-base font-bold text-admin-text font-headline tracking-tight">{{ $item->title }}</span>
-                                    @if($item->description)
-                                        <span class="text-xs text-admin-text-muted font-body leading-relaxed max-w-[200px] line-clamp-2">{{ $item->description }}</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-8 py-6 whitespace-nowrap">
-                                <span class="text-xs font-bold text-admin-text-muted uppercase tracking-widest font-body">{{ $item->category->name ?? '-' }}</span>
-                            </td>
-                            <td class="px-8 py-6">
-                                @if($item->location_address)
-                                    <div class="flex items-center gap-2 text-admin-text-muted group/loc">
-                                        <svg class="w-3.5 h-3.5 group-hover/loc:text-admin-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <span class="text-xs font-body truncate max-w-[150px]">{{ $item->location_address }}</span>
-                                    </div>
-                                @else
-                                    <span class="text-xs text-admin-text-muted">-</span>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $item->title }}</div>
+                                @if($item->description)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs">{{ $item->description }}</div>
                                 @endif
                             </td>
-                            <td class="px-8 py-6 whitespace-nowrap">
-                                <div class="flex flex-wrap gap-2">
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $item->category->name ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">{{ $item->location_address ?? '-' }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
                                     @if($item->is_featured)
-                                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-500/10 border border-amber-500/20">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                                            <span class="text-[9px] font-bold text-amber-500 uppercase tracking-widest font-body">Featured</span>
-                                        </div>
+                                        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Featured</span>
                                     @endif
-                                    @if($item->is_active)
-                                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-green-500/10 border border-green-500/20">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                            <span class="text-[9px] font-bold text-green-500 uppercase tracking-widest font-body">Active</span>
-                                        </div>
-                                    @else
-                                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-admin-text-muted/10 border border-admin-text-muted/20 opacity-50">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-admin-text-muted"></span>
-                                            <span class="text-[9px] font-bold text-admin-text-muted uppercase tracking-widest font-body">Inactive</span>
-                                        </div>
-                                    @endif
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $item->is_active ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400' }}">
+                                        {{ $item->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
                                 </div>
                             </td>
-                            <td class="px-8 py-6 whitespace-nowrap text-right">
-                                <a href="{{ route('admin.gallery.edit', $item) }}" class="admin-action-btn admin-action-btn-ghost group/edit">
-                                    <svg class="w-4 h-4 transition-colors group-hover/edit:text-admin-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    <span class="font-bold tracking-tight text-sm">Edit</span>
-                                </a>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{{ route('admin.gallery.edit', $item) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:opacity-75 transition-opacity">Edit</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-8 py-20 text-center">
-                                <div class="flex flex-col items-center justify-center space-y-4">
-                                    <div class="w-20 h-20 rounded-full bg-admin-surface-alt flex items-center justify-center border border-admin-border-subtle">
-                                        <svg class="w-10 h-10 text-admin-text-muted/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <p class="text-admin-text-muted font-body text-sm">No gallery items found.</p>
-                                </div>
-                            </td>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">No gallery items found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -129,10 +80,9 @@
         </div>
 
         @if($items->hasPages())
-            <div class="pt-4">
+            <div class="mt-4">
                 {{ $items->links() }}
             </div>
         @endif
     </div>
 </x-layouts::admin>
-

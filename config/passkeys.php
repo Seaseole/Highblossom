@@ -1,49 +1,117 @@
 <?php
 
-use App\Models\User;
-use Spatie\LaravelPasskeys\Actions\ConfigureCeremonyStepManagerFactoryAction;
-use Spatie\LaravelPasskeys\Actions\FindPasskeyToAuthenticateAction;
-use Spatie\LaravelPasskeys\Actions\GeneratePasskeyAuthenticationOptionsAction;
-use Spatie\LaravelPasskeys\Actions\GeneratePasskeyRegisterOptionsAction;
-use Spatie\LaravelPasskeys\Actions\StorePasskeyAction;
-use Spatie\LaravelPasskeys\Models\Passkey;
-
 return [
-    /*
-     * After a successful authentication attempt using a passkey
-     * we'll redirect to this URL.
-     */
-    'redirect_to_after_login' => '/dashboard',
 
     /*
-     * These class are responsible for performing core tasks regarding passkeys.
-     * You can customize them by creating a class that extends the default, and
-     * by specifying your custom class name here.
-     */
-    'actions' => [
-        'generate_passkey_register_options' => GeneratePasskeyRegisterOptionsAction::class,
-        'store_passkey' => StorePasskeyAction::class,
-        'generate_passkey_authentication_options' => GeneratePasskeyAuthenticationOptionsAction::class,
-        'find_passkey' => FindPasskeyToAuthenticateAction::class,
-        'configure_ceremony_step_manager_factory' => ConfigureCeremonyStepManagerFactoryAction::class,
+    |--------------------------------------------------------------------------
+    | Relying Party ID
+    |--------------------------------------------------------------------------
+    |
+    | The relying party ID represents your application in the WebAuthn protocol.
+    | This is typically your domain (e.g., "example.com"). Passkeys are bound
+    | to this ID and can only be verified on matching domains.
+    |
+    */
+
+    'relying_party_id' => parse_url(config('app.url'), PHP_URL_HOST),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Origins
+    |--------------------------------------------------------------------------
+    |
+    | The origins permitted to complete WebAuthn ceremonies. Passkeys bound
+    | to the relying party ID above will only verify when the browser
+    | reports one of these origins. Defaults to your application URL.
+    |
+    */
+
+    'allowed_origins' => [
+        config('app.url'),
     ],
 
     /*
-     * These properties will be used to generate the passkey.
-     */
-    'relying_party' => [
-        'name' => config('app.name'),
-        'id' => parse_url(config('app.url'), PHP_URL_HOST),
-        'icon' => null,
-    ],
+    |--------------------------------------------------------------------------
+    | User Handle Secret
+    |--------------------------------------------------------------------------
+    |
+    | Secret used to derive a stable WebAuthn user handle from each user model.
+    | Set this explicitly if you rotate your application key.
+    |
+    */
+
+    'user_handle_secret' => env('PASSKEYS_USER_HANDLE_SECRET', config('app.key')),
 
     /*
-     * The models used by the package.
-     *
-     * You can override this by specifying your own models
-     */
-    'models' => [
-        'passkey' => Passkey::class,
-        'authenticatable' => env('AUTH_MODEL', User::class),
-    ],
+    |--------------------------------------------------------------------------
+    | WebAuthn Timeout
+    |--------------------------------------------------------------------------
+    |
+    | The timeout in milliseconds for WebAuthn operations. This determines
+    | how long users have to complete passkey registration or verification.
+    |
+    */
+
+    'timeout' => 60000,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    |
+    | The authentication guard to use when logging in users with passkeys.
+    | This should match your application's primary authentication guard.
+    |
+    */
+
+    'guard' => 'web',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Passkeys Routes Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which middleware Passkeys will assign to the routes
+    | that it registers with the application. If necessary, you may change
+    | these middleware but typically this provided default is preferred.
+    |
+    */
+
+    'middleware' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Passkeys Management Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the middleware applied to passkey management routes
+    | that create or delete passkeys. By default, Laravel's password
+    | confirmation middleware is used.
+    |
+    */
+
+    'management_middleware' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Passkeys Throttling
+    |--------------------------------------------------------------------------
+    |
+    | Middleware used to throttle passkey endpoints. Set to null to disable.
+    |
+    */
+
+    'throttle' => 'throttle:6,1',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect
+    |--------------------------------------------------------------------------
+    |
+    | The path to redirect to after successful passkey verification.
+    |
+    */
+
+    'redirect' => '/dashboard',
+
 ];

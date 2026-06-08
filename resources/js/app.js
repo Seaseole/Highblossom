@@ -2,6 +2,9 @@ import Alpine from 'alpinejs'
 window.Alpine = Alpine
 Alpine.start()
 
+import { Passkeys } from '@laravel/passkeys';
+window.Passkeys = Passkeys;
+
 // Simple vanilla JS helpers for public site
 import {
     browserSupportsWebAuthn,
@@ -12,6 +15,7 @@ import {
 window.browserSupportsWebAuthn = browserSupportsWebAuthn;
 window.startAuthentication = startAuthentication;
 window.startRegistration = startRegistration;
+// Simple vanilla JS helpers for public site
 
 document.addEventListener('DOMContentLoaded', () => {
     // Mobile menu toggle

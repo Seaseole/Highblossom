@@ -1,85 +1,66 @@
 <x-layouts::admin title="Edit Testimonial">
-    <div class="p-6">
-        <div class="admin-section-header">
-            <h1 class="admin-section-title">Edit Testimonial</h1>
-            <a href="{{ route('admin.testimonials.index') }}" class="admin-action-btn admin-action-btn-secondary">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                <span>Back</span>
+    <div class="max-w-2xl mx-auto space-y-8 py-10">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div class="space-y-1">
+                <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Edit Testimonial</h1>
+                <p class="text-gray-500 dark:text-gray-400">Update testimonial details.</p>
+            </div>
+            <a href="{{ route('admin.testimonials.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                Back to List
             </a>
         </div>
 
-        <form method="POST" action="{{ route('admin.testimonials.update', $testimonial) }}" class="max-w-2xl">
+        <form method="POST" action="{{ route('admin.testimonials.update', $testimonial) }}" class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
             @csrf
             @method('PUT')
 
-            <div class="bg-admin-surface-alt border border-admin-border rounded-xl p-6 space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-admin-text-muted mb-2">Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $testimonial->name) }}" required class="w-full admin-form-input" placeholder="Customer name">
-                    @error('name')
-                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+                    <input type="text" name="name" id="name" value="{{ old('name', $testimonial->name) }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="Customer name">
                 </div>
 
                 <div>
-                    <label for="role" class="block text-sm font-medium text-admin-text-muted mb-2">Role <span class="text-admin-text-muted">(Optional)</span></label>
-                    <input type="text" name="role" id="role" value="{{ old('role', $testimonial->role) }}" class="w-full admin-form-input" placeholder="e.g. CEO, Customer">
-                    @error('role')
-                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role (Optional)</label>
+                    <input type="text" name="role" id="role" value="{{ old('role', $testimonial->role) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="e.g. CEO, Customer">
                 </div>
 
                 <div>
-                    <label for="content" class="block text-sm font-medium text-admin-text-muted mb-2">Content</label>
-                    <textarea name="content" id="content" rows="5" required class="w-full admin-form-input resize-none" placeholder="Customer testimonial">{{ old('content', $testimonial->content) }}</textarea>
-                    @error('content')
-                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                    <textarea name="content" id="content" rows="5" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="Customer testimonial">{{ old('content', $testimonial->content) }}</textarea>
                 </div>
 
                 <div>
-                    <label for="rating" class="block text-sm font-medium text-admin-text-muted mb-2">Rating</label>
-                    <select name="rating" id="rating" class="w-full admin-form-input">
-                        <option value="5" {{ old('rating', $testimonial->rating) == 5 ? 'selected' : '' }}>5 Stars</option>
-                        <option value="4" {{ old('rating', $testimonial->rating) == 4 ? 'selected' : '' }}>4 Stars</option>
-                        <option value="3" {{ old('rating', $testimonial->rating) == 3 ? 'selected' : '' }}>3 Stars</option>
-                        <option value="2" {{ old('rating', $testimonial->rating) == 2 ? 'selected' : '' }}>2 Stars</option>
-                        <option value="1" {{ old('rating', $testimonial->rating) == 1 ? 'selected' : '' }}>1 Star</option>
+                    <label for="rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rating</label>
+                    <select name="rating" id="rating" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        @for($i = 5; $i >= 1; $i--)
+                            <option value="{{ $i }}" {{ old('rating', $testimonial->rating) == $i ? 'selected' : '' }}>{{ $i }} Stars</option>
+                        @endfor
                     </select>
-                    @error('rating')
-                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
                 </div>
 
-                <div class="flex items-center gap-3 p-4 bg-admin-surface-alt rounded-xl border border-admin-border">
-                    <input type="hidden" name="is_featured" value="0">
-                    <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured', $testimonial->is_featured) ? 'checked' : '' }} class="h-5 w-5 bg-admin-input-bg border-admin-input-border rounded focus:ring-2 focus:ring-admin-accent cursor-pointer">
-                    <label for="is_featured" class="text-sm font-medium text-admin-text cursor-pointer select-none">Featured</label>
-                    <span class="text-xs text-admin-text-muted ml-auto">Highlighted on public site</span>
-                </div>
-
-                <div class="flex items-center gap-3 p-4 bg-admin-surface-alt rounded-xl border border-admin-border">
-                    <input type="hidden" name="is_published" value="0">
-                    <input type="checkbox" name="is_published" id="is_published" value="1" {{ old('is_published', $testimonial->is_published) ? 'checked' : '' }} class="h-5 w-5 bg-admin-input-bg border-admin-input-border rounded focus:ring-2 focus:ring-admin-accent cursor-pointer">
-                    <label for="is_published" class="text-sm font-medium text-admin-text cursor-pointer select-none">Published</label>
-                    <span class="text-xs text-admin-text-muted ml-auto">Visible on public site</span>
+                <div class="flex items-center gap-6">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $testimonial->is_featured) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Featured</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_published" value="1" {{ old('is_published', $testimonial->is_published) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Published</span>
+                    </label>
                 </div>
 
                 <div>
-                    <label for="sort_order" class="block text-sm font-medium text-admin-text-muted mb-2">Sort Order <span class="text-admin-text-muted">(Optional)</span></label>
-                    <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $testimonial->sort_order) }}" class="w-full admin-form-input" placeholder="Lower numbers appear first">
-                    @error('sort_order')
-                        <p class="mt-1 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label for="sort_order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort Order (Optional)</label>
+                    <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $testimonial->sort_order) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="Lower numbers appear first">
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4">
-                    <a href="{{ route('admin.testimonials.index') }}" class="admin-action-btn admin-action-btn-secondary">
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-white/5">
+                    <a href="{{ route('admin.testimonials.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                         Cancel
                     </a>
-                    <button type="submit" class="admin-action-btn admin-action-btn-primary">
+                    <button type="submit" class="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
                         Update Testimonial
                     </button>
                 </div>

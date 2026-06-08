@@ -1,75 +1,52 @@
 <x-layouts::admin title="Edit User">
-    <div class="p-6">
-        {{-- Header --}}
-        <div class="mb-6">
-            <a href="{{ route('admin.users.index') }}" class="inline-flex items-center gap-2 text-sm text-admin-text-muted hover:text-admin-accent transition-colors duration-200 group">
-                <svg class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
+    <div class="max-w-xl mx-auto space-y-8 py-10">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div class="space-y-1">
+                <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Edit User</h1>
+                <p class="text-gray-500 dark:text-gray-400">Update user account details.</p>
+            </div>
+            <a href="{{ route('admin.users.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Back to Users
             </a>
         </div>
 
-        {{-- Title Section --}}
-        <div class="mb-8">
-            <h1 class="font-headline text-3xl font-bold text-admin-text tracking-tight">Edit User</h1>
-            <p class="text-admin-text-muted text-sm mt-2">Update user account details</p>
-        </div>
-
-        <form method="POST" action="{{ route('admin.users.update', $user) }}" class="max-w-2xl">
+        <form action="{{ route('admin.users.update', $user) }}" method="POST" 
+              class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
             @csrf
             @method('PUT')
 
-            <div class="admin-glass-card rounded-3xl shadow-black/20 p-6 space-y-5">
+            <div class="space-y-6">
                 <div>
-                    <label for="name" class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-2">Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required class="admin-form-input w-full" placeholder="Full name">
-                    @error('name')
-                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                 </div>
 
                 <div>
-                    <label for="email" class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-2">Email</label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required class="admin-form-input w-full" placeholder="email@example.com">
-                    @error('email')
-                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                 </div>
 
                 <div>
-                    <label for="password" class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-2">
-                        Password <span class="text-admin-text-muted font-normal normal-case">(leave blank to keep current)</span>
-                    </label>
-                    <input type="password" name="password" id="password" placeholder="New password" class="admin-form-input w-full">
-                    @error('password')
-                        <p class="mt-2 text-sm text-admin-accent">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password <span class="text-xs text-gray-500 font-normal">(leave blank to keep current)</span></label>
+                    <input type="password" name="password" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="New password">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-admin-text-muted uppercase tracking-wider mb-3">Roles</label>
-                    <div class="grid grid-cols-1 gap-2 p-4 bg-admin-surface-alt/50 rounded-2xl border border-admin-border-subtle max-h-48 overflow-y-auto">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Roles</label>
+                    <div class="space-y-2 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
                         @foreach($roles as $role)
-                            <label class="flex items-center gap-3 p-2 hover:bg-admin-surface rounded-xl cursor-pointer transition-colors">
-                                <input
-                                    type="checkbox"
-                                    name="roles[]"
-                                    value="{{ $role->name }}"
-                                    {{ $user->roles->contains('name', $role->name) ? 'checked' : '' }}
-                                    class="h-5 w-5 bg-admin-input-bg border-admin-border rounded focus:ring-2 focus:ring-admin-accent cursor-pointer"
-                                >
-                                <span class="text-sm text-admin-text">{{ $role->name }}</span>
+                            <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors">
+                                <input type="checkbox" name="roles[]" value="{{ $role->name }}" {{ $user->roles->contains('name', $role->name) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">{{ $role->name }}</span>
                             </label>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4 border-t border-admin-border-subtle">
-                    <a href="{{ route('admin.users.index') }}" class="admin-action-btn admin-action-btn-secondary">
-                        Cancel
-                    </a>
-                    <button type="submit" class="admin-action-btn admin-action-btn-primary">
+                <div class="pt-6 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
+                    <a href="{{ route('admin.users.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Cancel</a>
+                    <button type="submit" class="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
                         Update User
                     </button>
                 </div>
