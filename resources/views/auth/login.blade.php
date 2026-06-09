@@ -1,6 +1,6 @@
-<x-auth-premium 
-    :title="__('auth.login.title')" 
-    :companyName="config('app.name')" 
+<x-auth-premium
+    :title="__('auth.login.title')"
+    :companyName="config('app.name')"
     :brandingSubtitle="__('auth.login.welcome_back')"
 >
     <div class="mb-10">
@@ -71,8 +71,8 @@
                 onclick="signInWithPasskey()"
                 class="w-full bg-white border-2 border-[#E4E4E7] text-[#18181B] py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#F9FAFB] hover:border-[#DC2626]/30 focus:outline-none focus:ring-4 focus:ring-[#DC2626]/10 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 group"
             >
-                <svg class="w-6 h-6 text-[#71717A] group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
                 </svg>
                 <span>Sign in with Passkey</span>
             </button>
@@ -85,7 +85,7 @@
             try {
                 const response = await window.Passkeys.verify();
                 console.log('Passkey login successful', response);
-                
+
                 // Manual redirect if the library doesn't handle it
                 if (response && response.redirect) {
                     window.location.href = response.redirect;
