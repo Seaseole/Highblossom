@@ -125,29 +125,39 @@
                      }">
                      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Branding</h3>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
+                        <div class="space-y-4" x-data="{ removeLogo: false }">
                              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Logo</label>
-                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="$refs.logoInput.click()">
-                                <template x-if="logoPreview">
+                             <input type="hidden" name="remove_business_logo" :value="removeLogo ? 1 : 0">
+                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="if(!removeLogo) $refs.logoInput.click()">
+                                <template x-if="logoPreview && !removeLogo">
                                     <img :src="logoPreview" class="max-h-[140px] object-contain">
                                 </template>
-                                <template x-if="!logoPreview">
+                                <template x-if="!logoPreview || removeLogo">
                                     <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload logo</span>
                                 </template>
                              </div>
-                             <input type="file" name="business_logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'logoPreview')">
+                             <input type="file" name="business_logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'logoPreview'); removeLogo = false;">
+                             <button type="button" @click="removeLogo = true; logoPreview = null" x-show="logoPreview && !removeLogo" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">
+                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                Remove Logo
+                             </button>
                         </div>
-                        <div class="space-y-4">
+                        <div class="space-y-4" x-data="{ removeFavicon: false }">
                              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Favicon</label>
-                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="$refs.faviconInput.click()">
-                                <template x-if="faviconPreview">
+                             <input type="hidden" name="remove_favicon" :value="removeFavicon ? 1 : 0">
+                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="if(!removeFavicon) $refs.faviconInput.click()">
+                                <template x-if="faviconPreview && !removeFavicon">
                                     <img :src="faviconPreview" class="max-h-[140px] object-contain">
                                 </template>
-                                <template x-if="!faviconPreview">
+                                <template x-if="!faviconPreview || removeFavicon">
                                     <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload favicon</span>
                                 </template>
                              </div>
-                             <input type="file" name="favicon" x-ref="faviconInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'faviconPreview')">
+                             <input type="file" name="favicon" x-ref="faviconInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'faviconPreview'); removeFavicon = false;">
+                             <button type="button" @click="removeFavicon = true; faviconPreview = null" x-show="faviconPreview && !removeFavicon" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">
+                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                Remove Favicon
+                             </button>
                         </div>
                      </div>
                 </div>
