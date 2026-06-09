@@ -162,11 +162,42 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
-                            <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Currency Symbol</label>
-                            <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Date Format</label>
+                            <select name="date_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                                @foreach(['d/m/Y', 'm/d/Y', 'Y-m-d', 'd.m.Y', 'j M Y', 'D, j M Y'] as $format)
+                                    <option value="{{ $format }}" {{ old('date_format', $settings['date_format']) === $format ? 'selected' : '' }}>
+                                        {{ date($format) }} ({{ $format }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Format</label>
+                            <select name="time_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                                @foreach(['H:i', 'h:i A', 'H:i:s', 'h:i:s A'] as $format)
+                                    <option value="{{ $format }}" {{ old('time_format', $settings['time_format']) === $format ? 'selected' : '' }}>
+                                        {{ date($format) }} ({{ $format }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Display</label>
+                            <select name="time_format_display" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                                <option value="12" {{ old('time_format_display', $settings['time_format_display']) === '12' ? 'selected' : '' }}>12-hour (AM/PM)</option>
+                                <option value="24" {{ old('time_format_display', $settings['time_format_display']) === '24' ? 'selected' : '' }}>24-hour</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Locale</label>
+                            <input type="text" name="locale" value="{{ old('locale', $settings['locale']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="en_GB">
                         </div>
                     </div>
                 </div>
@@ -176,16 +207,55 @@
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
-                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Social Links</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</label>
-                            <input type="url" name="facebook_url" value="{{ old('facebook_url', $settings['facebook_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;">
+                    
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Social Links</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</label>
+                                <input type="url" name="facebook_url" value="{{ old('facebook_url', $settings['facebook_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Instagram</label>
+                                <input type="url" name="instagram_url" value="{{ old('instagram_url', $settings['instagram_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Instagram</label>
-                            <input type="url" name="instagram_url" value="{{ old('instagram_url', $settings['instagram_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                    </div>
+
+                    <div class="pt-8 border-t border-gray-100 dark:border-white/10 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">WhatsApp Settings</h3>
+                            <button type="button" @click="addNumber()" class="text-sm text-gray-900 dark:text-white font-medium hover:underline">+ Add Additional Number</button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default WhatsApp Number</label>
+                                <input type="text" name="whatsapp_number_default" value="{{ old('whatsapp_number_default', $settings['whatsapp_number_default']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="+267 ...">
+                            </div>
+
+                            <div class="space-y-4">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional WhatsApp Numbers</label>
+                                <div class="grid gap-4">
+                                    <template x-for="(number, index) in whatsappNumbers" :key="index">
+                                        <div class="flex gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 items-start">
+                                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div class="space-y-1">
+                                                    <input type="text" :name="`whatsapp_additional_numbers[${index}][label]`" x-model="number.label" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-white outline-none" placeholder="e.g. Sales, Support">
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <input type="text" :name="`whatsapp_additional_numbers[${index}][number]`" x-model="number.number" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-white outline-none" placeholder="+267 ...">
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="removeNumber(index)" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98] mt-auto">
+                                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -199,7 +269,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quote Notification Emails</label>
-                        <textarea name="quote_notification_emails" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
+                        <textarea name="quote_notification_emails" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
                     </div>
                 </div>
                 
@@ -208,16 +278,61 @@
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
-                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
-                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Announcements</h3>
-                     <template x-for="(announcement, index) in announcements" :key="index">
-                        <div class="flex gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-                            <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm" placeholder="Text">
-                            <input type="text" :name="`announcements[${index}][link]`" x-model="announcement.link" class="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm" placeholder="Link">
-                            <button type="button" @click="removeAnnouncement(index)" class="text-red-500">Remove</button>
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;">
+                     
+                     <div class="flex items-center justify-between">
+                        <div class="space-y-1">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Announcements</h3>
+                            <p class="text-sm text-gray-500">Manage the scrolling marquee messages.</p>
                         </div>
-                     </template>
-                     <button type="button" @click="addAnnouncement()" class="text-sm text-gray-900 dark:text-white font-medium">+ Add Announcement</button>
+                        <label class="relative inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" name="announcement_active" value="1" {{ $settings['announcement_active'] ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-white/10 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-400 peer-checked:bg-gray-900 dark:peer-checked:bg-white"></div>
+                            <span class="ml-3 text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Active</span>
+                        </label>
+                     </div>
+
+                     <div class="pt-8 border-t border-gray-100 dark:border-white/10 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400">Marquee Content</h4>
+                            <button type="button" @click="addAnnouncement()" class="text-sm text-gray-900 dark:text-white font-medium hover:underline">+ Add Message</button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <template x-for="(announcement, index) in announcements" :key="index">
+                                <div class="flex gap-4 p-6 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 items-start">
+                                    <div class="flex-1 space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="space-y-1.5">
+                                                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Message Text</label>
+                                                <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white" placeholder="Type message...">
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Destination</label>
+                                                <select :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white">
+                                                    <option value="">No Link</option>
+                                                    <optgroup label="System Routes">
+                                                        @foreach($availableRoutes as $value => $label)
+                                                            <option value="{{ $value }}">{{ $label }}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                    <template x-if="announcement.link && ![{{ implode(',', array_map(fn($r) => "'$r'", array_keys($availableRoutes))) }}].includes(announcement.link)">
+                                                        <optgroup label="Custom Link">
+                                                            <option :value="announcement.link" x-text="announcement.link" selected></option>
+                                                        </optgroup>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="removeAnnouncement(index)" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98] mt-auto">
+                                        <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                        Delete
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                     </div>
                 </div>
 
                 <div class="pt-6 border-t border-gray-100 dark:border-white/10">

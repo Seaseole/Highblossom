@@ -44,7 +44,7 @@
                                     $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
                                     $openDays = [];
                                     $closedDays = [];
-                                    
+
                                     if (isset($workingHours) && is_array($workingHours)) {
                                         foreach ($dayOrder as $key => $abbr) {
                                             if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
@@ -55,23 +55,23 @@
                                                 $closedDays[] = $abbr;
                                             }
                                         }
-                                        
+
                                         // Group consecutive days with same hours
                                         $groupedDays = [];
                                         $currentGroup = [];
                                         $currentTime = null;
                                         $prevKey = null;
                                         $dayKeys = array_keys($dayOrder);
-                                        
+
                                         foreach ($dayKeys as $key) {
                                             if (!isset($openDays[$key])) continue;
-                                            
+
                                             $dayData = $openDays[$key];
                                             $time = $dayData['time'];
-                                            
+
                                             // Check if consecutive and same time
                                             $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-                                            
+
                                             if ($time === $currentTime && $isConsecutive) {
                                                 $currentGroup[] = $dayData['abbr'];
                                             } else {
@@ -83,27 +83,27 @@
                                             }
                                             $prevKey = $key;
                                         }
-                                        
+
                                         if (!empty($currentGroup)) {
                                             $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
                                         }
-                                        
+
                                         // Modern professional format
                                         $formatted = [];
                                         foreach ($groupedDays as $group) {
-                                            $dayLabel = count($group['days']) > 2 
-                                                ? $group['days'][0] . '–' . end($group['days']) 
+                                            $dayLabel = count($group['days']) > 2
+                                                ? $group['days'][0] . '–' . end($group['days'])
                                                 : implode(' & ', $group['days']);
                                             $formatted[] = $dayLabel . ' · ' . $group['time'];
                                         }
-                                        
+
                                         if (!empty($closedDays)) {
-                                            $closedLabel = count($closedDays) > 2 
-                                                ? $closedDays[0] . '–' . end($closedDays) 
+                                            $closedLabel = count($closedDays) > 2
+                                                ? $closedDays[0] . '–' . end($closedDays)
                                                 : implode(' & ', $closedDays);
                                             $formatted[] = $closedLabel . ' · Closed';
                                         }
-                                        
+
                                         echo implode(' | ', $formatted);
                                     } else {
                                         echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
@@ -143,7 +143,7 @@
                                 $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
                                 $openDays = [];
                                 $closedDays = [];
-                                
+
                                 if (isset($workingHours) && is_array($workingHours)) {
                                     foreach ($dayOrder as $key => $abbr) {
                                         if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
@@ -154,23 +154,23 @@
                                             $closedDays[] = $abbr;
                                         }
                                     }
-                                    
+
                                     // Group consecutive days with same hours
                                     $groupedDays = [];
                                     $currentGroup = [];
                                     $currentTime = null;
                                     $prevKey = null;
                                     $dayKeys = array_keys($dayOrder);
-                                    
+
                                     foreach ($dayKeys as $key) {
                                         if (!isset($openDays[$key])) continue;
-                                        
+
                                         $dayData = $openDays[$key];
                                         $time = $dayData['time'];
-                                        
+
                                         // Check if consecutive and same time
                                         $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-                                        
+
                                         if ($time === $currentTime && $isConsecutive) {
                                             $currentGroup[] = $dayData['abbr'];
                                         } else {
@@ -182,27 +182,27 @@
                                         }
                                         $prevKey = $key;
                                     }
-                                    
+
                                     if (!empty($currentGroup)) {
                                         $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
                                     }
-                                    
+
                                     // Modern professional format
                                     $formatted = [];
                                     foreach ($groupedDays as $group) {
-                                        $dayLabel = count($group['days']) > 2 
-                                            ? $group['days'][0] . '–' . end($group['days']) 
+                                        $dayLabel = count($group['days']) > 2
+                                            ? $group['days'][0] . '–' . end($group['days'])
                                             : implode(' & ', $group['days']);
                                         $formatted[] = $dayLabel . ' · ' . $group['time'];
                                     }
-                                    
+
                                     if (!empty($closedDays)) {
-                                        $closedLabel = count($closedDays) > 2 
-                                            ? $closedDays[0] . '–' . end($closedDays) 
+                                        $closedLabel = count($closedDays) > 2
+                                            ? $closedDays[0] . '–' . end($closedDays)
                                             : implode(' & ', $closedDays);
                                         $formatted[] = $closedLabel . ' · Closed';
                                     }
-                                    
+
                                     echo implode(' | ', $formatted);
                                 } else {
                                     echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
@@ -269,7 +269,7 @@
                 <div class="relative">
                     <div class="h-[600px] rounded-2xl overflow-hidden relative">
                         <iframe
-                            src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($companyAddress) }}"
+                            src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($companyName) }}"
                             width="100%"
                             height="100%"
                             style="border:0;"

@@ -49,7 +49,7 @@ final class CompanySettingRequest extends FormRequest
             'announcement_active' => ['nullable', 'boolean'],
             'announcements' => ['nullable', 'array'],
             'announcements.*.text' => ['required', 'string', 'max:500'],
-            'announcements.*.link' => ['nullable', 'url', 'max:500'],
+            'announcements.*.link' => ['nullable', 'string', 'max:500'],
             'gallery_metrics' => ['nullable', 'array', 'max:6'],
             'gallery_metrics.*.label' => ['required', 'string', 'max:80'],
             'gallery_metrics.*.value' => ['required', 'string', 'max:20'],

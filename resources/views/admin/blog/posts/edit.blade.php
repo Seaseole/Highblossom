@@ -35,7 +35,7 @@
                 <!-- Content Blocks -->
                 <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Content</h2>
-                    <livewire:block-builder name="content" :value="json_encode($post->content)" />
+                    <livewire:block-builder name="content" :value="$post->content" />
                 </div>
                 
                 <!-- Categories & Tags -->

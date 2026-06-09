@@ -58,9 +58,15 @@
                         <div class="ticker-wrapper">
                             @for ($i = 0; $i < 3; $i++)
                                 @foreach($announceList as $announcement)
+                                    @php
+                                        $link = $announcement['link'] ?? '';
+                                        if (!empty($link) && !str_starts_with($link, 'http') && Route::has($link)) {
+                                            $link = route($link);
+                                        }
+                                    @endphp
                                     <div class="ticker-item text-[11px] font-medium tracking-wide text-white mx-4">
-                                        @if(!empty($announcement['link']))
-                                            <a href="{{ $announcement['link'] }}" class="flex items-center gap-1 hover:text-white/80 transition-colors">
+                                        @if(!empty($link))
+                                            <a href="{{ $link }}" class="flex items-center gap-1 hover:text-white/80 transition-colors">
                                                 <span>{{ $announcement['text'] }}</span>
                                                 <span class="material-symbols-outlined text-[12px] opacity-80">arrow_forward</span>
                                             </a>

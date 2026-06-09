@@ -13,13 +13,17 @@ final class CompanySettingController
 {
     public function __construct(
         private readonly CompanySettingService $settingService,
+        private readonly \App\Services\SeoService $seoService,
     ) {}
 
     public function index(): View
     {
         $settings = $this->settingService->getDefaultSettings();
+        $availableRoutes = collect(config('seo.static_routes', []))->mapWithKeys(function ($route) {
+            return [$route => $this->seoService->getRouteLabel($route)];
+        })->toArray();
 
-        return view('admin.settings.index', compact('settings'));
+        return view('admin.settings.index', compact('settings', 'availableRoutes'));
     }
 
     public function gallerySettings(): View

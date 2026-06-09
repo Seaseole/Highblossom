@@ -1,5 +1,15 @@
 <x-layouts::admin title="Edit User">
-    <div class="max-w-xl mx-auto space-y-8 py-10">
+    <div class="max-w-xl mx-auto space-y-8 py-10" x-data="{
+        showPassword: false,
+        minLen: 8,
+        init() {
+            const passInput = $refs.passwordInput;
+            if (passInput && passInput.dataset.rules) {
+                const minMatch = passInput.dataset.rules.match(/min:(\d+)/);
+                if (minMatch) this.minLen = parseInt(minMatch[1]);
+            }
+        }
+    }">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div class="space-y-1">
@@ -29,12 +39,22 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password <span class="text-xs text-gray-500 font-normal">(leave blank to keep current)</span></label>
-                    <input type="password" name="password" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white" placeholder="New password">
+                    <div class="relative">
+                        <input :type="showPassword ? 'text' : 'password'" name="password" x-ref="passwordInput" 
+                               class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white pr-10" 
+                               placeholder="New password"
+                               data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}">
+                        <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg x-show="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg x-show="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1" x-text="`Min ${minLen} characters`"></p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Roles</label>
-                    <div class="space-y-2 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
+                    <div class="space-y-2 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5 max-h-64 overflow-y-auto">
                         @foreach($roles as $role)
                             <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors">
                                 <input type="checkbox" name="roles[]" value="{{ $role->name }}" {{ $user->roles->contains('name', $role->name) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-white/20 text-gray-900 focus:ring-gray-900 dark:focus:ring-white">

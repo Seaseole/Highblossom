@@ -4,8 +4,12 @@
             const name = prompt('Give this passkey a name:', 'My Security Key');
             if (!name) return;
 
+            // Show a loading state if needed by UI
             await window.Passkeys.register({ name: name });
             
+            // Dispatch a Livewire event to handle the refresh reliably
+            Livewire.dispatch('passkeyRegistered');
+
             $dispatch('toast', {
                 type: 'success',
                 message: 'Passkey registered successfully.'
@@ -20,11 +24,11 @@
             }
             return;
         }
-
-        try {
-            await this.$wire.$refresh();
-        } catch (e) {
-            console.error('Failed to refresh passkeys list', e);
+    },
+    rename(id, currentName) {
+        const newName = prompt('Enter new name for passkey:', currentName);
+        if (newName && newName !== currentName) {
+            Livewire.dispatch('renamePasskeyRequest', { id: id, name: newName });
         }
     }
 }">
@@ -53,15 +57,24 @@
                         </div>
                         <span class="text-gray-900 dark:text-gray-100 font-medium">{{ $passkey->name }}</span>
                     </div>
-                    <button 
-                        wire:click="deletePasskey({{ $passkey->id }})" 
-                        wire:confirm="Are you sure you want to delete this passkey?"
-                        class="text-gray-400 hover:text-red-500 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                        wire:loading.attr="disabled"
-                    >
-                        <span wire:loading.remove wire:target="deletePasskey({{ $passkey->id }})">Remove</span>
-                        <span wire:loading wire:target="deletePasskey({{ $passkey->id }})">Removing...</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button
+                            @click="rename({{ $passkey->id }}, '{{ $passkey->name }}')"
+                            class="text-gray-400 hover:text-blue-500 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                            Rename
+                        </button>
+                        <button 
+                            wire:click="deletePasskey({{ $passkey->id }})" 
+                            wire:confirm="Are you sure you want to delete this passkey?"
+                            class="text-gray-400 hover:text-red-500 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                            wire:loading.attr="disabled"
+                        >
+                        
+                            <span wire:loading.remove wire:target="deletePasskey({{ $passkey->id }})">Remove</span>
+                            <span wire:loading wire:target="deletePasskey({{ $passkey->id }})">Removing...</span>
+                        </button>
+                    </div>
                 </li>
             @endforeach
         </ul>

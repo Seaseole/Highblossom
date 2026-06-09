@@ -1,230 +1,112 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('auth.login.title') }} - {{ config('app.name') }}</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.8s var(--ease-out-expo) forwards;
-            opacity: 0;
-        }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
-        .delay-500 { animation-delay: 500ms; }
-
-        .glass-vivid {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Override checkbox for light theme */
-        .light-checkbox .ui-checkbox-label {
-            color: #71717A !important;
-        }
-        .light-checkbox:hover .ui-checkbox-label {
-            color: #18181B !important;
-        }
-    </style>
-</head>
-<body class="min-h-[100dvh] bg-[#F9FAFB] text-[#18181B] font-body selection:bg-[#DC2626] selection:text-white antialiased">
-    <x-ui.toaster />
-    <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh] overflow-hidden">
-        <!-- Left Column - Branding -->
-        <div class="hidden lg:flex flex-col justify-center items-center p-12 bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#F43F5E] relative overflow-hidden">
-            <!-- Background Decoration -->
-            <div class="absolute inset-0 opacity-20">
-                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <defs>
-                        <pattern id="grid-light" width="8" height="8" patternUnits="userSpaceOnUse">
-                            <path d="M 8 0 L 0 0 0 8" fill="none" stroke="white" stroke-width="0.2"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100" height="100" fill="url(#grid-light)"/>
-                </svg>
-            </div>
-
-            <!-- Floating Orbs -->
-            <div class="absolute top-[-10%] left-[-10%] w-80 h-80 bg-white/20 rounded-full blur-[100px] animate-pulse"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-black/10 rounded-full blur-[100px]"></div>
-
-            <div class="relative z-10 text-center max-w-lg">
-                <div class="animate-fade-in-up">
-                    <div class="w-28 h-28 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center mx-auto mb-10 shadow-2xl relative group overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <span class="text-5xl font-bold text-white drop-shadow-lg transform group-hover:scale-110 transition-transform duration-500">H</span>
-                    </div>
-                </div>
-
-                <h1 class="text-6xl font-bold text-white mb-6 tracking-tighter font-headline animate-fade-in-up delay-100 leading-none">
-                    {{ $companyName ?? config('app.name') }}
-                </h1>
-
-                <p class="text-xl text-white/80 leading-relaxed animate-fade-in-up delay-200 font-medium">
-                    {{ __('auth.login.welcome_back') }}
-                </p>
-
-                <div class="mt-12 flex gap-4 justify-center animate-fade-in-up delay-300">
-                    <div class="h-1 w-12 bg-white/30 rounded-full"></div>
-                    <div class="h-1 w-4 bg-white/30 rounded-full"></div>
-                    <div class="h-1 w-4 bg-white/30 rounded-full"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column - Login Form -->
-        <div class="flex items-center justify-center p-6 lg:p-12 relative">
-            <!-- Mobile Background Accent -->
-            <div class="lg:hidden absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#DC2626]/10 to-transparent"></div>
-
-            <div class="w-full max-w-md relative z-10">
-                <!-- Mobile Logo -->
-                <div class="lg:hidden text-center mb-10 animate-fade-in-up">
-                    <div class="w-16 h-16 bg-gradient-to-br from-[#DC2626] to-[#B91C1C] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                        <span class="text-2xl font-bold text-white">H</span>
-                    </div>
-                    <h1 class="text-3xl font-bold text-[#18181B] font-headline tracking-tight">{{ $companyName ?? config('app.name') }}</h1>
-                </div>
-
-                <div class="glass-vivid rounded-[2rem] p-8 lg:p-10 animate-fade-in-up delay-100">
-                    <div class="mb-10">
-                        <h2 class="text-3xl font-bold text-[#18181B] mb-2 font-headline tracking-tight">{{ __('auth.login.heading') }}</h2>
-                        <p class="text-[#71717A]">{{ __('auth.login.subheading') }}</p>
-                    </div>
-
-                    <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                        @csrf
-
-                        <div class="animate-fade-in-up delay-200">
-                            <label for="email" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest mb-2 px-1">{{ __('auth.login.email_label') }}</label>
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
-                                placeholder="{{ __('auth.login.email_placeholder') }}"
-                                required
-                                autofocus
-                                autocomplete="username"
-                                value="{{ old('email') }}"
-                            >
-                        </div>
-                        <div class="animate-fade-in-up delay-300">
-                            <div class="flex items-center justify-between mb-2 px-1">
-                                <label for="password" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">{{ __('auth.login.password_label') }}</label>
-                                <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#DC2626] hover:text-[#B91C1C] transition-colors uppercase tracking-widest">
-                                    {{ __('auth.login.forgot_password') }}
-                                </a>
-                            </div>
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
-                                placeholder="{{ __('auth.login.password_placeholder') }}"
-                                required
-                                autocomplete="current-password"
-                            >
-                        </div>
-
-                        <div class="flex items-center justify-between animate-fade-in-up delay-400 px-1">
-                            <div class="light-checkbox">
-                                <x-ui.checkbox name="remember" label="{{ __('auth.login.remember_me') }}" />
-                            </div>
-                        </div>
-
-                        <div class="animate-fade-in-up delay-500 pt-2 flex flex-col gap-4">
-                            <button
-                                type="submit"
-                                class="w-full bg-[#DC2626] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#B91C1C] focus:outline-none focus:ring-4 focus:ring-[#DC2626]/20 transition-all duration-300 active:scale-[0.98] shadow-xl shadow-[#DC2626]/20 group flex items-center justify-center gap-2"
-                            >
-                                <span>{{ __('auth.login.sign_in_button') }}</span>
-                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                                </svg>
-                            </button>
-
-                            <div class="relative flex items-center py-2">
-                                <div class="flex-grow border-t border-[#E4E4E7]"></div>
-                                <span class="flex-shrink mx-4 text-xs font-bold text-[#A1A1AA] uppercase tracking-widest">Or</span>
-                                <div class="flex-grow border-t border-[#E4E4E7]"></div>
-                            </div>
-
-                            <button
-                                type="button"
-                                onclick="signInWithPasskey()"
-                                class="w-full bg-white border-2 border-[#E4E4E7] text-[#18181B] py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#F9FAFB] hover:border-[#DC2626]/30 focus:outline-none focus:ring-4 focus:ring-[#DC2626]/10 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 group"
-                            >
-                                <svg class="w-6 h-6 text-[#71717A] group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                                </svg>
-                                <span>Sign in with Passkey</span>
-                            </button>
-                        </div>
-                    </form>
-
-                    <script>
-                        async function signInWithPasskey() {
-                            console.log('Starting passkey login...');
-                            try {
-                                const response = await window.Passkeys.verify();
-                                console.log('Passkey login successful', response);
-                                
-                                // Manual redirect if the library doesn't handle it
-                                if (response && response.redirect) {
-                                    window.location.href = response.redirect;
-                                }
-                            } catch (e) {
-                                console.error('Passkey login failed', e);
-                                // Only alert if it's not a user cancellation
-                                if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
-                                    alert('Failed to sign in with passkey. Please try again or use your password.');
-                                }
-                            }
-                        }
-                    </script>
-
-
-
-                    <div class="mt-10 text-center animate-fade-in-up delay-500">
-                        <p class="text-[#71717A] font-medium">
-                            Don't have an account?
-                            <a href="{{ route('register') }}" class="text-[#DC2626] hover:text-[#B91C1C] font-bold transition-colors underline decoration-2 underline-offset-4 decoration-[#DC2626]/20 hover:decoration-[#DC2626]">
-                                Register
-                            </a>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Footer Info -->
-                <p class="mt-8 text-center text-xs text-[#A1A1AA] font-medium uppercase tracking-[0.2em] animate-fade-in-up delay-500">
-                    &copy; {{ date('Y') }} {{ App\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
-                </p>
-            </div>
-        </div>
+<x-auth-premium 
+    :title="__('auth.login.title')" 
+    :companyName="config('app.name')" 
+    :brandingSubtitle="__('auth.login.welcome_back')"
+>
+    <div class="mb-10">
+        <h2 class="text-3xl font-bold text-[#18181B] mb-2 font-headline tracking-tight">{{ __('auth.login.heading') }}</h2>
+        <p class="text-[#71717A]">{{ __('auth.login.subheading') }}</p>
     </div>
-</body>
-</html>
+
+    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+        @csrf
+
+        <div class="animate-fade-in-up delay-200">
+            <label for="email" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest mb-2 px-1">{{ __('auth.login.email_label') }}</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
+                placeholder="{{ __('auth.login.email_placeholder') }}"
+                required
+                autofocus
+                autocomplete="username"
+                value="{{ old('email') }}"
+            >
+        </div>
+        <div class="animate-fade-in-up delay-300">
+            <div class="flex items-center justify-between mb-2 px-1">
+                <label for="password" class="block text-xs font-bold text-[#71717A] uppercase tracking-widest">{{ __('auth.login.password_label') }}</label>
+                <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#DC2626] hover:text-[#B91C1C] transition-colors uppercase tracking-widest">
+                    {{ __('auth.login.forgot_password') }}
+                </a>
+            </div>
+            <input
+                id="password"
+                type="password"
+                name="password"
+                class="w-full px-5 py-4 bg-white/50 border border-[#E4E4E7] rounded-2xl text-[#18181B] placeholder-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all duration-300 shadow-sm"
+                placeholder="{{ __('auth.login.password_placeholder') }}"
+                required
+                autocomplete="current-password"
+            >
+        </div>
+
+        <div class="flex items-center justify-between animate-fade-in-up delay-400 px-1">
+            <div class="light-checkbox">
+                <x-ui.checkbox name="remember" label="{{ __('auth.login.remember_me') }}" />
+            </div>
+        </div>
+
+        <div class="animate-fade-in-up delay-500 pt-2 flex flex-col gap-4">
+            <button
+                type="submit"
+                class="w-full bg-[#DC2626] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#B91C1C] focus:outline-none focus:ring-4 focus:ring-[#DC2626]/20 transition-all duration-300 active:scale-[0.98] shadow-xl shadow-[#DC2626]/20 group flex items-center justify-center gap-2"
+            >
+                <span>{{ __('auth.login.sign_in_button') }}</span>
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </button>
+
+            <div class="relative flex items-center py-2">
+                <div class="flex-grow border-t border-[#E4E4E7]"></div>
+                <span class="flex-shrink mx-4 text-xs font-bold text-[#A1A1AA] uppercase tracking-widest">Or</span>
+                <div class="flex-grow border-t border-[#E4E4E7]"></div>
+            </div>
+
+            <button
+                type="button"
+                onclick="signInWithPasskey()"
+                class="w-full bg-white border-2 border-[#E4E4E7] text-[#18181B] py-4 px-6 rounded-2xl font-bold text-lg hover:bg-[#F9FAFB] hover:border-[#DC2626]/30 focus:outline-none focus:ring-4 focus:ring-[#DC2626]/10 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 group"
+            >
+                <svg class="w-6 h-6 text-[#71717A] group-hover:text-[#DC2626] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                <span>Sign in with Passkey</span>
+            </button>
+        </div>
+    </form>
+
+    <script>
+        async function signInWithPasskey() {
+            console.log('Starting passkey login...');
+            try {
+                const response = await window.Passkeys.verify();
+                console.log('Passkey login successful', response);
+                
+                // Manual redirect if the library doesn't handle it
+                if (response && response.redirect) {
+                    window.location.href = response.redirect;
+                }
+            } catch (e) {
+                if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+                    console.log('Passkey login cancelled by user.');
+                } else {
+                    console.error('Passkey login failed:', e);
+                    alert('Failed to sign in with passkey. Please try again or use your password.');
+                }
+            }
+        }
+    </script>
+
+    <div class="mt-10 text-center animate-fade-in-up delay-500">
+        <p class="text-[#71717A] font-medium">
+            Don't have an account?
+            <a href="{{ route('register') }}" class="text-[#DC2626] hover:text-[#B91C1C] font-bold transition-colors underline decoration-2 underline-offset-4 decoration-[#DC2626]/20 hover:decoration-[#DC2626]">
+                Register
+            </a>
+        </p>
+    </div>
+</x-auth-premium>

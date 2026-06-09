@@ -73,6 +73,7 @@ final class BlockBuilder extends Component
 
     public function addBlock(string $type): void
     {
+        \Illuminate\Support\Facades\Log::info('addBlock called', ['type' => $type]);
         $this->blocks[] = [
             'id' => uniqid('block_', true),
             'type' => $type,
