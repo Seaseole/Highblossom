@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\CompanySettingRequest;
-use App\Http\Requests\CompanyValidationRules;
 use App\Services\CompanySettingService;
+use App\Services\SeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -14,7 +14,7 @@ final class CompanySettingController
 {
     public function __construct(
         private readonly CompanySettingService $settingService,
-        private readonly \App\Services\SeoService $seoService,
+        private readonly SeoService $seoService,
     ) {}
 
     public function index(): View

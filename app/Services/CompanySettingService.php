@@ -63,6 +63,17 @@ final class CompanySettingService
 
     private function handleFaviconUpload(Request $request): void
     {
+        // Handle removal request first
+        if ($request->boolean('remove_favicon')) {
+            $oldFavicon = CompanySetting::get('favicon', '');
+            if ($oldFavicon) {
+                Storage::disk('public')->delete($oldFavicon);
+            }
+            CompanySetting::set('favicon', '');
+
+            return;
+        }
+
         $imagePath = $request->input('favicon_path');
 
         if (! empty($imagePath)) {
