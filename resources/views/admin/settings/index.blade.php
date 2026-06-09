@@ -30,17 +30,17 @@
             <!-- Tabs Navigation -->
             <div class="flex border-b border-gray-200 dark:border-white/10 space-x-1">
                 @foreach([
-                    'general' => 'General', 
-                    'hours' => 'Hours', 
-                    'assets' => 'Branding', 
-                    'localization' => 'Locale', 
+                    'general' => 'General',
+                    'hours' => 'Hours',
+                    'assets' => 'Branding',
+                    'localization' => 'Locale',
                     'social' => 'Social',
                     'notifications' => 'Notifications',
                     'announcements' => 'Announcements'
                 ] as $key => $label)
-                    <button type="button" 
-                            @click="tab = '{{ $key }}'" 
-                            :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'" 
+                    <button type="button"
+                            @click="tab = '{{ $key }}'"
+                            :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
                             class="pb-4 px-1 border-b-2 font-medium transition-colors text-sm">
                         {{ $label }}
                     </button>
@@ -50,7 +50,7 @@
             <!-- Tab Contents -->
             <div class="space-y-8">
                 <!-- General Tab -->
-                <div x-show="tab === 'general'" 
+                <div x-show="tab === 'general'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -81,7 +81,7 @@
                 </div>
 
                 <!-- Business Hours Tab -->
-                <div x-show="tab === 'hours'" 
+                <div x-show="tab === 'hours'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -108,14 +108,14 @@
                         @endforeach
                     </div>
                 </div>
-                
+
                 <!-- Branding Tab -->
-                <div x-show="tab === 'assets'" 
+                <div x-show="tab === 'assets'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;"
-                     x-data="{ 
+                     x-data="{
                         logoPreview: '{{ $settings['business_logo'] ? Storage::url($settings['business_logo']) : null }}',
                         faviconPreview: '{{ $settings['favicon'] ? Storage::url($settings['favicon']) : null }}',
                         handleFileSelect(event, previewKey) {
@@ -138,8 +138,11 @@
                              </div>
                              <input type="file" name="business_logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'logoPreview'); removeLogo = false;">
                              <button type="button" @click="removeLogo = true; logoPreview = null" x-show="logoPreview && !removeLogo" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">
-                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
-                                Remove Logo
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                 </svg>
+
+                                 Remove Logo
                              </button>
                         </div>
                         <div class="space-y-4" x-data="{ removeFavicon: false }">
@@ -163,7 +166,7 @@
                 </div>
 
                 <!-- Locale Tab -->
-                <div x-show="tab === 'localization'" 
+                <div x-show="tab === 'localization'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -213,12 +216,12 @@
                 </div>
 
                 <!-- Social Tab -->
-                <div x-show="tab === 'social'" 
+                <div x-show="tab === 'social'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;">
-                    
+
                     <div class="space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Social Links</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -259,7 +262,10 @@
                                                 </div>
                                             </div>
                                             <button type="button" @click="removeNumber(index)" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98] mt-auto">
-                                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+
                                                 Delete
                                             </button>
                                         </div>
@@ -271,7 +277,7 @@
                 </div>
 
                 <!-- Notifications Tab -->
-                <div x-show="tab === 'notifications'" 
+                <div x-show="tab === 'notifications'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -282,14 +288,14 @@
                         <textarea name="quote_notification_emails" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
                     </div>
                 </div>
-                
+
                 <!-- Announcements Tab -->
-                <div x-show="tab === 'announcements'" 
+                <div x-show="tab === 'announcements'"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;">
-                     
+
                      <div class="flex items-center justify-between">
                         <div class="space-y-1">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Announcements</h3>
@@ -336,7 +342,10 @@
                                         </div>
                                     </div>
                                     <button type="button" @click="removeAnnouncement(index)" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98] mt-auto">
-                                        <span class="material-symbols-outlined text-sm">&#xe872;</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+
                                         Delete
                                     </button>
                                 </div>

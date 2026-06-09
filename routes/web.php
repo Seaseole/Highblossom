@@ -256,3 +256,5 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(functio
 });
 
 require __DIR__.'/settings.php';
+
+Route::get('api/glass-types/{glassType}/sub-categories', [Admin\GlassTypeController::class, 'getSubCategories'])->name('api.glass-types.sub-categories');
