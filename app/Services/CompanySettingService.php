@@ -32,60 +32,74 @@ final class CompanySettingService
 
     private function handleLogoUpload(Request $request): void
     {
-        // Handle removal request first
-        if ($request->boolean('remove_business_logo')) {
-            $oldLogo = CompanySetting::get('business_logo', '');
-            if ($oldLogo) {
-                Storage::disk('public')->delete($oldLogo);
-            }
-            CompanySetting::set('business_logo', '');
+        $oldLogo = CompanySetting::get('business_logo', '');
 
+        // Branch 1: Explicit removal requested
+        if ($request->boolean('remove_business_logo')) {
+            $this->deleteStoredImage($oldLogo);
+            CompanySetting::set('business_logo', '');
             return;
         }
 
+        // Branch 2: Pre-uploaded path provided (e.g. from a temp upload or CDN)
         $imagePath = $request->input('business_logo_path');
 
-        if (! empty($imagePath)) {
-            $oldLogo = CompanySetting::get('business_logo', '');
+        if (filled($imagePath)) {
             if ($oldLogo && $oldLogo !== $imagePath) {
-                Storage::disk('public')->delete($oldLogo);
+                $this->deleteStoredImage($oldLogo);
             }
             CompanySetting::set('business_logo', $imagePath);
-        } elseif ($request->hasFile('business_logo')) {
-            $oldLogo = CompanySetting::get('business_logo', '');
-            if ($oldLogo) {
-                Storage::disk('public')->delete($oldLogo);
-            }
+            return;
+        }
+
+        // Branch 3: Direct file upload
+        if ($request->hasFile('business_logo') && $request->file('business_logo')->isValid()) {
+            $this->deleteStoredImage($oldLogo);
             $path = $request->file('business_logo')->store('settings', 'public');
             CompanySetting::set('business_logo', $path);
         }
     }
 
-    private function handleFaviconUpload(Request $request): void
+    private function deleteStoredImage(?string $path): void
     {
-        // Handle removal request first
-        if ($request->boolean('remove_favicon')) {
-            $oldFavicon = CompanySetting::get('favicon', '');
-            if ($oldFavicon) {
-                Storage::disk('public')->delete($oldFavicon);
-            }
-            CompanySetting::set('favicon', '');
-
+        if (blank($path)) {
             return;
         }
 
+        try {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        } catch (\Exception $e) {
+            Log::warning('Could not delete stored image', [
+                'path' => $path,
+                'reason' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function handleFaviconUpload(Request $request): void
+    {
         $imagePath = $request->input('favicon_path');
 
         if (! empty($imagePath)) {
             $oldFavicon = CompanySetting::get('favicon', '');
-            if ($oldFavicon && $oldFavicon !== $imagePath) {
-                Storage::disk('public')->delete($oldFavicon);
+            try {
+                if ($oldFavicon && $oldFavicon !== $imagePath && Storage::disk('public')->exists($oldFavicon)) {
+                    Storage::disk('public')->delete($oldFavicon);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to remove old favicon: ' . $e->getMessage());
             }
             CompanySetting::set('favicon', $imagePath);
         } elseif ($request->hasFile('favicon')) {
             $oldFavicon = CompanySetting::get('favicon', '');
-            if ($oldFavicon) {
-                Storage::disk('public')->delete($oldFavicon);
+            try {
+                if ($oldFavicon && Storage::disk('public')->exists($oldFavicon)) {
+                    Storage::disk('public')->delete($oldFavicon);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to remove old favicon: ' . $e->getMessage());
             }
             $path = $request->file('favicon')->store('settings', 'public');
             CompanySetting::set('favicon', $path);
@@ -165,7 +179,7 @@ final class CompanySettingService
             'wednesday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
             'thursday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
             'friday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'saturday' => ['open' => null, 'close' => null, 'is_closed' => true],
+            'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => false],
             'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
         ];
     }

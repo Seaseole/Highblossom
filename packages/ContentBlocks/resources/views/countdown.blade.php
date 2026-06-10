@@ -126,12 +126,12 @@
 </style>
 
 <div class="cb-countdown" x-data="{
-    targetDate: new Date('{{ $targetDate }}'),
+    targetDate: new Date({{ strtotime($targetDate) * 1000 }}),
     remaining: { days: 0, hours: 0, minutes: 0, seconds: 0 },
     expired: false,
     init() {
         this.calculateRemaining();
-        setInterval(() => this.calculateRemaining(), 1000);
+        this.interval = setInterval(() => this.calculateRemaining(), 1000);
     },
     calculateRemaining() {
         const now = new Date();
@@ -140,6 +140,7 @@
         if (diff <= 0) {
             this.expired = true;
             this.remaining = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+            clearInterval(this.interval);
             return;
         }
         

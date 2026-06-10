@@ -14,7 +14,7 @@ final class PollBlock extends AbstractBlock
     public function getValidationRules(): array
     {
         return [
-            'poll_id' => 'required|integer',
+            'poll_id' => 'nullable|integer',
             'question' => 'required|string',
             'options' => 'required|array|min:2',
             'options.*' => 'required|string',

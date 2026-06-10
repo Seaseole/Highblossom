@@ -85,6 +85,7 @@ final class BlockBuilder extends Component
 
     public function removeBlock(int $index): void
     {
+        \Illuminate\Support\Facades\Log::info('removeBlock called', ['index' => $index]);
         unset($this->blocks[$index]);
         $this->blocks = array_values($this->blocks);
         $this->dispatchBlocksUpdated();

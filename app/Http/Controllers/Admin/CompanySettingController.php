@@ -19,6 +19,7 @@ final class CompanySettingController
 
     public function index(): View
     {
+
         $settings = $this->settingService->getDefaultSettings();
         $availableRoutes = collect(config('seo.static_routes', []))->mapWithKeys(function ($route) {
             return [$route => $this->seoService->getRouteLabel($route)];

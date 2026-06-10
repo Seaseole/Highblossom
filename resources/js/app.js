@@ -1,9 +1,17 @@
-import Alpine from 'alpinejs'
-import collapse from '@alpinejs/collapse'
+// import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
 
-Alpine.plugin(collapse)
-window.Alpine = Alpine
-Alpine.start()
+// window.Alpine = Alpine;
+// Alpine.plugin(collapse);
+
+document.addEventListener('livewire:init', () => {
+    window.Alpine.plugin(collapse);
+});
+
+// Safely start Alpine if not already initialized
+// if (!window.Alpine.initialized) {
+//     Alpine.start();
+// }
 
 import { Passkeys } from '@laravel/passkeys';
 window.Passkeys = Passkeys;

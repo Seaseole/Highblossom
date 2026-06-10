@@ -137,30 +137,25 @@
                                 </template>
                              </div>
                              <input type="file" name="business_logo" x-ref="logoInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'logoPreview'); removeLogo = false;">
-                             <button type="button" @click="removeLogo = true; logoPreview = null" x-show="logoPreview && !removeLogo" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">
-                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                 </svg>
+{{--                             <button type="button" @click="removeLogo = true; logoPreview = null" x-show="logoPreview && !removeLogo" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">--}}
+{{--                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">--}}
+{{--                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />--}}
+{{--                                 </svg>--}}
 
-                                 Remove Logo
-                             </button>
+{{--                                 Remove Logo--}}
+{{--                             </button>--}}
                         </div>
-                        <div class="space-y-4" x-data="{ removeFavicon: false }">
+                        <div class="space-y-4">
                              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Favicon</label>
-                             <input type="hidden" name="remove_favicon" :value="removeFavicon ? 1 : 0">
-                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="if(!removeFavicon) $refs.faviconInput.click()">
-                                <template x-if="faviconPreview && !removeFavicon">
+                             <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[160px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all" @click="$refs.faviconInput.click()">
+                                <template x-if="faviconPreview">
                                     <img :src="faviconPreview" class="max-h-[140px] object-contain">
                                 </template>
-                                <template x-if="!faviconPreview || removeFavicon">
+                                <template x-if="!faviconPreview">
                                     <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload favicon</span>
                                 </template>
                              </div>
-                             <input type="file" name="favicon" x-ref="faviconInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'faviconPreview'); removeFavicon = false;">
-                             <button type="button" @click="removeFavicon = true; faviconPreview = null" x-show="faviconPreview && !removeFavicon" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full text-xs transition-all shadow-sm active:scale-[0.98]">
-                                <span class="material-symbols-outlined text-sm">&#xe872;</span>
-                                Remove Favicon
-                             </button>
+                             <input type="file" name="favicon" x-ref="faviconInput" class="hidden" accept="image/*" @change="handleFileSelect($event, 'faviconPreview')">
                         </div>
                      </div>
                 </div>

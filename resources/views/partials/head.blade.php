@@ -5,7 +5,7 @@
     {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
 </title>
 
-@if($favicon)
+@if($favicon ?? false)
     <link rel="icon" href="{{ Storage::url($favicon) }}" sizes="any">
 @endif
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -16,3 +16,4 @@
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+@include('partials.cloak')

@@ -6,9 +6,17 @@
                 <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Edit Blog Post</h1>
                 <p class="text-gray-500 dark:text-gray-400">Modify your blog content.</p>
             </div>
-            <a href="{{ route('admin.posts.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Back to Posts
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('blog.show', $post) }}" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-900 dark:hover:border-white transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    Preview
+                </a>
+                <a href="{{ route('admin.posts.index') }}" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                    Back to Posts
+                </a>
+            </div>
         </div>
 
         <form method="POST" action="{{ route('admin.posts.update', $post) }}" enctype="multipart/form-data" 

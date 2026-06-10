@@ -18,6 +18,7 @@ final class PostService
     {
         $this->handleFeaturedImage($data, $request);
         $this->relocateContentImages($data);
+        $this->syncPolls($data);
 
         $post = Post::create($data);
 
@@ -30,12 +31,38 @@ final class PostService
     {
         $this->handleFeaturedImageUpdate($data, $request, $post);
         $this->relocateContentImages($data);
+        $this->syncPolls($data);
 
         $post->update($data);
 
         $this->syncRelations($post, $data);
 
         return $post->fresh();
+    }
+
+    private function syncPolls(array &$data): void
+    {
+        if (empty($data['content'])) {
+            return;
+        }
+
+        foreach ($data['content'] as &$block) {
+            if ($block['type'] === 'poll') {
+                $attrs = $block['attributes'];
+                
+                $poll = \App\Models\Poll::updateOrCreate(
+                    ['id' => $attrs['poll_id'] ?? null],
+                    [
+                        'question' => $attrs['question'],
+                        'options' => $attrs['options'],
+                        'allow_multiple' => $attrs['allow_multiple'] ?? false,
+                        'show_results' => $attrs['show_results'] ?? true,
+                    ]
+                );
+
+                $block['attributes']['poll_id'] = $poll->id;
+            }
+        }
     }
 
     public function delete(Post $post): void

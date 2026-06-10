@@ -57,6 +57,12 @@ Route::get('/privacy', fn() => view('privacy'))->name('privacy');
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
 
+// Poll API
+Route::post('/api/content-blocks/poll/{poll}', [\App\Http\Controllers\PollController::class, 'vote'])
+    ->name('poll.vote')
+    ->middleware('throttle:10,1');
+Route::get('/api/content-blocks/poll/{poll}/results', [\App\Http\Controllers\PollController::class, 'results'])->name('poll.results');
+
 // Booking Flow
 // Route::middleware('throttle:6,1')->group(function () {
 //    // TODO: Migrate to controller + Blade view
