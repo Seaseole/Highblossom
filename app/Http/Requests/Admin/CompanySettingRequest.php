@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 final class CompanySettingRequest extends FormRequest
 {
     use CompanyValidationRules;
+
     public function authorize(): bool
     {
         return true;
@@ -17,6 +18,6 @@ final class CompanySettingRequest extends FormRequest
 
     public function rules(): array
     {
-        return $this->ValidationRules();
+        return $this->validateCompanyRules();
     }
 }

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Models\CompanySetting;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -22,8 +25,8 @@ final class AdminSidebar extends Component
     {
         $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
         $this->mobileMenuOpen = false;
-        $this->userCount = \App\Models\User::count();
-        $this->logoUrl = \App\Models\CompanySetting::first()?->business_logo ? \Illuminate\Support\Facades\Storage::url(\App\Models\CompanySetting::first()->business_logo) : null;
+        $this->userCount = User::count();
+        $this->logoUrl = CompanySetting::first()?->business_logo ? Storage::url(CompanySetting::first()->business_logo) : null;
     }
 
     public function toggleTheme(?string $newTheme = null): void
@@ -41,11 +44,6 @@ final class AdminSidebar extends Component
             $this->setTheme($newTheme);
         }
     }
-
-    // public function updatedTheme(string $value): void
-    // {
-    //     $this->setTheme($value);
-    // }
 
     private function setTheme(string $theme): void
     {

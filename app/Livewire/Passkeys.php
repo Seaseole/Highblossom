@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\On;
+use Illuminate\Support\Facades\DB;
 use Laravel\Passkeys\Actions\DeletePasskey;
 use Laravel\Passkeys\Passkey;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class Passkeys extends Component
 {
@@ -28,8 +28,9 @@ class Passkeys extends Component
         if ($passkey->user_id !== Auth::id()) {
             $this->dispatch('toast', [
                 'type' => 'error',
-                'message' => 'Unauthorized action.'
+                'message' => 'Unauthorized action.',
             ]);
+
             return;
         }
 
@@ -38,7 +39,7 @@ class Passkeys extends Component
 
         $this->dispatch('toast', [
             'type' => 'success',
-            'message' => 'Passkey deleted successfully.'
+            'message' => 'Passkey deleted successfully.',
         ]);
     }
 
@@ -55,8 +56,9 @@ class Passkeys extends Component
         if ($passkey->user_id !== Auth::id()) {
             $this->dispatch('toast', [
                 'type' => 'error',
-                'message' => 'Unauthorized action.'
+                'message' => 'Unauthorized action.',
             ]);
+
             return;
         }
 
@@ -66,7 +68,7 @@ class Passkeys extends Component
 
         $this->dispatch('toast', [
             'type' => 'success',
-            'message' => 'Passkey renamed successfully.'
+            'message' => 'Passkey renamed successfully.',
         ]);
     }
 

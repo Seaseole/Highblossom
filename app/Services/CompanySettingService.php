@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\CompanySetting;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 #[Singleton(name: 'company_settings')]
@@ -38,6 +39,7 @@ final class CompanySettingService
         if ($request->boolean('remove_business_logo')) {
             $this->deleteStoredImage($oldLogo);
             CompanySetting::set('business_logo', '');
+
             return;
         }
 
@@ -49,6 +51,7 @@ final class CompanySettingService
                 $this->deleteStoredImage($oldLogo);
             }
             CompanySetting::set('business_logo', $imagePath);
+
             return;
         }
 
@@ -89,7 +92,7 @@ final class CompanySettingService
                     Storage::disk('public')->delete($oldFavicon);
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to remove old favicon: ' . $e->getMessage());
+                Log::error('Failed to remove old favicon: '.$e->getMessage());
             }
             CompanySetting::set('favicon', $imagePath);
         } elseif ($request->hasFile('favicon')) {
@@ -99,7 +102,7 @@ final class CompanySettingService
                     Storage::disk('public')->delete($oldFavicon);
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to remove old favicon: ' . $e->getMessage());
+                Log::error('Failed to remove old favicon: '.$e->getMessage());
             }
             $path = $request->file('favicon')->store('settings', 'public');
             CompanySetting::set('favicon', $path);

@@ -24,11 +24,10 @@ class IdempotencyService
         return Cache::has($this->getCacheKey($token));
     }
 
-     /**
+    /**
      * Mark a token as processed.
      *
-     * @param string $token The idempotency token to mark as processed.
-     * @return void
+     * @param  string  $token  The idempotency token to mark as processed.
      */
     public function markProcessed(string $token): void
     {

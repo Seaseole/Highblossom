@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
+use App\Livewire\Passkeys;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-use App\Livewire\Passkeys;
+use Tests\TestCase;
 
 class PasskeyDeletionTest extends TestCase
 {
@@ -18,7 +19,7 @@ class PasskeyDeletionTest extends TestCase
         $this->actingAs($user);
 
         // Create a passkey for the user manually
-        $passkeyId = \Illuminate\Support\Facades\DB::table('passkeys')->insertGetId([
+        $passkeyId = DB::table('passkeys')->insertGetId([
             'user_id' => $user->id,
             'name' => 'My Passkey',
             'credential_id' => 'test-credential-id',

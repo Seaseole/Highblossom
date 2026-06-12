@@ -18,7 +18,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
-            'employee'=>$this->employeeRules($userId),
+            'employee' => $this->employeeRules($userId),
         ];
     }
 
@@ -54,8 +54,6 @@ trait ProfileValidationRules
      * Get employee details validated
      *
      * This method is not used yet.
-     *
-     * @return array
      */
     public function employeeRules(?int $userId = null): array
     {

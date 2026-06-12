@@ -73,7 +73,7 @@ final class BlockBuilder extends Component
 
     public function addBlock(string $type): void
     {
-        \Illuminate\Support\Facades\Log::info('addBlock called', ['type' => $type]);
+        Log::info('addBlock called', ['type' => $type]);
         $this->blocks[] = [
             'id' => uniqid('block_', true),
             'type' => $type,
@@ -85,7 +85,7 @@ final class BlockBuilder extends Component
 
     public function removeBlock(int $index): void
     {
-        \Illuminate\Support\Facades\Log::info('removeBlock called', ['index' => $index]);
+        Log::info('removeBlock called', ['index' => $index]);
         unset($this->blocks[$index]);
         $this->blocks = array_values($this->blocks);
         $this->dispatchBlocksUpdated();

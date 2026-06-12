@@ -21,7 +21,7 @@ final readonly class SiteService
             'otherTestimonials' => Testimonial::active()->where('is_featured', false)->ordered()->with([])->get(),
             'featuredServices' => Service::active()->ordered()->with([])->take(3)->get(),
             'featuredGalleryImages' => GalleryImage::featured()->active()->with('category')->ordered()->take(3)->get(),
-//            'workingHours' => $this->getWorkingHours(),
+            //            'workingHours' => $this->getWorkingHours(),
             'timeFormatDisplay' => CompanySetting::get('time_format_display', '24'),
         ];
     }
@@ -53,16 +53,16 @@ final readonly class SiteService
     /**
      * Get working hours from settings with defaults.
      */
-//    private function getWorkingHours(): array
-//    {
-//        return CompanySetting::get('working_hours', [
-//            'monday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-//            'tuesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-//            'wednesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-//            'thursday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-//            'friday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-//            'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => true],
-//            'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
-//        ]);
-//    }
+    //    private function getWorkingHours(): array
+    //    {
+    //        return CompanySetting::get('working_hours', [
+    //            'monday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+    //            'tuesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+    //            'wednesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+    //            'thursday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+    //            'friday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
+    //            'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => true],
+    //            'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
+    //        ]);
+    //    }
 }

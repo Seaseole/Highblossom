@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VideoUploadController;
+use App\Http\Controllers\PollController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
@@ -50,18 +51,18 @@ Route::get('/quote', [SiteController::class, 'quote'])->name('quote');
 Route::post('/quote', [SiteController::class, 'submitQuote'])->middleware('throttle:3,1')->name('quote.submit');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->middleware('throttle:3,1')->name('contact.submit');
-Route::get('/terms', fn() => view('terms'))->name('terms');
-Route::get('/privacy', fn() => view('privacy'))->name('privacy');
+Route::get('/terms', fn () => view('terms'))->name('terms');
+Route::get('/privacy', fn () => view('privacy'))->name('privacy');
 
 // Blog
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
 
 // Poll API
-Route::post('/api/content-blocks/poll/{poll}', [\App\Http\Controllers\PollController::class, 'vote'])
+Route::post('/api/content-blocks/poll/{poll}', [PollController::class, 'vote'])
     ->name('poll.vote')
     ->middleware('throttle:10,1');
-Route::get('/api/content-blocks/poll/{poll}/results', [\App\Http\Controllers\PollController::class, 'results'])->name('poll.results');
+Route::get('/api/content-blocks/poll/{poll}/results', [PollController::class, 'results'])->name('poll.results');
 
 // Booking Flow
 // Route::middleware('throttle:6,1')->group(function () {
@@ -252,10 +253,8 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
 });
 
-
 // Passkeys Routes
 // Removed manual routes to let standalone package handle it
-
 
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

@@ -155,5 +155,4 @@ return [
         Features::passkeys(['confirmPassword' => false]),
     ],
 
-
 ];

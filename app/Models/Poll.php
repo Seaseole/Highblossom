@@ -37,7 +37,7 @@ class Poll extends Model
         $votes = $this->votes;
 
         $voteCounts = $votes->groupBy('option_index')
-            ->map(fn($votes) => count($votes));
+            ->map(fn ($votes) => count($votes));
 
         $totalVotes = $votes->count();
         if ($totalVotes === 0) {
@@ -49,6 +49,7 @@ class Poll extends Model
             $count = $voteCounts->get($index, 0);
             $results[$index] = round(($count / $totalVotes) * 100, 1);
         }
+
         return $results;
     }
 
@@ -58,14 +59,15 @@ class Poll extends Model
     public function getVoteCountsAttribute(): array
     {
         $votes = $this->votes;
-        
+
         $voteCounts = $votes->groupBy('option_index')
-            ->map(fn($votes) => count($votes));
+            ->map(fn ($votes) => count($votes));
 
         $results = [];
         foreach ($this->options as $index => $_) {
             $results[$index] = $voteCounts->get($index, 0);
         }
+
         return $results;
     }
 }

@@ -4,36 +4,40 @@ namespace App\Http\Controllers;
 
 use App\Models\Poll;
 use App\Models\PollVote;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class PollController extends Controller
 {
     public function vote(Request $request, Poll $poll)
     {
-        \Illuminate\Support\Facades\Log::info('Poll vote attempt', [
+        Log::info('Poll vote attempt', [
             'poll_id' => $poll->id,
             'request_options' => $request->options,
             'poll_options' => $poll->options,
-            'ip' => $request->ip()
+            'ip' => $request->ip(),
         ]);
 
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'options' => 'required|array|min:1',
             'options.*' => [
                 'integer',
                 'min:0',
-                'max:' . (count($poll->options) - 1),
+                'max:'.(count($poll->options) - 1),
             ],
         ]);
 
         if ($validator->fails()) {
-            \Illuminate\Support\Facades\Log::error('Poll vote validation failed', [
+            Log::error('Poll vote validation failed', [
                 'errors' => $validator->errors()->toArray(),
-                'request' => $request->all()
+                'request' => $request->all(),
             ]);
+
             return response()->json([
                 'error' => 'Validation failed',
-                'details' => $validator->errors()
+                'details' => $validator->errors(),
             ], 422);
         }
 
@@ -46,13 +50,13 @@ class PollController extends Controller
         $ipAddress = $request->ip();
         $userId = auth()->id();
 
-        if (!$poll->is_active) {
+        if (! $poll->is_active) {
             return response()->json(['error' => 'This poll is no longer accepting votes.'], 403);
         }
 
         $votesCreated = 0;
         foreach ($request->options as $optionIndex) {
-            $index = (int)$optionIndex;
+            $index = (int) $optionIndex;
             try {
                 PollVote::create([
                     'poll_id' => $poll->id,
@@ -61,8 +65,9 @@ class PollController extends Controller
                     'user_id' => $userId,
                 ]);
                 $votesCreated++;
-            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
-                \Illuminate\Support\Facades\Log::warning('Poll vote rejected: already voted', ['poll_id' => $poll->id, 'ip' => $ipAddress]);
+            } catch (UniqueConstraintViolationException $e) {
+                Log::warning('Poll vote rejected: already voted', ['poll_id' => $poll->id, 'ip' => $ipAddress]);
+
                 return response()->json([
                     'error' => 'You have already voted in this poll.',
                     'results' => $poll->results,
@@ -70,9 +75,9 @@ class PollController extends Controller
             }
         }
 
-        \Illuminate\Support\Facades\Log::info('Poll voting complete', [
+        Log::info('Poll voting complete', [
             'poll_id' => $poll->id,
-            'votes_created' => $votesCreated
+            'votes_created' => $votesCreated,
         ]);
 
         cache()->forget("poll_results_{$poll->id}");

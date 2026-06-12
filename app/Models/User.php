@@ -22,7 +22,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable, PasskeyAuthenticatable;
+    use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.

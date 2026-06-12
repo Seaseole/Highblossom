@@ -22,11 +22,12 @@ final class UserController
     {
         $users = User::query()
             ->with('roles')
-            ->when($request->search, fn($query) => $query->whereAny(['name', 'email'], 'like', "%{$request->search}%"))
+            ->when($request->search, fn ($query) => $query->whereAny(['name', 'email'], 'like', "%{$request->search}%"))
             ->latest()
             ->paginate(10);
 
         $roles = Role::all();
+
         // $count = User::count();
         // dd($count);
         return view('admin.users.index', compact('users', 'roles'));

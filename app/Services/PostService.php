@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Actions\Content\RelocateTempUploadsAction;
+use App\Models\Poll;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -49,8 +50,8 @@ final class PostService
         foreach ($data['content'] as &$block) {
             if ($block['type'] === 'poll') {
                 $attrs = $block['attributes'];
-                
-                $poll = \App\Models\Poll::updateOrCreate(
+
+                $poll = Poll::updateOrCreate(
                     ['id' => $attrs['poll_id'] ?? null],
                     [
                         'question' => $attrs['question'],
