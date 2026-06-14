@@ -24,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(
+            \App\Services\Settings\SettingsManager::class,
+            \App\Services\Settings\SettingsManager::class
+        );
+
+        $this->app->singleton(
             AvailabilityServiceInterface::class,
             AvailabilityService::class
         );
@@ -40,55 +45,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureDefaults();
 
-        // Share company settings globally with fallback defaults
-        try {
-            $settings = [
-                'companyName' => CompanySetting::get('company_name', 'Highblossom PTY LTD'),
-                'logoText' => CompanySetting::get('logo_text', 'Highblossom'),
-                'primaryEmail' => CompanySetting::get('primary_email', 'info@highblossom.co.bw'),
-                'companyAddress' => CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
-                'primaryPhone' => CompanySetting::get('primary_phone', '+267 123 4567'),
-                'whatsappDefault' => CompanySetting::get('whatsapp_number_default', '+267 123 4567'),
-                'whatsappAdditional' => CompanySetting::get('whatsapp_additional_numbers', []),
-                'workingHours' => CompanySetting::get('working_hours', [
-                    'monday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-                    'tuesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-                    'wednesday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-                    'thursday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-                    'friday' => ['open' => '08:00', 'close' => '17:00', 'is_closed' => false],
-                    'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => false],
-                    'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
-                ]),
-                'timeFormatDisplay' => CompanySetting::get('time_format_display', '12'),
-                'businessLogo' => CompanySetting::get('business_logo', ''),
-                'favicon' => CompanySetting::get('favicon', ''),
-                'googleMapsApiKey' => CompanySetting::get('google_maps_api_key', ''),
-                'mapDirectionsLink' => CompanySetting::get('map_directions_link', 'https://maps.app.goo.gl/KJip8MytQrPrULg58'),
-                'timezone' => CompanySetting::get('timezone', 'Africa/Gaborone'),
-                'locale' => CompanySetting::get('locale', 'en_GB'),
-                'dateFormat' => CompanySetting::get('date_format', 'd/M/Y'),
-                'timeFormat' => CompanySetting::get('time_format', 'H:i'),
-                'currencySymbol' => CompanySetting::get('currency_symbol', 'P'),
-                'facebookUrl' => CompanySetting::get('facebook_url', ''),
-                'instagramUrl' => CompanySetting::get('instagram_url', ''),
-                'linkedinUrl' => CompanySetting::get('linkedin_url', ''),
-                'announcementActive' => (bool) CompanySetting::get('announcement_active', false),
-                'announcements' => CompanySetting::get('announcements', []),
-            ];
-
-            foreach ($settings as $key => $value) {
-                View::share($key, $value);
-            }
-        } catch (\Exception $e) {
-            // Basic fallbacks for when database isn't ready
-            View::share('companyName', 'Highblossom PTY LTD');
-            View::share('logoText', 'Highblossom');
-            View::share('primaryEmail', 'info@highblossom.co.bw');
-            View::share('companyAddress', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana');
-            View::share('primaryPhone', '+267 123 4567');
-            View::share('announcementActive', false);
-            View::share('announcements', []);
-        }
+        // Share global settings via View Composer
+        View::composer('*', \App\Http\View\Composers\GlobalSettingsComposer::class);
 
         Model::preventLazyLoading(! app()->isProduction());
 

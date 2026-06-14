@@ -115,7 +115,7 @@
 
                 <!-- Footer Info -->
                 <p class="mt-8 text-center text-xs text-[#A1A1AA] font-medium uppercase tracking-[0.2em] animate-fade-in-up delay-500">
-                    &copy; {{ date('Y') }} {{ App\Models\CompanySetting::get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
+                    &copy; {{ date('Y') }} {{ $settings->get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
                 </p>
             </div>
         </div>

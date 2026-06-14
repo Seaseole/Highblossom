@@ -11,6 +11,7 @@ export default defineConfig({
                 // Public site (TailwindCSS v4)
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/site-alpine.js',
                 // Admin panel (Bootstrap 5 + AdminLTE 4)
                 'resources/css/admin.css',
                 'resources/js/admin.js',

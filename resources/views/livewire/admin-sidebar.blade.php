@@ -1,5 +1,5 @@
 @php
-    $currentRoute = request()->route()->getName();
+    $currentRoute = request()->route()?->getName() ?? '';
     $user = auth()->user();
     $userCount = \App\Models\User::count();
 
@@ -28,7 +28,16 @@
         ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
 @endphp
 
-<div class="flex h-full flex-col bg-white dark:bg-[#0A0A0F] border-r border-gray-200 dark:border-white/5">
+<div class="h-full flex flex-col bg-white dark:bg-[#0A0A0F] border-r border-gray-200 dark:border-white/5">
+    
+    {{-- Overlay for mobile --}}
+    <div x-show="$store.mobileMenu.open" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" @click="$store.mobileMenu.close()" x-cloak></div>
+
+    {{-- Sidebar Content --}}
+    <div class="relative z-50 flex h-full flex-col bg-white dark:bg-[#0A0A0F] border-r border-gray-200 dark:border-white/5 
+                transition-transform duration-300 ease-in-out
+                w-64 fixed lg:relative shadow-2xl lg:shadow-none"
+                :class="$store.mobileMenu.open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
     
     {{-- Brand --}}
     <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-white/5">
@@ -44,13 +53,14 @@
             </div>
             <span class="font-semibold text-gray-900 dark:text-white">{{ config('app.name') }}</span>
         </div>
+        <button @click="$store.mobileMenu.close()" class="lg:hidden ml-auto p-2 text-gray-400">X</button>
     </div>
 
     {{-- Navigation --}}
-    <nav class="flex-1 overflow-y-auto p-4 space-y-2" x-data="{ activeGroup: null }">
+    <nav class="flex-1 overflow-y-auto p-4 space-y-2">
         @foreach($group as $groupKey => $groupData)
             @php $active = $isGroupActive($groupData['routes']); @endphp
-            <div x-data="{ open: {{ $active ? 'true' : 'false' }} }">
+            <div x-data="{ open: @js($active) }">
                 <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-2 text-[0.7rem] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-gray-900 dark:hover:text-white">
                     {{ $groupData['label'] }}
                     <svg class="size-3 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -87,5 +97,6 @@
                 Logout
             </button>
         </form>
+    </div>
     </div>
 </div>

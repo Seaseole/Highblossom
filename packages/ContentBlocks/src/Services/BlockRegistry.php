@@ -55,39 +55,4 @@ class BlockRegistry
     {
         return $this->blocks->keys()->toArray();
     }
-
-    /**
-     * Render a block by type with attributes.
-     */
-    public function render(string $type, array $attributes = []): string
-    {
-        $block = $this->get($type);
-
-        if (! $block) {
-            return $this->renderUnknownBlock($type, $attributes);
-        }
-
-        return $block->render($attributes);
-    }
-
-    /**
-     * Render an unknown block fallback.
-     */
-    protected function renderUnknownBlock(string $type, array $attributes): string
-    {
-        return "<!-- Unknown block type: {$type} -->";
-    }
-
-    /**
-     * Render a block from variadic arguments (type, attributes).
-     *
-     * @param  mixed  ...$args
-     */
-    public function renderArray(...$args): string
-    {
-        $type = $args[0] ?? '';
-        $attributes = $args[1] ?? [];
-
-        return $this->render($type, $attributes);
-    }
 }

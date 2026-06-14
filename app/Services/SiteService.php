@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\CompanySetting;
 use App\Models\GalleryImage;
 use App\Models\Service;
 use App\Models\Testimonial;
+use App\Services\Settings\SettingsManager;
 
 final readonly class SiteService
 {
+    public function __construct(
+        private SettingsManager $settings
+    ) {}
+
     /**
      * Get data for the home page.
      */
     public function getHomeData(): array
     {
         return [
-            'featuredTestimonial' => Testimonial::where('is_featured', true)->active()->with([])->first(),
-            'otherTestimonials' => Testimonial::active()->where('is_featured', false)->ordered()->with([])->get(),
-            'featuredServices' => Service::active()->ordered()->with([])->take(3)->get(),
+            'featuredTestimonial' => Testimonial::where('is_featured', true)->active()->first(),
+            'otherTestimonials' => Testimonial::active()->where('is_featured', false)->ordered()->get(),
+            'featuredServices' => Service::active()->ordered()->take(3)->get(),
             'featuredGalleryImages' => GalleryImage::featured()->active()->with('category')->ordered()->take(3)->get(),
             //            'workingHours' => $this->getWorkingHours(),
-            'timeFormatDisplay' => CompanySetting::get('time_format_display', '24'),
+            'timeFormatDisplay' => $this->settings->time_format_display,
         ];
     }
 
@@ -31,22 +35,22 @@ final readonly class SiteService
      */
     public function getContactData(): array
     {
-        $workingHours = CompanySetting::get('working_hours', []);
+        $workingHours = $this->settings->working_hours;
 
         return [
-            'primaryPhone' => CompanySetting::get('primary_phone', '+267 123 4567'),
-            'primaryEmail' => CompanySetting::get('primary_email', 'sales@highblossom.net'),
+            'primaryPhone' => $this->settings->primary_phone,
+            'primaryEmail' => $this->settings->primary_email,
             'workingHours' => $workingHours,
-            'timeFormatDisplay' => CompanySetting::get('time_format_display', '12'),
+            'timeFormatDisplay' => $this->settings->time_format_display,
             'hasWorkingHours' => is_array($workingHours) && ! empty($workingHours) && isset($workingHours['monday']),
             'dayOrder' => [
                 'monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday',
                 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday',
             ],
-            'companyName' => CompanySetting::get('company_name', 'Highblossom PTY LTD'),
-            'companyAddress' => CompanySetting::get('address', 'Plot 123, Broadhurst, Gaborone, Botswana'),
-            'googleMapsApiKey' => CompanySetting::get('google_maps_api_key', ''),
-            'mapDirectionsLink' => CompanySetting::get('map_directions_link', 'https://maps.google.com'),
+            'companyName' => $this->settings->company_name,
+            'companyAddress' => $this->settings->address,
+            'googleMapsApiKey' => $this->settings->google_maps_api_key,
+            'mapDirectionsLink' => $this->settings->map_directions_link,
         ];
     }
 

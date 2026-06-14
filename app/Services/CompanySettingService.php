@@ -22,13 +22,26 @@ final class CompanySettingService
 
     private const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
+    public function __construct(private readonly EnvEditor $envEditor) {}
+
     public function update(array $data, Request $request): void
     {
         $this->handleLogoUpload($request);
         $this->handleFaviconUpload($request);
         $this->saveSimpleFields($data);
         $this->saveJsonFields($data);
+        $this->handleEnvUpdate($data);
         CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
+    }
+
+    private function handleEnvUpdate(array $data): void
+    {
+        if (isset($data['env']) && is_array($data['env'])) {
+            foreach ($data['env'] as $key => $value) {
+                // Ignore empty or null values if you want, but env vars can be empty strings.
+                $this->envEditor->set((string) $key, (string) $value);
+            }
+        }
     }
 
     private function handleLogoUpload(Request $request): void

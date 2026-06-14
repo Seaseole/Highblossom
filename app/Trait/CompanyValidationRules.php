@@ -45,6 +45,8 @@ trait CompanyValidationRules
             'gallery_metrics.*.label' => ['required', 'string', 'max:80'],
             'gallery_metrics.*.value' => ['required', 'string', 'max:20'],
             'gallery_metrics.*.suffix' => ['nullable', 'string', 'max:10'],
+            'env' => ['nullable', 'array'],
+            'env.*' => ['nullable', 'string'],
         ];
 
     }

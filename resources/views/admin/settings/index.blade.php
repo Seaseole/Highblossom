@@ -1,9 +1,9 @@
 <x-layouts::admin title="Company Settings">
     <div class="max-w-5xl mx-auto space-y-10 py-10" x-data="{
         tab: '{{ request()->query('tab', 'general') }}',
-        whatsappNumbers: {{ json_encode($settings['whatsapp_additional_numbers'] ?? []) }},
-        workingHours: {{ json_encode($settings['working_hours'] ?? []) }},
-        announcements: {{ json_encode($settings['announcements'] ?? []) }},
+        whatsappNumbers: {{ \Illuminate\Support\Js::from($settings['whatsapp_additional_numbers'] ?? []) }},
+        workingHours: {{ \Illuminate\Support\Js::from($settings['working_hours'] ?? []) }},
+        announcements: {{ \Illuminate\Support\Js::from($settings['announcements'] ?? []) }},
         init() {
             this.$watch('tab', value => {
                 const url = new URL(window.location.href);
@@ -36,7 +36,8 @@
                     'localization' => 'Locale',
                     'social' => 'Social',
                     'notifications' => 'Notifications',
-                    'announcements' => 'Announcements'
+                    'announcements' => 'Announcements',
+                    'system_config' => 'System Config'
                 ] as $key => $label)
                     <button type="button"
                             @click="tab = '{{ $key }}'"
@@ -346,6 +347,36 @@
                             </template>
                         </div>
                      </div>
+                </div>
+
+                <!-- System Config Tab -->
+                <div x-show="tab === 'system_config'"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6" style="display: none;">
+                    <div class="space-y-1 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Config</h3>
+                        <p class="text-sm text-gray-500">Read-only environment variables. Click an input to edit its value.</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        @foreach($envConfig as $key => $value)
+                            <div class="space-y-2" x-data="{ editing: false }">
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500">{{ $key }}</label>
+                                <input 
+                                    type="text" 
+                                    name="env[{{ $key }}]" 
+                                    value="{{ old('env.'.$key, $value) }}" 
+                                    :readonly="!editing"
+                                    @click="editing = true"
+                                    @click.away="editing = false"
+                                    :class="editing ? 'bg-white dark:bg-white/5 border-gray-900 dark:border-white focus:ring-1 focus:ring-gray-900 dark:focus:ring-white' : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 cursor-pointer text-gray-500'"
+                                    class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none transition-all"
+                                >
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="pt-6 border-t border-gray-100 dark:border-white/10">

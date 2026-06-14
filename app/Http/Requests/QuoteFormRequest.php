@@ -25,6 +25,7 @@ class QuoteFormRequest extends FormRequest
             'glass_sub_category_id' => 'nullable|exists:glass_sub_categories,id',
             'service_type_id' => 'required|exists:service_types,id',
             'image' => 'nullable|image|max:10240', // Max 10MB
+            'image_path' => 'nullable|string|max:255',
             'mobile_service' => 'nullable|boolean',
         ];
     }

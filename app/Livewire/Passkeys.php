@@ -12,18 +12,15 @@ use Livewire\Component;
 class Passkeys extends Component
 {
     #[On('passkeyRegistered')]
-    #[On('renamePasskeyRequest')]
     #[On('passkeyDeleted')]
+    #[On('passkeyRenamed')]
     public function update()
     {
         // Refresh trigger
     }
 
-    public function deletePasskey(Passkey $passkeyId, DeletePasskey $deletePasskey)
+    public function deletePasskey(Passkey $passkey, DeletePasskey $deletePasskey)
     {
-        $passkey = Passkey::findOrFail($passkeyId);
-        dd($passkeyId);
-
         // Ensure the passkey belongs to the authenticated user
         if ($passkey->user_id !== Auth::id()) {
             $this->dispatch('toast', [
@@ -43,15 +40,16 @@ class Passkeys extends Component
         ]);
     }
 
-    public function handleRenamePasskey($data)
+    #[On('renamePasskeyRequest')]
+    public function handleRenamePasskey($id, $name)
     {
-        $this->renamePasskey($data['id'], $data['name']);
+        $this->renamePasskey($id, $name);
     }
 
     public function renamePasskey($passkeyId, $newName)
     {
         $passkey = Passkey::findOrFail($passkeyId);
-        dd($passkey);
+
         // Ensure the passkey belongs to the authenticated user
         if ($passkey->user_id !== Auth::id()) {
             $this->dispatch('toast', [
@@ -74,8 +72,8 @@ class Passkeys extends Component
 
     public function render()
     {
-        $passkeys = DB::table('passkeys')
-            ->where('user_id', Auth::id())
+        $passkeys = Passkey::where('user_id', Auth::id())
+            ->latest()
             ->get();
 
         return view('livewire.passkeys', ['passkeys' => $passkeys]);

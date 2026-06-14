@@ -160,7 +160,7 @@ class ContentBlocksServiceProvider extends ServiceProvider
         // Register directive for each block type
         foreach ($registry->types() as $type) {
             Blade::directive($this->getDirectiveName($type), function ($expression) use ($type) {
-                return "<?php echo app('Highblossom\\\\ContentBlocks\\\\Services\\\\BlockRegistry')->render('{$type}', {$expression}); ?>";
+                return "<?php echo app('Highblossom\\\\ContentBlocks\\\\Services\\\\BlockRenderer')->render('{$type}', {$expression}); ?>";
             });
         }
 
@@ -172,7 +172,7 @@ class ContentBlocksServiceProvider extends ServiceProvider
             $type = $parts[0] ?? '';
             $attributes = $parts[1] ?? '[]';
 
-            return "<?php echo app('Highblossom\\ContentBlocks\\Services\\BlockRegistry')->render({$type}, {$attributes}); ?>";
+            return "<?php echo app('Highblossom\\ContentBlocks\\Services\\BlockRenderer')->render({$type}, {$attributes}); ?>";
         });
     }
 

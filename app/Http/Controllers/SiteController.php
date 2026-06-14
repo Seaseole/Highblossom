@@ -7,7 +7,6 @@ use App\Actions\StoreQuoteAction;
 use App\Http\Requests\ContactFormRequest;
 use App\Http\Requests\QuoteFormRequest;
 use App\Models\AboutUsContent;
-use App\Models\CompanySetting;
 use App\Models\GalleryCategory;
 use App\Models\GalleryImage;
 use App\Models\GlassSubCategory;
@@ -17,6 +16,7 @@ use App\Models\Service;
 use App\Models\ServiceType;
 use App\Models\Staff;
 use App\Services\ContactNumberService;
+use App\Services\Settings\SettingsManager;
 use App\Services\SiteService;
 use Illuminate\Http\Request;
 
@@ -26,7 +26,8 @@ class SiteController extends Controller
         protected StoreQuoteAction $storeQuoteAction,
         protected ContactNumberService $contactNumberService,
         protected SiteService $siteService,
-        protected SendContactMessage $sendContactMessage
+        protected SendContactMessage $sendContactMessage,
+        protected SettingsManager $settings
     ) {}
 
     public function home()
@@ -36,7 +37,7 @@ class SiteController extends Controller
 
     public function aboutUs()
     {
-        $content = AboutUsContent::active()->with([])->first();
+        $content = AboutUsContent::active()->first();
 
         if (! $content) {
             abort(404);
@@ -54,7 +55,6 @@ class SiteController extends Controller
 
         $services = Service::active()
             ->ordered()
-            ->with([])
             ->paginate($perPage, ['*'], 'page', $page);
 
         return view('site.services', compact('services'));
@@ -73,8 +73,8 @@ class SiteController extends Controller
         }
 
         $images = $query->paginate($perPage, ['*'], 'page', $page);
-        $categories = GalleryCategory::active()->ordered()->with([])->get();
-        $galleryMetrics = CompanySetting::get('gallery_metrics', []);
+        $categories = GalleryCategory::active()->ordered()->get();
+        $galleryMetrics = $this->settings->gallery_metrics;
 
         return view('site.gallery', compact('images', 'categories', 'category', 'galleryMetrics'));
     }
@@ -96,9 +96,9 @@ class SiteController extends Controller
 
     public function contact()
     {
-        $whatsappDefault = CompanySetting::get('whatsapp_number_default', '+267 123 4567');
-        $whatsappAdditional = CompanySetting::get('whatsapp_additional_numbers', []);
-        $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
+        $whatsappDefault = $this->settings->whatsapp_number_default;
+        $whatsappAdditional = $this->settings->whatsapp_additional_numbers;
+        $primaryPhone = $this->settings->primary_phone;
 
         $contactData = $this->siteService->getContactData();
         $contactData['contactNumbers'] = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
@@ -108,12 +108,12 @@ class SiteController extends Controller
 
     public function quote()
     {
-        $whatsappDefault = CompanySetting::get('whatsapp_number_default', '+267 123 4567');
-        $whatsappAdditional = CompanySetting::get('whatsapp_additional_numbers', []);
-        $primaryPhone = CompanySetting::get('primary_phone', '+267 123 4567');
+        $whatsappDefault = $this->settings->whatsapp_number_default;
+        $whatsappAdditional = $this->settings->whatsapp_additional_numbers;
+        $primaryPhone = $this->settings->primary_phone;
 
         $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
-        $serviceTypes = ServiceType::active()->ordered()->with([])->get();
+        $serviceTypes = ServiceType::active()->ordered()->get();
         $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
 
         $contactNumbers = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);

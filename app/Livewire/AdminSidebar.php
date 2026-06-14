@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 final class AdminSidebar extends Component
@@ -27,6 +28,12 @@ final class AdminSidebar extends Component
         $this->mobileMenuOpen = false;
         $this->userCount = User::count();
         $this->logoUrl = CompanySetting::first()?->business_logo ? Storage::url(CompanySetting::first()->business_logo) : null;
+    }
+
+    #[On('toggle-sidebar')]
+    public function toggleMobileMenu(): void
+    {
+        $this->mobileMenuOpen = !$this->mobileMenuOpen;
     }
 
     public function toggleTheme(?string $newTheme = null): void

@@ -54,30 +54,34 @@ class PollController extends Controller
             return response()->json(['error' => 'This poll is no longer accepting votes.'], 403);
         }
 
-        $votesCreated = 0;
-        foreach ($request->options as $optionIndex) {
-            $index = (int) $optionIndex;
-            try {
-                PollVote::create([
-                    'poll_id' => $poll->id,
-                    'option_index' => $index,
-                    'ip_address' => $ipAddress,
-                    'user_id' => $userId,
-                ]);
-                $votesCreated++;
-            } catch (UniqueConstraintViolationException $e) {
-                Log::warning('Poll vote rejected: already voted', ['poll_id' => $poll->id, 'ip' => $ipAddress]);
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($poll, $request, $ipAddress, $userId) {
+                foreach ($request->options as $optionIndex) {
+                    $index = (int) $optionIndex;
+                    PollVote::create([
+                        'poll_id' => $poll->id,
+                        'option_index' => $index,
+                        'ip_address' => $ipAddress,
+                        'user_id' => $userId,
+                    ]);
+                }
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            Log::warning('Poll vote rejected: already voted', ['poll_id' => $poll->id, 'ip' => $ipAddress]);
 
-                return response()->json([
-                    'error' => 'You have already voted in this poll.',
-                    'results' => $poll->results,
-                ], 422);
-            }
+            return response()->json([
+                'error' => 'You have already voted in this poll.',
+                'results' => $poll->results,
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Poll vote transaction failed', ['error' => $e->getMessage(), 'poll_id' => $poll->id]);
+
+            return response()->json(['error' => 'An error occurred while processing your vote.'], 500);
         }
 
         Log::info('Poll voting complete', [
             'poll_id' => $poll->id,
-            'votes_created' => $votesCreated,
+            'votes_count' => count($request->options),
         ]);
 
         cache()->forget("poll_results_{$poll->id}");

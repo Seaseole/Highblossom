@@ -8,6 +8,7 @@ use App\Enums\VideoSourceType;
 use App\Services\VideoSourceDetector;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
+use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
@@ -41,110 +42,43 @@ final class BlockBuilder extends Component
 
     public ?int $uploadingVideoBlockIndex = null;
 
-    public array $availableBlockTypes = [
-        'paragraph' => 'Paragraph',
-        'heading' => 'Heading',
-        'image' => 'Image',
-        'quote' => 'Quote',
-        'code' => 'Code',
-        'list' => 'List',
-        'cta' => 'Call to Action',
-        'video' => 'Video',
-        'divider' => 'Divider',
-        'alert' => 'Alert',
-        'html' => 'HTML',
-        'embed' => 'Embed',
-        'accordion' => 'Accordion',
-        'table' => 'Table',
-        'gallery' => 'Gallery',
-        'form' => 'Form',
-        'columns' => 'Columns',
-        'tabs' => 'Tabs',
-        'carousel' => 'Carousel',
-        'countdown' => 'Countdown',
-        'poll' => 'Poll',
-    ];
+    public array $availableBlockTypes = [];
 
     public function mount(string $name = 'content', $value = null): void
     {
         $this->name = $name;
-        $this->blocks = is_array($value) ? $value : [];
+        $blocks = is_array($value) ? array_values($value) : [];
+
+        // Ensure all blocks have a unique ID and sequential keys
+        $this->blocks = array_map(function ($block) {
+            if (!isset($block['id'])) {
+                $block['id'] = uniqid('block_', true);
+            }
+            return $block;
+        }, $blocks);
+
+        $this->loadAvailableBlocks();
     }
 
-    public function addBlock(string $type): void
+    /**
+     * Load available block types from the registry.
+     */
+    protected function loadAvailableBlocks(): void
     {
-        Log::info('addBlock called', ['type' => $type]);
-        $this->blocks[] = [
-            'id' => uniqid('block_', true),
-            'type' => $type,
-            'attributes' => $this->getDefaultAttributesForType($type),
-        ];
+        $registry = app(BlockRegistry::class);
+        $types = $registry->types();
+        
+        Log::debug('BlockBuilder: Loading available blocks', [
+            'count' => count($types),
+            'types' => $types
+        ]);
 
-        $this->dispatchBlocksUpdated();
+        $this->availableBlockTypes = collect($types)
+            ->mapWithKeys(fn ($type) => [$type => ucfirst(str_replace('_', ' ', $type))])
+            ->toArray();
     }
 
-    public function removeBlock(int $index): void
-    {
-        Log::info('removeBlock called', ['index' => $index]);
-        unset($this->blocks[$index]);
-        $this->blocks = array_values($this->blocks);
-        $this->dispatchBlocksUpdated();
-    }
-
-    public function moveBlock(int $fromIndex, int $toIndex): void
-    {
-        if ($fromIndex === $toIndex) {
-            return;
-        }
-
-        $block = $this->blocks[$fromIndex];
-        unset($this->blocks[$fromIndex]);
-        $this->blocks = array_values($this->blocks);
-
-        array_splice($this->blocks, $toIndex, 0, [$block]);
-        $this->dispatchBlocksUpdated();
-    }
-
-    public function updateBlock(int $index, array $attributes): void
-    {
-        if (isset($this->blocks[$index])) {
-            $this->blocks[$index]['attributes'] = $attributes;
-            $this->dispatchBlocksUpdated();
-        }
-    }
-
-    protected function getDefaultAttributesForType(string $type): array
-    {
-        return match ($type) {
-            'paragraph' => ['content' => '', 'class' => ''],
-            'heading' => ['content' => '', 'level' => 'h2', 'class' => ''],
-            'image' => ['src' => '', 'alt' => '', 'caption' => ''],
-            'quote' => ['content' => '', 'author' => '', 'cite' => '', 'class' => ''],
-            'code' => ['content' => '', 'class' => ''],
-            'list' => ['items' => [], 'type' => 'ul', 'class' => ''],
-            'cta' => ['title' => '', 'description' => '', 'button_text' => '', 'button_url' => '', 'class' => ''],
-            'video' => ['src' => '', 'poster' => '', 'type' => 'video/mp4', 'controls' => true, 'class' => ''],
-            'divider' => ['style' => 'line', 'size' => 'md'],
-            'alert' => ['type' => 'info', 'title' => null, 'content' => '', 'dismissible' => false],
-            'html' => ['content' => ''],
-            'embed' => ['url' => '', 'title' => null],
-            'accordion' => ['items' => [['title' => '', 'content' => '']], 'multiple_open' => false],
-            'table' => ['headers' => ['Column 1', 'Column 2'], 'rows' => [['Row 1 Cell 1', 'Row 1 Cell 2']], 'caption' => null],
-            'gallery' => ['images' => [], 'columns' => 3],
-            'form' => ['fields' => [], 'submit_text' => 'Submit', 'action_url' => null],
-            'columns' => ['columns' => [[], []], 'column_widths' => [6, 6]],
-            'tabs' => ['tabs' => [['label' => 'Tab 1', 'content' => []], ['label' => 'Tab 2', 'content' => []]]],
-            'carousel' => ['slides' => [], 'autoplay' => false, 'interval' => 5],
-            'countdown' => ['target_date' => now()->addDays(7)->toIso8601String(), 'label' => null, 'timezone' => config('app.timezone', 'UTC')],
-            'poll' => ['poll_id' => null, 'question' => '', 'options' => ['Option 1', 'Option 2'], 'allow_multiple' => false, 'show_results' => false],
-            default => [],
-        };
-    }
-
-    protected function dispatchBlocksUpdated(): void
-    {
-        $this->dispatch('blocks-updated', blocks: $this->blocks);
-    }
+    // Block manipulation methods have been moved to Alpine.js for client-side performance.
 
     /**
      * Auto-upload when imageUpload property changes.
@@ -189,19 +123,10 @@ final class BlockBuilder extends Component
             'blocks_count' => count($this->blocks),
         ]);
 
-        if (isset($this->blocks[$blockIndex])) {
-            $this->blocks[$blockIndex]['attributes']['src'] = $url;
-            $this->dispatchBlocksUpdated();
-            Log::debug('Image src set successfully', [
-                'index' => $blockIndex,
-                'src' => $url,
-            ]);
-        } else {
-            Log::error('Failed to set image src - invalid block index', [
-                'blockIndex' => $blockIndex,
-                'blocks' => $this->blocks,
-            ]);
-        }
+        $this->dispatch('image-uploaded', [
+            'index' => $blockIndex,
+            'url' => $url,
+        ]);
 
         $this->imageUpload = null;
         $this->uploadProgress = 0;
@@ -210,14 +135,6 @@ final class BlockBuilder extends Component
 
         $this->dispatch('notify', message: 'Image uploaded successfully', type: 'success');
     }
-
-    public function removeUploadedImage(int $blockIndex): void
-    {
-        $this->blocks[$blockIndex]['attributes']['src'] = '';
-        $this->imageUpload = null;
-        $this->dispatchBlocksUpdated();
-    }
-
     public function uploadVideo(): void
     {
         $this->validate([
@@ -261,12 +178,12 @@ final class BlockBuilder extends Component
             }
         }
 
-        if ($this->uploadingVideoBlockIndex !== null && isset($this->blocks[$this->uploadingVideoBlockIndex])) {
-            $this->blocks[$this->uploadingVideoBlockIndex]['attributes']['src'] = $videoUrl;
-            if ($thumbnailUrl) {
-                $this->blocks[$this->uploadingVideoBlockIndex]['attributes']['poster'] = $thumbnailUrl;
-            }
-            $this->dispatchBlocksUpdated();
+        if ($this->uploadingVideoBlockIndex !== null) {
+            $this->dispatch('video-uploaded', [
+                'index' => $this->uploadingVideoBlockIndex,
+                'url' => $videoUrl,
+                'poster' => $thumbnailUrl,
+            ]);
         }
 
         $this->videoUpload = null;
@@ -289,14 +206,6 @@ final class BlockBuilder extends Component
         if ($this->videoUpload) {
             $this->uploadVideo();
         }
-    }
-
-    public function removeUploadedVideo(int $blockIndex): void
-    {
-        $this->blocks[$blockIndex]['attributes']['src'] = '';
-        $this->blocks[$blockIndex]['attributes']['poster'] = '';
-        $this->videoUpload = null;
-        $this->dispatchBlocksUpdated();
     }
 
     /**
@@ -330,6 +239,8 @@ final class BlockBuilder extends Component
 
     public function render(): View
     {
+        $this->loadAvailableBlocks();
+
         return view('livewire.block-builder');
     }
 }

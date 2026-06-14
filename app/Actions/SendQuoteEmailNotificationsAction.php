@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Mail\QuoteSubmittedMail;
-use App\Models\CompanySetting;
 use App\Models\Quote;
+use App\Services\Settings\SettingsManager;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 final readonly class SendQuoteEmailNotificationsAction
 {
+    public function __construct(
+        private SettingsManager $settings
+    ) {}
+
     /**
      * Send queued email notifications for the quote.
      *
@@ -43,8 +47,8 @@ final readonly class SendQuoteEmailNotificationsAction
      */
     private function sendEmails(Quote $quote, array $adminEmails): void
     {
-        $primaryPhone = CompanySetting::get('primary_phone');
-        $primaryEmail = CompanySetting::get('primary_email');
+        $primaryPhone = $this->settings->get('primary_phone');
+        $primaryEmail = $this->settings->get('primary_email');
 
         // Queue admin notifications
         foreach ($adminEmails as $email) {
@@ -74,7 +78,7 @@ final readonly class SendQuoteEmailNotificationsAction
      */
     private function getNotificationEmails(): array
     {
-        $emailsSetting = CompanySetting::get('quote_notification_emails');
+        $emailsSetting = $this->settings->get('quote_notification_emails');
 
         if (! empty($emailsSetting)) {
             $emails = array_map('trim', explode(',', $emailsSetting));
@@ -83,7 +87,7 @@ final readonly class SendQuoteEmailNotificationsAction
         }
 
         // Fallback to primary email
-        $primaryEmail = CompanySetting::get('primary_email');
+        $primaryEmail = $this->settings->get('primary_email');
         if (! empty($primaryEmail)) {
             return [$primaryEmail];
         }

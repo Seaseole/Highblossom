@@ -24,9 +24,15 @@ class StoreQuoteAction
 
         try {
             $imagePath = $this->handleImageUpload($request);
-            $this->markIdempotencyProcessed($request);
 
-            $quote = $this->createQuote($request, $imagePath);
+            $quote = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $imagePath) {
+                $this->markIdempotencyProcessed($request);
+                $quote = $this->createQuote($request, $imagePath);
+                
+                return $quote;
+            });
+
+            // Trigger notification outside transaction but only if successful
             $this->sendEmailNotificationsAction->execute($quote);
 
             return [

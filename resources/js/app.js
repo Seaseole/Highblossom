@@ -1,17 +1,5 @@
-// import Alpine from 'alpinejs';
-import collapse from '@alpinejs/collapse';
+// Alpine configuration moved to site-alpine.js and admin.js
 
-// window.Alpine = Alpine;
-// Alpine.plugin(collapse);
-
-document.addEventListener('livewire:init', () => {
-    window.Alpine.plugin(collapse);
-});
-
-// Safely start Alpine if not already initialized
-// if (!window.Alpine.initialized) {
-//     Alpine.start();
-// }
 
 import { Passkeys } from '@laravel/passkeys';
 window.Passkeys = Passkeys;
@@ -78,19 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const lowercase = 'abcdefghijklmnopqrstuvwxyz';
         const numbers = '0123456789';
         const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-        
+
         let password = '';
         // Ensure at least one of each to meet typical "mixedCase", "letters", "numbers", "symbols" rules
         password += uppercase[Math.floor(Math.random() * uppercase.length)];
         password += lowercase[Math.floor(Math.random() * lowercase.length)];
         password += numbers[Math.floor(Math.random() * numbers.length)];
         password += symbols[Math.floor(Math.random() * symbols.length)];
-        
+
         const all = uppercase + lowercase + numbers + symbols;
         for (let i = password.length; i < length; i++) {
             password += all[Math.floor(Math.random() * all.length)];
         }
-        
+
         // Shuffle
         return password.split('').sort(() => 0.5 - Math.random()).join('');
     };
@@ -110,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = password;
             input.type = 'text'; // Show it initially so they can see it? Or keep it hidden?
             // Usually good to show it or have a toggle.
-            
+
             if (confirmInput) {
                 confirmInput.value = password;
             }

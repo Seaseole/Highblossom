@@ -28,7 +28,7 @@
         results: @js($results),
         isVoting: false,
         error: null,
-        
+
         get hasSelection() {
             return this.allowMultiple
                 ? this.selectedOptions.length > 0
@@ -46,7 +46,7 @@
                 const opts = this.allowMultiple
                     ? this.selectedOptions.map(Number)
                     : [Number(this.selectedOption)];
-                
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -58,9 +58,9 @@
                         options: opts
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     this.results = data.results;
                     this.hasVoted = true;
@@ -128,7 +128,7 @@
             </div>
         @endforeach
         <p class="text-sm text-center text-gray-500 dark:text-gray-400 mt-4">
-            {{ $showResults ? 'Thank you for voting!' : 'Thank you for your vote!' }}
+            {{ $ showResults ? 'Thank you for voting!' : 'Thank you for your vote!' }}
         </p>
     </div>
 </div>

@@ -1,7 +1,7 @@
 <nav id="public-main-nav" class="sticky top-0 w-full z-40 bg-[#0A0A0F]/90 backdrop-blur-xl border-b border-white/5 flex flex-col">
     @php
-        $isAnnounceActive = $announcementActive ?? \App\Models\CompanySetting::get('announcement_active', false);
-        $announceList = $announcements ?? \App\Models\CompanySetting::get('announcements', []);
+        $isAnnounceActive = $announcementActive ?? $settings->get('announcement_active', false);
+        $announceList = $announcements ?? $settings->get('announcements', []);
     @endphp
 @if($isAnnounceActive && !empty($announceList))
     <style>

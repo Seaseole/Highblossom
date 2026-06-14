@@ -15,6 +15,7 @@ final class CompanySettingController
     public function __construct(
         private readonly CompanySettingService $settingService,
         private readonly SeoService $seoService,
+        private readonly \App\Services\EnvEditor $envEditor,
     ) {}
 
     public function index(): View
@@ -24,8 +25,9 @@ final class CompanySettingController
         $availableRoutes = collect(config('seo.static_routes', []))->mapWithKeys(function ($route) {
             return [$route => $this->seoService->getRouteLabel($route)];
         })->toArray();
+        $envConfig = $this->envEditor->all();
 
-        return view('admin.settings.index', compact('settings', 'availableRoutes'));
+        return view('admin.settings.index', compact('settings', 'availableRoutes', 'envConfig'));
     }
 
     public function gallerySettings(): View
