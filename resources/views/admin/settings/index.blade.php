@@ -320,19 +320,27 @@
                                             </div>
                                             <div class="space-y-1.5">
                                                 <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Destination</label>
-                                                <select :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white">
-                                                    <option value="">No Link</option>
-                                                    <optgroup label="System Routes">
-                                                        @foreach($availableRoutes as $value => $label)
-                                                            <option value="{{ $value }}">{{ $label }}</option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                    <template x-if="announcement.link && ![{{ implode(',', array_map(fn($r) => "'$r'", array_keys($availableRoutes))) }}].includes(announcement.link)">
-                                                        <optgroup label="Custom Link">
-                                                            <option :value="announcement.link" x-text="announcement.link" selected></option>
+                                                <div class="space-y-2">
+                                                    <select :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white">
+                                                        <option value="">No Link</option>
+                                                        <optgroup label="System Routes">
+                                                            @foreach($availableRoutes as $value => $label)
+                                                                <option value="{{ $value }}">{{ $label }}</option>
+                                                            @endforeach
                                                         </optgroup>
-                                                    </template>
-                                                </select>
+                                                        <option value="custom">Custom Link...</option>
+                                                        <template x-if="announcement.link && ![{{ implode(',', array_map(fn($r) => "'$r'", array_keys($availableRoutes))) }}].includes(announcement.link) && announcement.link !== 'custom'">
+                                                            <optgroup label="Selected Custom Link">
+                                                                <option :value="announcement.link" x-text="announcement.link" selected></option>
+                                                            </optgroup>
+                                                        </template>
+                                                    </select>
+                                                    <input type="text" 
+                                                           x-show="announcement.link === 'custom' || (![{{ implode(',', array_map(fn($r) => "'$r'", array_keys($availableRoutes))) }}].includes(announcement.link) && announcement.link !== '' && announcement.link !== 'custom')"
+                                                           x-model="announcement.link" 
+                                                           class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white" 
+                                                           placeholder="Enter URL (e.g. https://...)">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

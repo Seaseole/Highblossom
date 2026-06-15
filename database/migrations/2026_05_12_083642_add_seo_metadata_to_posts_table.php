@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->json('seo_metadata')->nullable()->after('user_id');
+            $table->json('seo_metadata')->nullable()->after('featured_image_url');
         });
     }
 

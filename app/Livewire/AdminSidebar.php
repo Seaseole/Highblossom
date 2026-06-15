@@ -22,12 +22,15 @@ final class AdminSidebar extends Component
 
     public ?string $logoUrl = null;
 
+    public ?string $companyName = null;
+
     public function mount(): void
     {
         $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
         $this->mobileMenuOpen = false;
         $this->userCount = User::count();
-        $this->logoUrl = CompanySetting::first()?->business_logo ? Storage::url(CompanySetting::first()->business_logo) : null;
+        $this->logoUrl = CompanySetting::get('business_logo') ? Storage::url(CompanySetting::get('business_logo')) : null;
+        $this->companyName = CompanySetting::get('company_name', config('app.name'));
     }
 
     #[On('toggle-sidebar')]

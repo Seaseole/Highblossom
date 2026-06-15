@@ -38,7 +38,7 @@ final class SmtpSettingService
 
     public function getSettings(): array
     {
-        return [
+        $settings = [
             'mail_mailer' => $this->envEditor->get('MAIL_MAILER', 'smtp'),
             'mail_host' => $this->envEditor->get('MAIL_HOST', ''),
             'mail_port' => $this->envEditor->get('MAIL_PORT', '587'),
@@ -48,5 +48,11 @@ final class SmtpSettingService
             'mail_from_address' => $this->envEditor->get('MAIL_FROM_ADDRESS', ''),
             'mail_from_name' => $this->envEditor->get('MAIL_FROM_NAME', config('app.name')),
         ];
+        
+        if (!isset($settings['mail_mailer'])) {
+             \Illuminate\Support\Facades\Log::error('Settings mail_mailer missing', $settings);
+        }
+        
+        return $settings;
     }
 }

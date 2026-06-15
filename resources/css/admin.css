@@ -19,7 +19,8 @@
     --info: #3b82f6;
 }
 
-/* Admin Section Header */
+/* ... (rest of admin.css) ... */
+
 .admin-section-header {
     display: flex;
     align-items: center;

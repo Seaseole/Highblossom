@@ -41,12 +41,12 @@ class Passkeys extends Component
     }
 
     #[On('renamePasskeyRequest')]
-    public function handleRenamePasskey($id, $name)
+    public function handleRenamePasskey(int $id, string $name)
     {
         $this->renamePasskey($id, $name);
     }
 
-    public function renamePasskey($passkeyId, $newName)
+    public function renamePasskey(int $passkeyId, string $newName)
     {
         $passkey = Passkey::findOrFail($passkeyId);
 

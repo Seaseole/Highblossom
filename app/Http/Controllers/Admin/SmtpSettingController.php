@@ -19,6 +19,7 @@ final class SmtpSettingController
     public function index(): View
     {
         $settings = $this->smtpService->getSettings();
+        \Illuminate\Support\Facades\Log::info('Settings:', $settings);
 
         return view('admin.smtp.index', compact('settings'));
     }

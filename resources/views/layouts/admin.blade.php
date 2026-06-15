@@ -30,8 +30,6 @@
         })();
     </script>
 
-    @fluxAppearance
-    @livewireStyles
     @include('partials.cloak')
     @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/admin.js'])
     <script src="{{ asset('vendor/ckeditor/ckeditor.js') }}"></script>
@@ -46,7 +44,7 @@
         }
     </style>
 </head>
-<body class="min-h-[100dvh] bg-white dark:bg-[#0A0A0F] text-gray-900 dark:text-gray-100 font-sans antialiased">
+<body class="min-h-[100dvh] bg-white dark:bg-[#0A0A0F] text-gray-900 dark:text-gray-100 font-sans antialiased admin-panel">
     <div class="flex min-h-[100dvh]">
         <!-- Livewire Admin Sidebar -->
         <livewire:admin-sidebar />
@@ -112,6 +110,17 @@
 
     {{-- Global Toaster --}}
     <x-ui.toaster />
+
+    {{-- Alpine mobileMenu store — must be registered before Alpine initialises --}}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('mobileMenu', {
+                open: false,
+                toggle() { this.open = !this.open; },
+                close() { this.open = false; },
+            });
+        });
+    </script>
 
     @livewireScripts
     @fluxScripts

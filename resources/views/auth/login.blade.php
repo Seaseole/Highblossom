@@ -100,13 +100,14 @@
             }
         }
     </script>
-
-    <div class="mt-10 text-center animate-fade-in-up delay-500">
+    @if (config('app.registration_enabled', false))
+    {{-- <div class="mt-10 text-center animate-fade-in-up delay-500">
         <p class="text-[#71717A] font-medium">
             Don't have an account?
             <a href="{{ route('register') }}" class="text-[#DC2626] hover:text-[#B91C1C] font-bold transition-colors underline decoration-2 underline-offset-4 decoration-[#DC2626]/20 hover:decoration-[#DC2626]">
                 Register
             </a>
         </p>
-    </div>
+    </div> --}}
+    @endif
 </x-auth-premium>

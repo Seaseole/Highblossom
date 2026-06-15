@@ -159,8 +159,16 @@
                     <template x-if="block.type === 'embed'"><div class="space-y-4"><input type="url" x-model="block.attributes.url" class="w-full border rounded-xl px-4 py-2.5" placeholder="URL"><input type="text" x-model="block.attributes.title" class="w-full border rounded-xl px-4 py-2.5" placeholder="Title"></div></template>
                     <template x-if="block.type === 'divider'">
                         <div class="space-y-4">
-                            <select x-model="block.attributes.style" class="w-full border rounded-xl px-4 py-2.5 text-sm"><option value="line">Line</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
-                            <select x-model="block.attributes.size" class="w-full border rounded-xl px-4 py-2.5 text-sm"><option value="sm">Small</option><option value="md">Medium</option><option value="lg">Large</option></select>
+                            <select x-model="block.attributes.style" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                                <option value="line">Line</option>
+                                <option value="dashed">Dashed</option>
+                                <option value="dotted">Dotted</option>
+                            </select>
+                            <select x-model="block.attributes.size" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                                <option value="sm">Small</option>
+                                <option value="md">Medium</option>
+                                <option value="lg">Large</option>
+                            </select>
                         </div>
                     </template>
                     
@@ -197,7 +205,7 @@
 
     <!-- Add Block Button -->
     <div class="relative" x-data="{ open: false }">
-        <button type="button" @click="open = !open" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-medium transition-colors">
+        <button type="button" @click="open = !open" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl font-medium transition-colors text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-white/10">
             Add Block
         </button>
         <div x-show="open" @click.outside="open = false" x-cloak class="absolute z-10 w-full mt-2 bg-white dark:bg-[#16161D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden">

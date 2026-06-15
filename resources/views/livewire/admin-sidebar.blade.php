@@ -41,18 +41,18 @@
     
     {{-- Brand --}}
     <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-white/5">
-        <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-3">
             <div class="flex aspect-square size-8 items-center justify-center rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 overflow-hidden">
                 @if($logoUrl)
-                    <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" class="size-full object-cover">
+                    <img src="{{ $logoUrl }}" alt="{{ $companyName }}" class="size-full object-cover">
                 @else
                     <svg class="size-5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                     </svg>
                 @endif
             </div>
-            <span class="font-semibold text-gray-900 dark:text-white">{{ config('app.name') }}</span>
-        </div>
+            <span class="font-semibold text-gray-900 dark:text-white">{{ $companyName }}</span>
+        </a>
         <button @click="$store.mobileMenu.close()" class="lg:hidden ml-auto p-2 text-gray-400">X</button>
     </div>
 
