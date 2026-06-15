@@ -93,11 +93,14 @@ final class EnvEditor
 
     private function parseLine(string $line): array
     {
-        if (! str_contains($line, '=')) {
-            return ['', ''];
+        $trimmed = trim($line);
+
+        // If the line has no '=' but contains text, treat it as a key with an empty value.
+        if (! str_contains($trimmed, '=')) {
+            return [$trimmed, ''];
         }
 
-        $parts = explode('=', $line, 2);
+        $parts = explode('=', $trimmed, 2);
 
         return [trim($parts[0]), trim($parts[1])];
     }
