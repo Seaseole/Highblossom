@@ -368,6 +368,22 @@
                         <p class="text-sm text-gray-500">Read-only environment variables. Click an input to edit its value.</p>
                     </div>
                     
+                    @php
+                        $registrationEnabled = ($envConfig['FEATURES_REGISTRATION_ENABLED'] ?? 'true') === 'true';
+                    @endphp
+
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 mb-6">
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Enable Registration</h4>
+                            <p class="text-xs text-gray-500">Allow new users to register on the site.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="hidden" name="env[FEATURES_REGISTRATION_ENABLED]" value="false">
+                            <input type="checkbox" name="env[FEATURES_REGISTRATION_ENABLED]" value="true" {{ $registrationEnabled ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-white/10 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-400 peer-checked:bg-gray-900 dark:peer-checked:bg-white"></div>
+                        </label>
+                    </div>
+
                     <div class="space-y-4">
                         @foreach($envConfig as $key => $value)
                             <div class="space-y-2" x-data="{ editing: false }">
