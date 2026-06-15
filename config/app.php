@@ -123,6 +123,4 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'registration_enabled' => env('APP_REGISTRATION_ENABLED', false),
-
 ];

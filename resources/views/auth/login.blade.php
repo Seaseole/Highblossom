@@ -100,7 +100,7 @@
             }
         }
     </script>
-    @if (config('app.registration_enabled'))
+    @if (config('features.registration_enabled'))
     <div class="mt-10 text-center animate-fade-in-up delay-500">
         <p class="text-[#71717A] font-medium">
             Don't have an account?

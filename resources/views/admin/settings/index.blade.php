@@ -386,6 +386,7 @@
 
                     <div class="space-y-4">
                         @foreach($envConfig as $key => $value)
+                            @if($key === 'FEATURES_REGISTRATION_ENABLED') @continue @endif
                             <div class="space-y-2" x-data="{ editing: false }">
                                 <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500">{{ $key }}</label>
                                 <input 
