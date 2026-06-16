@@ -236,6 +236,10 @@
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Instagram</label>
                                 <input type="url" name="instagram_url" value="{{ old('instagram_url', $settings['instagram_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
                             </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">LinkedIn</label>
+                                <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $settings['linkedin_url']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            </div>
                         </div>
                     </div>
 

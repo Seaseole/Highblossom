@@ -34,6 +34,11 @@
                 this.addToast('error', @js($error));
             @endforeach
         @endif
+
+        // Listen for Livewire-dispatched toast events (from PHP components)
+        Livewire.on('toast', (data) => {
+            this.addToast(data.type, data.message, data.duration || 5000);
+        });
     }
 }" 
 @toast.window="addToast($event.detail.type, $event.detail.message, $event.detail.duration || 5000)"
@@ -48,7 +53,7 @@ class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none w-fu
             x-transition:leave-start="translate-x-0 scale-100 opacity-100"
             x-transition:leave-end="translate-x-4 scale-95 opacity-0"
             style="transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);"
-            class="pointer-events-auto relative overflow-hidden rounded-xl backdrop-blur-xl border shadow-2xl bg-white/90 dark:bg-[#16161D]/90"
+            class="pointer-events-auto relative overflow-hidden rounded-xl backdrop-blur-xl border shadow-2xl bg-white/95 dark:bg-[#1E1E2E]/95"
             :class="{
                 'border-emerald-500/30 dark:border-emerald-500/20': toast.type === 'success',
                 'border-red-500/30 dark:border-red-500/20': toast.type === 'error',

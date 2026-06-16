@@ -10,17 +10,15 @@
             // Dispatch a Livewire event to handle the refresh reliably
             Livewire.dispatch('passkeyRegistered');
 
-            $dispatch('toast', {
-                type: 'success',
-                message: 'Passkey registered successfully.'
-            });
+            window.dispatchEvent(new CustomEvent('toast', {
+                detail: { type: 'success', message: 'Passkey registered successfully.' }
+            }));
         } catch (e) {
             console.error('Passkey registration failed', e);
             if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
-                $dispatch('toast', {
-                    type: 'error',
-                    message: 'Failed to register passkey. Please try again.'
-                });
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'error', message: 'Failed to register passkey. Please try again.' }
+                }));
             }
             return;
         }

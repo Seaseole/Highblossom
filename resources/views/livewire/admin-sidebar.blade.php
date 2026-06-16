@@ -11,7 +11,7 @@
         'blog' => ['label' => 'Blog', 'icon' => 'newspaper', 'routes' => ['admin.posts', 'admin.categories', 'admin.tags']],
         'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles']],
         'media' => ['label' => 'Media', 'icon' => 'image', 'routes' => ['admin.media-library']],
-        'system' => ['label' => 'System', 'icon' => 'cog', 'routes' => ['admin.settings', 'admin.smtp', 'admin.seo']]
+        'system' => ['label' => 'System', 'icon' => 'cog', 'routes' => ['admin.settings', 'admin.seo']]
     ];
 
     // Helper functions (simplified)
@@ -24,7 +24,7 @@
             'admin.gallery-categories' => 'Gallery Categories', 'admin.partners' => 'Partners', 'admin.staff' => 'Staff',
             'admin.glass-types' => 'Glass Types', 'admin.service-types' => 'Service Types', 'admin.contact-messages' => 'Messages',
             'admin.posts' => 'Posts', 'admin.categories' => 'Categories', 'admin.tags' => 'Tags', 'admin.users' => 'Users',
-            'admin.roles' => 'Roles', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.smtp' => 'SMTP', 'admin.seo' => 'SEO'
+            'admin.roles' => 'Roles', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO'
         ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
 @endphp
 

@@ -21,7 +21,6 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
-use App\Http\Controllers\Admin\SmtpSettingController;
 use App\Http\Controllers\Admin\StaffAbsenceController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TagController;
@@ -52,11 +51,6 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     // About Us
     Route::get('about-us', [AboutUsController::class, 'edit'])->middleware('can:manage pages')->name('about-us.edit');
     Route::put('about-us', [AboutUsController::class, 'update'])->middleware('can:manage pages')->name('about-us.update');
-
-    // SMTP
-    Route::get('smtp', [SmtpSettingController::class, 'index'])->middleware('can:view settings')->name('smtp.index');
-    Route::put('smtp', [SmtpSettingController::class, 'update'])->middleware('can:update settings')->name('smtp.update');
-    Route::post('smtp/test', [SmtpSettingController::class, 'sendTest'])->middleware('can:update settings')->name('smtp.test');
 
     // Content Management
     Route::get('testimonials', [TestimonialController::class, 'index'])->middleware('can:manage testimonials')->name('testimonials.index');
