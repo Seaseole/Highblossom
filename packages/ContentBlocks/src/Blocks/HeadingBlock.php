@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
+/**
+ * Heading block with level (h1-h6) support.
+ */
 class HeadingBlock extends AbstractBlock
 {
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'heading';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -20,6 +31,9 @@ class HeadingBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -29,6 +43,9 @@ class HeadingBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [

@@ -1,14 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Services;
 
 use Highblossom\ContentBlocks\Contracts\BlockInterface;
 use Illuminate\Support\Collection;
 
+/**
+ * Registry for managing and retrieving block type instances.
+ */
 class BlockRegistry
 {
     protected Collection $blocks;
 
+    /**
+     * Create a new block registry instance.
+     */
     public function __construct()
     {
         $this->blocks = collect();

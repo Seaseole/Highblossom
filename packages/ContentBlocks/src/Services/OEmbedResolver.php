@@ -7,15 +7,24 @@ namespace Highblossom\ContentBlocks\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Resolves oEmbed data for media URLs.
+ */
 final class OEmbedResolver
 {
     private array $providerEndpoints;
 
+    /**
+     * Create a new oEmbed resolver instance.
+     */
     public function __construct()
     {
         $this->providerEndpoints = config('content-blocks.oembed.providers', $this->getDefaultProviders());
     }
 
+    /**
+     * Resolve oEmbed data for the given URL.
+     */
     public function resolve(string $url): ?array
     {
         if (! $this->isValidUrl($url)) {
@@ -68,11 +77,17 @@ final class OEmbedResolver
         }
     }
 
+    /**
+     * Check if the given URL is valid.
+     */
     private function isValidUrl(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 
+    /**
+     * Find the matching oEmbed provider for the URL.
+     */
     private function findProviderForUrl(string $url): ?array
     {
         foreach ($this->providerEndpoints as $provider) {
@@ -86,6 +101,9 @@ final class OEmbedResolver
         return null;
     }
 
+    /**
+     * Build the endpoint URL for the given provider.
+     */
     private function buildEndpoint(array $provider, string $url): string
     {
         $endpoint = $provider['endpoint'];
@@ -97,6 +115,9 @@ final class OEmbedResolver
         return $endpoint;
     }
 
+    /**
+     * Get the default oEmbed provider configurations.
+     */
     private function getDefaultProviders(): array
     {
         return [

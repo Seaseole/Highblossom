@@ -19,6 +19,8 @@
     ],
     "require": {
         "php": "^8.2",
+        "arpanihan/auditify": "*",
+        "devakshay/scheduler-list-laravel": "^1.0",
         "endroid/qr-code": "^6.1",
         "highblossom/content-blocks": "@dev",
         "jeroennoten/laravel-adminlte": "^3.15",

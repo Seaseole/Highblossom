@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Contracts;
 
+/**
+ * Interface for all content block types.
+ */
 interface BlockInterface
 {
     /**

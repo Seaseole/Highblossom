@@ -1,12 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions;
 
 use App\Models\Quote;
 use App\Services\IdempotencyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Handle the submission of a windshield repair quote request.
+ *
+ * Processes incoming quote requests with idempotency protection,
+ * handles image uploads, creates the quote record, and triggers
+ * email notifications.
+ */
 class StoreQuoteAction
 {
     public function __construct(
@@ -15,6 +25,11 @@ class StoreQuoteAction
         protected SendQuoteEmailNotificationsAction $sendEmailNotificationsAction
     ) {}
 
+    /**
+     * Execute the full quote submission flow.
+     *
+     * @return array<string, mixed>
+     */
     public function execute(Request $request): array
     {
         $idempotencyResult = $this->checkIdempotency($request);
@@ -25,10 +40,10 @@ class StoreQuoteAction
         try {
             $imagePath = $this->handleImageUpload($request);
 
-            $quote = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $imagePath) {
+            $quote = DB::transaction(function () use ($request, $imagePath) {
                 $this->markIdempotencyProcessed($request);
                 $quote = $this->createQuote($request, $imagePath);
-                
+
                 return $quote;
             });
 
@@ -131,6 +146,11 @@ class StoreQuoteAction
         return $quote;
     }
 
+    /**
+     * Invoke the action as a callable.
+     *
+     * @return array<string, mixed>
+     */
     public function __invoke(Request $request): array
     {
         return $this->execute($request);

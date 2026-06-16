@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\InspectionFactory;
@@ -7,10 +9,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * On-site inspection records linked to bookings.
+ * Maps to the `inspections` database table.
+ */
 final class Inspection extends Model
 {
     use HasFactory;
 
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return InspectionFactory
+     */
     protected static function newFactory()
     {
         return InspectionFactory::new();
@@ -26,11 +37,17 @@ final class Inspection extends Model
         'ended_at' => 'datetime',
     ];
 
+    /**
+     * Get the booking this inspection belongs to.
+     */
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
     }
 
+    /**
+     * Get the staff member assigned to this inspection.
+     */
     public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'staff_id');

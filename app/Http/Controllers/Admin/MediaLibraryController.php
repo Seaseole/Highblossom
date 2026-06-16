@@ -12,12 +12,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Manage the media library for image browsing and uploads.
+ */
 final class MediaLibraryController
 {
     public function __construct(
         private readonly MediaLibraryService $mediaLibraryService,
     ) {}
 
+    /**
+     * Display the media library (paginated). Supports HTMX partial rendering.
+     */
     public function index(Request $request): View
     {
         $images = GalleryImage::query()
@@ -32,6 +38,9 @@ final class MediaLibraryController
         return view('admin.media-library.index', compact('images'));
     }
 
+    /**
+     * Upload a new image to the media library.
+     */
     public function upload(MediaLibraryRequest $request): JsonResponse
     {
         try {
@@ -49,6 +58,9 @@ final class MediaLibraryController
         }
     }
 
+    /**
+     * Get metadata for a specific image.
+     */
     public function show(GalleryImage $image): JsonResponse
     {
         $image->load(['media.usages.model']);
@@ -71,25 +83,18 @@ final class MediaLibraryController
         ]);
     }
 
+    /**
+     * Delete an image from the media library and optionally clean up registry.
+     */
     public function destroy(GalleryImage $image): JsonResponse
     {
         try {
             if ($image->media) {
-                // If it's registered in the media registry, try to force delete it from there
-                // But GalleryImage::delete() also handles its own cleanup if not using service.
-                // Let's use the RegistryService for superpowers.
-
                 $registryId = $image->media->id;
 
-                // First unregister this specific usage
-                MediaRegistryService::class; // Ensure loaded
                 $registryService = app(MediaRegistryService::class);
                 $registryService->unregister($image, 'image_path');
-
-                // Then delete the gallery image record
                 $image->delete();
-
-                // Finally try to force delete the file if no more usages exist
                 $deletedFile = $registryService->forceDelete($registryId);
 
                 return response()->json([
@@ -106,6 +111,9 @@ final class MediaLibraryController
         }
     }
 
+    /**
+     * Format a byte size into a human-readable string.
+     */
     private function formatFileSize(?int $bytes): string
     {
         if (! $bytes) {

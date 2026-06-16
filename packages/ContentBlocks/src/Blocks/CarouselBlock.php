@@ -1,24 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 use Highblossom\ContentBlocks\Services\BlockRenderer;
 
+/**
+ * Carousel block with slides and autoplay support.
+ */
 final class CarouselBlock extends AbstractBlock
 {
     private BlockRenderer $blockRenderer;
 
+    /**
+     * Create a new carousel block instance.
+     */
     public function __construct(BlockRenderer $blockRenderer)
     {
         $this->blockRenderer = $blockRenderer;
     }
 
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'carousel';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -28,6 +42,9 @@ final class CarouselBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -37,6 +54,9 @@ final class CarouselBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [
@@ -46,6 +66,9 @@ final class CarouselBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Build the carousel view with slides.
+     */
     public function buildView(array $attributes): string
     {
         $slides = $attributes['slides'] ?? [];

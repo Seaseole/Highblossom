@@ -12,12 +12,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * Manage CRUD operations for glass sub-categories.
+ */
 final class GlassSubCategoryController
 {
     public function __construct(
         private readonly GlassSubCategoryService $glassSubCategoryService,
     ) {}
 
+    /**
+     * Display a listing of glass sub-categories.
+     */
     public function index(): View
     {
         $glassSubCategories = $this->glassSubCategoryService->getAll();
@@ -25,6 +31,9 @@ final class GlassSubCategoryController
         return view('admin.glass-sub-categories.index', compact('glassSubCategories'));
     }
 
+    /**
+     * Show the form for creating a new glass sub-category.
+     */
     public function create(): View
     {
         $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
@@ -32,6 +41,9 @@ final class GlassSubCategoryController
         return view('admin.glass-sub-categories.create', compact('glassTypes'));
     }
 
+    /**
+     * Store a newly created glass sub-category in storage.
+     */
     public function store(GlassSubCategoryRequest $request): RedirectResponse
     {
         $this->glassSubCategoryService->create($request->validated());
@@ -41,6 +53,9 @@ final class GlassSubCategoryController
             ->with('success', __('messages.glass_sub_category_created'));
     }
 
+    /**
+     * Show the form for editing the specified glass sub-category.
+     */
     public function edit(GlassSubCategory $glassSubCategory): View
     {
         $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
@@ -48,6 +63,9 @@ final class GlassSubCategoryController
         return view('admin.glass-sub-categories.edit', compact('glassSubCategory', 'glassTypes'));
     }
 
+    /**
+     * Update the specified glass sub-category in storage.
+     */
     public function update(GlassSubCategoryRequest $request, GlassSubCategory $glassSubCategory): RedirectResponse
     {
         $this->glassSubCategoryService->update($glassSubCategory, $request->validated());
@@ -57,6 +75,9 @@ final class GlassSubCategoryController
             ->with('success', __('messages.glass_sub_category_updated'));
     }
 
+    /**
+     * Remove the specified glass sub-category from storage.
+     */
     public function destroy(GlassSubCategory $glassSubCategory): RedirectResponse
     {
         try {
@@ -73,7 +94,7 @@ final class GlassSubCategoryController
     }
 
     /**
-     * Toggle sub-category status.
+     * Toggle sub-category active status.
      */
     public function toggleStatus(GlassSubCategory $glassSubCategory): JsonResponse
     {
@@ -98,7 +119,7 @@ final class GlassSubCategoryController
     }
 
     /**
-     * Reorder sub-categories.
+     * Reorder glass sub-categories.
      */
     public function reorder(): JsonResponse
     {

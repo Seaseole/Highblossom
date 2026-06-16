@@ -7,10 +7,16 @@ namespace Highblossom\ContentBlocks\Services;
 use HTMLPurifier;
 use HTMLPurifier_Config;
 
+/**
+ * Sanitizes HTML content using HTMLPurifier.
+ */
 final class HtmlSanitizer
 {
     private ?HTMLPurifier $purifier = null;
 
+    /**
+     * Sanitize the given HTML string.
+     */
     public function sanitize(string $html): string
     {
         $this->ensurePurifierInitialized();
@@ -18,6 +24,9 @@ final class HtmlSanitizer
         return $this->purifier->purify($html);
     }
 
+    /**
+     * Ensure the HTMLPurifier instance is initialized.
+     */
     private function ensurePurifierInitialized(): void
     {
         if ($this->purifier !== null) {

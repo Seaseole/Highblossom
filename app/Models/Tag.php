@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
+/**
+ * Blog post tags with auto-slugging.
+ * Maps to the `tags` database table.
+ */
 final class Tag extends Model
 {
     protected $fillable = [
@@ -15,11 +19,17 @@ final class Tag extends Model
         'slug',
     ];
 
+    /**
+     * Get the posts assigned to this tag.
+     */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'post_tag');
     }
 
+    /**
+     * Boot the model and auto-generate slug on creating/updating.
+     */
     protected static function boot()
     {
         parent::boot();

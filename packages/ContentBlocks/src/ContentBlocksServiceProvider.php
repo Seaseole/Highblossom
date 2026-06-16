@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks;
 
 use Highblossom\ContentBlocks\Blocks\AccordionBlock;
@@ -30,6 +32,9 @@ use Highblossom\ContentBlocks\Services\OEmbedResolver;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Service provider for the ContentBlocks package.
+ */
 class ContentBlocksServiceProvider extends ServiceProvider
 {
     /**
@@ -110,11 +115,17 @@ class ContentBlocksServiceProvider extends ServiceProvider
         $this->app->singleton(PollBlock::class);
     }
 
+    /**
+     * Register the HTML sanitizer service.
+     */
     protected function registerHtmlSanitizer(): void
     {
         $this->app->singleton(HtmlSanitizer::class);
     }
 
+    /**
+     * Register the oEmbed resolver service.
+     */
     protected function registerOEmbedResolver(): void
     {
         $this->app->singleton(OEmbedResolver::class);

@@ -7,15 +7,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\QuoteStatusRequest;
 use App\Models\Quote;
 use App\Services\QuoteService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Manage CRUD operations for quote requests.
+ */
 final class QuoteController
 {
     public function __construct(
         private readonly QuoteService $quoteService,
     ) {}
 
+    /**
+     * Display a paginated list of quotes, optionally filtered by status.
+     */
     public function index(Request $request): View
     {
         $status = $request->get('status');
@@ -30,6 +37,9 @@ final class QuoteController
         return view('admin.quotes.index', compact('quotes', 'status'));
     }
 
+    /**
+     * Display the specified quote.
+     */
     public function show(Quote $quote): View
     {
         $quote->load(['glassType', 'serviceType']);
@@ -37,6 +47,11 @@ final class QuoteController
         return view('admin.quotes.show', compact('quote'));
     }
 
+    /**
+     * Update the status of the specified quote.
+     *
+     * @return RedirectResponse
+     */
     public function updateStatus(QuoteStatusRequest $request, Quote $quote)
     {
         $this->quoteService->updateStatus($quote, $request->input('status'));
@@ -44,6 +59,11 @@ final class QuoteController
         return redirect()->back()->with('success', __('messages.quote_status_updated'));
     }
 
+    /**
+     * Remove the specified quote from storage.
+     *
+     * @return RedirectResponse
+     */
     public function destroy(Quote $quote)
     {
         $this->quoteService->delete($quote);

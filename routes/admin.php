@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\SmtpSettingController;
@@ -161,11 +162,11 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::delete('quotes/{quote}', [QuoteController::class, 'destroy'])->middleware('can:update bookings')->name('quotes.destroy');
 
     // SEO Management
-    Route::get('seo/static-routes', [\App\Http\Controllers\Admin\SeoController::class, 'index'])->middleware('can:manage seo')->name('seo.static-routes');
-    Route::get('seo/create', [\App\Http\Controllers\Admin\SeoController::class, 'create'])->middleware('can:manage seo')->name('seo.create');
-    Route::post('seo', [\App\Http\Controllers\Admin\SeoController::class, 'store'])->middleware('can:manage seo')->name('seo.store');
-    Route::get('seo/{id}/edit', [\App\Http\Controllers\Admin\SeoController::class, 'edit'])->middleware('can:manage seo')->name('seo.edit');
-    Route::put('seo/{id}', [\App\Http\Controllers\Admin\SeoController::class, 'update'])->middleware('can:manage seo')->name('seo.update');
+    Route::get('seo/static-routes', [SeoController::class, 'index'])->middleware('can:manage seo')->name('seo.static-routes');
+    Route::get('seo/create', [SeoController::class, 'create'])->middleware('can:manage seo')->name('seo.create');
+    Route::post('seo', [SeoController::class, 'store'])->middleware('can:manage seo')->name('seo.store');
+    Route::get('seo/{id}/edit', [SeoController::class, 'edit'])->middleware('can:manage seo')->name('seo.edit');
+    Route::put('seo/{id}', [SeoController::class, 'update'])->middleware('can:manage seo')->name('seo.update');
 
     // Access Control
     Route::get('users', [UserController::class, 'index'])->middleware('can:manage users')->name('users.index');

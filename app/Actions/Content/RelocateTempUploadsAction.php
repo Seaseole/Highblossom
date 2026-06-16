@@ -8,12 +8,19 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Relocate uploaded content-block files from temporary to permanent storage.
+ *
+ * Processes content block arrays recursively, moving files referenced
+ * with temp:// URIs to the public disk under organised directories.
+ */
 final class RelocateTempUploadsAction
 {
     /**
      * Relocate uploaded files from temp storage to permanent storage.
      *
-     * @param  array  $contentBlocks  The content blocks array containing file URLs
+     * @param array $contentBlocks The content blocks array containing file URLs
+     *
      * @return array Updated content blocks with relocated file URLs
      */
     public function execute(array $contentBlocks): array
@@ -27,8 +34,8 @@ final class RelocateTempUploadsAction
     /**
      * Recursively process all blocks and relocate files.
      *
-     * @param  Filesystem  $tempDisk
-     * @param  Filesystem  $publicDisk
+     * @param Filesystem $tempDisk
+     * @param Filesystem $publicDisk
      */
     private function processBlocks(array $blocks, $tempDisk, $publicDisk): array
     {
@@ -118,8 +125,8 @@ final class RelocateTempUploadsAction
     /**
      * Process columns block with nested blocks.
      *
-     * @param  Filesystem  $tempDisk
-     * @param  Filesystem  $publicDisk
+     * @param Filesystem $tempDisk
+     * @param Filesystem $publicDisk
      */
     private function processColumnsBlock(array $attributes, $tempDisk, $publicDisk): array
     {
@@ -167,8 +174,9 @@ final class RelocateTempUploadsAction
     /**
      * Move a file from temp to permanent storage.
      *
-     * @param  Filesystem  $tempDisk
-     * @param  Filesystem  $publicDisk
+     * @param Filesystem $tempDisk
+     * @param Filesystem $publicDisk
+     *
      * @return string|null The new relative path or null on failure
      */
     private function moveToPermanent(

@@ -7,8 +7,14 @@ namespace App\Services;
 use App\Models\Category;
 use Illuminate\Support\Str;
 
+/**
+ * Service for managing blog categories.
+ */
 final class CategoryService
 {
+    /**
+     * Create a new category.
+     */
     public function create(array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
@@ -16,6 +22,9 @@ final class CategoryService
         return Category::create($data);
     }
 
+    /**
+     * Update an existing category.
+     */
     public function update(Category $category, array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
@@ -25,6 +34,9 @@ final class CategoryService
         return $category->fresh();
     }
 
+    /**
+     * Delete a category.
+     */
     public function delete(Category $category): void
     {
         $category->delete();

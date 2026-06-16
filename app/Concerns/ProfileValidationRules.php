@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Concerns;
 
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validation rules for user profile data.
+ *
+ * Provides methods to validate user names, emails, and employee details.
+ */
 trait ProfileValidationRules
 {
     /**
@@ -51,7 +58,7 @@ trait ProfileValidationRules
     }
 
     /**
-     * Get employee details validated
+     * Get employee details validated.
      *
      * This method is not used yet.
      */

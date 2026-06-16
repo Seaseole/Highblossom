@@ -12,10 +12,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Mailable sent when a quote request is submitted.
+ * Dispatched to both admin and customer with different views.
+ */
 final class QuoteSubmittedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Create a new message instance.
+     */
     public function __construct(
         public readonly Quote $quote,
         public readonly string $recipientType = 'admin',
@@ -23,6 +30,9 @@ final class QuoteSubmittedMail extends Mailable implements ShouldQueue
         public readonly ?string $primaryEmail = null
     ) {}
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         $subject = $this->recipientType === 'admin'
@@ -34,6 +44,9 @@ final class QuoteSubmittedMail extends Mailable implements ShouldQueue
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
         $view = $this->recipientType === 'admin'

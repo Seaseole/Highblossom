@@ -9,6 +9,9 @@ use App\Models\Service;
 use App\Models\Testimonial;
 use App\Services\Settings\SettingsManager;
 
+/**
+ * Service for assembling page-specific data from multiple models and settings.
+ */
 final readonly class SiteService
 {
     public function __construct(

@@ -6,6 +6,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * About Us page content with mission and vision.
+ * Maps to the `about_us_contents` database table.
+ */
 final class AboutUsContent extends Model
 {
     protected $fillable = [
@@ -22,6 +26,11 @@ final class AboutUsContent extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Get the active About Us content entry.
+     *
+     * @return static|null
+     */
     public static function active(): ?self
     {
         return self::where('is_active', true)->first();

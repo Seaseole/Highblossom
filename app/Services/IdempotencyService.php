@@ -6,10 +6,15 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Service for preventing duplicate form submissions using idempotency tokens.
+ */
 class IdempotencyService
 {
-    private const CACHE_TTL_SECONDS = 300; // 5 minutes
+    /** @var int Cache TTL in seconds for idempotency tokens */
+    private const CACHE_TTL_SECONDS = 300;
 
+    /** @var string Cache key prefix for idempotency tokens */
     private const CACHE_PREFIX = 'idempotency:';
 
     /**
@@ -27,7 +32,7 @@ class IdempotencyService
     /**
      * Mark a token as processed.
      *
-     * @param  string  $token  The idempotency token to mark as processed.
+     * @param string $token The idempotency token to mark as processed.
      */
     public function markProcessed(string $token): void
     {
@@ -66,6 +71,9 @@ class IdempotencyService
         return $callback();
     }
 
+    /**
+     * Build the cache key for the given token.
+     */
     private function getCacheKey(string $token): string
     {
         return self::CACHE_PREFIX.$token;

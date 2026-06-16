@@ -5,14 +5,21 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Service for managing SMTP mail configuration in the .env file.
+ */
 final class SmtpSettingService
 {
     public function __construct(
         private readonly EnvEditor $envEditor,
     ) {}
 
+    /**
+     * Update SMTP settings in the .env file.
+     */
     public function update(array $data): void
     {
         $this->envEditor->set('MAIL_MAILER', $data['mail_mailer']);
@@ -25,6 +32,9 @@ final class SmtpSettingService
         $this->envEditor->set('MAIL_FROM_NAME', $data['mail_from_name']);
     }
 
+    /**
+     * Send a test email to verify SMTP configuration.
+     */
     public function sendTestEmail(string $email): bool
     {
         try {
@@ -36,6 +46,9 @@ final class SmtpSettingService
         }
     }
 
+    /**
+     * Get current SMTP settings from the .env file with defaults.
+     */
     public function getSettings(): array
     {
         $settings = [
@@ -48,11 +61,11 @@ final class SmtpSettingService
             'mail_from_address' => $this->envEditor->get('MAIL_FROM_ADDRESS', ''),
             'mail_from_name' => $this->envEditor->get('MAIL_FROM_NAME', config('app.name')),
         ];
-        
-        if (!isset($settings['mail_mailer'])) {
-             \Illuminate\Support\Facades\Log::error('Settings mail_mailer missing', $settings);
+
+        if (! isset($settings['mail_mailer'])) {
+            Log::error('Settings mail_mailer missing', $settings);
         }
-        
+
         return $settings;
     }
 }

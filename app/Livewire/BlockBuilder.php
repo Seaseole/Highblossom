@@ -16,25 +16,31 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
+/**
+ * Build and manage content blocks with image and video upload support.
+ */
 final class BlockBuilder extends Component
 {
     use WithFileUploads;
 
+    /** The field name used for storing block data. */
     #[Locked]
     public string $name = 'content';
 
     public array $blocks = [];
 
+    /** The uploaded image file. */
     #[Validate(['nullable', 'image', 'max:61440'])]
     public $imageUpload = null;
 
-    // Track which block index is being uploaded to (persists better than uploadingBlockIndex)
+    /** The block index currently being uploaded to. */
     public ?int $activeImageUploadIndex = null;
 
     public int $uploadProgress = 0;
 
     public ?int $uploadingBlockIndex = null;
 
+    /** The uploaded video file. */
     #[Validate(['nullable', 'file', 'max:61440'])]
     public $videoUpload = null;
 
@@ -44,6 +50,11 @@ final class BlockBuilder extends Component
 
     public array $availableBlockTypes = [];
 
+    /**
+     * Initialize the block builder with the field name and existing block data.
+     *
+     * @param array|null $value
+     */
     public function mount(string $name = 'content', $value = null): void
     {
         $this->name = $name;
@@ -51,9 +62,10 @@ final class BlockBuilder extends Component
 
         // Ensure all blocks have a unique ID and sequential keys
         $this->blocks = array_map(function ($block) {
-            if (!isset($block['id'])) {
+            if (! isset($block['id'])) {
                 $block['id'] = uniqid('block_', true);
             }
+
             return $block;
         }, $blocks);
 
@@ -67,10 +79,10 @@ final class BlockBuilder extends Component
     {
         $registry = app(BlockRegistry::class);
         $types = $registry->types();
-        
+
         Log::debug('BlockBuilder: Loading available blocks', [
             'count' => count($types),
-            'types' => $types
+            'types' => $types,
         ]);
 
         $this->availableBlockTypes = collect($types)
@@ -93,6 +105,9 @@ final class BlockBuilder extends Component
         }
     }
 
+    /**
+     * Upload an image for a specific block and notify the frontend.
+     */
     public function uploadImageForBlock(int $blockIndex): void
     {
         if (empty($this->imageUpload)) {
@@ -135,6 +150,10 @@ final class BlockBuilder extends Component
 
         $this->dispatch('notify', message: 'Image uploaded successfully', type: 'success');
     }
+
+    /**
+     * Validate and upload a video file, generate a thumbnail, and notify the frontend.
+     */
     public function uploadVideo(): void
     {
         $this->validate([
@@ -193,6 +212,9 @@ final class BlockBuilder extends Component
         $this->dispatch('notify', message: 'Video uploaded successfully', type: 'success');
     }
 
+    /**
+     * Mark a block index as ready for video upload.
+     */
     public function startVideoUpload(int $blockIndex): void
     {
         $this->uploadingVideoBlockIndex = $blockIndex;
@@ -209,7 +231,9 @@ final class BlockBuilder extends Component
     }
 
     /**
-     * Detect video URL and return preview data for live embed.
+     * Detect the video source type from a URL and return preview data for live embed.
+     *
+     * @return array{valid: bool, error?: string, source_type?: string, source_label?: string, embed_url?: string, video_id?: string, uses_iframe?: bool, full_url?: string}
      */
     public function detectVideoUrl(string $url): array
     {
@@ -237,6 +261,9 @@ final class BlockBuilder extends Component
         ];
     }
 
+    /**
+     * Render the block builder component.
+     */
     public function render(): View
     {
         $this->loadAvailableBlocks();

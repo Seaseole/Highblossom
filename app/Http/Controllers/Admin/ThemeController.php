@@ -10,10 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * Handle user theme preference storage (light/dark).
+ */
 final class ThemeController extends Controller
 {
     /**
-     * Store/update the user's theme preference.
+     * Store or update the authenticated user's theme preference.
      */
     public function store(Request $request): JsonResponse
     {

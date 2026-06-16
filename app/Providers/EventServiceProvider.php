@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Events\ContactMessageReceived;
 use App\Listeners\SendContactMessageEmail;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
+/**
+ * Event service provider for the application.
+ *
+ * Registers event-to-listener mappings used throughout the application.
+ */
 class EventServiceProvider extends ServiceProvider
 {
     /**

@@ -7,8 +7,18 @@ namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service for handling image file uploads with Windows-compatible path handling.
+ */
 final class ImageUploadService
 {
+    /**
+     * Upload a file to the public storage directory.
+     *
+     * @return array{path: string, url: string}
+     *
+     * @throws \RuntimeException When the file is invalid or move fails
+     */
     public function upload(UploadedFile $file, string $folder = 'uploads'): array
     {
         if (! $file || ! $file->isValid()) {
@@ -33,6 +43,9 @@ final class ImageUploadService
         ];
     }
 
+    /**
+     * Ensure the target directory exists, creating it if necessary.
+     */
     private function ensureDirectoryExists(string $directory): void
     {
         if (! is_dir($directory)) {

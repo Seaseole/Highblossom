@@ -9,12 +9,18 @@ use App\Models\Poll;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
+/**
+ * Service for managing blog posts with content blocks, featured images, and relations.
+ */
 final class PostService
 {
     public function __construct(
         private readonly RelocateTempUploadsAction $relocateAction,
     ) {}
 
+    /**
+     * Create a new post with featured image, content image relocation, and relations.
+     */
     public function create(array $data, Request $request): Post
     {
         $this->handleFeaturedImage($data, $request);
@@ -28,6 +34,9 @@ final class PostService
         return $post;
     }
 
+    /**
+     * Update an existing post with image handling and relation syncing.
+     */
     public function update(Post $post, array $data, Request $request): Post
     {
         $this->handleFeaturedImageUpdate($data, $request, $post);
@@ -41,6 +50,9 @@ final class PostService
         return $post->fresh();
     }
 
+    /**
+     * Sync poll blocks in content with the polls table.
+     */
     private function syncPolls(array &$data): void
     {
         if (empty($data['content'])) {
@@ -66,11 +78,17 @@ final class PostService
         }
     }
 
+    /**
+     * Delete a post.
+     */
     public function delete(Post $post): void
     {
         $post->delete();
     }
 
+    /**
+     * Handle featured image upload during post creation.
+     */
     private function handleFeaturedImage(array &$data, Request $request): void
     {
         if ($request->hasFile('featured_image')) {
@@ -80,6 +98,9 @@ final class PostService
         }
     }
 
+    /**
+     * Handle featured image update or deletion during post update.
+     */
     private function handleFeaturedImageUpdate(array &$data, Request $request, Post $post): void
     {
         if ($request->boolean('delete_featured_image')) {
@@ -92,6 +113,9 @@ final class PostService
         }
     }
 
+    /**
+     * Relocate temporary uploaded images to permanent storage.
+     */
     private function relocateContentImages(array &$data): void
     {
         if (! empty($data['content'])) {
@@ -99,6 +123,9 @@ final class PostService
         }
     }
 
+    /**
+     * Sync categories and tags relationships for a post.
+     */
     private function syncRelations(Post $post, array $data): void
     {
         if (isset($data['categories'])) {

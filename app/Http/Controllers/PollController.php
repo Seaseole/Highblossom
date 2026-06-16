@@ -1,16 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Poll;
 use App\Models\PollVote;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * Handle poll voting and results retrieval.
+ */
 class PollController extends Controller
 {
+    /**
+     * Cast a vote on the given poll.
+     *
+     * @return JsonResponse
+     */
     public function vote(Request $request, Poll $poll)
     {
         Log::info('Poll vote attempt', [
@@ -55,7 +67,7 @@ class PollController extends Controller
         }
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($poll, $request, $ipAddress, $userId) {
+            DB::transaction(function () use ($poll, $request, $ipAddress, $userId) {
                 foreach ($request->options as $optionIndex) {
                     $index = (int) $optionIndex;
                     PollVote::create([
@@ -95,6 +107,11 @@ class PollController extends Controller
         ]);
     }
 
+    /**
+     * Return the results for the given poll.
+     *
+     * @return JsonResponse
+     */
     public function results(Poll $poll)
     {
         return response()->json([

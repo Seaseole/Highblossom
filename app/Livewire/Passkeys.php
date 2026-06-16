@@ -1,24 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Laravel\Passkeys\Actions\DeletePasskey;
 use Laravel\Passkeys\Passkey;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/**
+ * Manage WebAuthn passkeys for the authenticated user.
+ */
 class Passkeys extends Component
 {
     #[On('passkeyRegistered')]
     #[On('passkeyDeleted')]
     #[On('passkeyRenamed')]
+    /**
+     * Refresh the passkey list after a registration, deletion, or rename event.
+     */
     public function update()
     {
         // Refresh trigger
     }
 
+    /**
+     * Delete a passkey after verifying it belongs to the authenticated user.
+     */
     public function deletePasskey(Passkey $passkey, DeletePasskey $deletePasskey)
     {
         // Ensure the passkey belongs to the authenticated user
@@ -41,11 +53,20 @@ class Passkeys extends Component
     }
 
     #[On('renamePasskeyRequest')]
+    /**
+     * Handle a rename request dispatched from the frontend.
+     */
     public function handleRenamePasskey(int $id, string $name)
     {
         $this->renamePasskey($id, $name);
     }
 
+    /**
+     * Rename a passkey after verifying ownership.
+     *
+     *
+     * @throws ModelNotFoundException
+     */
     public function renamePasskey(int $passkeyId, string $newName)
     {
         $passkey = Passkey::findOrFail($passkeyId);
@@ -70,6 +91,11 @@ class Passkeys extends Component
         ]);
     }
 
+    /**
+     * Render the passkey management component.
+     *
+     * @return View
+     */
     public function render()
     {
         $passkeys = Passkey::where('user_id', Auth::id())

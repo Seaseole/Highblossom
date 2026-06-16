@@ -6,6 +6,13 @@ namespace App\Actions\Seo;
 
 use App\Models\SeoStaticRoute;
 
+/**
+ * Generate the content of the robots.txt file.
+ *
+ * Compiles standard disallow rules for admin/auth routes together
+ * with dynamic disallow paths for routes flagged as no-index, and
+ * appends the sitemap URL.
+ */
 final readonly class GenerateRobotsTxt
 {
     public function __construct(
@@ -13,6 +20,9 @@ final readonly class GenerateRobotsTxt
         private string $sitemapUrl,
     ) {}
 
+    /**
+     * Generate the robots.txt content.
+     */
     public function execute(): string
     {
         $lines = [

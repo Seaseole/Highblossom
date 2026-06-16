@@ -11,9 +11,10 @@ final readonly class ContactNumberService
     /**
      * Build contact numbers collection from company settings.
      *
-     * @param  string  $whatsappDefault  Default WhatsApp number
-     * @param  array  $whatsappAdditional  Additional WhatsApp numbers
-     * @param  string  $primaryPhone  Primary phone number
+     * @param string $whatsappDefault    Default WhatsApp number
+     * @param array  $whatsappAdditional Additional WhatsApp numbers
+     * @param string $primaryPhone       Primary phone number
+     *
      * @return Collection Collection of contact number objects
      */
     public function buildContactNumbers(string $whatsappDefault, array $whatsappAdditional, string $primaryPhone): Collection

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\ContactMessageReceived;
@@ -8,12 +10,24 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Listener that sends an email notification when a contact message is received.
+ */
 class SendContactMessageEmail implements ShouldQueue
 {
+    /**
+     * Create a new listener instance.
+     */
     public function __construct(
         protected SettingsManager $settings
     ) {}
 
+    /**
+     * Handle the event.
+     *
+     *
+     * @throws \Exception
+     */
     public function handle(ContactMessageReceived $event): void
     {
         try {

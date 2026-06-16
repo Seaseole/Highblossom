@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Sub-categories of glass types with auto-slugging.
+ * Maps to the `glass_sub_categories` database table.
+ */
 final class GlassSubCategory extends Model
 {
     protected $fillable = [

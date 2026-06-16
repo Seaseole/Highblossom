@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
+/**
+ * Form block for building dynamic forms.
+ */
 final class FormBlock extends AbstractBlock
 {
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'form';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -25,6 +36,9 @@ final class FormBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -34,6 +48,9 @@ final class FormBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [

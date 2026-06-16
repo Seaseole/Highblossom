@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Services;
 
+/**
+ * Renders content blocks by type with depth tracking.
+ */
 class BlockRenderer
 {
     protected BlockRegistry $registry;
@@ -10,6 +15,9 @@ class BlockRenderer
 
     protected int $currentDepth = 0;
 
+    /**
+     * Create a new block renderer instance.
+     */
     public function __construct(BlockRegistry $registry)
     {
         $this->registry = $registry;
@@ -32,7 +40,7 @@ class BlockRenderer
     /**
      * Render a block from variadic arguments (type, attributes).
      *
-     * @param  mixed  ...$args
+     * @param mixed ...$args
      */
     public function renderArray(...$args): string
     {

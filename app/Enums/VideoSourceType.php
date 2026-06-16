@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+/**
+ * Enum representing supported video source types.
+ */
 enum VideoSourceType: string
 {
     case LOCAL_FILE = 'local_file';

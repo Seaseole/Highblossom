@@ -1,24 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 use Highblossom\ContentBlocks\Services\OEmbedResolver;
 
+/**
+ * Embed block for oEmbed-powered media embeds.
+ */
 final class EmbedBlock extends AbstractBlock
 {
     private OEmbedResolver $resolver;
 
+    /**
+     * Create a new embed block instance.
+     */
     public function __construct(OEmbedResolver $resolver)
     {
         $this->resolver = $resolver;
     }
 
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'embed';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -27,6 +41,9 @@ final class EmbedBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -35,6 +52,9 @@ final class EmbedBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [
@@ -43,6 +63,9 @@ final class EmbedBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Normalize attributes by resolving oEmbed data.
+     */
     public function normalizeAttributes(array $attributes): array
     {
         $attributes = parent::normalizeAttributes($attributes);

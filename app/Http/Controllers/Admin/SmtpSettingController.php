@@ -8,22 +8,32 @@ use App\Http\Requests\Admin\SmtpSettingRequest;
 use App\Http\Requests\Admin\TestEmailRequest;
 use App\Services\SmtpSettingService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
+/**
+ * Manage SMTP settings and send test emails.
+ */
 final class SmtpSettingController
 {
     public function __construct(
         private readonly SmtpSettingService $smtpService,
     ) {}
 
+    /**
+     * Display the SMTP settings page.
+     */
     public function index(): View
     {
         $settings = $this->smtpService->getSettings();
-        \Illuminate\Support\Facades\Log::info('Settings:', $settings);
+        Log::info('Settings:', $settings);
 
         return view('admin.smtp.index', compact('settings'));
     }
 
+    /**
+     * Update SMTP settings.
+     */
     public function update(SmtpSettingRequest $request): RedirectResponse
     {
         $this->smtpService->update($request->validated());
@@ -31,6 +41,9 @@ final class SmtpSettingController
         return redirect()->back()->with('success', 'SMTP settings saved successfully.');
     }
 
+    /**
+     * Send a test email to verify SMTP configuration.
+     */
     public function sendTest(TestEmailRequest $request): RedirectResponse
     {
         $success = $this->smtpService->sendTestEmail($request->input('test_email'));

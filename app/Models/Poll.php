@@ -1,11 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
+/**
+ * Polls with multiple choice options and voting.
+ * Maps to the `polls` database table.
+ */
 class Poll extends Model
 {
     protected $fillable = [
@@ -23,6 +29,9 @@ class Poll extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Get the votes for this poll.
+     */
     public function votes(): HasMany
     {
         return $this->hasMany(PollVote::class);

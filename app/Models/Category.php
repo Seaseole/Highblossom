@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
+/**
+ * Blog post categories with auto-slugging.
+ * Maps to the `categories` database table.
+ */
 final class Category extends Model
 {
     protected $fillable = [
@@ -16,11 +20,17 @@ final class Category extends Model
         'description',
     ];
 
+    /**
+     * Get the posts in this category.
+     */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'post_category');
     }
 
+    /**
+     * Boot the model and auto-generate slug on creating/updating.
+     */
     protected static function boot()
     {
         parent::boot();

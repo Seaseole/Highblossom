@@ -8,12 +8,18 @@ use App\Http\Requests\Admin\VideoUploadRequest;
 use App\Services\VideoUploadService;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Handle video upload requests for the admin panel.
+ */
 final class VideoUploadController
 {
     public function __construct(
         private readonly VideoUploadService $videoUploadService,
     ) {}
 
+    /**
+     * Upload a video and return its path, URL, and optional thumbnail.
+     */
     public function upload(VideoUploadRequest $request): JsonResponse
     {
         try {

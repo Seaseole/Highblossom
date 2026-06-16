@@ -11,8 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+/**
+ * Manage CRUD operations for staff members.
+ */
 final class StaffController extends Controller
 {
+    /**
+     * Display a listing of all staff members ordered by position.
+     */
     public function index(): View
     {
         $staff = Staff::orderBy('order')->get();
@@ -20,11 +26,17 @@ final class StaffController extends Controller
         return view('admin.staff.index', compact('staff'));
     }
 
+    /**
+     * Show the form for creating a new staff member.
+     */
     public function create(): View
     {
         return view('admin.staff.create');
     }
 
+    /**
+     * Store a newly created staff member in storage.
+     */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -46,11 +58,17 @@ final class StaffController extends Controller
         return redirect()->route('admin.staff.index')->with('success', 'Staff member added.');
     }
 
+    /**
+     * Show the form for editing the specified staff member.
+     */
     public function edit(Staff $staff): View
     {
         return view('admin.staff.edit', compact('staff'));
     }
 
+    /**
+     * Update the specified staff member in storage.
+     */
     public function update(Request $request, Staff $staff): RedirectResponse
     {
         $validated = $request->validate([
@@ -76,6 +94,9 @@ final class StaffController extends Controller
         return redirect()->route('admin.staff.index')->with('success', 'Staff member updated.');
     }
 
+    /**
+     * Remove the specified staff member from storage.
+     */
     public function destroy(Staff $staff): RedirectResponse
     {
         if ($staff->photo_path) {

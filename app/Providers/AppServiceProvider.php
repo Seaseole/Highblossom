@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
-use App\Models\CompanySetting;
+use App\Http\View\Composers\GlobalSettingsComposer;
 use App\Services\AvailabilityService;
 use App\Services\Contracts\AvailabilityServiceInterface;
+use App\Services\Settings\SettingsManager;
+use Auditify\Facades\Auditify;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
@@ -16,6 +20,11 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Opcodes\LogViewer\Facades\LogViewer;
 
+/**
+ * Application service provider.
+ *
+ * Registers core application services, global view composers, and production-safe defaults.
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,8 +33,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(
-            \App\Services\Settings\SettingsManager::class,
-            \App\Services\Settings\SettingsManager::class
+            SettingsManager::class,
+            SettingsManager::class
         );
 
         $this->app->singleton(
@@ -46,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         // Share global settings via View Composer
-        View::composer('*', \App\Http\View\Composers\GlobalSettingsComposer::class);
+        View::composer('*', GlobalSettingsComposer::class);
 
         Model::preventLazyLoading(! app()->isProduction());
 
@@ -59,6 +68,14 @@ class AppServiceProvider extends ServiceProvider
         // Grant Super Admin all permissions
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
+        });
+        Gate::define('viewSchedulerList', function ($user) {
+            return $user->hasRole('Super Admin') ? true : null;
+        });
+
+        Auditify::auth(function ($request) {
+            // Option A: Check user role (e.g. if using Spatie Role package)
+            return $request->user() && $request->user()->hasRole('Super Admin');
         });
     }
 

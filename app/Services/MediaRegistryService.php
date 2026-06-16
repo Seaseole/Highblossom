@@ -9,8 +9,14 @@ use App\Models\MediaUsage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service for tracking media file usage across the application.
+ */
 final class MediaRegistryService
 {
+    /**
+     * Register a media file and its usage by a model attribute.
+     */
     public function register(string $path, string $originalName, int $fileSize, Model $model, string $attribute): MediaRegistry
     {
         $registry = MediaRegistry::firstOrCreate(['path' => $path], [
@@ -28,6 +34,9 @@ final class MediaRegistryService
         return $registry;
     }
 
+    /**
+     * Remove media usage record for a model attribute.
+     */
     public function unregister(Model $model, string $attribute): void
     {
         MediaUsage::where('model_type', get_class($model))
@@ -36,6 +45,9 @@ final class MediaRegistryService
             ->delete();
     }
 
+    /**
+     * Force delete a media registry entry and its file if it has no remaining usages.
+     */
     public function forceDelete(int $mediaRegistryId): bool
     {
         $registry = MediaRegistry::find($mediaRegistryId);

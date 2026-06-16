@@ -1,10 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Concerns;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Validation rules for user passwords.
+ *
+ * Provides reusable password and current-password validation rule sets.
+ */
 trait PasswordValidationRules
 {
     /**

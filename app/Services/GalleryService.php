@@ -8,12 +8,18 @@ use App\Models\GalleryImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service for managing gallery images.
+ */
 final class GalleryService
 {
     public function __construct(
         private MediaRegistryService $mediaRegistryService
     ) {}
 
+    /**
+     * Create a new gallery image with media registry tracking.
+     */
     public function create(array $data, Request $request): GalleryImage
     {
         $path = $this->resolveImagePath($request, null);
@@ -34,6 +40,9 @@ final class GalleryService
         return $galleryImage;
     }
 
+    /**
+     * Update a gallery image with image replacement and media registry tracking.
+     */
     public function update(GalleryImage $item, array $data, Request $request): GalleryImage
     {
         $oldPath = $item->image_path;
@@ -66,6 +75,9 @@ final class GalleryService
         return $item->fresh();
     }
 
+    /**
+     * Delete a gallery image and its media registry entry.
+     */
     public function delete(GalleryImage $item): void
     {
         $this->mediaRegistryService->unregister($item, 'image_path');
@@ -78,6 +90,9 @@ final class GalleryService
         $item->delete();
     }
 
+    /**
+     * Resolve the image path from request input, file upload, or existing path.
+     */
     private function resolveImagePath(Request $request, ?string $existingPath): ?string
     {
         // Handle removal request first

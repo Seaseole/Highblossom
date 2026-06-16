@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+/**
+ * Service for reading and writing .env configuration files.
+ */
 final class EnvEditor
 {
+    /** @var string Path to the .env file */
     private string $path;
 
     public function __construct()
@@ -13,6 +17,9 @@ final class EnvEditor
         $this->path = base_path('.env');
     }
 
+    /**
+     * Get a value from the .env file.
+     */
     public function get(string $key, mixed $default = null): mixed
     {
         if (! file_exists($this->path)) {
@@ -36,6 +43,9 @@ final class EnvEditor
         return $default;
     }
 
+    /**
+     * Set a value in the .env file, creating or replacing the key.
+     */
     public function set(string $key, mixed $value): void
     {
         if (! file_exists($this->path)) {
@@ -67,6 +77,9 @@ final class EnvEditor
         file_put_contents($this->path, implode(PHP_EOL, $lines).PHP_EOL);
     }
 
+    /**
+     * Get all key-value pairs from the .env file.
+     */
     public function all(): array
     {
         if (! file_exists($this->path)) {
@@ -91,6 +104,9 @@ final class EnvEditor
         return $result;
     }
 
+    /**
+     * Parse a single .env line into key and value.
+     */
     private function parseLine(string $line): array
     {
         $trimmed = trim($line);
@@ -105,6 +121,9 @@ final class EnvEditor
         return [trim($parts[0]), trim($parts[1])];
     }
 
+    /**
+     * Wrap a value in double quotes if it contains spaces or special characters.
+     */
     private function quote(string $value): string
     {
         if (str_contains($value, ' ') || str_contains($value, '#')) {
@@ -114,6 +133,9 @@ final class EnvEditor
         return $value;
     }
 
+    /**
+     * Remove surrounding double quotes from a value.
+     */
     private function unquote(string $value): string
     {
         if (str_starts_with($value, '"') && str_ends_with($value, '"')) {

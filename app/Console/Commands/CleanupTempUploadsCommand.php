@@ -7,6 +7,11 @@ namespace App\Console\Commands;
 use App\Services\Content\ContentBlockCleanupService;
 use Illuminate\Console\Command;
 
+/**
+ * Console command to clean up temporary uploaded files older than a specified age.
+ *
+ * Delegates the actual cleanup to ContentBlockCleanupService.
+ */
 final class CleanupTempUploadsCommand extends Command
 {
     /**
@@ -24,6 +29,9 @@ final class CleanupTempUploadsCommand extends Command
      */
     protected $description = 'Clean up temporary uploaded files older than the specified hours (default: 24)';
 
+    /**
+     * Create a new command instance.
+     */
     public function __construct(
         protected ContentBlockCleanupService $cleanupService
     ) {

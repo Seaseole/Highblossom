@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Services;
 
 use Highblossom\ContentBlocks\Contracts\BlockInterface;
@@ -8,6 +10,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+/**
+ * Base class for all content blocks with common rendering logic.
+ */
 abstract class AbstractBlock implements BlockInterface
 {
     protected string $viewNamespace = 'content-blocks';

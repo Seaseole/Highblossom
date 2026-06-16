@@ -12,6 +12,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * Manage CRUD operations for glass types.
+ */
 final readonly class GlassTypeController
 {
     public function __construct(
@@ -19,6 +22,9 @@ final readonly class GlassTypeController
         private GlassSubCategoryService $glassSubCategoryService,
     ) {}
 
+    /**
+     * Display a paginated list of glass types.
+     */
     public function index(): View
     {
         $glassTypes = GlassType::query()->ordered()->with('subCategories')->paginate(15);
@@ -26,11 +32,17 @@ final readonly class GlassTypeController
         return view('admin.glass-types.index', compact('glassTypes'));
     }
 
+    /**
+     * Show the form for creating a new glass type.
+     */
     public function create(): View
     {
         return view('admin.glass-types.create');
     }
 
+    /**
+     * Store a newly created glass type in storage.
+     */
     public function store(GlassTypeRequest $request): RedirectResponse
     {
         $this->glassTypeService->create($request->validated());
@@ -40,6 +52,9 @@ final readonly class GlassTypeController
             ->with('success', __('messages.glass_type_created'));
     }
 
+    /**
+     * Show the form for editing the specified glass type.
+     */
     public function edit(GlassType $glassType): View
     {
         $glassSubCategories = $this->glassSubCategoryService->getByGlassType($glassType);
@@ -47,6 +62,9 @@ final readonly class GlassTypeController
         return view('admin.glass-types.edit', compact('glassType', 'glassSubCategories'));
     }
 
+    /**
+     * Update the specified glass type in storage.
+     */
     public function update(GlassTypeRequest $request, GlassType $glassType): RedirectResponse
     {
         $this->glassTypeService->update($glassType, $request->validated());
@@ -56,6 +74,9 @@ final readonly class GlassTypeController
             ->with('success', __('messages.glass_type_updated'));
     }
 
+    /**
+     * Remove the specified glass type from storage.
+     */
     public function destroy(GlassType $glassType): RedirectResponse
     {
         $this->glassTypeService->delete($glassType);

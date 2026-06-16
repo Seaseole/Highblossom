@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\StaffFactory;
@@ -18,6 +20,12 @@ class Staff extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Get the full URL to the staff member's photo.
+     */
+    /**
+     * Get the full URL to the staff member's photo.
+     */
     public function getPhotoUrlAttribute(): string
     {
         return $this->photo_path ? Storage::url($this->photo_path) : asset('placeholder.gif');

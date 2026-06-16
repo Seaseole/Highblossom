@@ -8,8 +8,16 @@ use App\Models\GalleryImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Service for managing the media library (gallery image uploads).
+ */
 final class MediaLibraryService
 {
+    /**
+     * Create a new media library entry from request data.
+     *
+     * @throws \RuntimeException When no image is provided or upload fails
+     */
     public function create(array $data, Request $request): GalleryImage
     {
         $imagePath = $this->resolveImagePath($request);
@@ -27,6 +35,11 @@ final class MediaLibraryService
         ]);
     }
 
+    /**
+     * Resolve image path from request input or file upload.
+     *
+     * @throws \RuntimeException When file upload fails
+     */
     private function resolveImagePath(Request $request): ?string
     {
         $imagePath = $request->input('image_path');

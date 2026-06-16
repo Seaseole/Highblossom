@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bookings;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validate and authorize booking submissions from public users.
+ */
 final class StoreBookingRequest extends FormRequest
 {
     /**
-     * Rule 6: Authorize every action
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true; // Public users can create bookings (leads)
+        return true;
     }
 
     /**
-     * Rule 7: Strict validation with Rule objects
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, mixed>
      */
     public function rules(): array
     {

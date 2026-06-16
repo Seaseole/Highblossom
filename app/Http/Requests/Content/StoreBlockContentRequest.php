@@ -10,6 +10,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
+/**
+ * Validate and authorize content block storage requests.
+ */
 final class StoreBlockContentRequest extends FormRequest
 {
     /**

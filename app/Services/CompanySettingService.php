@@ -10,9 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service for managing company-wide settings including logos, favicons,
+ * working hours, social links, and environment configuration.
+ */
 #[Singleton(name: 'company_settings')]
 final class CompanySettingService
 {
+    /** @var list<string> Fields that are saved as simple key-value pairs */
     private const SIMPLE_FIELDS = [
         'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
@@ -20,10 +25,14 @@ final class CompanySettingService
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
     ];
 
+    /** @var list<string> Day keys used for working hours configuration */
     private const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
     public function __construct(private readonly EnvEditor $envEditor) {}
 
+    /**
+     * Update company settings from form data and request.
+     */
     public function update(array $data, Request $request): void
     {
         $this->handleLogoUpload($request);
@@ -34,6 +43,9 @@ final class CompanySettingService
         CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
     }
 
+    /**
+     * Persist environment variable changes from the data array.
+     */
     private function handleEnvUpdate(array $data): void
     {
         if (isset($data['env']) && is_array($data['env'])) {
@@ -44,6 +56,9 @@ final class CompanySettingService
         }
     }
 
+    /**
+     * Handle business logo upload, replacement, or removal.
+     */
     private function handleLogoUpload(Request $request): void
     {
         $oldLogo = CompanySetting::get('business_logo', '');
@@ -76,6 +91,9 @@ final class CompanySettingService
         }
     }
 
+    /**
+     * Delete a stored image from the public disk if it exists.
+     */
     private function deleteStoredImage(?string $path): void
     {
         if (blank($path)) {
@@ -94,6 +112,9 @@ final class CompanySettingService
         }
     }
 
+    /**
+     * Handle favicon upload, replacement, or removal.
+     */
     private function handleFaviconUpload(Request $request): void
     {
         $imagePath = $request->input('favicon_path');
@@ -122,6 +143,9 @@ final class CompanySettingService
         }
     }
 
+    /**
+     * Persist simple scalar fields to the company settings store.
+     */
     private function saveSimpleFields(array $data): void
     {
         foreach (self::SIMPLE_FIELDS as $field) {
@@ -131,6 +155,9 @@ final class CompanySettingService
         }
     }
 
+    /**
+     * Persist JSON-encoded array fields to the company settings store.
+     */
     private function saveJsonFields(array $data): void
     {
         CompanySetting::set('whatsapp_additional_numbers', $data['whatsapp_additional_numbers'] ?? [], 'json');
@@ -139,6 +166,9 @@ final class CompanySettingService
         CompanySetting::set('announcements', $data['announcements'] ?? [], 'json');
     }
 
+    /**
+     * Normalize and fill defaults for the working hours array.
+     */
     private function prepareWorkingHours(array $workingHours): array
     {
         foreach (self::DAY_KEYS as $day) {
@@ -152,6 +182,9 @@ final class CompanySettingService
         return $workingHours;
     }
 
+    /**
+     * Get all default settings merged with any stored overrides.
+     */
     public function getDefaultSettings(): array
     {
         return [
@@ -187,6 +220,9 @@ final class CompanySettingService
         ];
     }
 
+    /**
+     * Get default working hours for all days of the week.
+     */
     private function getDefaultWorkingHours(): array
     {
         return [

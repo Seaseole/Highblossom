@@ -6,8 +6,17 @@ namespace App\Services\DataTransferObjects;
 
 use InvalidArgumentException;
 
+/**
+ * Data transfer object representing SEO metadata for a page.
+ */
 final readonly class SeoMetadata
 {
+    /**
+     * @param float  $priority   Sitemap priority between 0.0 and 1.0
+     * @param string $changefreq Sitemap change frequency
+     *
+     * @throws InvalidArgumentException When priority is out of range or changefreq is invalid
+     */
     public function __construct(
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
@@ -37,6 +46,9 @@ final readonly class SeoMetadata
         }
     }
 
+    /**
+     * Create a new instance from an associative array.
+     */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -60,6 +72,9 @@ final readonly class SeoMetadata
         );
     }
 
+    /**
+     * Convert the DTO to an associative array.
+     */
     public function toArray(): array
     {
         return [
@@ -83,6 +98,9 @@ final readonly class SeoMetadata
         ];
     }
 
+    /**
+     * Create a new instance with specific fields overridden.
+     */
     public function withOverrides(array $overrides): self
     {
         $data = $this->toArray();
@@ -96,16 +114,25 @@ final readonly class SeoMetadata
         return self::fromArray($data);
     }
 
+    /**
+     * Get the effective title, falling back from OG title to meta title.
+     */
     public function getEffectiveTitle(): string
     {
         return $this->ogTitle ?? $this->metaTitle ?? '';
     }
 
+    /**
+     * Get the effective description, falling back from OG description to meta description.
+     */
     public function getEffectiveDescription(): string
     {
         return $this->ogDescription ?? $this->metaDescription ?? '';
     }
 
+    /**
+     * Get the effective image URL, falling back from OG image to Twitter image.
+     */
     public function getEffectiveImage(): ?string
     {
         return $this->ogImage ?? $this->twitterImage ?? null;

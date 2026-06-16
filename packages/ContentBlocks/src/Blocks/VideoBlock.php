@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
+/**
+ * Video block supporting YouTube, Vimeo, Dailymotion, Facebook, and local files.
+ */
 class VideoBlock extends AbstractBlock
 {
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'video';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -23,6 +34,9 @@ class VideoBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -35,6 +49,9 @@ class VideoBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [

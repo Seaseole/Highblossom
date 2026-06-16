@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\GlassTypeController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
@@ -35,4 +36,4 @@ Route::get('/api/content-blocks/poll/{poll}/results', [PollController::class, 'r
 
 require __DIR__.'/settings.php';
 
-Route::get('api/glass-types/{glassType}/sub-categories', [\App\Http\Controllers\Admin\GlassTypeController::class, 'getSubCategories'])->name('api.glass-types.sub-categories');
+Route::get('api/glass-types/{glassType}/sub-categories', [GlassTypeController::class, 'getSubCategories'])->name('api.glass-types.sub-categories');

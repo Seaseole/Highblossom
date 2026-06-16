@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Customer quote requests for glass services with status tracking.
+ * Maps to the `quotes` database table.
+ */
 class Quote extends Model
 {
     use HasFactory;

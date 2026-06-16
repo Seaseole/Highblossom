@@ -10,10 +10,16 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * SMTP test email using Laravel Mailables Envelope/Content pattern.
+ */
 class TestEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -21,6 +27,9 @@ class TestEmail extends Mailable
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
         return new Content(

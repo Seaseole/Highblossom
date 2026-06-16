@@ -1,24 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 use Highblossom\ContentBlocks\Services\BlockRenderer;
 
+/**
+ * Columns block for multi-column layouts.
+ */
 final class ColumnsBlock extends AbstractBlock
 {
     private BlockRenderer $blockRenderer;
 
+    /**
+     * Create a new columns block instance.
+     */
     public function __construct(BlockRenderer $blockRenderer)
     {
         $this->blockRenderer = $blockRenderer;
     }
 
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'columns';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -28,6 +42,9 @@ final class ColumnsBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -36,6 +53,9 @@ final class ColumnsBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [
@@ -44,6 +64,9 @@ final class ColumnsBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Build the columns view with column data.
+     */
     public function buildView(array $attributes): string
     {
         $columns = $attributes['columns'] ?? [];

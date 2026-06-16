@@ -6,8 +6,14 @@ namespace App\Services;
 
 use App\Models\ContactMessage;
 
+/**
+ * Service for managing contact form messages.
+ */
 final class ContactMessageService
 {
+    /**
+     * Mark a contact message as read.
+     */
     public function markAsRead(ContactMessage $message): ContactMessage
     {
         if (! $message->is_read) {
@@ -17,6 +23,9 @@ final class ContactMessageService
         return $message;
     }
 
+    /**
+     * Delete a contact message.
+     */
     public function delete(ContactMessage $message): void
     {
         $message->delete();

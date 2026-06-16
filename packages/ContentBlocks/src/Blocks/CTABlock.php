@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
+/**
+ * Call-to-action block with title, description, and button.
+ */
 class CTABlock extends AbstractBlock
 {
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'cta';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -22,6 +33,9 @@ class CTABlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -33,6 +47,9 @@ class CTABlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [
@@ -44,6 +61,9 @@ class CTABlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the view name for this block.
+     */
     protected function getViewName(): string
     {
         return 'cta';

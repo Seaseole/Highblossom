@@ -7,8 +7,16 @@ namespace App\Http\View\Composers;
 use App\Services\Settings\SettingsManager;
 use Illuminate\View\View;
 
+/**
+ * View composer that injects global company settings into all views.
+ *
+ * Maps snake_case settings from the SettingsManager to camelCase view variables.
+ */
 final readonly class GlobalSettingsComposer
 {
+    /**
+     * Create a new composer instance.
+     */
     public function __construct(
         private SettingsManager $settings
     ) {}

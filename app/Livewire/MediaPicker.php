@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\GalleryImage;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
+/**
+ * Pick or upload media images via a modal interface.
+ */
 final class MediaPicker extends Component
 {
     use WithFileUploads;
 
+    /** The name of the form field being populated. */
     #[Locked]
     public string $fieldName = 'image';
 
@@ -28,6 +34,7 @@ final class MediaPicker extends Component
 
     public string $category = 'all';
 
+    /** The uploaded image file. */
     public $upload;
 
     public string $uploadTitle = '';
@@ -44,17 +51,26 @@ final class MediaPicker extends Component
         'other' => 'Other',
     ];
 
+    /**
+     * Initialize the component with the target field name and optional current value.
+     */
     public function mount(string $fieldName = 'image', ?string $currentValue = null): void
     {
         $this->fieldName = $fieldName;
         $this->selectedImageUrl = $currentValue;
     }
 
+    /**
+     * Open the media picker modal.
+     */
     public function open(): void
     {
         $this->isOpen = true;
     }
 
+    /**
+     * Close the media picker modal and reset upload state.
+     */
     public function close(): void
     {
         $this->isOpen = false;
@@ -62,6 +78,12 @@ final class MediaPicker extends Component
         $this->uploadTitle = '';
     }
 
+    /**
+     * Select an image and dispatch the media-selected event.
+     *
+     *
+     * @throws ModelNotFoundException
+     */
     public function selectImage(int $imageId): void
     {
         $image = GalleryImage::findOrFail($imageId);
@@ -76,6 +98,9 @@ final class MediaPicker extends Component
         $this->close();
     }
 
+    /**
+     * Validate and upload a new image to the gallery, then select it.
+     */
     public function uploadImage(): void
     {
         $this->validate([
@@ -100,6 +125,12 @@ final class MediaPicker extends Component
         $this->dispatch('notify', message: 'Image uploaded successfully', type: 'success');
     }
 
+    /**
+     * Delete an image from the gallery and its storage disk.
+     *
+     *
+     * @throws ModelNotFoundException
+     */
     public function deleteImage(int $imageId): void
     {
         $image = GalleryImage::findOrFail($imageId);
@@ -113,11 +144,19 @@ final class MediaPicker extends Component
         $this->dispatch('notify', message: 'Image deleted successfully', type: 'success');
     }
 
+    /**
+     * Reset pagination when the search term changes.
+     */
     public function updatedSearch(): void
     {
         // Reset pagination when search changes
     }
 
+    /**
+     * Get the filtered, paginated images for the media picker gallery.
+     *
+     * @return LengthAwarePaginator
+     */
     public function getImagesProperty()
     {
         return GalleryImage::query()
@@ -128,6 +167,9 @@ final class MediaPicker extends Component
             ->paginate(12);
     }
 
+    /**
+     * Render the media picker component.
+     */
     public function render(): View
     {
         return view('livewire.media-picker');

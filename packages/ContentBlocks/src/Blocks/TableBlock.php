@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
+/**
+ * Table block with headers, rows, and caption support.
+ */
 final class TableBlock extends AbstractBlock
 {
+    /**
+     * Get the block type identifier.
+     */
     public function getType(): string
     {
         return 'table';
     }
 
+    /**
+     * Get the validation rules for this block.
+     */
     public function getValidationRules(): array
     {
         return [
@@ -23,6 +34,9 @@ final class TableBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the default attributes for this block.
+     */
     public function getDefaultAttributes(): array
     {
         return [
@@ -32,6 +46,9 @@ final class TableBlock extends AbstractBlock
         ];
     }
 
+    /**
+     * Get the attribute type casts.
+     */
     protected function getAttributeCasts(): array
     {
         return [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Actions\SendContactMessage;
@@ -18,8 +20,15 @@ use App\Models\Staff;
 use App\Services\ContactNumberService;
 use App\Services\Settings\SettingsManager;
 use App\Services\SiteService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Handle public-facing page requests for the main site.
+ */
 class SiteController extends Controller
 {
     public function __construct(
@@ -30,11 +39,23 @@ class SiteController extends Controller
         protected SettingsManager $settings
     ) {}
 
+    /**
+     * Display the homepage.
+     *
+     * @return View
+     */
     public function home()
     {
         return view('welcome', $this->siteService->getHomeData());
     }
 
+    /**
+     * Display the About Us page.
+     *
+     * @return View
+     *
+     * @throws NotFoundHttpException
+     */
     public function aboutUs()
     {
         $content = AboutUsContent::active()->first();
@@ -48,6 +69,11 @@ class SiteController extends Controller
         return view('site.about-us', compact('content', 'staff'));
     }
 
+    /**
+     * Display the Services listing page.
+     *
+     * @return View
+     */
     public function services(Request $request)
     {
         $perPage = 6;
@@ -60,6 +86,11 @@ class SiteController extends Controller
         return view('site.services', compact('services'));
     }
 
+    /**
+     * Display the Gallery index page.
+     *
+     * @return View
+     */
     public function gallery(Request $request)
     {
         $category = $request->input('category');
@@ -79,6 +110,11 @@ class SiteController extends Controller
         return view('site.gallery', compact('images', 'categories', 'category', 'galleryMetrics'));
     }
 
+    /**
+     * Display a single gallery image.
+     *
+     * @return View
+     */
     public function galleryShow(GalleryImage $galleryImage)
     {
         $galleryImage->load('category');
@@ -94,6 +130,11 @@ class SiteController extends Controller
         return view('site.gallery-show', compact('galleryImage', 'relatedImages'));
     }
 
+    /**
+     * Display the Contact page.
+     *
+     * @return View
+     */
     public function contact()
     {
         $whatsappDefault = $this->settings->whatsapp_number_default;
@@ -106,6 +147,11 @@ class SiteController extends Controller
         return view('site.contact', $contactData);
     }
 
+    /**
+     * Display the Quote request page.
+     *
+     * @return View
+     */
     public function quote()
     {
         $whatsappDefault = $this->settings->whatsapp_number_default;
@@ -121,6 +167,11 @@ class SiteController extends Controller
         return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes', 'glassSubCategories'));
     }
 
+    /**
+     * Handle contact form submission.
+     *
+     * @return RedirectResponse
+     */
     public function submitContact(ContactFormRequest $request)
     {
         $result = $this->sendContactMessage->handle($request);
@@ -128,6 +179,11 @@ class SiteController extends Controller
         return redirect()->back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 
+    /**
+     * Handle quote form submission.
+     *
+     * @return RedirectResponse
+     */
     public function submitQuote(QuoteFormRequest $request)
     {
         $result = $this->storeQuoteAction->execute($request);
@@ -135,6 +191,11 @@ class SiteController extends Controller
         return redirect()->back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 
+    /**
+     * Display the Blog index page.
+     *
+     * @return View
+     */
     public function blog(Request $request)
     {
         // Pass initial URL parameters to the view for Livewire component
@@ -145,6 +206,13 @@ class SiteController extends Controller
         return view('blog.index', compact('search', 'categorySlug', 'tagSlug'));
     }
 
+    /**
+     * Display a single blog post by slug.
+     *
+     * @return View
+     *
+     * @throws ModelNotFoundException
+     */
     public function blogShow(string $slug)
     {
         $post = Post::published()->where('slug', $slug)->with('categories', 'tags')->firstOrFail();

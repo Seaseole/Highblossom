@@ -10,8 +10,14 @@ use App\Models\Quote;
 use App\Models\User;
 use Illuminate\View\View;
 
+/**
+ * Display the admin dashboard with key metrics.
+ */
 final class DashboardController
 {
+    /**
+     * Show the admin dashboard with aggregate statistics.
+     */
     public function __invoke(): View
     {
         $totalUsers = User::count();

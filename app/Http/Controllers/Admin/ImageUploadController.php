@@ -8,12 +8,18 @@ use App\Http\Requests\Admin\ImageUploadRequest;
 use App\Services\ImageUploadService;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Handle image upload requests for the admin panel.
+ */
 final class ImageUploadController
 {
     public function __construct(
         private readonly ImageUploadService $imageUploadService,
     ) {}
 
+    /**
+     * Upload an image to the specified folder.
+     */
     public function upload(ImageUploadRequest $request): JsonResponse
     {
         try {

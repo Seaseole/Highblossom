@@ -11,8 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+/**
+ * Manage CRUD operations for partner logos and links.
+ */
 final class PartnerController extends Controller
 {
+    /**
+     * Display a list of all partners ordered by position.
+     */
     public function index(): View
     {
         $partners = Partner::orderBy('order')->get();
@@ -20,11 +26,17 @@ final class PartnerController extends Controller
         return view('admin.partners.index', compact('partners'));
     }
 
+    /**
+     * Show the form for creating a new partner.
+     */
     public function create(): View
     {
         return view('admin.partners.create');
     }
 
+    /**
+     * Store a newly created partner in storage.
+     */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -44,11 +56,17 @@ final class PartnerController extends Controller
         return redirect()->route('admin.partners.index')->with('success', 'Partner added successfully.');
     }
 
+    /**
+     * Show the form for editing the specified partner.
+     */
     public function edit(Partner $partner): View
     {
         return view('admin.partners.edit', compact('partner'));
     }
 
+    /**
+     * Update the specified partner in storage.
+     */
     public function update(Request $request, Partner $partner): RedirectResponse
     {
         $validated = $request->validate([
@@ -70,6 +88,9 @@ final class PartnerController extends Controller
         return redirect()->route('admin.partners.index')->with('success', 'Partner updated successfully.');
     }
 
+    /**
+     * Remove the specified partner from storage.
+     */
     public function destroy(Partner $partner): RedirectResponse
     {
         Storage::disk('public')->delete($partner->logo_path);

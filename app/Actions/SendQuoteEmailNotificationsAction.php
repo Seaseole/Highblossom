@@ -10,6 +10,12 @@ use App\Services\Settings\SettingsManager;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Send email notifications for a new quote submission.
+ *
+ * Queues admin notification emails and a customer confirmation
+ * email based on the configured notification settings.
+ */
 final readonly class SendQuoteEmailNotificationsAction
 {
     public function __construct(
@@ -19,7 +25,7 @@ final readonly class SendQuoteEmailNotificationsAction
     /**
      * Send queued email notifications for the quote.
      *
-     * @param  Quote  $quote  The quote to send notifications for
+     * @param Quote $quote The quote to send notifications for
      */
     public function execute(Quote $quote): void
     {
@@ -44,6 +50,8 @@ final readonly class SendQuoteEmailNotificationsAction
 
     /**
      * Send queued emails to admin and customer.
+     *
+     * @param array<string> $adminEmails
      */
     private function sendEmails(Quote $quote, array $adminEmails): void
     {
@@ -95,6 +103,9 @@ final readonly class SendQuoteEmailNotificationsAction
         return [];
     }
 
+    /**
+     * Invoke the action as a callable.
+     */
     public function __invoke(Quote $quote): void
     {
         $this->execute($quote);

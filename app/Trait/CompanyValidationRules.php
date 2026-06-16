@@ -1,9 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Trait;
 
+/**
+ * Validation rules for company settings.
+ *
+ * Provides a reusable set of validation rules for company configuration fields.
+ */
 trait CompanyValidationRules
 {
+    /**
+     * Get the validation rules for company settings.
+     *
+     * @return array<string, array<int, string>>
+     */
     public function validateCompanyRules(): array
     {
         return [

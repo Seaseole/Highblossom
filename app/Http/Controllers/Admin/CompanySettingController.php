@@ -6,18 +6,25 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\CompanySettingRequest;
 use App\Services\CompanySettingService;
+use App\Services\EnvEditor;
 use App\Services\SeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * Manage company-wide settings (general, gallery, and environment).
+ */
 final class CompanySettingController
 {
     public function __construct(
         private readonly CompanySettingService $settingService,
         private readonly SeoService $seoService,
-        private readonly \App\Services\EnvEditor $envEditor,
+        private readonly EnvEditor $envEditor,
     ) {}
 
+    /**
+     * Display the company settings page.
+     */
     public function index(): View
     {
 
@@ -30,6 +37,9 @@ final class CompanySettingController
         return view('admin.settings.index', compact('settings', 'availableRoutes', 'envConfig'));
     }
 
+    /**
+     * Display the gallery settings page.
+     */
     public function gallerySettings(): View
     {
         $settings = $this->settingService->getDefaultSettings();
@@ -37,6 +47,9 @@ final class CompanySettingController
         return view('admin.gallery.settings', compact('settings'));
     }
 
+    /**
+     * Update gallery-specific settings.
+     */
     public function updateGallerySettings(CompanySettingRequest $request): RedirectResponse
     {
         $this->settingService->update($request->validated(), $request);
@@ -44,6 +57,9 @@ final class CompanySettingController
         return redirect()->route('admin.gallery-settings.index')->with('success', __('messages.settings_saved'));
     }
 
+    /**
+     * Update general company settings.
+     */
     public function update(CompanySettingRequest $request): RedirectResponse
     {
         $this->settingService->update($request->validated(), $request);
@@ -52,9 +68,6 @@ final class CompanySettingController
 
         if ($request->has('tab')) {
             $redirect->withInput(['tab' => $request->input('tab')]);
-            // Better yet, just append it to the URL if we can,
-            // but redirect()->back() usually doesn't allow easy param appending.
-            // Let's use redirect()->to() with the previous URL + tab if it exists.
             $previousUrl = url()->previous();
             $tab = $request->input('tab');
 

@@ -7,12 +7,22 @@ namespace App\Actions\Seo;
 use App\Models\SeoStaticRoute;
 use Illuminate\Support\Collection;
 
+/**
+ * Build the XML sitemap for the application.
+ *
+ * Collects indexable static routes from the database and generates
+ * a valid XML sitemap with loc, lastmod, changefreq, and priority
+ * elements for each URL.
+ */
 final readonly class BuildSitemap
 {
     public function __construct(
         private string $baseUrl,
     ) {}
 
+    /**
+     * Execute sitemap generation.
+     */
     public function execute(): string
     {
         $urls = $this->collectUrls();
@@ -29,6 +39,11 @@ final readonly class BuildSitemap
         return $xml;
     }
 
+    /**
+     * Collect all indexable route URLs from the database.
+     *
+     * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
+     */
     private function collectUrls(): Collection
     {
         $urls = collect();
@@ -46,6 +61,9 @@ final readonly class BuildSitemap
         return $urls;
     }
 
+    /**
+     * Resolve a route name to its full URL.
+     */
     private function resolveRouteUrl(string $routeName): string
     {
         try {
@@ -55,6 +73,11 @@ final readonly class BuildSitemap
         }
     }
 
+    /**
+     * Build a <url> XML element for the sitemap.
+     *
+     * @param array{loc: string, lastmod: string|null, changefreq: string, priority: string} $url
+     */
     private function buildUrlElement(array $url): string
     {
         $element = '  <url>'.PHP_EOL;

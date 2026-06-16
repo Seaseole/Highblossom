@@ -10,9 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service for managing the About Us page content.
+ */
 #[Singleton(name: 'about_us')]
 final class AboutUsService
 {
+    /**
+     * Get existing content or create with defaults if none exists.
+     */
     public function getOrCreateContent(): AboutUsContent
     {
         $content = AboutUsContent::first();
@@ -31,6 +37,9 @@ final class AboutUsService
         return $content;
     }
 
+    /**
+     * Update About Us content with hero image handling.
+     */
     public function update(array $data, Request $request): AboutUsContent
     {
         $content = $this->getOrCreateContent();
@@ -49,6 +58,9 @@ final class AboutUsService
         return $content;
     }
 
+    /**
+     * Handle hero image upload, replacement, or removal.
+     */
     private function handleHeroImage(AboutUsContent $content, Request $request): void
     {
         // Handle removal request first

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions;
 
 use App\Events\ContactMessageReceived;
@@ -7,6 +9,13 @@ use App\Http\Requests\ContactFormRequest;
 use App\Models\ContactMessage;
 use App\Services\IdempotencyService;
 
+/**
+ * Process and store a contact form submission.
+ *
+ * Validates the incoming contact request, checks for duplicate
+ * submissions via idempotency token, persists the message to
+ * the database, and dispatches a notification event.
+ */
 class SendContactMessage
 {
     private IdempotencyService $idempotencyService;
@@ -16,6 +25,11 @@ class SendContactMessage
         $this->idempotencyService = $idempotencyService;
     }
 
+    /**
+     * Handle the contact form submission.
+     *
+     * @return array<string, mixed>
+     */
     public function handle(ContactFormRequest $request): array
     {
         // Check for duplicate submission using idempotency token

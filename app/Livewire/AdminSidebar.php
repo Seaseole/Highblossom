@@ -12,6 +12,9 @@ use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/**
+ * Render the admin sidebar with theme toggle, mobile menu, and company info.
+ */
 final class AdminSidebar extends Component
 {
     public string $theme = 'auto';
@@ -24,6 +27,9 @@ final class AdminSidebar extends Component
 
     public ?string $companyName = null;
 
+    /**
+     * Initialize the sidebar with the current user's theme and company settings.
+     */
     public function mount(): void
     {
         $this->theme = Auth::check() ? Auth::user()->theme?->value ?? 'auto' : 'auto';
@@ -34,11 +40,17 @@ final class AdminSidebar extends Component
     }
 
     #[On('toggle-sidebar')]
+    /**
+     * Toggle the mobile sidebar menu open/closed.
+     */
     public function toggleMobileMenu(): void
     {
-        $this->mobileMenuOpen = !$this->mobileMenuOpen;
+        $this->mobileMenuOpen = ! $this->mobileMenuOpen;
     }
 
+    /**
+     * Cycle through or set a specific theme (auto, light, dark).
+     */
     public function toggleTheme(?string $newTheme = null): void
     {
         if ($newTheme) {
@@ -55,6 +67,9 @@ final class AdminSidebar extends Component
         }
     }
 
+    /**
+     * Persist the theme to the database and apply it via JavaScript.
+     */
     private function setTheme(string $theme): void
     {
         $this->theme = $theme;
@@ -80,6 +95,9 @@ final class AdminSidebar extends Component
         JS);
     }
 
+    /**
+     * Determine whether the effective appearance is dark mode.
+     */
     public function isEffectiveDark(): bool
     {
         return match ($this->theme) {
@@ -91,16 +109,25 @@ final class AdminSidebar extends Component
         };
     }
 
+    /**
+     * Close the mobile sidebar menu.
+     */
     public function closeMobileMenu(): void
     {
         $this->mobileMenuOpen = false;
     }
 
+    /**
+     * Open the mobile sidebar menu.
+     */
     public function openMobileMenu(): void
     {
         $this->mobileMenuOpen = true;
     }
 
+    /**
+     * Render the admin sidebar component.
+     */
     public function render(): View
     {
         return view('livewire.admin-sidebar');

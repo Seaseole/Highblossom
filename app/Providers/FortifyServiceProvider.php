@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
@@ -11,6 +13,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
+/**
+ * Fortify service provider.
+ *
+ * Configures Laravel Fortify authentication, views, and rate limiting for the application.
+ */
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
