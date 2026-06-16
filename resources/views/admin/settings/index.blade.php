@@ -126,7 +126,7 @@
                      class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8" style="display: none;"
                      x-data="{
                         logoPreview: '{{ $settings['business_logo'] ? Storage::url($settings['business_logo']) : null }}',
-                        faviconPreview: '{{ $settings['favicon'] ? Storage::url($settings['favicon']) : null }}',
+                        faviconPreview: '{{ $settings['favicon'] ? Storage::url($settings['favicon']) : (file_exists(public_path('favicon.ico')) ? '/favicon.ico' : null) }}',
                         handleFileSelect(event, previewKey) {
                             const file = event.target.files[0];
                             if (file) this[previewKey] = URL.createObjectURL(file);
