@@ -23,11 +23,11 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Basic Information</h2>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
-                        <input type="text" name="title" value="{{ old('title') }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        <input type="text" name="title" value="{{ old('title') }}" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Excerpt</label>
-                        <textarea name="excerpt" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white"></textarea>
+                        <textarea name="excerpt" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]"></textarea>
                     </div>
                 </div>
 
@@ -61,14 +61,14 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Publish Settings</h2>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                        <select name="status" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        <select name="status" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                             <option value="draft">Draft</option>
                             <option value="published">Published</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Published At</label>
-                        <input type="datetime-local" name="published_at" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        <input type="datetime-local" name="published_at" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                     </div>
                 </div>
 

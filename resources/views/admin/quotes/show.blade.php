@@ -80,7 +80,7 @@
                     <form action="{{ route('admin.quotes.updateStatus', $quote) }}" method="POST" class="space-y-4">
                         @csrf
                         @method('PUT')
-                        <select name="status" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        <select name="status" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                             @foreach(['pending', 'contacted', 'completed', 'cancelled'] as $s)
                                 <option value="{{ $s }}" {{ $quote->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
                             @endforeach

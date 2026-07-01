@@ -18,7 +18,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Glass Type</label>
-                <select name="glass_type_id" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                <select name="glass_type_id" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                     <option value="">Select a glass type...</option>
                     @foreach($glassTypes as $glassType)
                         <option value="{{ $glassType->id }}" {{ old('glass_type_id', $glassSubCategory->glass_type_id) == $glassType->id ? 'selected' : '' }}>{{ $glassType->name }}</option>

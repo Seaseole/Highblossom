@@ -69,7 +69,7 @@
                     <form action="{{ route('admin.bookings.update-status', $booking) }}" method="POST" class="space-y-4 pt-4 border-t border-gray-100 dark:border-white/10">
                         @csrf
                         @method('PATCH')
-                        <select name="status" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                        <select name="status" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                             @foreach(['pending', 'confirmed', 'completed', 'cancelled'] as $status)
                                 <option value="{{ $status }}" {{ $booking->status === $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
                             @endforeach

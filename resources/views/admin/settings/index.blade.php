@@ -178,15 +178,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
-                            <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                            <input type="text" name="timezone" value="{{ old('timezone', $settings['timezone']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Currency Symbol</label>
-                            <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                            <input type="text" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Date Format</label>
-                            <select name="date_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            <select name="date_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                 @foreach(['d/m/Y', 'm/d/Y', 'Y-m-d', 'd.m.Y', 'j M Y', 'D, j M Y'] as $format)
                                     <option value="{{ $format }}" {{ old('date_format', $settings['date_format']) === $format ? 'selected' : '' }}>
                                         {{ date($format) }} ({{ $format }})
@@ -196,7 +196,7 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Format</label>
-                            <select name="time_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            <select name="time_format" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                 @foreach(['H:i', 'h:i A', 'H:i:s', 'h:i:s A'] as $format)
                                     <option value="{{ $format }}" {{ old('time_format', $settings['time_format']) === $format ? 'selected' : '' }}>
                                         {{ date($format) }} ({{ $format }})
@@ -206,14 +206,14 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Display</label>
-                            <select name="time_format_display" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none">
+                            <select name="time_format_display" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                 <option value="12" {{ old('time_format_display', $settings['time_format_display']) === '12' ? 'selected' : '' }}>12-hour (AM/PM)</option>
                                 <option value="24" {{ old('time_format_display', $settings['time_format_display']) === '24' ? 'selected' : '' }}>24-hour</option>
                             </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Locale</label>
-                            <input type="text" name="locale" value="{{ old('locale', $settings['locale']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="en_GB">
+                            <input type="text" name="locale" value="{{ old('locale', $settings['locale']) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]" placeholder="en_GB">
                         </div>
                     </div>
                 </div>
@@ -328,12 +328,12 @@
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div class="space-y-1.5">
                                                 <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Message Text</label>
-                                                <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white" placeholder="Type message...">
+                                                <input type="text" :name="`announcements[${index}][text]`" x-model="announcement.text" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]" placeholder="Type message...">
                                             </div>
                                             <div class="space-y-1.5">
                                                 <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Destination</label>
                                                 <div class="space-y-2">
-                                                    <select :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-white">
+                                                    <select :name="`announcements[${index}][link]`" x-model="announcement.link" class="w-full admin-select border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                                         <option value="">No Link</option>
                                                         <optgroup label="System Routes">
                                                             @foreach($availableRoutes as $value => $label)

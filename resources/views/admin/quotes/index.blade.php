@@ -8,7 +8,7 @@
             </div>
             
             <form method="GET" action="{{ route('admin.quotes.index') }}" class="flex items-center gap-3">
-                <select name="status" class="bg-white dark:bg-[#0A0A0F] border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                <select name="status" class="bg-white dark:bg-[#0A0A0F] border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                     <option value="">All Statuses</option>
                     @foreach(['pending', 'contacted', 'completed', 'cancelled'] as $s)
                         <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>

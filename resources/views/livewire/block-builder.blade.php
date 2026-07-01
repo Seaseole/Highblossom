@@ -51,7 +51,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Level</label>
-                                <select x-model="block.attributes.level" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                                <select x-model="block.attributes.level" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                     <option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="h4">H4</option>
                                 </select>
                             </div>
@@ -159,12 +159,12 @@
                     <template x-if="block.type === 'embed'"><div class="space-y-4"><input type="url" x-model="block.attributes.url" class="w-full border rounded-xl px-4 py-2.5" placeholder="URL"><input type="text" x-model="block.attributes.title" class="w-full border rounded-xl px-4 py-2.5" placeholder="Title"></div></template>
                     <template x-if="block.type === 'divider'">
                         <div class="space-y-4">
-                            <select x-model="block.attributes.style" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                            <select x-model="block.attributes.style" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                 <option value="line">Line</option>
                                 <option value="dashed">Dashed</option>
                                 <option value="dotted">Dotted</option>
                             </select>
-                            <select x-model="block.attributes.size" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                            <select x-model="block.attributes.size" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                 <option value="sm">Small</option>
                                 <option value="md">Medium</option>
                                 <option value="lg">Large</option>

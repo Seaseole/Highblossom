@@ -57,7 +57,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Change Frequency</label>
-                                <select name="changefreq" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-gray-900 dark:focus:ring-white">
+                                <select name="changefreq" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                                     @foreach(['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'] as $f)
                                         <option value="{{ $f }}" {{ old('changefreq', $route->changefreq) === $f ? 'selected' : '' }}>{{ ucfirst($f) }}</option>
                                     @endforeach

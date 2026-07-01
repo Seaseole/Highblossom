@@ -1,10 +1,15 @@
 <x-layouts::site title="Highblossom | Precision Automotive Glass">
     <!-- Hero Section - Cinematic Dark -->
     <header class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
+        <style>
+            @media (prefers-reduced-motion: reduce) {
+                .animate-fade-up, .animate-pulse { animation: none !important; transition: none !important; }
+            }
+        </style>
         {{-- Background Image with Overlay --}}
         <div class="absolute inset-0 z-0">
             <img alt="Premium automotive glass installation" class="w-full h-full object-cover opacity-40"
-                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1920&q=80" loading="eager">
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1920&q=80" width="1920" height="1080" fetchpriority="high" loading="eager">
             <div class="absolute inset-0 bg-gradient-to-b from-[#0A0A0F] via-[#0A0A0F]/80 to-[#0A0A0F]"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#0A0A0F] via-transparent to-[#0A0A0F]/50"></div>
         </div>
@@ -20,7 +25,8 @@
                 </div>
 
                 {{-- Animated Headline - Focus Blur Resolve --}}
-                <div id="hero-headline-container" class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight leading-[1.2] sm:leading-[1.1] mb-4 sm:mb-6 mx-auto break-words hyphens-auto"
+                <h1 id="hero-heading" class="sr-only">{{ __('site.home.hero_headline_fallback') }}</h1>
+                <div id="hero-headline-container" aria-labelledby="hero-heading" class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight leading-[1.2] sm:leading-[1.1] mb-4 sm:mb-6 mx-auto break-words hyphens-auto"
                     style="perspective: 900px; min-height: 2.4em;">
                 </div>
 
@@ -39,7 +45,7 @@
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                         </svg>
                     </a>
-                    <a href="{{ route('gallery') }}" class="btn-glass glow-red-subtle text-lg px-8 py-4">
+                    <a href="{{ route('gallery') }}" class="btn-glass btn-glass--accent glow-red-subtle pulse text-lg px-8 py-4">
                         <span>{{ __('site.home.hero_view_work') }}</span>
                     </a>
                 </div>
@@ -79,8 +85,8 @@
             <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-start">
                     <template x-for="(step, index) in steps" :key="index">
-                        <div @click="activeCard = index"
-                             class="glass-card rounded-xl p-4 md:p-6 cursor-pointer group transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-[#DC2626]/20 animate-fade-up"
+                        <button type="button" @click="activeCard = index"
+                             class="glass-card rounded-xl p-4 md:p-6 cursor-pointer group transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-[#DC2626]/20 animate-fade-up focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                              :style="`animation-delay: ${index * 100}ms`">
                             <div class="flex items-start justify-between">
                                 <div class="w-10 h-10 rounded-lg bg-[#DC2626]/10 flex items-center justify-center mb-3 group-hover:bg-[#DC2626]/20 transition-colors" x-html="step.icon">
@@ -91,14 +97,14 @@
                             </div>
                             <h3 class="text-[#FAFAFA] font-semibold text-sm md:text-base mb-1" x-text="step.title"></h3>
                             <p class="text-[#A1A1AA] text-xs md:text-sm leading-relaxed line-clamp-1" x-text="step.description"></p>
-                        </div>
+                        </button>
                     </template>
                 </div>
             </div>
 
             {{-- Modal Overlay --}}
             <template x-teleport="body">
-                <div x-show="activeCard !== null" 
+                 <div x-show="activeCard !== null" 
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0"
                      x-transition:enter-end="opacity-100"
@@ -108,29 +114,31 @@
                      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0A0A0F]/80 backdrop-blur-md">
                     
                     <div x-show="activeCard !== null"
-                         @click.away="activeCard = null"
-                         @keydown.escape.window="activeCard = null"
-                         x-transition:enter="transition cubic-bezier(0.32, 0.72, 0, 1) duration-500"
-                         x-transition:enter-start="opacity-0 scale-95 translateY(20px)"
-                         x-transition:enter-end="opacity-100 scale-100 translateY(0)"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         class="w-full max-w-lg glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
+                        @click.away="activeCard = null"
+                        @keydown.escape.window="activeCard = null"
+                        x-transition:enter="transition cubic-bezier(0.32, 0.72, 0, 1) duration-500"
+                        x-transition:enter-start="opacity-0 scale-95 translateY(20px)"
+                        x-transition:enter-end="opacity-100 scale-100 translateY(0)"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc"
+                        x-ref="dialog" tabindex="-1" x-effect="activeCard !== null && $nextTick(() =&gt; $refs.dialog.focus())"
+                        class="w-full max-w-lg glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
                         
                         <div class="p-8">
                             <div class="flex justify-between items-start mb-6">
                                 <div class="w-14 h-14 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center" x-html="activeCard !== null ? steps[activeCard].icon.replace('w-5 h-5', 'w-7 h-7') : ''">
                                 </div>
-                                <button @click="activeCard = null" class="p-2 rounded-full hover:bg-white/5 transition-colors text-[#A1A1AA] hover:text-[#FAFAFA]">
+                                <button @click="activeCard = null" aria-label="Close" type="button" class="p-2 rounded-full hover:bg-white/5 transition-colors text-[#A1A1AA] hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
                             </div>
                             
-                            <h2 class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2" x-text="activeCard !== null ? steps[activeCard].title : ''"></h2>
-                            <p class="text-[#DC2626] font-medium mb-6" x-text="activeCard !== null ? steps[activeCard].description : ''"></p>
+                            <h2 id="modal-title" class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2" x-text="activeCard !== null ? steps[activeCard].title : ''"></h2>
+                            <p id="modal-desc" class="text-[#DC2626] font-medium mb-6" x-text="activeCard !== null ? steps[activeCard].description : ''"></p>
                             
                             <div class="space-y-4">
                                 <p class="text-[#A1A1AA] text-lg leading-relaxed" x-text="activeCard !== null ? steps[activeCard].details : ''"></p>
@@ -159,7 +167,7 @@
                         {{ __('site.home.services_title') }}
                     </h2>
                 </div>
-                <a href="{{ route('services') }}" class="btn-glass text-lg px-8 py-4">
+                <a href="{{ route('services') }}" class="btn-glass btn-glass--accent glow-red-subtle pulse text-lg px-8 py-4">
                     <span>{{ __('site.home.services_view_all') }}</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -279,7 +287,7 @@
                         {{ __('site.home.gallery_title') }}
                     </h2>
                 </div>
-                <a href="{{ route('gallery') }}" class="btn-glass text-lg px-8 py-4">
+                <a href="{{ route('gallery') }}" class="btn-glass btn-glass--accent glow-red-subtle pulse text-lg px-8 py-4">
                     <span>{{ __('site.home.gallery_view_full') }}</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
