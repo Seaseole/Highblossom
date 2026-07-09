@@ -11,11 +11,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Mailable sent to confirm a booking has been received.
- *
- * Rule 9: Implement ShouldQueue + afterCommit().
+ * Mailable sent to confirm a booking has been approved.
  */
-final class BookingConfirmationMail extends Mailable implements ShouldQueue
+final class BookingConfirmedClientMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -33,7 +31,7 @@ final class BookingConfirmationMail extends Mailable implements ShouldQueue
      */
     public function build(): self
     {
-        return $this->subject('Highblossom: Booking Received')
-            ->markdown('emails.bookings.confirmation');
+        return $this->subject('Highblossom: Booking Confirmed')
+            ->markdown('emails.bookings.confirmed');
     }
 }

@@ -68,6 +68,61 @@
                     @endif
                 </dl>
             </div>
+            
+            <!-- Update Form Card -->
+            <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Update Inspection</h2>
+                <form action="{{ route('admin.inspections.update', $inspection) }}" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign Staff</label>
+                        <select name="staff_id" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                            <option value="">Select Staff</option>
+                            @foreach($staffMembers as $user)
+                                <option value="{{ $user->id }}" {{ $inspection->staff_id === $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled At</label>
+                        <input type="datetime-local" name="scheduled_at" value="{{ $inspection->scheduled_at->format('Y-m-d\TH:i') }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Ended At (Completion Time)</label>
+                        <input type="datetime-local" name="ended_at" value="{{ $inspection->ended_at ? $inspection->ended_at->format('Y-m-d\TH:i') : '' }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</label>
+                        <input type="text" name="location" value="{{ $inspection->location }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</label>
+                        <select name="type" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                            <option value="mobile" {{ $inspection->type === 'mobile' ? 'selected' : '' }}>Mobile</option>
+                            <option value="workshop" {{ $inspection->type === 'workshop' ? 'selected' : '' }}>Workshop</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
+                        Update Inspection
+                    </button>
+                </form>
+                
+                <!-- Delete Action -->
+                <form action="{{ route('admin.inspections.destroy', $inspection) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this inspection?');" class="pt-4 border-t border-gray-100 dark:border-white/10">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full text-sm font-medium text-red-600 dark:text-red-400 hover:opacity-75 transition-opacity">
+                        Delete Inspection
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </x-layouts::admin>

@@ -122,6 +122,9 @@
             <a href="{{ route('quote') }}" class="btn-premium text-sm py-2.5 px-5">
                 Get Quote
             </a>
+            <a href="{{ route('bookings.create') }}" class="btn-glass text-sm py-2.5 px-5">
+                Book Inspection
+            </a>
         </div>
 
         {{-- Right Side Actions --}}
@@ -174,7 +177,7 @@
 </nav>
 
 {{-- Mobile Menu --}}
-<div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-full max-w-sm h-screen h-[100dvh] bg-[#121218] border-l border-white/10 z-60 hidden md:hidden">
+<div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-full max-w-sm h-screen h-[100dvh] bg-[#121218] border-l border-white/10 z-[60]" aria-hidden="true" aria-label="Mobile navigation menu">
             <div class="flex flex-col h-full">
             {{-- Mobile Header --}}
             <div class="flex justify-between items-center px-6 py-4 border-b border-white/10 flex-shrink-0">
@@ -206,6 +209,9 @@
                 <a href="{{ route('quote') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('quote') ? 'text-[#DC2626]' : '' }}">
                     Get Quote
                 </a>
+                <a href="{{ route('bookings.create') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('bookings.create') ? 'text-[#DC2626]' : '' }}">
+                    Book Inspection
+                </a>
                 <a href="{{ route('contact') }}" onclick="closeMobileMenu()" class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('contact') ? 'text-[#DC2626]' : '' }}">
                     Contact
                 </a>
@@ -235,61 +241,103 @@
     </div>
 
 {{-- Mobile Menu Overlay --}}
-<div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black/60 z-50 md:hidden"></div>
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
 
 @push('scripts')
 <script>
-    function closeMobileMenu() {
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-        
-        if (mobileMenu) mobileMenu.classList.remove('open');
-        if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('open');
-        
-        document.body.style.overflow = '';
-        
-        // Optional: add back hidden after transition if you want total removal from render tree
-        // but visibility: hidden in CSS is usually enough.
-    }
+    (function () {
+        'use strict';
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenuClose = document.getElementById('mobile-menu-close');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        const TRANSITION_DURATION = 400; // ms — matches CSS .mobile-menu transition
+
+        let isOpen = false;
+        let closeTimer = null;
 
         function openMobileMenu() {
+            if (isOpen) return;
+            isOpen = true;
+
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+            if (closeTimer) {
+                clearTimeout(closeTimer);
+                closeTimer = null;
+            }
+
             if (mobileMenu) {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => mobileMenu.classList.add('open'), 10);
+                mobileMenu.removeAttribute('aria-hidden');
+                // Slight defer so the browser paints the element before we add .open
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => mobileMenu.classList.add('open'));
+                });
             }
-            if (mobileMenuOverlay) {
-                mobileMenuOverlay.classList.add('open');
-            }
+            if (mobileMenuOverlay) mobileMenuOverlay.classList.add('open');
+            if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'true');
+
             document.body.style.overflow = 'hidden';
         }
 
-        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
-        if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
-        if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+        function closeMobileMenu() {
+            if (!isOpen) return;
+            isOpen = false;
 
-        // Close Announcement Bar
-        const closeAnnouncementBtn = document.getElementById('close-announcement-btn');
-        if (closeAnnouncementBtn) {
-            closeAnnouncementBtn.addEventListener('click', function() {
-                const bar = document.getElementById('announcement-ticker-bar');
-                if (bar) {
-                    bar.style.height = '0px';
-                    bar.style.paddingTop = '0px';
-                    bar.style.paddingBottom = '0px';
-                    bar.style.opacity = '0';
-                    bar.style.borderBottomWidth = '0px';
-                    
-                    // Set session flag to keep it closed for current session
-                    sessionStorage.setItem('dismissed_announcement', 'true');
-                }
-            });
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+            if (mobileMenu) mobileMenu.classList.remove('open');
+            if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('open');
+            if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+
+            document.body.style.overflow = '';
+
+            // Re-apply aria-hidden after the slide-out transition finishes
+            closeTimer = setTimeout(() => {
+                const menu = document.getElementById('mobile-menu');
+                if (menu && !isOpen) menu.setAttribute('aria-hidden', 'true');
+                closeTimer = null;
+            }, TRANSITION_DURATION);
         }
-    });
+
+        // Expose globally for onclick handlers on anchor tags
+        window.closeMobileMenu = closeMobileMenu;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                mobileMenuBtn.setAttribute('aria-controls', 'mobile-menu');
+                mobileMenuBtn.addEventListener('click', openMobileMenu);
+            }
+            if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+            if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+            // Close on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && isOpen) closeMobileMenu();
+            });
+
+            // Close Announcement Bar
+            const closeAnnouncementBtn = document.getElementById('close-announcement-btn');
+            if (closeAnnouncementBtn) {
+                closeAnnouncementBtn.addEventListener('click', function () {
+                    const bar = document.getElementById('announcement-ticker-bar');
+                    if (bar) {
+                        bar.style.height = '0px';
+                        bar.style.paddingTop = '0px';
+                        bar.style.paddingBottom = '0px';
+                        bar.style.opacity = '0';
+                        bar.style.borderBottomWidth = '0px';
+                        sessionStorage.setItem('dismissed_announcement', 'true');
+                    }
+                });
+            }
+        });
+    }());
 </script>
 @endpush

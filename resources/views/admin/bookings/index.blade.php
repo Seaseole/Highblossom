@@ -8,6 +8,7 @@
             </div>
             
             <form action="{{ route('admin.bookings.index') }}" method="GET" class="flex items-center gap-3">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search client..." class="bg-white dark:bg-[#0A0A0F] border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                 <select name="status" class="bg-white dark:bg-[#0A0A0F] border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
                     <option value="">All Statuses</option>
                     @foreach(['pending', 'confirmed', 'completed', 'cancelled'] as $status)
@@ -26,6 +27,7 @@
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-white/10">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-bookings.client') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-bookings.contact') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-bookings.vehicle') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('admin-bookings.price') }}</th>
@@ -41,6 +43,12 @@
                                 @if($booking->user)
                                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ $booking->user->email }}</div>
                                 @endif
+                                @if($booking->inspection)
+                                    <div class="mt-1"><span class="px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">Has Inspection</span></div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $booking->scheduled_at ? $booking->scheduled_at->format('M j, Y g:i A') : 'TBC' }}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                 {{ $booking->client_phone ?? '-' }}<br>

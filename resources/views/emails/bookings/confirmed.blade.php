@@ -1,9 +1,9 @@
 @component('mail::message')
-# Booking Request Received
+# Booking Confirmed
 
 Hi {{ $booking->client_name }},
 
-Thank you for choosing Highblossom. We have received your booking request for the following vehicle:
+Great news! Your booking has been confirmed and added to our inspection list.
 
 **Vehicle Details:**
 {{ $booking->vehicle_details }}
@@ -18,7 +18,7 @@ Thank you for choosing Highblossom. We have received your booking request for th
 {{ $booking->client_address }}
 @endif
 
-We have received your request. Our staff will review your booking and send you a confirmation email once it has been approved and added to our inspection list.
+Our team looks forward to serving you. If you need to make any changes, please reply to this email or contact our support team.
 
 Thanks,<br>
 {{ config('app.name') }}

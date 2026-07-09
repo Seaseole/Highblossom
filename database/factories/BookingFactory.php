@@ -26,6 +26,7 @@ class BookingFactory extends Factory
             'vehicle_details' => $this->faker->sentence(),
             'status' => 'pending',
             'total_price' => 0.00,
+            'client_address' => $this->faker->optional()->address(),
         ];
     }
 }

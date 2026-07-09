@@ -10,13 +10,6 @@ window.Passkeys = Passkeys;
 document.addEventListener('alpine:init', () => {
     console.log('Admin JS: alpine:init fired');
     
-    // Register global store for mobile menu
-    window.Alpine.store('mobileMenu', {
-        open: false,
-        toggle() { this.open = !this.open },
-        close() { this.open = false }
-    });
-
     // Register plugins
     window.Alpine.plugin(collapse);
 

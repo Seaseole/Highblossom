@@ -35,11 +35,15 @@ use Lubusin\Decomposer\Controllers\DecomposerController;
 Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('bookings', [BookingController::class, 'index'])->middleware('can:view bookings')->name('bookings.index');
     Route::get('bookings/{booking}', [BookingController::class, 'show'])->middleware('can:view bookings')->name('bookings.show');
+    Route::patch('bookings/{booking}', [BookingController::class, 'update'])->middleware('can:update bookings')->name('bookings.update');
     Route::patch('bookings/{booking}/update-status', [BookingController::class, 'updateStatus'])->middleware('can:update bookings')->name('bookings.update-status');
     Route::delete('bookings/{booking}', [BookingController::class, 'destroy'])->middleware('can:update bookings')->name('bookings.destroy');
 
     Route::get('inspections', [InspectionController::class, 'index'])->middleware('can:view inspections')->name('inspections.index');
     Route::get('inspections/{inspection}', [InspectionController::class, 'show'])->middleware('can:view inspections')->name('inspections.show');
+    Route::post('inspections', [InspectionController::class, 'store'])->middleware('can:update inspections')->name('inspections.store');
+    Route::put('inspections/{inspection}', [InspectionController::class, 'update'])->middleware('can:update inspections')->name('inspections.update');
+    Route::delete('inspections/{inspection}', [InspectionController::class, 'destroy'])->middleware('can:update inspections')->name('inspections.destroy');
 
     Route::get('absences', [StaffAbsenceController::class, 'index'])->middleware('can:manage absences')->name('absences.index');
     Route::get('absences/{absence}', [StaffAbsenceController::class, 'show'])->middleware('can:manage absences')->name('absences.show');

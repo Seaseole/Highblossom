@@ -13,6 +13,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
+    {{-- Safe area insets for notched mobile devices --}}
+    <style>
+        .safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .safe-area-left { padding-left: env(safe-area-inset-left, 0px); }
+        .safe-area-right { padding-right: env(safe-area-inset-right, 0px); }
+    </style>
+
     {{-- Seed localStorage BEFORE @fluxAppearance reads it, so Flux honours the backend preference --}}
     <script>
         (function() {
@@ -45,21 +53,28 @@
     </style>
 </head>
 <body class="min-h-[100dvh] bg-white dark:bg-[#0A0A0F] text-gray-900 dark:text-gray-100 font-sans antialiased admin-panel">
-    <div class="flex min-h-[100dvh]">
+    <div x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false">
+    {{-- Mobile Top Bar --}}
+    <div class="lg:hidden fixed top-0 inset-x-0 z-30 h-16 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/10 flex items-center justify-between px-4 safe-area-top">
+        <button id="mobile-menu-btn" @click="mobileOpen = !mobileOpen" class="flex items-center justify-center size-11 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white -ml-2" aria-label="Toggle navigation" :aria-expanded="mobileOpen.toString()" aria-controls="sidebar-panel">
+            <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $title ?? config('app.name') }}</span>
+        <div class="size-11"></div>
+    </div>
+
+    <div class="flex min-h-[100dvh] pt-16 lg:pt-0">
         <!-- Livewire Admin Sidebar -->
         <livewire:admin-sidebar />
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto admin-main bg-white dark:bg-[#0A0A0F]">
-            <div class="lg:hidden p-4">
-                <button @click="Alpine.store('mobileMenu').toggle()" class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-            </div>
             <div class="p-8">
                 {{ $slot }}
             </div>
         </main>
+    </div>
+
     </div>
 
     {{-- Environment Badge --}}

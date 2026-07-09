@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\GlassTypeController;
+use App\Http\Controllers\Api\BookingAvailabilityController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
@@ -27,6 +29,17 @@ Route::get('/privacy', fn () => view('privacy'))->name('privacy');
 // Blog
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
+
+// Bookings
+Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
+Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:3,1')->name('bookings.store');
+Route::get('/bookings/{booking}/confirmation', [BookingController::class, 'confirmation'])
+    ->middleware('signed')
+    ->name('bookings.confirmation');
+
+Route::get('/api/bookings/availability', [BookingAvailabilityController::class, 'availability'])
+    ->middleware('throttle:30,1')
+    ->name('api.bookings.availability');
 
 // Poll API
 Route::post('/api/content-blocks/poll/{poll}', [PollController::class, 'vote'])

@@ -30,10 +30,11 @@ final class Booking extends Model
 
     protected $fillable = [
         'user_id', 'client_name', 'client_email', 'client_phone',
-        'vehicle_details', 'status', 'total_price',
+        'vehicle_details', 'scheduled_at', 'location', 'client_address', 'status', 'total_price',
     ];
 
     protected $casts = [
+        'scheduled_at' => 'datetime',
         'total_price' => 'decimal:2',
     ];
 

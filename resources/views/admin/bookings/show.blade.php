@@ -32,12 +32,30 @@
                             <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</dt>
                             <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->client_phone ?? '—' }}</dd>
                         </div>
+                        @if($booking->location === 'mobile' && $booking->client_address)
+                            <div class="space-y-1">
+                                <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Client Address</dt>
+                                <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->client_address }}</dd>
+                            </div>
+                        @endif
                         @if($booking->user)
                             <div class="space-y-1">
                                 <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wider">User Account</dt>
                                 <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->user->email }}</dd>
                             </div>
                         @endif
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled At</dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->scheduled_at ? $booking->scheduled_at->format('F j, Y g:i A') : 'TBC' }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->location === 'mobile' ? 'Mobile Service' : ($booking->location ? 'Workshop' : 'TBC') }}
+                                @if($booking->location === 'mobile' && $booking->client_address)
+                                    <span class="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $booking->client_address }}</span>
+                                @endif
+                            </dd>
+                        </div>
                     </dl>
                 </div>
 
@@ -47,6 +65,52 @@
                     <p class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
                         {{ $booking->vehicle_details }}
                     </p>
+                </div>
+
+                <!-- Inspection Panel -->
+                <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Inspection</h2>
+                    @if($booking->inspection)
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Inspection #{{ $booking->inspection->id }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Assigned to: {{ $booking->inspection->staff->name ?? 'Unassigned' }}</p>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $booking->inspection->ended_at ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' }}">
+                                    {{ $booking->inspection->ended_at ? 'Completed' : 'Scheduled' }}
+                                </span>
+                            </div>
+                            <a href="{{ route('admin.inspections.show', $booking->inspection) }}" class="inline-block w-full text-center bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm">
+                                View Inspection
+                            </a>
+                        </div>
+                    @else
+                        <form action="{{ route('admin.inspections.store') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+                            <input type="hidden" name="scheduled_at" value="{{ $booking->scheduled_at }}">
+                            <input type="hidden" name="location" value="{{ $booking->location ?? 'mobile' }}">
+                            <input type="hidden" name="type" value="mobile"> <!-- Default to mobile, you could add a selector if needed -->
+                            
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign Staff</label>
+                                <select name="staff_id" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                                    <option value="">Select Staff</option>
+                                    @foreach(\App\Models\User::all() as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('staff_id')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm">
+                                Schedule Inspection
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
 
@@ -80,13 +144,28 @@
                     </form>
                 </div>
 
-                <!-- Pricing Card -->
-                <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Pricing</h2>
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Total Price</span>
-                        <span class="text-xl font-bold text-gray-900 dark:text-white">${{ number_format($booking->total_price, 2) }}</span>
-                    </div>
+                <!-- Pricing & Notes Card -->
+                <div class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Pricing & Notes</h2>
+                    <form action="{{ route('admin.bookings.update', $booking) }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Price ($)</label>
+                            <input type="number" step="0.01" name="total_price" value="{{ old('total_price', $booking->total_price) }}" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Internal Notes</label>
+                            <!-- Note: The notes column might not exist in the database, this is handled gracefully if not fillable -->
+                            <textarea name="notes" rows="3" class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">{{ old('notes', $booking->notes ?? '') }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-medium py-2.5 px-6 rounded-full text-sm transition-all">
+                            Save Changes
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Delete Action -->

@@ -17,8 +17,6 @@ final class NewBookingStaffNotification extends Notification implements ShouldQu
 {
     use Queueable;
 
-    public $afterCommit = true;
-
     /**
      * Create a new notification instance.
      */
@@ -35,7 +33,7 @@ final class NewBookingStaffNotification extends Notification implements ShouldQu
      */
     public function via($notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     /**

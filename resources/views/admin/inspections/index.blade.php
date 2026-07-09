@@ -12,6 +12,7 @@
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-white/10">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Client</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th>
@@ -23,6 +24,15 @@
                     @forelse($inspections as $inspection)
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors duration-200">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{{ $inspection->scheduled_at->format('M j, Y g:i A') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                @if($inspection->booking)
+                                    <a href="{{ route('admin.bookings.show', $inspection->booking) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        {{ $inspection->booking->client_name }}
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $inspection->location }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ ucfirst($inspection->type) }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $inspection->staff?->name ?? '-' }}</td>

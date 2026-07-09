@@ -86,9 +86,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
-       DB::prohibitDestructiveCommands(
-           app()->isProduction(),
-       );
+        DB::prohibitDestructiveCommands(
+            app()->isProduction(),
+        );
     }
 
     //    public static function passwordRules(): Password

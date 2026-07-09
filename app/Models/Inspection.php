@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * On-site inspection records linked to bookings.
  * Maps to the `inspections` database table.
+ *
+ * @property-read string $status
  */
 final class Inspection extends Model
 {
@@ -51,5 +53,17 @@ final class Inspection extends Model
     public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'staff_id');
+    }
+
+    /**
+     * Get the computed status of the inspection.
+     */
+    public function getStatusAttribute(): string
+    {
+        if ($this->ended_at !== null) {
+            return 'completed';
+        }
+
+        return $this->scheduled_at->isPast() ? 'overdue' : 'scheduled';
     }
 }
