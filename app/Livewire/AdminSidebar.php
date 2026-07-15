@@ -103,9 +103,7 @@ final class AdminSidebar extends Component
         return match ($this->theme) {
             'dark' => true,
             'light' => false,
-            default => request()->hasHeader('Sec-CH-UA-Platform')
-                ? false // Server-side fallback
-                : true, // Will be resolved client-side
+            default => false, // Server-side fallback for 'auto' - client will resolve via JS
         };
     }
 
