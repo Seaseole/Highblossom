@@ -7,6 +7,8 @@ namespace App\Services;
 use App\Models\CompanySetting;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Image;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,6 +29,15 @@ final class CompanySettingService
 
     /** @var list<string> Day keys used for working hours configuration */
     private const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+    /** Logo containment dimensions (max width/height). Preserves aspect ratio. */
+    private const LOGO_MAX_DIMENSIONS = [512, 512];
+
+    /** Favicon cover dimensions (square). */
+    private const FAVICON_DIMENSIONS = [256, 256];
+
+    /** Output quality for processed images (1-100). */
+    private const IMAGE_QUALITY = 82;
 
     public function __construct(private readonly EnvEditor $envEditor) {}
 
@@ -58,6 +69,14 @@ final class CompanySettingService
 
     /**
      * Handle business logo upload, replacement, or removal.
+     *
+     * Three branches:
+     *  1. Explicit removal request -> delete the stored image and clear the field.
+     *  2. Pre-uploaded path provided (e.g. from the AJAX media uploader) -> adopt it,
+     *     deleting the previous file if it has changed.
+     *  3. Direct file upload -> process through Laravel 13.20 `Image` facade (contain
+     *     within 512x512, normalised to WebP at fixed quality) and store on the public
+     *     disk, deleting the previous file if present.
      */
     private function handleLogoUpload(Request $request): void
     {
@@ -83,11 +102,23 @@ final class CompanySettingService
             return;
         }
 
-        // Branch 3: Direct file upload
+        // Branch 3: Direct file upload - process and normalise before storage.
         if ($request->hasFile('business_logo') && $request->file('business_logo')->isValid()) {
-            $this->deleteStoredImage($oldLogo);
-            $path = $request->file('business_logo')->store('settings', 'public');
-            CompanySetting::set('business_logo', $path);
+            try {
+                $this->deleteStoredImage($oldLogo);
+                $file = $request->file('business_logo');
+                $path = Image::fromUpload($file)
+                    ->contain(self::LOGO_MAX_DIMENSIONS[0], self::LOGO_MAX_DIMENSIONS[1])
+                    ->toWebp()
+                    ->quality(self::IMAGE_QUALITY)
+                    ->store('settings', 'public');
+
+                if ($path !== false) {
+                    CompanySetting::set('business_logo', $path);
+                }
+            } catch (ImageException $e) {
+                Log::error('Failed to process logo upload: '.$e->getMessage());
+            }
         }
     }
 
@@ -114,6 +145,12 @@ final class CompanySettingService
 
     /**
      * Handle favicon upload, replacement, or removal.
+     *
+     * Two branches:
+     *  1. Pre-uploaded path provided -> adopt it, deleting the previous file if changed.
+     *  2. Direct file upload -> process through Laravel 13.20 `Image` facade (cover to
+     *     256x256 square, normalised to WebP at fixed quality) and store on the public
+     *     disk, deleting the previous file if present.
      */
     private function handleFaviconUpload(Request $request): void
     {
@@ -122,8 +159,8 @@ final class CompanySettingService
         if (! empty($imagePath)) {
             $oldFavicon = CompanySetting::get('favicon', '');
             try {
-                if ($oldFavicon && $oldFavicon !== $imagePath && Storage::disk('public')->exists($oldFavicon)) {
-                    Storage::disk('public')->delete($oldFavicon);
+                if ($oldFavicon && $oldFavicon !== $imagePath) {
+                    $this->deleteStoredImage($oldFavicon);
                 }
             } catch (\Exception $e) {
                 Log::error('Failed to remove old favicon: '.$e->getMessage());
@@ -132,14 +169,22 @@ final class CompanySettingService
         } elseif ($request->hasFile('favicon')) {
             $oldFavicon = CompanySetting::get('favicon', '');
             try {
-                if ($oldFavicon && Storage::disk('public')->exists($oldFavicon)) {
-                    Storage::disk('public')->delete($oldFavicon);
+                if ($oldFavicon) {
+                    $this->deleteStoredImage($oldFavicon);
                 }
-            } catch (\Exception $e) {
-                Log::error('Failed to remove old favicon: '.$e->getMessage());
+                $file = $request->file('favicon');
+                $path = Image::fromUpload($file)
+                    ->cover(self::FAVICON_DIMENSIONS[0], self::FAVICON_DIMENSIONS[1])
+                    ->toWebp()
+                    ->quality(self::IMAGE_QUALITY)
+                    ->store('settings', 'public');
+
+                if ($path !== false) {
+                    CompanySetting::set('favicon', $path);
+                }
+            } catch (ImageException $e) {
+                Log::error('Failed to process favicon upload: '.$e->getMessage());
             }
-            $path = $request->file('favicon')->store('settings', 'public');
-            CompanySetting::set('favicon', $path);
         }
     }
 

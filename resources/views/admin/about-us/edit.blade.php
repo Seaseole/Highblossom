@@ -165,6 +165,7 @@
                         hiddenInput: document.getElementById('hero-image-path'),
                         uploadUrl: '{{ route("admin.image-upload") }}',
                         csrfToken: '{{ csrf_token() }}',
+                        folder: 'about-us',
                         maxSize: 2 * 1024 * 1024,
                         acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
                         onUploadComplete: function(response) {

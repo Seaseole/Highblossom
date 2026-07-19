@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\GalleryImage;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Image;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -52,10 +54,14 @@ final class MediaLibraryService
             try {
                 $file = $request->file('upload');
                 if ($file && $file->isValid()) {
-                    return $file->store('gallery', 'public');
+                    return Image::fromUpload($file)
+                        ->scale(width: 1920, height: 1920)
+                        ->toWebp()
+                        ->quality(82)
+                        ->store('gallery', 'public');
                 }
-            } catch (\Exception $e) {
-                Log::error('Failed to store media library image: '.$e->getMessage());
+            } catch (ImageException $e) {
+                Log::error('Failed to process media library image: '.$e->getMessage());
                 throw new \RuntimeException('Failed to upload image.');
             }
         }

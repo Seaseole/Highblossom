@@ -6,6 +6,9 @@ namespace App\Services;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Image;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 final class ServiceService
@@ -64,7 +67,18 @@ final class ServiceService
         }
 
         if ($request->hasFile('image')) {
-            return $request->file('image')->store('services', 'public');
+            try {
+                $file = $request->file('image');
+                if ($file && $file->isValid()) {
+                    return Image::fromUpload($file)
+                        ->contain(width: 800, height: 600)
+                        ->toWebp()
+                        ->quality(82)
+                        ->store('services', 'public');
+                }
+            } catch (ImageException $e) {
+                Log::error('Failed to process service image: '.$e->getMessage());
+            }
         }
 
         // For create, use placeholder; for update, keep existing

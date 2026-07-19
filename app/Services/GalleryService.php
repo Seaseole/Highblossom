@@ -6,6 +6,9 @@ namespace App\Services;
 
 use App\Models\GalleryImage;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Image;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -111,7 +114,18 @@ final class GalleryService
         }
 
         if ($request->hasFile('image')) {
-            return $request->file('image')->store('gallery', 'public');
+            try {
+                $file = $request->file('image');
+                if ($file && $file->isValid()) {
+                    return Image::fromUpload($file)
+                        ->scale(width: 1920, height: 1920)
+                        ->toWebp()
+                        ->quality(82)
+                        ->store('gallery', 'public');
+                }
+            } catch (ImageException $e) {
+                Log::error('Failed to process gallery image: '.$e->getMessage());
+            }
         }
 
         // For create, use placeholder; for update, keep existing

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 /**
  * Validate and authorize quote form submissions.
@@ -38,9 +40,48 @@ class QuoteFormRequest extends FormRequest
             'glass_sub_category_id' => 'nullable|exists:glass_sub_categories,id',
             'service_type_id' => 'required|exists:service_types,id',
             'image' => 'nullable|image|max:10240', // Max 10MB
-            'image_path' => 'nullable|string|max:255',
+            'image_path' => [
+                'nullable',
+                'string',
+                Rule::in($this->allowedQuoteImagePaths()),
+            ],
             'mobile_service' => 'nullable|boolean',
         ];
+    }
+
+    /**
+     * Get a list of valid quote image paths on the public disk.
+     *
+     * Prevents path traversal and ensures the path actually exists.
+     *
+     * @return array<int, string>
+     */
+    private function allowedQuoteImagePaths(): array
+    {
+        $paths = [];
+
+        try {
+            $disk = Storage::disk('public');
+
+            // Only allow paths under the quotes folder
+            $folder = 'quotes';
+
+            if ($disk->exists($folder)) {
+                $files = $disk->files($folder);
+
+                foreach ($files as $file) {
+                    // Ensure the path is within the allowed folder
+                    if (str_starts_with($file, $folder.'/') && ! str_contains($file, '..')) {
+                        $paths[] = $file;
+                    }
+                }
+            }
+        } catch (\Exception) {
+            // If disk access fails, return empty array to deny all paths
+            return [];
+        }
+
+        return $paths;
     }
 
     /**

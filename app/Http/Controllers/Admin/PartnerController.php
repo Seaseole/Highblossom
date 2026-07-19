@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Image;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -45,7 +48,16 @@ final class PartnerController extends Controller
             'website_url' => 'nullable|url',
         ]);
 
-        $path = $request->file('logo')->store('partners', 'public');
+        try {
+            $path = Image::fromUpload($request->file('logo'))
+                ->contain(width: 800, height: 800)
+                ->toWebp()
+                ->quality(82)
+                ->store('partners', 'public');
+        } catch (ImageException $e) {
+            Log::error('Failed to process partner logo: '.$e->getMessage());
+            $path = $request->file('logo')->store('partners', 'public');
+        }
 
         Partner::create([
             'name' => $validated['name'],
@@ -76,8 +88,18 @@ final class PartnerController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            Storage::disk('public')->delete($partner->logo_path);
-            $partner->logo_path = $request->file('logo')->store('partners', 'public');
+            try {
+                Storage::disk('public')->delete($partner->logo_path);
+                $partner->logo_path = Image::fromUpload($request->file('logo'))
+                    ->contain(width: 800, height: 800)
+                    ->toWebp()
+                    ->quality(82)
+                    ->store('partners', 'public');
+            } catch (ImageException $e) {
+                Log::error('Failed to process partner logo: '.$e->getMessage());
+                Storage::disk('public')->delete($partner->logo_path);
+                $partner->logo_path = $request->file('logo')->store('partners', 'public');
+            }
         }
 
         $partner->update([

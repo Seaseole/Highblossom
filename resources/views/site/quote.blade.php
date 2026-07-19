@@ -424,13 +424,14 @@
                 alpineComponent = form._x_dataStack[0];
             }
 
-            const uploader = new ImageUploader({
+const uploader = new ImageUploader({
                 fileInput: document.querySelector('input[name="image"]'),
                 previewContainer: document.getElementById('quote-image-preview'),
                 progressContainer: document.getElementById('quote-image-progress'),
                 hiddenInput: document.getElementById('quote-image-path'),
                 uploadUrl: '{{ route("admin.image-upload") }}',
                 csrfToken: '{{ csrf_token() }}',
+                folder: 'quotes',
                 maxSize: 2 * 1024 * 1024, // 2MB
                 acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
                 onUploadStart: function() {

@@ -135,6 +135,7 @@
                     hiddenInput: document.getElementById('media-image-path'),
                     uploadUrl: '{{ route("admin.image-upload") }}',
                     csrfToken: '{{ csrf_token() }}',
+                    folder: 'uploads',
                     maxSize: 5 * 1024 * 1024, // 5MB
                     acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
                     onUploadComplete: function(response) {

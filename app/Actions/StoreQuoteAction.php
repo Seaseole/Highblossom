@@ -7,7 +7,9 @@ namespace App\Actions;
 use App\Models\Quote;
 use App\Services\IdempotencyService;
 use Illuminate\Http\Request;
+use Illuminate\Image\ImageException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Image;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -109,10 +111,14 @@ class StoreQuoteAction
             try {
                 $file = $request->file('image');
                 if ($file && $file->isValid()) {
-                    return $file->store('quotes', 'public');
+                    return Image::fromUpload($file)
+                        ->scale(width: 1920, height: 1920)
+                        ->toWebp()
+                        ->quality(82)
+                        ->store('quotes', 'public');
                 }
-            } catch (\Exception $e) {
-                Log::error('Failed to store quote image: '.$e->getMessage());
+            } catch (ImageException $e) {
+                Log::error('Failed to process quote image: '.$e->getMessage());
             }
         }
 
