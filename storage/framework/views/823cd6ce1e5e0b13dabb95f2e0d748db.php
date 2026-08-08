@@ -1,0 +1,2 @@
+<h<?php echo e($level); ?> class="text-[#FAFAFA] <?php echo e($class ?? ''); ?>"> <?php echo e($content); ?> </h<?php echo e($level); ?>>
+<?php /**PATH C:\laragon\www\Highblossom\packages\ContentBlocks\resources\views\heading.blade.php ENDPATH**/ ?>

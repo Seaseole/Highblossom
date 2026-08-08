@@ -1,12 +1,12 @@
 @blaze(fold: true, memo: true)
 
 @php
-$attributes = $attributes->merge([
-    'variant' => 'subtle',
-    'class' => '-me-1',
-    'square' => true,
-    'size' => null,
-]);
+    $attributes = $attributes->merge([
+        'variant' => 'subtle',
+        'class' => '-me-1',
+        'square' => true,
+        'size' => null,
+    ]);
 @endphp
 
 <flux:button
@@ -17,6 +17,6 @@ $attributes = $attributes->merge([
     x-bind:data-viewable-open="open"
     aria-label="{{ __('Toggle password visibility') }}"
 >
-    <flux:icon.eye-slash variant="micro" class="hidden [[data-viewable-open]>&]:block" />
-    <flux:icon.eye variant="micro" class="block [[data-viewable-open]>&]:hidden" />
+    <flux:icon.eye-slash variant="micro" class="[[data-viewable-open]>&]:block hidden" />
+    <flux:icon.eye variant="micro" class="[[data-viewable-open]>&]:hidden block" />
 </flux:button>

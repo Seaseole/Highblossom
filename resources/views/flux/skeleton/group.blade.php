@@ -4,6 +4,4 @@
     'animate' => null,
 ])
 
-<div {{ $attributes }} data-flux-skeleton-group>
-    {{ $slot }}
-</div>
+<div {{ $attributes }} data-flux-skeleton-group>{{ $slot }}</div>

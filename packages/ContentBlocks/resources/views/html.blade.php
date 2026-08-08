@@ -1,3 +1,1 @@
-<div class="cb-html">
-    {!! $content !!}
-</div>
+<div class="cb-html">{!! $content !!}</div>

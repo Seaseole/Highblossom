@@ -8,18 +8,20 @@
 @endphp
 
 <div class="cb-embed">
-    @if($embedHtml)
-        <div class="cb-embed__iframe-wrapper">
-            {!! $embedHtml !!}
-        </div>
-    @elseif($url)
+    @if ($embedHtml)
+        <div class="cb-embed__iframe-wrapper">{!! $embedHtml !!}</div>
+    @elseif ($url)
         <div class="cb-embed__fallback">
             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="cb-embed__link">
-                @if($embedThumbnail)
-                    <img src="{{ $embedThumbnail }}" alt="{{ $embedTitle ?? $title ?? 'Embedded content' }}" class="cb-embed__thumbnail">
+                @if ($embedThumbnail)
+                    <img
+                        src="{{ $embedThumbnail }}"
+                        alt="{{ $embedTitle ?? $title ?? 'Embedded content' }}"
+                        class="cb-embed__thumbnail"
+                    />
                 @endif
                 <div class="cb-embed__meta">
-                    @if($embedProvider)
+                    @if ($embedProvider)
                         <span class="cb-embed__provider">{{ $embedProvider }}</span>
                     @endif
                     <span class="cb-embed__url">{{ $url }}</span>

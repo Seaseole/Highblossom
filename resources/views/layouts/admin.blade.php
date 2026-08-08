@@ -1,29 +1,42 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}</title>
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
+    </title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    />
 
     {{-- Safe area insets for notched mobile devices --}}
     <style>
-        .safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
-        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-        .safe-area-left { padding-left: env(safe-area-inset-left, 0px); }
-        .safe-area-right { padding-right: env(safe-area-inset-right, 0px); }
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .safe-area-left {
+            padding-left: env(safe-area-inset-left, 0px);
+        }
+        .safe-area-right {
+            padding-right: env(safe-area-inset-right, 0px);
+        }
     </style>
 
     {{-- Seed localStorage BEFORE @fluxAppearance reads it, so Flux honours the backend preference --}}
     <script>
-        (function() {
+        (function () {
             const theme = @json($theme);
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             // Apply class immediately to prevent FOUT
@@ -45,20 +58,31 @@
     <style>
         /* Base background colors to prevent flash */
         html {
-            background-color: #FFFFFF; /* White */
+            background-color: #ffffff; /* White */
         }
         html.dark {
-            background-color: #0A0A0F; /* Dark Background */
+            background-color: #0a0a0f; /* Dark Background */
         }
     </style>
 </head>
-<body class="min-h-[100dvh] bg-white dark:bg-[#0A0A0F] text-gray-900 dark:text-gray-100 font-sans antialiased admin-panel" x-data @keydown.escape.window="$store.mobileMenu.close()">
+<body
+    class="admin-panel min-h-[100dvh] bg-white font-sans text-gray-900 antialiased dark:bg-[#0A0A0F] dark:text-gray-100"
+    x-data
+    @keydown.escape.window="$store.mobileMenu.close()"
+>
     {{-- Mobile Top Bar --}}
-    <div class="lg:hidden fixed top-0 inset-x-0 z-30 h-16 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/10 flex items-center justify-between px-4 safe-area-top">
-        <button id="mobile-menu-btn" @click="$store.mobileMenu.toggle()" class="flex items-center justify-center size-11 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white -ml-2" aria-label="Toggle navigation" :aria-expanded="$store.mobileMenu.open.toString()" aria-controls="sidebar-panel">
-            <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <div class="safe-area-top fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur-sm lg:hidden dark:border-white/10 dark:bg-[#0A0A0F]/95">
+        <button
+            id="mobile-menu-btn"
+            @click="$store.mobileMenu.toggle()"
+            class="-ml-2 flex size-11 items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            aria-label="Toggle navigation"
+            :aria-expanded="$store.mobileMenu.open.toString()"
+            aria-controls="sidebar-panel"
+        >
+            <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
         </button>
-        <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $title ?? config('app.name') }}</span>
+        <span class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $title ?? config('app.name') }}</span>
         <div class="size-11"></div>
     </div>
 
@@ -67,10 +91,8 @@
         <livewire:admin-sidebar />
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-auto admin-main bg-white dark:bg-[#0A0A0F]">
-            <div class="p-8">
-                {{ $slot }}
-            </div>
+        <main class="admin-main flex-1 overflow-auto bg-white dark:bg-[#0A0A0F]">
+            <div class="p-8">{{ $slot }}</div>
         </main>
     </div>
 
@@ -101,13 +123,14 @@
                 <span class="absolute inline-flex h-2 w-2 rounded-full {{ $envDotColor }} animate-pulse-dot"></span>
                 <span class="relative inline-flex h-2 w-2 rounded-full {{ $envDotColor }} opacity-75"></span>
             </span>
-            <span class="text-xs font-semibold uppercase tracking-wide">{{ $environment }}</span>
+            <span class="text-xs font-semibold tracking-wide uppercase">{{ $environment }}</span>
         </div>
     </div>
 
     <style>
         @keyframes pulse-dot {
-            0%, 100% {
+            0%,
+            100% {
                 opacity: 1;
                 transform: scale(1);
             }
@@ -130,8 +153,12 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('mobileMenu', {
                 open: false,
-                toggle() { this.open = !this.open; },
-                close() { this.open = false; },
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
             });
         });
     </script>

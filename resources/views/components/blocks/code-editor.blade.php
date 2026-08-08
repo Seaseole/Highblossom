@@ -1,15 +1,12 @@
-<flux:input 
-    wire:model.live="blocks.{{ $index }}.attributes.content" 
-    label="Code" 
+<flux:input
+    wire:model.live="blocks.{{ $index }}.attributes.content"
+    label="Code"
     type="textarea"
     rows="6"
     placeholder="Enter code..."
 />
 
-<flux:select 
-    wire:model.live="blocks.{{ $index }}.attributes.language" 
-    label="Language"
->
+<flux:select wire:model.live="blocks.{{ $index }}.attributes.language" label="Language">
     <flux:select.option value="javascript">JavaScript</flux:select.option>
     <flux:select.option value="php">PHP</flux:select.option>
     <flux:select.option value="python">Python</flux:select.option>
@@ -19,8 +16,8 @@
     <flux:select.option value="sql">SQL</flux:select.option>
 </flux:select>
 
-<flux:input 
-    wire:model.live="blocks.{{ $index }}.attributes.class" 
-    label="CSS Classes" 
+<flux:input
+    wire:model.live="blocks.{{ $index }}.attributes.class"
+    label="CSS Classes"
     placeholder="Additional CSS classes..."
 />

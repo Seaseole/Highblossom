@@ -1,20 +1,29 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark scroll-smooth">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <x-seo.meta />
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script src="/vendor/ckeditor/ckeditor.js"></script>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+    />
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/site-booking.js', 'resources/js/site-alpine.js'])
     @include('partials.cloak')
@@ -29,7 +38,11 @@
             -webkit-backdrop-filter: blur(20px);
         }
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
         }
         .primary-gradient {
             background: linear-gradient(135deg, #73081d 0%, #a93440 100%);
@@ -49,16 +62,14 @@
         }
         /* Base background color to prevent flash */
         html {
-            background-color: #0A0A0F;
+            background-color: #0a0a0f;
         }
     </style>
 </head>
-<body class="bg-[#0A0A0F] text-[#FAFAFA] font-body selection:bg-[#DC2626] selection:text-white antialiased">
+<body class="font-body bg-[#0A0A0F] text-[#FAFAFA] antialiased selection:bg-[#DC2626] selection:text-white">
     @include('partials.site-nav')
 
-    <main>
-        {{ $slot }}
-    </main>
+    <main>{{ $slot }}</main>
 
     @include('partials.site-footer')
     @include('partials.whatsapp-fab')

@@ -1,44 +1,151 @@
 <x-layouts::site title="Contact Us">
     <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 bg-[#0A0A0F]">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.label') }}</div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FAFAFA] font-headline tracking-tight mb-6">
+    <section class="relative bg-[#0A0A0F] pt-32 pb-20">
+        <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    {{ __('contact.label') }}
+                </div>
+                <h1 class="font-headline mb-6 text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl lg:text-6xl">
                     {{ __('contact.title') }}
                 </h1>
-                <p class="text-lg text-[#A1A1AA] leading-relaxed">
-                    {{ __('contact.description') }}
-                </p>
+                <p class="text-lg leading-relaxed text-[#A1A1AA]">{{ __('contact.description') }}</p>
             </div>
         </div>
     </section>
 
     <!-- Contact Methods Grid -->
-    <section class="py-24 bg-[#0A0A0F]">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="bg-[#0A0A0F] py-24">
+        <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 @forelse ($contactNumbers->take(3) as $index => $number)
-                <div class="glass-card rounded-2xl p-8 text-center group hover:bg-white/[0.06] transition-all">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#DC2626]/20 transition-colors">
-                        @if ($number->is_whatsapp)
-                            <svg class="w-8 h-8 text-[#DC2626]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.447-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 5.834h-.004a9.311 9.311 0 01-4.51-1.177l-.323-.191-3.35.879.893-3.267-.209-.332a9.309 9.309 0 01-1.38-4.984c0-5.149 4.19-9.338 9.346-9.338a9.307 9.307 0 016.607 2.737 9.32 9.32 0 012.73 6.609c-.002 5.15-4.191 9.338-9.346 9.338m7.642-16.862A11.292 11.292 0 0012.237 0C5.636 0 .17 5.467.17 12.067c0 2.126.556 4.197 1.607 6.017L0 24l6.256-1.64a11.248 11.248 0 005.98 1.608c6.598 0 11.965-5.468 11.965-12.067a11.956 11.956 0 00-3.508-8.47"/>
+                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                            @if ($number->is_whatsapp)
+                                <svg class="h-8 w-8 text-[#DC2626]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.447-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 5.834h-.004a9.311 9.311 0 01-4.51-1.177l-.323-.191-3.35.879.893-3.267-.209-.332a9.309 9.309 0 01-1.38-4.984c0-5.149 4.19-9.338 9.346-9.338a9.307 9.307 0 016.607 2.737 9.32 9.32 0 012.73 6.609c-.002 5.15-4.191 9.338-9.346 9.338m7.642-16.862A11.292 11.292 0 0012.237 0C5.636 0 .17 5.467.17 12.067c0 2.126.556 4.197 1.607 6.017L0 24l6.256-1.64a11.248 11.248 0 005.98 1.608c6.598 0 11.965-5.468 11.965-12.067a11.956 11.956 0 00-3.508-8.47" />
+                                </svg>
+                            @else
+                                <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                            @endif
+                        </div>
+                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                            {{ $number->is_whatsapp ? __('contact.whatsapp') : $number->label }}
+                        </div>
+                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                            {{ $number->formatted_number }}
+                        </div>
+                        <p class="mb-6 text-sm text-[#71717A]">
+                            @if ($number->is_primary)
+                                @php
+                                    try {
+                                        $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
+                                        $openDays = [];
+                                        $closedDays = [];
+
+                                        if (isset($workingHours) && is_array($workingHours)) {
+                                            foreach ($dayOrder as $key => $abbr) {
+                                                if (isset($workingHours[$key]) && ! ($workingHours[$key]['is_closed'] ?? false)) {
+                                                    $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
+                                                    $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')).' – '.date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
+                                                    $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
+                                                } else {
+                                                    $closedDays[] = $abbr;
+                                                }
+                                            }
+
+                                            // Group consecutive days with same hours
+                                            $groupedDays = [];
+                                            $currentGroup = [];
+                                            $currentTime = null;
+                                            $prevKey = null;
+                                            $dayKeys = array_keys($dayOrder);
+
+                                            foreach ($dayKeys as $key) {
+                                                if (! isset($openDays[$key])) {
+                                                    continue;
+                                                }
+
+                                                $dayData = $openDays[$key];
+                                                $time = $dayData['time'];
+
+                                                // Check if consecutive and same time
+                                                $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
+
+                                                if ($time === $currentTime && $isConsecutive) {
+                                                    $currentGroup[] = $dayData['abbr'];
+                                                } else {
+                                                    if (! empty($currentGroup)) {
+                                                        $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                                    }
+                                                    $currentGroup = [$dayData['abbr']];
+                                                    $currentTime = $time;
+                                                }
+                                                $prevKey = $key;
+                                            }
+
+                                            if (! empty($currentGroup)) {
+                                                $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
+                                            }
+
+                                            // Modern professional format
+                                            $formatted = [];
+                                            foreach ($groupedDays as $group) {
+                                                $dayLabel = count($group['days']) > 2
+                                                    ? $group['days'][0].'–'.end($group['days'])
+                                                    : implode(' & ', $group['days']);
+                                                $formatted[] = $dayLabel.' · '.$group['time'];
+                                            }
+
+                                            if (! empty($closedDays)) {
+                                                $closedLabel = count($closedDays) > 2
+                                                    ? $closedDays[0].'–'.end($closedDays)
+                                                    : implode(' & ', $closedDays);
+                                                $formatted[] = $closedLabel.' · Closed';
+                                            }
+
+                                            echo implode(' | ', $formatted);
+                                        } else {
+                                            echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                                        }
+                                    } catch (\Exception $e) {
+                                        echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
+                                    }
+                                @endphp
+                            @elseif ($number->is_whatsapp)
+                                {{ __('contact.available_24_7') }}
+                            @else
+                                {{ $number->label }} {{ __('contact.line_label') }}
+                            @endif
+                        </p>
+                        <a
+                            href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . $number->phone_number }}"
+                            target="{{ $number->is_whatsapp ? '_blank' : '_self' }}"
+                            class="btn-premium"
+                        >
+                            <span>{{ $number->is_whatsapp ? __('contact.chat_on_whatsapp') : __('contact.call_now') }}</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
-                        @else
-                            <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </a>
+                    </div>
+                @empty
+                    <!-- Fallback Cards -->
+                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                        @endif
-                    </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">
-                        {{ $number->is_whatsapp ? __('contact.whatsapp') : $number->label }}
-                    </div>
-                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
-                        {{ $number->formatted_number }}
-                    </div>
-                    <p class="text-[#71717A] text-sm mb-6">
-                        @if ($number->is_primary)
+                        </div>
+                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                            {{ __('contact.phone') }}
+                        </div>
+                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                            {{ $primaryPhone ?? '+267 123 456 78' }}
+                        </div>
+                        <p class="mb-6 text-sm text-[#71717A]">
                             @php
                                 try {
                                     $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
@@ -47,9 +154,9 @@
 
                                     if (isset($workingHours) && is_array($workingHours)) {
                                         foreach ($dayOrder as $key => $abbr) {
-                                            if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
+                                            if (isset($workingHours[$key]) && ! ($workingHours[$key]['is_closed'] ?? false)) {
                                                 $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
-                                                $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')) . ' – ' . date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
+                                                $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')).' – '.date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
                                                 $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
                                             } else {
                                                 $closedDays[] = $abbr;
@@ -64,7 +171,9 @@
                                         $dayKeys = array_keys($dayOrder);
 
                                         foreach ($dayKeys as $key) {
-                                            if (!isset($openDays[$key])) continue;
+                                            if (! isset($openDays[$key])) {
+                                                continue;
+                                            }
 
                                             $dayData = $openDays[$key];
                                             $time = $dayData['time'];
@@ -75,7 +184,7 @@
                                             if ($time === $currentTime && $isConsecutive) {
                                                 $currentGroup[] = $dayData['abbr'];
                                             } else {
-                                                if (!empty($currentGroup)) {
+                                                if (! empty($currentGroup)) {
                                                     $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
                                                 }
                                                 $currentGroup = [$dayData['abbr']];
@@ -84,7 +193,7 @@
                                             $prevKey = $key;
                                         }
 
-                                        if (!empty($currentGroup)) {
+                                        if (! empty($currentGroup)) {
                                             $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
                                         }
 
@@ -92,16 +201,16 @@
                                         $formatted = [];
                                         foreach ($groupedDays as $group) {
                                             $dayLabel = count($group['days']) > 2
-                                                ? $group['days'][0] . '–' . end($group['days'])
+                                                ? $group['days'][0].'–'.end($group['days'])
                                                 : implode(' & ', $group['days']);
-                                            $formatted[] = $dayLabel . ' · ' . $group['time'];
+                                            $formatted[] = $dayLabel.' · '.$group['time'];
                                         }
 
-                                        if (!empty($closedDays)) {
+                                        if (! empty($closedDays)) {
                                             $closedLabel = count($closedDays) > 2
-                                                ? $closedDays[0] . '–' . end($closedDays)
+                                                ? $closedDays[0].'–'.end($closedDays)
                                                 : implode(' & ', $closedDays);
-                                            $formatted[] = $closedLabel . ' · Closed';
+                                            $formatted[] = $closedLabel.' · Closed';
                                         }
 
                                         echo implode(' | ', $formatted);
@@ -112,188 +221,103 @@
                                     echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
                                 }
                             @endphp
-                        @elseif ($number->is_whatsapp)
-                            {{ __('contact.available_24_7') }}
-                        @else
-                            {{ $number->label }} {{ __('contact.line_label') }}
-                        @endif
-                    </p>
-                    <a href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . $number->phone_number }}" target="{{ $number->is_whatsapp ? '_blank' : '_self' }}" class="btn-premium">
-                        <span>{{ $number->is_whatsapp ? __('contact.chat_on_whatsapp') : __('contact.call_now') }}</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
-                @empty
-                <!-- Fallback Cards -->
-                <div class="glass-card rounded-2xl p-8 text-center group hover:bg-white/[0.06] transition-all">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                        </svg>
+                        </p>
+                        <a
+                            href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone ?? '+26712345678') }}"
+                            class="btn-premium"
+                        >
+                            <span>{{ __('contact.call_now') }}</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.phone') }}</div>
-                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
-                        {{ $primaryPhone ?? '+267 123 456 78' }}
+
+                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                            {{ __('contact.email') }}
+                        </div>
+                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                            {{ $primaryEmail ?? 'info@highblossom.co.bw' }}
+                        </div>
+                        <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.reply_within_24h') }}</p>
+                        <a href="mailto:{{ $primaryEmail }}" class="btn-premium">
+                            <span>{{ __('contact.send_email') }}</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </div>
-                    <p class="text-[#71717A] text-sm mb-6">
-                        @php
-                            try {
-                                $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
-                                $openDays = [];
-                                $closedDays = [];
 
-                                if (isset($workingHours) && is_array($workingHours)) {
-                                    foreach ($dayOrder as $key => $abbr) {
-                                        if (isset($workingHours[$key]) && !($workingHours[$key]['is_closed'] ?? false)) {
-                                            $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
-                                            $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')) . ' – ' . date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
-                                            $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
-                                        } else {
-                                            $closedDays[] = $abbr;
-                                        }
-                                    }
-
-                                    // Group consecutive days with same hours
-                                    $groupedDays = [];
-                                    $currentGroup = [];
-                                    $currentTime = null;
-                                    $prevKey = null;
-                                    $dayKeys = array_keys($dayOrder);
-
-                                    foreach ($dayKeys as $key) {
-                                        if (!isset($openDays[$key])) continue;
-
-                                        $dayData = $openDays[$key];
-                                        $time = $dayData['time'];
-
-                                        // Check if consecutive and same time
-                                        $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-
-                                        if ($time === $currentTime && $isConsecutive) {
-                                            $currentGroup[] = $dayData['abbr'];
-                                        } else {
-                                            if (!empty($currentGroup)) {
-                                                $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                            }
-                                            $currentGroup = [$dayData['abbr']];
-                                            $currentTime = $time;
-                                        }
-                                        $prevKey = $key;
-                                    }
-
-                                    if (!empty($currentGroup)) {
-                                        $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                    }
-
-                                    // Modern professional format
-                                    $formatted = [];
-                                    foreach ($groupedDays as $group) {
-                                        $dayLabel = count($group['days']) > 2
-                                            ? $group['days'][0] . '–' . end($group['days'])
-                                            : implode(' & ', $group['days']);
-                                        $formatted[] = $dayLabel . ' · ' . $group['time'];
-                                    }
-
-                                    if (!empty($closedDays)) {
-                                        $closedLabel = count($closedDays) > 2
-                                            ? $closedDays[0] . '–' . end($closedDays)
-                                            : implode(' & ', $closedDays);
-                                        $formatted[] = $closedLabel . ' · Closed';
-                                    }
-
-                                    echo implode(' | ', $formatted);
-                                } else {
-                                    echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                                }
-                            } catch (\Exception $e) {
-                                echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                            }
-                        @endphp
-                    </p>
-                    <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone ?? '+26712345678') }}" class="btn-premium">
-                        <span>{{ __('contact.call_now') }}</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="glass-card rounded-2xl p-8 text-center group hover:bg-white/[0.06] transition-all">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
+                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                            {{ __('contact.location') }}
+                        </div>
+                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                            {{ __('contact.location_address') }}
+                        </div>
+                        <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.location_details') }}</p>
+                        <a href="https://maps.google.com" target="_blank" class="btn-premium">
+                            <span>{{ __('contact.get_directions') }}</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.email') }}</div>
-                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">
-                        {{ $primaryEmail ?? 'info@highblossom.co.bw' }}
-                    </div>
-                    <p class="text-[#71717A] text-sm mb-6">{{ __('contact.reply_within_24h') }}</p>
-                    <a href="mailto:{{ $primaryEmail }}" class="btn-premium">
-                        <span>{{ __('contact.send_email') }}</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="glass-card rounded-2xl p-8 text-center group hover:bg-white/[0.06] transition-all">
-                    <div class="w-16 h-16 rounded-2xl bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-8 h-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-3">{{ __('contact.location') }}</div>
-                    <div class="text-2xl font-bold text-[#FAFAFA] font-headline mb-2">{{ __('contact.location_address') }}</div>
-                    <p class="text-[#71717A] text-sm mb-6">{{ __('contact.location_details') }}</p>
-                    <a href="https://maps.google.com" target="_blank" class="btn-premium">
-                        <span>{{ __('contact.get_directions') }}</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
                 @endforelse
             </div>
         </div>
     </section>
 
     <!-- Map & Contact Form Section -->
-    <section class="py-24 bg-gradient-to-b from-[#0A0A0F] to-[#121218] border-t border-white/5">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="grid lg:grid-cols-2 gap-12">
+    <section class="border-t border-white/5 bg-gradient-to-b from-[#0A0A0F] to-[#121218] py-24">
+        <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
+            <div class="grid gap-12 lg:grid-cols-2">
                 <!-- Map -->
                 <div class="relative">
-                    <div class="h-[600px] rounded-2xl overflow-hidden relative">
+                    <div class="relative h-[600px] overflow-hidden rounded-2xl">
                         <iframe
                             src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($companyName) }}"
                             width="100%"
                             height="100%"
-                            style="border:0;"
+                            style="border: 0"
                             allowfullscreen=""
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
-                            class="grayscale contrast-125">
+                            class="contrast-125 grayscale"
+                        >
                         </iframe>
                         <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent"></div>
                     </div>
-                    <div class="glass-card rounded-2xl p-6 absolute bottom-6 left-6 right-6">
+                    <div class="glass-card absolute right-6 bottom-6 left-6 rounded-2xl p-6">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-[#DC2626]/10 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#DC2626]/10">
+                                <svg class="h-6 w-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-lg font-bold text-[#FAFAFA] font-headline mb-1">{{ $companyName }}</h3>
-                                <p class="text-[#A1A1AA] text-sm mb-3">{{ $companyAddress }}</p>
-                                <a href="{{ $mapDirectionsLink }}" target="_blank" class="inline-flex items-center gap-2 text-[#DC2626] text-sm font-semibold hover:text-[#FAFAFA] transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/>
+                                <h3 class="font-headline mb-1 text-lg font-bold text-[#FAFAFA]">{{ $companyName }}</h3>
+                                <p class="mb-3 text-sm text-[#A1A1AA]">{{ $companyAddress }}</p>
+                                <a
+                                    href="{{ $mapDirectionsLink }}"
+                                    target="_blank"
+                                    class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-colors hover:text-[#FAFAFA]"
+                                >
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
                                     </svg>
                                     {{ __('contact.get_directions') }}
                                 </a>
@@ -305,84 +329,153 @@
                 <!-- Contact Form -->
                 <div>
                     <div class="glass-card rounded-2xl p-8 md:p-10">
-                        <div class="flex items-center gap-3 mb-8">
-                            <div class="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        <div class="mb-8 flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/10">
+                                <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-2xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.send_message') }}</h2>
-                                <p class="text-[#71717A] text-sm">{{ __('contact.form_description') }}</p>
+                                <h2 class="font-headline text-2xl font-bold text-[#FAFAFA]">
+                                    {{ __('contact.send_message') }}
+                                </h2>
+                                <p class="text-sm text-[#71717A]">{{ __('contact.form_description') }}</p>
                             </div>
                         </div>
 
-                        <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6"
+                        <form
+                            action="{{ route('contact.submit') }}"
+                            method="POST"
+                            class="space-y-6"
                             x-data="{ isSubmitting: false }"
-                            @submit.prevent="if (!isSubmitting) { isSubmitting = true; $el.submit(); }">
+                            @submit.prevent="
+                                if (! isSubmitting) {
+                                    isSubmitting = true;
+                                    $el.submit();
+                                }
+                            "
+                        >
                             @csrf
-                            <input type="hidden" name="_idempotency_token" value="{{ session()->get('contact_token', md5(uniqid())) }}">
+                            <input
+                                type="hidden"
+                                name="_idempotency_token"
+                                value="{{ session()->get('contact_token', md5(uniqid())) }}"
+                            />
                             @php(session()->put('contact_token', md5(uniqid())))
-                            <div class="grid md:grid-cols-2 gap-6">
+                            <div class="grid gap-6 md:grid-cols-2">
                                 <div>
-                                    <label for="contact_name" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.full_name') }} *</label>
-                                    <input type="text" id="contact_name" name="name" required
+                                    <label for="contact_name" class="mb-2 block text-sm font-medium text-[#A1A1AA]"
+                                        >{{ __('contact.full_name') }} *</label>
+                                    <input
+                                        type="text"
+                                        id="contact_name"
+                                        name="name"
+                                        required
                                         class="form-input-premium @error('name') border-red-500 @enderror"
                                         value="{{ old('name') }}"
-                                        placeholder="John Doe">
-                                    @error('name') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
+                                        placeholder="John Doe"
+                                    />
+                                    @error('name')
+                                        <p class="mt-1 text-xs text-[#DC2626]">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 <div>
-                                    <label for="contact_email" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.email_address') }} *</label>
-                                    <input type="email" id="contact_email" name="email" required
+                                    <label for="contact_email" class="mb-2 block text-sm font-medium text-[#A1A1AA]"
+                                        >{{ __('contact.email_address') }} *</label>
+                                    <input
+                                        type="email"
+                                        id="contact_email"
+                                        name="email"
+                                        required
                                         class="form-input-premium @error('email') border-red-500 @enderror"
                                         value="{{ old('email') }}"
-                                        placeholder="{{ __('contact.email_placeholder') }}">
-                                    @error('email') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
+                                        placeholder="{{ __('contact.email_placeholder') }}"
+                                    />
+                                    @error('email')
+                                        <p class="mt-1 text-xs text-[#DC2626]">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
                             <div>
-                                <label for="contact_phone" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.phone_number') }}</label>
-                                <input type="tel" id="contact_phone" name="phone"
+                                <label
+                                    for="contact_phone"
+                                    class="mb-2 block text-sm font-medium text-[#A1A1AA]"
+                                >{{ __('contact.phone_number') }}</label>
+                                <input
+                                    type="tel"
+                                    id="contact_phone"
+                                    name="phone"
                                     class="form-input-premium @error('phone') border-red-500 @enderror"
                                     value="{{ old('phone') }}"
-                                    placeholder="{{ __('contact.phone_placeholder') }}">
-                                @error('phone') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
+                                    placeholder="{{ __('contact.phone_placeholder') }}"
+                                />
+                                @error('phone')
+                                    <p class="mt-1 text-xs text-[#DC2626]">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="contact_subject" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.subject') }} *</label>
-                                <select id="contact_subject" name="subject" required
-                                    class="form-input-premium @error('subject') border-red-500 @enderror">
+                                <label for="contact_subject" class="mb-2 block text-sm font-medium text-[#A1A1AA]"
+                                    >{{ __('contact.subject') }} *</label>
+                                <select
+                                    id="contact_subject"
+                                    name="subject"
+                                    required
+                                    class="form-input-premium @error('subject') border-red-500 @enderror"
+                                >
                                     <option value="">{{ __('contact.select_subject') }}</option>
-                                    <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>{{ __('contact.subject_general') }}</option>
-                                    <option value="quote" {{ old('subject') == 'quote' ? 'selected' : '' }}>{{ __('contact.subject_quote') }}</option>
-                                    <option value="booking" {{ old('subject') == 'booking' ? 'selected' : '' }}>{{ __('contact.subject_booking') }}</option>
-                                    <option value="complaint" {{ old('subject') == 'complaint' ? 'selected' : '' }}>{{ __('contact.subject_complaint') }}</option>
-                                    <option value="other" {{ old('subject') == 'other' ? 'selected' : '' }}>{{ __('contact.subject_other') }}</option>
+                                    <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>
+                                        {{ __('contact.subject_general') }}
+                                    </option>
+                                    <option value="quote" {{ old('subject') == 'quote' ? 'selected' : '' }}>
+                                        {{ __('contact.subject_quote') }}
+                                    </option>
+                                    <option value="booking" {{ old('subject') == 'booking' ? 'selected' : '' }}>
+                                        {{ __('contact.subject_booking') }}
+                                    </option>
+                                    <option value="complaint" {{ old('subject') == 'complaint' ? 'selected' : '' }}>
+                                        {{ __('contact.subject_complaint') }}
+                                    </option>
+                                    <option value="other" {{ old('subject') == 'other' ? 'selected' : '' }}>
+                                        {{ __('contact.subject_other') }}
+                                    </option>
                                 </select>
-                                @error('subject') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
+                                @error('subject')
+                                    <p class="mt-1 text-xs text-[#DC2626]">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="contact_message" class="block text-sm font-medium text-[#A1A1AA] mb-2">{{ __('contact.message') }} *</label>
-                                <textarea id="contact_message" name="message" rows="4" required
+                                <label for="contact_message" class="mb-2 block text-sm font-medium text-[#A1A1AA]"
+                                    >{{ __('contact.message') }} *</label>
+                                <textarea
+                                    id="contact_message"
+                                    name="message"
+                                    rows="4"
+                                    required
                                     class="form-input-premium resize-none @error('message') border-red-500 @enderror"
-                                    placeholder="{{ __('contact.message_placeholder') }}">{{ old('message') }}</textarea>
-                                @error('message') <p class="mt-1 text-[#DC2626] text-xs">{{ $message }}</p> @enderror
+                                    placeholder="{{ __('contact.message_placeholder') }}"
+                                >{{ old('message') }}</textarea>
+                                @error('message')
+                                    <p class="mt-1 text-xs text-[#DC2626]">{{ $message }}</p>
+                                @enderror
                             </div>
-                            <button type="submit"
-                                class="btn-premium glow-red-subtle w-full text-lg py-4"
+                            <button
+                                type="submit"
+                                class="btn-premium glow-red-subtle w-full py-4 text-lg"
                                 :disabled="isSubmitting"
-                                :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
-                                <span x-show="!isSubmitting" x-cloak>{{ __('contact.submit_button') }}</span>
+                                :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }"
+                            >
+                                <span x-show="! isSubmitting" x-cloak>{{ __('contact.submit_button') }}</span>
                                 <span x-show="isSubmitting" x-cloak class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                     Sending...
                                 </span>
-                                <svg x-show="!isSubmitting" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                <svg x-show="
+                                        ! isSubmitting
+                                    " x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </button>
                         </form>
@@ -393,74 +486,83 @@
     </section>
 
     <!-- Business Hours -->
-    <section class="py-24 bg-[#0A0A0F]">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.operational_hours') }}</div>
-                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.business_hours') }}</h2>
+    <section class="bg-[#0A0A0F] py-24">
+        <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
+            <div class="mb-12 text-center">
+                <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    {{ __('contact.operational_hours') }}
+                </div>
+                <h2 class="font-headline text-3xl font-bold text-[#FAFAFA] md:text-4xl">
+                    {{ __('contact.business_hours') }}
+                </h2>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid gap-6 md:grid-cols-2">
                 <div class="glass-card rounded-2xl p-8">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <div class="mb-6 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/10">
+                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.workshop_hours') }}</h3>
+                        <h3 class="font-headline text-xl font-bold text-[#FAFAFA]">
+                            {{ __('contact.workshop_hours') }}
+                        </h3>
                     </div>
                     <ul class="space-y-4">
-                        @if($hasWorkingHours)
-                            @foreach($dayOrder as $key => $label)
+                        @if ($hasWorkingHours)
+                            @foreach ($dayOrder as $key => $label)
                                 @php($isClosed = $workingHours[$key]['is_closed'] ?? false)
                                 @php($openTime = $workingHours[$key]['open'] ?? null)
                                 @php($closeTime = $workingHours[$key]['close'] ?? null)
                                 @php($format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A')
                                 @php($timeDisplay = $isClosed ? 'Closed' : (date($format, strtotime($openTime)) . ' – ' . date($format, strtotime($closeTime))))
                                 @php($textClass = $isClosed ? 'text-[#DC2626]' : 'text-[#FAFAFA]')
-                                <li class="flex justify-between items-center py-3 border-b border-white/5">
+                                <li class="flex items-center justify-between border-b border-white/5 py-3">
                                     <span class="text-[#A1A1AA]">{{ $label }}</span>
                                     <span class="{{ $textClass }} font-semibold">{{ $timeDisplay }}</span>
                                 </li>
                             @endforeach
                         @else
-                            <li class="flex justify-between items-center py-3 border-b border-white/5">
+                            <li class="flex items-center justify-between border-b border-white/5 py-3">
                                 <span class="text-[#A1A1AA]">{{ __('contact.monday_friday') }}</span>
-                                <span class="text-[#FAFAFA] font-semibold">7:30 AM – 5:00 PM</span>
+                                <span class="font-semibold text-[#FAFAFA]">7:30 AM – 5:00 PM</span>
                             </li>
-                            <li class="flex justify-between items-center py-3 border-b border-white/5">
+                            <li class="flex items-center justify-between border-b border-white/5 py-3">
                                 <span class="text-[#A1A1AA]">{{ __('contact.saturday') }}</span>
-                                <span class="text-[#FAFAFA] font-semibold">8:00 AM – 1:00 PM</span>
+                                <span class="font-semibold text-[#FAFAFA]">8:00 AM – 1:00 PM</span>
                             </li>
-                            <li class="flex justify-between items-center py-3">
+                            <li class="flex items-center justify-between py-3">
                                 <span class="text-[#A1A1AA]">{{ __('contact.sunday') }}</span>
-                                <span class="text-[#DC2626] font-semibold">{{ __('contact.closed') }}</span>
+                                <span class="font-semibold text-[#DC2626]">{{ __('contact.closed') }}</span>
                             </li>
                         @endif
                     </ul>
                 </div>
 
-                <div class="glass-card rounded-2xl p-6 relative overflow-hidden self-start">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#DC2626]/10 rounded-full blur-3xl"></div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                <div class="glass-card relative self-start overflow-hidden rounded-2xl p-6">
+                    <div class="absolute top-0 right-0 h-32 w-32 rounded-full bg-[#DC2626]/10 blur-3xl"></div>
+                    <div class="mb-4 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/10">
+                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.emergency_service') }}</h3>
+                        <h3 class="font-headline text-xl font-bold text-[#FAFAFA]">
+                            {{ __('contact.emergency_service') }}
+                        </h3>
                     </div>
-                    <p class="text-[#A1A1AA] mb-4 text-sm">
-                        {{ __('contact.emergency_description') }}
-                    </p>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('contact.emergency_description') }}</p>
                     @if ($primaryPhone)
-                    <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}" class="btn-premium text-sm py-2 px-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                        </svg>
-                        <span>{{ __('contact.hotline') }}: {{ $primaryPhone }}</span>
-                    </a>
+                        <a
+                            href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
+                            class="btn-premium px-4 py-2 text-sm"
+                        >
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span>{{ __('contact.hotline') }}: {{ $primaryPhone }}</span>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -468,58 +570,71 @@
     </section>
 
     <!-- Quick Actions -->
-    <section class="py-24 bg-gradient-to-b from-[#0A0A0F] to-[#121218] border-t border-white/5">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <div class="text-[#DC2626] text-sm font-semibold uppercase tracking-wider mb-4">{{ __('contact.navigation') }}</div>
-                <h2 class="text-3xl md:text-4xl font-bold text-[#FAFAFA] font-headline">{{ __('contact.quick_actions') }}</h2>
+    <section class="border-t border-white/5 bg-gradient-to-b from-[#0A0A0F] to-[#121218] py-24">
+        <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
+            <div class="mb-12 text-center">
+                <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    {{ __('contact.navigation') }}
+                </div>
+                <h2 class="font-headline text-3xl font-bold text-[#FAFAFA] md:text-4xl">
+                    {{ __('contact.quick_actions') }}
+                </h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <a href="{{ route('quote') }}" class="glass-card rounded-2xl p-8 group hover:bg-white/[0.06] transition-all">
-                    <div class="w-12 h-12 rounded-xl bg-[#DC2626]/10 flex items-center justify-center mb-4 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <a
+                    href="{{ route('quote') }}"
+                    class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
+                >
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                        <svg class="h-6 w-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">{{ __('contact.get_quote') }}</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">{{ __('contact.get_quote_description') }}</p>
-                    <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
+                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">{{ __('contact.get_quote') }}</h3>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('contact.get_quote_description') }}</p>
+                    <div class="flex items-center gap-2 font-semibold text-[#DC2626]">
                         <span>{{ __('contact.go') }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
                 </a>
 
-                <a href="{{ route('services') }}" class="glass-card rounded-2xl p-8 group hover:bg-white/[0.06] transition-all">
-                    <div class="w-12 h-12 rounded-xl bg-[#DC2626]/10 flex items-center justify-center mb-4 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                <a
+                    href="{{ route('services') }}"
+                    class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
+                >
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                        <svg class="h-6 w-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">View Services</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">Explore our range of glass services</p>
-                    <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
+                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">View Services</h3>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">Explore our range of glass services</p>
+                    <div class="flex items-center gap-2 font-semibold text-[#DC2626]">
                         <span>{{ __('contact.go') }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
                 </a>
 
-                <a href="{{ route('gallery') }}" class="glass-card rounded-2xl p-8 group hover:bg-white/[0.06] transition-all">
-                    <div class="w-12 h-12 rounded-xl bg-[#DC2626]/10 flex items-center justify-center mb-4 group-hover:bg-[#DC2626]/20 transition-colors">
-                        <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                <a
+                    href="{{ route('gallery') }}"
+                    class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
+                >
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                        <svg class="h-6 w-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-[#FAFAFA] font-headline mb-2">View Gallery</h3>
-                    <p class="text-[#A1A1AA] text-sm mb-4">See our completed projects</p>
-                    <div class="flex items-center gap-2 text-[#DC2626] font-semibold">
+                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">View Gallery</h3>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">See our completed projects</p>
+                    <div class="flex items-center gap-2 font-semibold text-[#DC2626]">
                         <span>{{ __('contact.go') }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
                 </a>

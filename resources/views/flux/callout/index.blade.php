@@ -16,9 +16,11 @@
 ])
 
 @php
-    if ($color === 'gray') $color = 'zinc';
+    if ($color === 'gray') {
+        $color = 'zinc';
+    }
 
-    $color = match($variant) {
+    $color = match ($variant) {
         'success' => 'green',
         'danger' => 'red',
         'warning' => 'yellow',
@@ -33,7 +35,7 @@
             '[&_[data-slot=heading]]:text-(--callout-heading)',
             '[&_[data-slot=text]]:text-(--callout-text)',
         ])
-        ->add(match($color) {
+        ->add(match ($color) {
             'blue' => [
                 '[--callout-border:var(--color-blue-200)] dark:[--callout-border:color-mix(in_oklab,var(--color-blue-400),transparent_50%)]',
                 '[--callout-background:var(--color-blue-50)] dark:[--callout-background:color-mix(in_oklab,var(--color-blue-400),transparent_90%)]',
@@ -167,56 +169,54 @@
                 '[--callout-text:var(--color-zinc-500)] dark:[--callout-text:var(--color-zinc-300)]',
                 '[--callout-icon:var(--color-zinc-400)] dark:[--callout-icon:var(--color-zinc-400)]',
             ],
-        })
-        ;
+        });
 
     $iconWrapperClasses = Flux::classes()
-        ->add('ps-2 py-2 pe-0 flex items-baseline')
-        ;
+        ->add('ps-2 py-2 pe-0 flex items-baseline');
 
     $iconClasses = Flux::classes()
         ->add('inline-block size-5 text-[var(--callout-icon)] dark:text-[var(--callout-icon)]')
-        ->add($attributes->pluck('class:icon'))
-        ;
+        ->add($attributes->pluck('class:icon'));
 @endphp
 
 <div {{ $attributes->class($classes) }} data-flux-callout>
-    <?php if (is_string($icon) && $icon !== ''): ?>
-        <div class="{{ $iconWrapperClasses }}">
-            <flux:icon :icon="$icon" :variant="$iconVariant" :class="$iconClasses" />
-        </div>
-    <?php elseif ($icon): ?>
-        <div {{ $icon->attributes->class($iconWrapperClasses) }}>
-            {{ $icon }}
-        </div>
-    <?php endif; ?>
+    <?php if (is_string($icon) && $icon !== '') { ?>
+    <div class="{{ $iconWrapperClasses }}">
+        <flux:icon :icon="$icon" :variant="$iconVariant" :class="$iconClasses" />
+    </div>
+    <?php } elseif ($icon) { ?>
+    <div {{ $icon->attributes->class($iconWrapperClasses) }}>{{ $icon }}</div>
+    <?php } ?>
 
     <div class="ps-2 flex-1 {{ $inline ? '@md:flex @md:[&>[data-slot="content"]:has([data-slot="heading"]):has([data-slot="text"])+[data-slot="actions"]]:p-2' : '' }}">
         <div class="flex-1 py-2 pe-3 @md:pe-4 flex flex-col justify-center gap-2" data-slot="content">
-            <?php if ($heading): ?>
-                <flux:callout.heading>{{ $heading }}</flux:callout.heading>
-            <?php endif; ?>
+            <?php if ($heading) { ?>
+            <flux:callout.heading>{{ $heading }}</flux:callout.heading>
+            <?php } ?>
 
-            <?php if ($text): ?>
-                <flux:callout.text>{{ $text }}</flux:callout.text>
-            <?php endif; ?>
+            <?php if ($text) { ?>
+            <flux:callout.text>{{ $text }}</flux:callout.text>
+            <?php } ?>
 
             {{ $content ?? $slot }}
         </div>
 
-        <?php if ($actions): ?>
-            <div {{ $actions->attributes->class([
-                $inline ? '@max-md:py-2 @md:m-[-2px] @md:ps-4 @md:justify-end @md:flex-row-reverse' : 'py-2',
-                'self-start flex items-center gap-2'
-            ]) }} data-slot="actions">
-                {{ $actions }}
-            </div>
-        <?php endif; ?>
+        <?php if ($actions) { ?>
+        <div
+            {{
+                $actions->attributes->class([
+                    $inline ? '@max-md:py-2 @md:m-[-2px] @md:ps-4 @md:justify-end @md:flex-row-reverse' : 'py-2',
+                    'self-start flex items-center gap-2',
+                ])
+            }}
+            data-slot="actions"
+        >
+            {{ $actions }}
+        </div>
+        <?php } ?>
     </div>
 
-    <?php if ($controls): ?>
-        <div {{ $controls->attributes->class($inline ? 'ps-2 m-[-2px]' : 'ps-2') }}>
-            {{ $controls }}
-        </div>
-    <?php endif; ?>
+    <?php if ($controls) { ?>
+    <div {{ $controls->attributes->class($inline ? 'ps-2 m-[-2px]' : 'ps-2') }}>{{ $controls }}</div>
+    <?php } ?>
 </div>

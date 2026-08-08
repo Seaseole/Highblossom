@@ -1,9 +1,8 @@
 @blaze(fold: true)
 
 @php
-$classes = Flux::classes('[grid-area:footer]')
-    ->add($attributes->has('container') ? '' : 'p-6 lg:p-8')
-    ;
+    $classes = Flux::classes('[grid-area:footer]')
+        ->add($attributes->has('container') ? '' : 'p-6 lg:p-8');
 @endphp
 
 <div {{ $attributes->class($classes) }} data-flux-footer>

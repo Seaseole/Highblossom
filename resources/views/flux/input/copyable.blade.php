@@ -1,12 +1,12 @@
 @blaze(fold: true, memo: true)
 
 @php
-$attributes = $attributes->merge([
-    'variant' => 'subtle',
-    'class' => '-me-1',
-    'square' => true,
-    'size' => null,
-]);
+    $attributes = $attributes->merge([
+        'variant' => 'subtle',
+        'class' => '-me-1',
+        'square' => true,
+        'size' => null,
+    ]);
 @endphp
 
 <flux:button
@@ -17,6 +17,6 @@ $attributes = $attributes->merge([
     x-bind:data-copyable-copied="copied"
     aria-label="{{ __('Copy to clipboard') }}"
 >
-    <flux:icon.clipboard-document-check variant="mini" class="hidden [[data-copyable-copied]>&]:block" />
-    <flux:icon.clipboard-document variant="mini" class="block [[data-copyable-copied]>&]:hidden" />
+    <flux:icon.clipboard-document-check variant="mini" class="[[data-copyable-copied]>&]:block hidden" />
+    <flux:icon.clipboard-document variant="mini" class="[[data-copyable-copied]>&]:hidden block" />
 </flux:button>

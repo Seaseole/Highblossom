@@ -2,7 +2,7 @@
     $targetDate = $target_date ?? null;
     $label = $label ?? null;
     $timezone = $timezone ?? 'UTC';
-    $uniqueId = 'cb-countdown-' . uniqid();
+    $uniqueId = 'cb-countdown-'.uniqid();
 @endphp
 
 <style>
@@ -80,7 +80,8 @@
     }
 
     @keyframes pulse {
-        0%, 100% {
+        0%,
+        100% {
             opacity: 1;
         }
         50% {
@@ -125,7 +126,9 @@
     }
 </style>
 
-<div class="cb-countdown" x-data="{
+<div
+    class="cb-countdown"
+    x-data="{
     targetDate: new Date({{ strtotime($targetDate) * 1000 }}),
     remaining: { days: 0, hours: 0, minutes: 0, seconds: 0 },
     expired: false,
@@ -151,12 +154,20 @@
         
         this.remaining = { days, hours, minutes, seconds };
     }
-}" x-init="init()">
-    @if($label)
+}"
+    x-init="init()"
+>
+    @if ($label)
         <div class="cb-countdown__label">{{ $label }}</div>
     @endif
 
-    <div class="cb-countdown__timer" x-show="!expired" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
+    <div
+        class="cb-countdown__timer"
+        x-show="! expired"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+    >
         <div class="cb-countdown__unit">
             <span class="cb-countdown__value" x-text="String(remaining.days).padStart(2, '0')">00</span>
             <span class="cb-countdown__unit-label">Days</span>
@@ -175,7 +186,14 @@
         </div>
     </div>
 
-    <div class="cb-countdown__expired" x-show="expired" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+    <div
+        class="cb-countdown__expired"
+        x-show="expired"
+        x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+    >
         Countdown expired
     </div>
 </div>

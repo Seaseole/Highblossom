@@ -20,10 +20,7 @@
             ],
             'pulse' => 'animate-pulse',
             default => '',
-        })
-        ;
+        });
 @endphp
 
-<div {{ $attributes->class($classes) }} data-flux-skeleton>
-    {{ $slot }}
-</div>
+<div {{ $attributes->class($classes) }} data-flux-skeleton>{{ $slot }}</div>

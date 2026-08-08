@@ -1,11 +1,11 @@
 @blaze(fold: true)
 
 @php
-extract(Flux::forwardedAttributes($attributes, [
-    'name',
-    'multiple',
-    'size',
-]));
+    extract(Flux::forwardedAttributes($attributes, [
+        'name',
+        'multiple',
+        'size',
+    ]));
 @endphp
 
 @props([
@@ -15,16 +15,15 @@ extract(Flux::forwardedAttributes($attributes, [
 ])
 
 @php
-$classes = Flux::classes()
-    ->add('w-full flex items-center gap-4')
-    ->add('[[data-flux-input-group]_&]:items-stretch [[data-flux-input-group]_&]:gap-0')
+    $classes = Flux::classes()
+        ->add('w-full flex items-center gap-4')
+        ->add('[[data-flux-input-group]_&]:items-stretch [[data-flux-input-group]_&]:gap-0')
 
-    // NOTE: We need to add relative positioning here to prevent odd overflow behaviors because of
-    // "sr-only": https://github.com/tailwindlabs/tailwindcss/discussions/12429
-    ->add('relative')
-    ;
+        // NOTE: We need to add relative positioning here to prevent odd overflow behaviors because of
+        // "sr-only": https://github.com/tailwindlabs/tailwindcss/discussions/12429
+        ->add('relative');
 
-[ $styleAttributes, $attributes ] = Flux::splitAttributes($attributes);
+    [$styleAttributes, $attributes] = Flux::splitAttributes($attributes);
 @endphp
 
 <div
@@ -41,19 +40,22 @@ $classes = Flux::classes()
 >
     <input
         x-ref="input"
-        x-on:click.stop {{-- Without this, the parent element's click listener will ".prevent" the file input from being clicked... --}}
+        x-on:click.stop
+        {{-- Without this, the parent element's click listener will ".prevent" the file input from being clicked... --}}
         type="file"
         class="sr-only"
         tabindex="-1"
-        {{ $attributes }} {{ $multiple ? 'multiple' : '' }} @if($name)name="{{ $name }}"@endif
-    >
+        {{ $attributes }}
+        {{ $multiple ? 'multiple' : '' }}
+        @if ($name) name="{{ $name }}"@endif
+    />
 
     <flux:button as="div" class="cursor-pointer" :$size aria-hidden="true">
-        <?php if ($multiple) : ?>
-            {!! __('Choose files') !!}
-        <?php else : ?>
-            {!! __('Choose file') !!}
-        <?php endif; ?>
+        <?php if ($multiple) { ?>
+        {!! __('Choose files') !!}
+        <?php } else { ?>
+        {!! __('Choose file') !!}
+        <?php } ?>
     </flux:button>
 
     <div

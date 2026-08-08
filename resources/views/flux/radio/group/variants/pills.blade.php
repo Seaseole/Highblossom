@@ -6,7 +6,6 @@
     'error:name', 'error:bag', 'error:message', 'error:icon', 'error:nested', 'error:deep',
 ])
 
-
 @props([
     'variant' => null,
     'size' => null,
@@ -14,21 +13,24 @@
 ])
 
 @php
-// We only want to show the name attribute on the radio if it has been set
-// manually, but not if it has been set from the wire:model attribute...
-$showName = isset($name);
+    // We only want to show the name attribute on the radio if it has been set
+    // manually, but not if it has been set from the wire:model attribute...
+    $showName = isset($name);
 
-if (! isset($name)) {
-    $name = $attributes->whereStartsWith('wire:model')->first();
-}
+    if (! isset($name)) {
+        $name = $attributes->whereStartsWith('wire:model')->first();
+    }
 
-$classes = Flux::classes()
-    ->add('flex flex-wrap gap-3')
-    ;
+    $classes = Flux::classes()
+        ->add('flex flex-wrap gap-3');
 @endphp
 
 <flux:with-field :$attributes>
-    <ui-radio-group {{ $attributes->class($classes) }} @if($showName) name="{{ $name }}" @endif data-flux-radio-group-pills>
+    <ui-radio-group
+        {{ $attributes->class($classes) }}
+        @if ($showName) name="{{ $name }}" @endif
+        data-flux-radio-group-pills
+    >
         {{ $slot }}
     </ui-radio-group>
 </flux:with-field>

@@ -1,56 +1,98 @@
 <x-layouts::admin title="Media Library">
-    <div class="max-w-7xl mx-auto space-y-8 py-10" x-data="mediaLibrary()">
+    <div class="mx-auto max-w-7xl space-y-8 py-10" x-data="mediaLibrary()">
         <!-- Header -->
         <div class="space-y-1">
-            <h1 class="text-3xl font-semibold text-gray-900 dark:text-white font-headline">Media Library</h1>
+            <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Media Library</h1>
             <p class="text-gray-500 dark:text-gray-400">Upload or select existing media assets.</p>
         </div>
 
         {{-- Tabs --}}
-        <div class="flex gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-full w-max">
-            <button type="button"
+        <div class="flex w-max gap-2 rounded-full bg-gray-100 p-1.5 dark:bg-white/5">
+            <button
+                type="button"
                 @click="activeTab = 'browse'"
-                :class="activeTab === 'browse' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-                class="px-6 py-2 text-sm font-medium rounded-full transition-all">
+                :class="activeTab === 'browse'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                class="rounded-full px-6 py-2 text-sm font-medium transition-all"
+            >
                 Browse
             </button>
-            <button type="button"
+            <button
+                type="button"
                 @click="activeTab = 'upload'"
-                :class="activeTab === 'upload' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-                class="px-6 py-2 text-sm font-medium rounded-full transition-all">
+                :class="activeTab === 'upload'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                class="rounded-full px-6 py-2 text-sm font-medium transition-all"
+            >
                 Upload
             </button>
         </div>
 
         {{-- Browse Tab --}}
-        <div x-show="activeTab === 'browse'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="space-y-6 pt-2">
+        <div
+            x-show="activeTab === 'browse'"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            class="space-y-6 pt-2"
+        >
             @include('admin.media-library.partials.image-grid')
         </div>
 
         {{-- Upload Tab --}}
-        <div x-show="activeTab === 'upload'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="space-y-6 pt-2" style="display: none;">
-            <form action="{{ route('admin.media-library.upload') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-6">
+        <div
+            x-show="activeTab === 'upload'"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            class="space-y-6 pt-2"
+            style="display: none"
+        >
+            <form
+                action="{{ route('admin.media-library.upload') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+            >
                 @csrf
-                <input type="hidden" name="image_path" id="media-image-path">
-                
+                <input type="hidden" name="image_path" id="media-image-path" />
+
                 <div id="media-image-preview"></div>
                 <div id="media-image-progress"></div>
-                
-                <div class="relative w-full bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[200px] cursor-pointer hover:border-gray-900 dark:hover:border-white transition-all">
-                    <label class="cursor-pointer text-center p-6 text-gray-500 dark:text-gray-400">
+
+                <div class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white">
+                    <label class="cursor-pointer p-6 text-center text-gray-500 dark:text-gray-400">
                         <span class="text-xs font-semibold">Click to upload image</span>
-                        <input type="file" name="upload" id="media-upload-input" class="hidden" accept="image/*" required>
+                        <input
+                            type="file"
+                            name="upload"
+                            id="media-upload-input"
+                            class="hidden"
+                            accept="image/*"
+                            required
+                        />
                     </label>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
-                        <input type="text" name="title" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            required
+                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                        />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                        <select name="category" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-gray-900 dark:focus:ring-[var(--color-admin-accent)]">
+                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                        <select
+                            name="category"
+                            required
+                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                        >
                             <option value="automotive">Automotive</option>
                             <option value="heavy_machinery">Heavy Machinery</option>
                             <option value="fleet">Fleet</option>
@@ -59,32 +101,58 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium py-2.5 px-6 rounded-full text-sm transition-all shadow-sm active:scale-[0.98]">
+                <button
+                    type="submit"
+                    class="w-full rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                >
                     Upload Media
                 </button>
             </form>
         </div>
 
         {{-- Preview Modal --}}
-        <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
-            <div x-show="showModal" @click="showModal = false" class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"></div>
-            <div x-show="showModal" class="relative bg-white dark:bg-[#0A0A0F] rounded-3xl border border-gray-200 dark:border-white/10 p-8 max-w-4xl w-full shadow-2xl flex flex-col md:flex-row gap-8">
-                <div class="md:w-3/5 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center p-4">
-                    <img :src="selectedImage.url" class="max-w-full max-h-[50vh] object-contain rounded-lg">
+        <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none">
+            <div
+                x-show="showModal"
+                @click="showModal = false"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            ></div>
+            <div
+                x-show="showModal"
+                class="relative flex w-full max-w-4xl flex-col gap-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl md:flex-row dark:border-white/10 dark:bg-[#0A0A0F]"
+            >
+                <div class="flex items-center justify-center rounded-2xl bg-gray-50 p-4 md:w-3/5 dark:bg-white/5">
+                    <img :src="selectedImage.url" class="max-h-[50vh] max-w-full rounded-lg object-contain" />
                 </div>
-                <div class="md:w-2/5 flex flex-col justify-between">
+                <div class="flex flex-col justify-between md:w-2/5">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4" x-text="selectedImage.title"></h2>
+                        <h2
+                            class="mb-4 text-xl font-semibold text-gray-900 dark:text-white"
+                            x-text="selectedImage.title"
+                        ></h2>
                         <dl class="space-y-4">
                             <div>
                                 <dt class="text-xs font-semibold text-gray-500 uppercase">File Info</dt>
-                                <dd class="text-sm text-gray-700 dark:text-gray-300" x-text="selectedImage.metadata?.file_size"></dd>
+                                <dd
+                                    class="text-sm text-gray-700 dark:text-gray-300"
+                                    x-text="selectedImage.metadata?.file_size"
+                                ></dd>
                             </div>
                         </dl>
                     </div>
                     <div class="flex gap-4 pt-6">
-                        <button @click="selectImage()" class="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium py-2 rounded-full text-sm">Select</button>
-                        <button @click="deleteImage()" class="px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full text-sm">Delete</button>
+                        <button
+                            @click="selectImage()"
+                            class="flex-1 rounded-full bg-gray-900 py-2 text-sm font-medium text-white dark:bg-white dark:text-gray-900"
+                        >
+                            Select
+                        </button>
+                        <button
+                            @click="deleteImage()"
+                            class="rounded-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                        >
+                            Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -109,7 +177,9 @@
                     const response = await fetch(`/admin/media-library/${id}`);
                     this.selectedImage = await response.json();
                     this.showModal = true;
-                } catch (error) { console.error(error); }
+                } catch (error) {
+                    console.error(error);
+                }
             },
             selectImage() {
                 window.dispatchEvent(new CustomEvent('image-selected', { detail: { url: this.selectedImage.url } }));
@@ -118,15 +188,20 @@
             async deleteImage() {
                 if (!confirm('Are you sure?')) return;
                 try {
-                    await fetch(`/admin/media-library/${this.selectedImage.id}`, { method: 'DELETE', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'} });
+                    await fetch(`/admin/media-library/${this.selectedImage.id}`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    });
                     window.location.reload();
-                } catch (error) { console.error(error); }
-            }
+                } catch (error) {
+                    console.error(error);
+                }
+            },
         };
     }
 
-    (function() {
-        const initMediaLibrary = function() {
+    (function () {
+        const initMediaLibrary = function () {
             if (typeof ImageUploader !== 'undefined') {
                 new ImageUploader({
                     fileInput: document.querySelector('input[name="upload"]'),
@@ -138,13 +213,13 @@
                     folder: 'uploads',
                     maxSize: 5 * 1024 * 1024, // 5MB
                     acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
-                    onUploadComplete: function(response) {
+                    onUploadComplete: function (response) {
                         console.log('Image uploaded successfully:', response);
                         window.location.reload();
                     },
-                    onUploadError: function(message) {
+                    onUploadError: function (message) {
                         console.error('Upload error:', message);
-                    }
+                    },
                 });
             }
         };

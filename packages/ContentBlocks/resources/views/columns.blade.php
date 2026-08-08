@@ -7,13 +7,13 @@
 
 <div class="cb-columns">
     <div class="cb-columns__grid">
-        @foreach($columns as $index => $columnBlocks)
+        @foreach ($columns as $index => $columnBlocks)
             @php
                 $width = $columnWidths[$index] ?? floor(12 / count($columns));
             @endphp
             <div class="cb-columns__column cb-columns__column--{{ $width }}">
-                @if($blockRenderer)
-                    @foreach($columnBlocks as $block)
+                @if ($blockRenderer)
+                    @foreach ($columnBlocks as $block)
                         {!! $blockRenderer->render($block['type'], $block['attributes']) !!}
                     @endforeach
                 @endif

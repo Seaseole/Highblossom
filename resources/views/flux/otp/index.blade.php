@@ -25,12 +25,12 @@
         role="group"
         data-flux-input-aria-label="{{ __('Character {current} of {total}') }}"
     >
-        <?php if($slot->isEmpty() && $length): ?>
-            <?php for($i = 0; $i < $length; $i++): ?>
-                <flux:otp.input />
-            <?php endfor; ?>
-        <?php else: ?>
-            {{ $slot }}
-        <?php endif; ?>
+        <?php if ($slot->isEmpty() && $length) { ?>
+        <?php for ($i = 0; $i < $length; $i++) { ?>
+        <flux:otp.input />
+        <?php } ?>
+        <?php } else { ?>
+        {{ $slot }}
+        <?php } ?>
     </ui-otp>
 </flux:with-field>

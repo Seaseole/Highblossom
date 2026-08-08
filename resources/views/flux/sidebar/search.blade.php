@@ -13,44 +13,38 @@
 ])
 
 @php
-$tooltip = $tooltip ?? $placeholder;
+    $tooltip = $tooltip ?? $placeholder;
 
-$tooltipKbd ??= $kbd;
+    $tooltipKbd ??= $kbd;
 
-$tooltipClasses = Flux::classes()
-    ->add('w-full')
-    ->add('in-data-flux-sidebar-header:in-data-flux-sidebar-collapsed-desktop:in-data-flux-sidebar-active:hidden')
-    ;
+    $tooltipClasses = Flux::classes()
+        ->add('w-full')
+        ->add('in-data-flux-sidebar-header:in-data-flux-sidebar-collapsed-desktop:in-data-flux-sidebar-active:hidden');
 
-$classes = Flux::classes()
-    ->add('h-10 py-2 px-3 w-full rounded-lg disabled:shadow-none dark:shadow-none appearance-none text-base sm:text-sm leading-[1.375rem] bg-zinc-800/5 dark:bg-white/10 dark:disabled:bg-white/[7%] text-zinc-700 placeholder-zinc-500 disabled:placeholder-zinc-400 dark:text-zinc-200 dark:placeholder-white/60 dark:disabled:placeholder-white/40 border-0 relative flex items-center gap-3')
-    ->add('in-data-flux-sidebar-on-mobile:h-10 in-data-flux-sidebar-collapsed-desktop:px-3')
-    ->add('in-data-flux-sidebar-header:in-data-flux-sidebar-collapsed-desktop:in-data-flux-sidebar-active:hidden')
-    ;
+    $classes = Flux::classes()
+        ->add('h-10 py-2 px-3 w-full rounded-lg disabled:shadow-none dark:shadow-none appearance-none text-base sm:text-sm leading-[1.375rem] bg-zinc-800/5 dark:bg-white/10 dark:disabled:bg-white/[7%] text-zinc-700 placeholder-zinc-500 disabled:placeholder-zinc-400 dark:text-zinc-200 dark:placeholder-white/60 dark:disabled:placeholder-white/40 border-0 relative flex items-center gap-3')
+        ->add('in-data-flux-sidebar-on-mobile:h-10 in-data-flux-sidebar-collapsed-desktop:px-3')
+        ->add('in-data-flux-sidebar-header:in-data-flux-sidebar-collapsed-desktop:in-data-flux-sidebar-active:hidden');
 @endphp
 
 <flux:tooltip :position="$tooltipPosition" :class="$tooltipClasses">
-    <button
-        {{ $attributes->class($classes) }}
-        type="button"
-        data-flux-sidebar-search
-    >
-        <div class="flex items-center justify-center text-xs text-zinc-400/75 start-0">
+    <button {{ $attributes->class($classes) }} type="button" data-flux-sidebar-search>
+        <div class="start-0 flex items-center justify-center text-xs text-zinc-400/75">
             <flux:icon class="size-4" icon="magnifying-glass" variant="outline" />
         </div>
 
-        <div class="in-data-flux-sidebar-collapsed-desktop:hidden block self-center text-start flex-1 font-medium text-zinc-400 dark:text-white/40">
+        <div class="block flex-1 self-center text-start font-medium text-zinc-400 in-data-flux-sidebar-collapsed-desktop:hidden dark:text-white/40">
             {{ $placeholder }}
         </div>
 
-        <?php if ($kbd): ?>
-            <div class="in-data-flux-sidebar-collapsed-desktop:hidden absolute top-0 bottom-0 flex items-center justify-center text-xs text-zinc-400/75 pe-4 end-0">
-                {{ $kbd }}
-            </div>
-        <?php endif; ?>
+        <?php if ($kbd) { ?>
+        <div class="absolute end-0 top-0 bottom-0 flex items-center justify-center pe-4 text-xs text-zinc-400/75 in-data-flux-sidebar-collapsed-desktop:hidden">
+            {{ $kbd }}
+        </div>
+        <?php } ?>
     </button>
 
-    <flux:tooltip.content :kbd="$tooltipKbd" class="not-in-data-flux-sidebar-collapsed-desktop:hidden cursor-default">
+    <flux:tooltip.content :kbd="$tooltipKbd" class="cursor-default not-in-data-flux-sidebar-collapsed-desktop:hidden">
         {{ $tooltip }}
     </flux:tooltip.content>
 </flux:tooltip>
