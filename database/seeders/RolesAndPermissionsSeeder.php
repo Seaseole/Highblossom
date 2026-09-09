@@ -80,7 +80,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create permissions
         foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission);
+            Permission::findOrCreate($permission, 'web');
         }
 
         // Create Super Admin role

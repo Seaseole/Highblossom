@@ -40,10 +40,12 @@
         "spatie/laravel-permission": "^7.3"
     },
     "require-dev": {
+        "albertoarena/laravel-truss": "^1.8",
         "beyondcode/laravel-query-detector": "^2.3",
         "fakerphp/faker": "^1.24",
         "fruitcake/laravel-debugbar": "^4.2",
         "laramint/laravel-brain": "^1.2",
+        "laravel/boost": "^2.7",
         "laravel/doctor": "^0.1.0",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",

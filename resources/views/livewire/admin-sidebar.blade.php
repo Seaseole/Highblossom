@@ -92,9 +92,13 @@
                             :aria-expanded="open.toString()"
                         >
                             {{ $groupData['label'] }}
-                            <svg class="size-3 transition-transform duration-200" :class="open
-                                    ? 'rotate-180'
-                                    : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <svg
+                                class="size-3 transition-transform duration-200"
+                                :class="open ? 'rotate-180' : ''"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
                         <div x-show="open" x-collapse.duration.200ms class="space-y-1">
                             @foreach ($groupData['routes'] as $route)
@@ -191,9 +195,13 @@
                         :aria-expanded="open.toString()"
                     >
                         {{ $groupData['label'] }}
-                        <svg class="size-3 transition-transform duration-200" :class="open
-                                ? 'rotate-180'
-                                : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        <svg
+                            class="size-3 transition-transform duration-200"
+                            :class="open ? 'rotate-180' : ''"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     <div x-show="open" x-collapse.duration.200ms class="space-y-1">
                         @foreach ($groupData['routes'] as $route)

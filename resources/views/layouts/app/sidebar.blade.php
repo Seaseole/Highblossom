@@ -51,9 +51,13 @@
                     "
                     class="flex-shrink-0 rounded p-1 transition-colors hover:bg-gray-100"
                 >
-                    <svg :class="sidebarCollapsed
-                            ? 'rotate-180'
-                            : ''" class="h-5 w-5 text-gray-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                        :class="sidebarCollapsed ? 'rotate-180' : ''"
+                        class="h-5 w-5 text-gray-500 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>

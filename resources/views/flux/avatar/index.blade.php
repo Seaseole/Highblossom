@@ -179,9 +179,9 @@
         data-size="{{ $size }}"
     >
         <?php
-        use Illuminate\View\ComponentSlot;
+                use Illuminate\View\ComponentSlot;
 
-if ($src) { ?>
+        if ($src) { ?>
         <img src="{{ $src }}" alt="{{ $alt ?? $name }}" class="size-full rounded-[var(--avatar-radius)] object-cover" />
         <?php } elseif ($icon) { ?>
         <flux:icon :name="$icon" :variant="$iconVariant" :class="$iconClasses" />

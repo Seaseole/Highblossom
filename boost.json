@@ -1,0 +1,19 @@
+{
+    "agents": [
+        "antigravity"
+    ],
+    "cloud": true,
+    "packages": [
+        "spatie/laravel-permission",
+        "fruitcake/laravel-debugbar"
+    ],
+    "skills": [
+        "fortify-development",
+        "laravel-best-practices",
+        "configure-nightwatch",
+        "tailwindcss-development",
+        "laravel-permission-development",
+        "debug-using-debugbar",
+        "deploying-laravel-cloud"
+    ]
+}

@@ -30,9 +30,9 @@
 <button type="button" {{ $attributes->class($classes) }} data-flux-profile>
     <div class="shrink-0">
         <?php
-        use Illuminate\View\ComponentSlot;
+                use Illuminate\View\ComponentSlot;
 
-if ($avatar instanceof ComponentSlot) { ?>
+        if ($avatar instanceof ComponentSlot) { ?>
         {{ $avatar }}
         <?php } else { ?>
         <?php $avatarAttributes = Flux::attributesAfter('avatar:', $attributes, ['src' => $avatar, 'size' => 'sm', 'circle' => $circle, 'name' => $name, 'initials' => $initials]); ?>

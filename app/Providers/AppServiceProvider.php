@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Http\View\Composers\GlobalSettingsComposer;
+use App\Services\AvailabilityService;
 use App\Services\Contracts\AvailabilityServiceInterface;
 use App\Services\Settings\SettingsManager;
 use Auditify\Facades\Auditify;
@@ -33,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SettingsManager::class, SettingsManager::class);
 
-        $this->app->singleton(AvailabilityServiceInterface::class, AvaabilityService::class);
+        $this->app->singleton(AvailabilityServiceInterface::class, AvailabilityService::class);
     }
 
     /**
