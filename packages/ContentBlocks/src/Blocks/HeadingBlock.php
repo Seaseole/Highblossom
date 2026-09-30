@@ -38,7 +38,7 @@ class HeadingBlock extends AbstractBlock
     {
         return [
             'content' => '',
-            'level' => 2,
+            'level' => 'h2',
             'class' => '',
         ];
     }

@@ -39,7 +39,9 @@ final class GalleryBlock extends AbstractBlock
     public function getDefaultAttributes(): array
     {
         return [
-            'images' => [],
+            'images' => [
+                ['src' => '', 'alt' => '', 'caption' => null],
+            ],
             'columns' => 3,
         ];
     }

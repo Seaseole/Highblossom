@@ -940,6 +940,11 @@ select optgroup {
     width: 18px;
     height: 18px;
     transform: translate3d(0, 0, 0);
+    transition: transform 160ms var(--ease-out-quint);
+}
+
+.ui-checkbox-wrapper:active .ui-checkbox-check {
+    transform: translate3d(0, 0, 0) scale(0.9);
 }
 
 .ui-checkbox-check::before {
@@ -964,7 +969,7 @@ select optgroup {
     stroke: #71717a;
     stroke-width: 1.5;
     transform: translate3d(0, 0, 0);
-    transition: all 0.2s ease;
+    transition: stroke 150ms ease;
 }
 
 .ui-checkbox-check svg path {
@@ -997,25 +1002,23 @@ select optgroup {
 
 .ui-checkbox-input:checked + .ui-checkbox-check svg path {
     stroke-dashoffset: 60;
-    transition: all 0.3s linear;
+    transition: stroke-dashoffset 200ms linear;
 }
 
 .ui-checkbox-input:checked + .ui-checkbox-check svg polyline {
     stroke-dashoffset: 42;
-    transition: all 0.2s linear;
-    transition-delay: 0.15s;
+    transition: stroke-dashoffset 150ms linear 75ms;
 }
 
-/* Unchecked state - reverse animation */
+/* Unchecked state — checkmark retracts first, box reopens after */
 .ui-checkbox-input:not(:checked) + .ui-checkbox-check svg path {
     stroke-dashoffset: 0;
-    transition: all 0.3s linear;
+    transition: stroke-dashoffset 200ms linear 150ms;
 }
 
 .ui-checkbox-input:not(:checked) + .ui-checkbox-check svg polyline {
     stroke-dashoffset: 66;
-    transition: all 0.2s linear;
-    transition-delay: 0.15s;
+    transition: stroke-dashoffset 150ms linear;
 }
 
 /* Focus state for accessibility */
@@ -1027,7 +1030,7 @@ select optgroup {
 
 /* Label styling */
 .ui-checkbox-label {
-    color: #a1a1aa;
+    color: var(--checkbox-label, #a1a1aa);
     font-size: 0.875rem;
     transition: color 0.2s ease;
     user-select: none;
@@ -1035,7 +1038,7 @@ select optgroup {
 
 .ui-checkbox-wrapper:hover .ui-checkbox-label,
 .group:hover .ui-checkbox-label {
-    color: #fafafa;
+    color: var(--checkbox-label-hover, #fafafa);
 }
 
 /* Disabled state */
@@ -1051,6 +1054,22 @@ select optgroup {
 .ui-checkbox-input:disabled ~ .ui-checkbox-label {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Reduced motion — keep color/state changes, remove movement */
+@media (prefers-reduced-motion: reduce) {
+    .ui-checkbox-check,
+    .ui-checkbox-check::before,
+    .ui-checkbox-check svg,
+    .ui-checkbox-check svg path,
+    .ui-checkbox-check svg polyline {
+        transition-duration: 0ms !important;
+        transition-delay: 0ms !important;
+    }
+
+    .ui-checkbox-wrapper:active .ui-checkbox-check {
+        transform: translate3d(0, 0, 0);
+    }
 }
 .feather-overlay {
     background:

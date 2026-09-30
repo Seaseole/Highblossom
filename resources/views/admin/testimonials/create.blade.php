@@ -75,25 +75,8 @@
                 </div>
 
                 <div class="flex items-center gap-6">
-                    <label class="flex cursor-pointer items-center gap-2">
-                        <input
-                            type="checkbox"
-                            name="is_featured"
-                            value="1"
-                            class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                        />
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Featured</span>
-                    </label>
-                    <label class="flex cursor-pointer items-center gap-2">
-                        <input
-                            type="checkbox"
-                            name="is_published"
-                            value="1"
-                            checked
-                            class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                        />
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Published</span>
-                    </label>
+                    <x-ui.checkbox name="is_featured" value="1" label="Featured" />
+                    <x-ui.checkbox name="is_published" value="1" :checked="true" label="Published" />
                 </div>
 
                 <div>

@@ -284,3 +284,14 @@
 [contenteditable] u {
     text-decoration: underline;
 }
+
+/* x-ui.checkbox label colors — dark-friendly on light admin surfaces */
+body {
+    --checkbox-label: #374151;
+    --checkbox-label-hover: #111827;
+}
+
+.dark body {
+    --checkbox-label: #a1a1aa;
+    --checkbox-label-hover: #fafafa;
+}

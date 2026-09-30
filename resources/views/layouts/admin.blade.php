@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>
         {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
     </title>
@@ -92,7 +93,30 @@
 
         <!-- Main Content -->
         <main class="admin-main flex-1 overflow-auto bg-white dark:bg-[#0A0A0F]">
-            <div class="p-8">{{ $slot }}</div>
+            <div class="p-8">
+                @if ($errors->any())
+                    <div
+                        class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+                        role="alert"
+                    >
+                        <p class="font-medium">
+                            The form could not be saved — {{ $errors->count() }}
+                            {{ Str::plural('issue', $errors->count()) }}
+                            need{{ $errors->count() === 1 ? 's' : '' }} attention:
+                        </p>
+                        <ul class="mt-2 list-disc space-y-1 pl-5">
+                            @foreach (array_slice($errors->all(), 0, 10) as $message)
+                                <li>{{ $message }}</li>
+                            @endforeach
+                        </ul>
+                        @if ($errors->count() > 10)
+                            <p class="mt-2">{{ $errors->count() - 10 }} more not shown.</p>
+                        @endif
+                    </div>
+                @endif
+
+                {{ $slot }}
+            </div>
         </main>
     </div>
 
@@ -162,6 +186,8 @@
             });
         });
     </script>
+
+    <x-media-picker />
 
     @livewireScripts
     @fluxScripts

@@ -159,26 +159,8 @@
                         />
                     </div>
                     <div class="flex items-center gap-6">
-                        <label class="flex cursor-pointer items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="is_featured"
-                                value="1"
-                                {{ old('is_featured', $item->is_featured) ? 'checked' : '' }}
-                                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                            />
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Featured</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="is_active"
-                                value="1"
-                                {{ old('is_active', $item->is_active) ? 'checked' : '' }}
-                                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                            />
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Visible</span>
-                        </label>
+                        <x-ui.checkbox name="is_featured" value="1" :checked="old('is_featured', $item->is_featured)" label="Featured" />
+                        <x-ui.checkbox name="is_active" value="1" :checked="old('is_active', $item->is_active)" label="Visible" />
                     </div>
 
                     <button

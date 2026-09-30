@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\GalleryCategory;
 use App\Models\GalleryImage;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
@@ -31,7 +32,7 @@ final class MediaLibraryService
         return GalleryImage::create([
             'title' => $data['title'],
             'image_path' => $imagePath,
-            'category' => $data['category'],
+            'gallery_category_id' => GalleryCategory::query()->where('slug', $data['category'])->value('id'),
             'is_active' => true,
             'sort_order' => GalleryImage::max('sort_order') + 1,
         ]);

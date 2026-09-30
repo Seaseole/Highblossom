@@ -138,16 +138,7 @@
                 <div class="space-y-6">
                     <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="font-semibold text-gray-900 dark:text-white">Status</h3>
-                        <label class="flex cursor-pointer items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="is_active"
-                                value="1"
-                                {{ old('is_active', $content->is_active) ? 'checked' : '' }}
-                                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                            />
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Active (visible on site)</span>
-                        </label>
+                        <x-ui.checkbox name="is_active" value="1" :checked="old('is_active', $content->is_active)" label="Active (visible on site)" />
 
                         <div class="space-y-4 border-t border-gray-100 pt-4 dark:border-white/10">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Hero Image</label>

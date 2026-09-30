@@ -102,19 +102,7 @@
                     </div>
                 </div>
 
-                <!-- Featured Image -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Featured Image</label>
-                    <div
-                        class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
-                        @click="$refs.imageInput.click()"
-                    >
-                        <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-                            <span class="text-xs font-semibold">Click to upload image</span>
-                        </div>
-                        <input type="file" name="featured_image" x-ref="imageInput" class="hidden" accept="image/*" />
-                    </div>
-                </div>
+                <x-blog.featured-image :existing-path="old('featured_image_path')" />
 
                 <button
                     type="submit"

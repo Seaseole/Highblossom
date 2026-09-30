@@ -113,16 +113,7 @@
                                 />
                             </div>
                         </div>
-                        <label class="flex cursor-pointer items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="no_index"
-                                value="1"
-                                {{ old('no_index', $route->no_index) ? 'checked' : '' }}
-                                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                            />
-                            <span class="text-sm text-gray-700 dark:text-gray-300">No Index (Prevent search engine indexing)</span>
-                        </label>
+                        <x-ui.checkbox name="no_index" value="1" :checked="old('no_index', $route->no_index)" label="No Index (Prevent search engine indexing)" />
                     </div>
                 </div>
             </div>

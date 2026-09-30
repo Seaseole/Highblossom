@@ -309,20 +309,18 @@
                                 </div>
                             </div>
 
-                            <label class="bg-admin-surface-alt/50 border-admin-border-subtle hover:border-admin-accent/30 flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors">
-                                <input
-                                    type="checkbox"
-                                    name="no_index"
-                                    id="no_index"
-                                    value="1"
-                                    {{ old('no_index') ? 'checked' : '' }}
-                                    class="bg-admin-input-bg border-admin-border focus:ring-admin-accent h-5 w-5 cursor-pointer rounded focus:ring-2"
-                                />
-                                <div>
+                            <x-ui.checkbox
+                                name="no_index"
+                                id="no_index"
+                                value="1"
+                                :checked="(bool) old('no_index')"
+                                class="bg-admin-surface-alt/50 border-admin-border-subtle hover:border-admin-accent/30 w-full items-start gap-3 rounded-xl border p-4 transition-colors"
+                            >
+                                <span class="flex flex-col">
                                     <span class="text-admin-text block text-sm font-medium">No Index</span>
                                     <span class="text-admin-text-muted text-xs">Prevent search engine indexing</span>
-                                </div>
-                            </label>
+                                </span>
+                            </x-ui.checkbox>
                         </div>
                     </div>
 

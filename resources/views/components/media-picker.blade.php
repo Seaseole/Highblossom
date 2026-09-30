@@ -1,14 +1,5 @@
-@props([
-    'field' => null,
-])
-
 <div
-    x-data="{
-        isOpen: false,
-        images: [],
-        loading: false,
-        selectedImage: null,
-    }"
+    x-data="mediaPicker"
     x-on:open-media-picker.window="
         isOpen = true;
         field = $event.detail.field;
@@ -55,15 +46,15 @@
 
             <!-- Upload Area -->
             <div class="border-b border-white/5 p-6">
-                <div class="cursor-pointer rounded-xl border-2 border-dashed border-white/10 p-8 text-center transition-colors hover:border-[#DC2626]/30">
+                <div class="cursor-pointer rounded-xl border-2 border-dashed border-white/10 p-8 text-center transition-colors hover:border-[#DC2626]/30" @click="$refs.uploadInput.click()">
                     <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5">
                         <svg class="h-6 w-6 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                     </div>
-                    <h3 class="mb-1 text-sm font-medium text-[#FAFAFA]">Upload images</h3>
-                    <p class="text-xs text-[#A1A1AA]">Drag and drop or click to browse</p>
-                    <input type="file" class="hidden" accept="image/*" multiple @change="uploadImages($event)" />
+                    <h3 class="mb-1 text-sm font-medium text-[#FAFAFA]">Upload an image</h3>
+                    <p class="text-xs text-[#A1A1AA]">Added to the gallery library and selected for you</p>
+                    <input type="file" class="hidden" accept="image/*" x-ref="uploadInput" @change="uploadImage($event)" />
                 </div>
             </div>
 
@@ -126,72 +117,3 @@
         </div>
     </div>
 </div>
-
-@script
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('mediaPicker', () => ({
-                field: null,
-                isOpen: false,
-                images: [],
-                loading: false,
-                selectedImage: null,
-
-                async loadImages() {
-                    this.loading = true;
-                    try {
-                        const response = await fetch('/admin/media-library');
-                        const data = await response.json();
-                        this.images = data.images || [];
-                    } catch (error) {
-                        console.error('Failed to load images:', error);
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
-                async uploadImages(event) {
-                    const files = event.target.files;
-                    if (!files.length) return;
-
-                    const formData = new FormData();
-                    for (let file of files) {
-                        formData.append('images[]', file);
-                    }
-
-                    this.loading = true;
-                    try {
-                        const response = await fetch('/admin/media-library/upload', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            },
-                        });
-                        const data = await response.json();
-                        await this.loadImages();
-                    } catch (error) {
-                        console.error('Failed to upload images:', error);
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
-                selectImage(image) {
-                    this.selectedImage = image;
-                },
-
-                confirmSelection() {
-                    if (this.selectedImage && this.field) {
-                        this.$dispatch('image-selected', {
-                            field: this.field,
-                            url: this.selectedImage.url,
-                        });
-                        this.isOpen = false;
-                        this.selectedImage = null;
-                    }
-                },
-            }));
-        });
-    </script>
-@endscript

@@ -49,8 +49,8 @@ final class TabsBlock extends AbstractBlock
     {
         return [
             'tabs' => [
-                ['label' => 'Tab 1', 'content' => []],
-                ['label' => 'Tab 2', 'content' => []],
+                ['label' => 'Tab 1', 'content' => [['type' => 'paragraph', 'attributes' => ['content' => '', 'class' => '']]]],
+                ['label' => 'Tab 2', 'content' => [['type' => 'paragraph', 'attributes' => ['content' => '', 'class' => '']]]],
             ],
         ];
     }

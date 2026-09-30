@@ -37,15 +37,13 @@
                 <label class="mb-4 block text-sm font-medium text-gray-700 dark:text-gray-300">Permissions</label>
                 <div class="max-h-64 space-y-2 overflow-y-auto rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
                     @foreach ($permissions as $permission)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-white/5">
-                            <input
-                                type="checkbox"
-                                name="permissions[]"
-                                value="{{ $permission->name }}"
-                                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                            />
-                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $permission->name }}</span>
-                        </label>
+                        <x-ui.checkbox
+                            :id="'permission-' . $permission->id"
+                            name="permissions[]"
+                            value="{{ $permission->name }}"
+                            label="{{ $permission->name }}"
+                            class="w-full rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
+                        />
                     @endforeach
                 </div>
             </div>

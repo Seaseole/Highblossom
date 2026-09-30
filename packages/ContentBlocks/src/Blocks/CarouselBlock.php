@@ -48,7 +48,11 @@ final class CarouselBlock extends AbstractBlock
     public function getDefaultAttributes(): array
     {
         return [
-            'slides' => [],
+            'slides' => [
+                [
+                    ['type' => 'paragraph', 'attributes' => ['content' => '', 'class' => '']],
+                ],
+            ],
             'autoplay' => false,
             'interval' => 5,
         ];

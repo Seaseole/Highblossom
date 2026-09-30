@@ -1,12 +1,43 @@
+@php
+    $iconBtnCls = 'rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white';
+@endphp
+
 <div
     class="space-y-4"
     wire:ignore.self
     wire:key="block-builder-{{ $name }}"
     x-data="blockBuilder({
     initialBlocks: {{ Js::from($blocks ?? []) }},
-    availableBlockTypes: {{ Js::from($availableBlockTypes ?? []) }}
+    blockMeta: {{ Js::from($blockMeta ?? []) }},
+    blockErrors: {{ Js::from($blockErrors ?? []) }},
+    name: @js($name)
 })"
 >
+    <!-- Invalid block summary -->
+    <template x-if="invalidBlockLabels().length > 0">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+            <p class="font-medium">These blocks are incomplete and will block the save:</p>
+            <p class="mt-1" x-text="invalidBlockLabels().join(', ')"></p>
+        </div>
+    </template>
+
+    <!-- Undo remove -->
+    <template x-if="lastRemoved">
+        <div class="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5">
+            <span class="text-gray-600 dark:text-gray-300"
+                >Removed <strong x-text="label(lastRemoved.block.type)"></strong> block.</span
+            >
+            <div class="flex items-center gap-2">
+                <button type="button" @click="undoRemove()" class="font-medium text-gray-900 underline dark:text-white">
+                    Undo
+                </button>
+                <button type="button" @click="lastRemoved = null" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </template>
+
     <!-- Blocks List -->
     <div class="space-y-3">
         <template x-if="blocks.length === 0">
@@ -16,503 +47,159 @@
         </template>
 
         <template x-for="(block, index) in blocks" :key="block.id">
-            <div class="group relative rounded-2xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#16161D]">
+            <div
+                class="group relative rounded-2xl border bg-white p-4 transition-shadow dark:bg-[#16161D]"
+                :class="[
+                    isInvalid(block)
+                        ? 'border-red-300 dark:border-red-500/40'
+                        : 'border-gray-200 dark:border-white/10',
+                    dropIndex === index ? 'ring-2 ring-gray-900 dark:ring-white' : '',
+                    dragIndex === index ? 'opacity-40' : '',
+                ]"
+                @dragover.prevent="hoverDrag(index)"
+                @drop.prevent="finishDrag()"
+            >
                 <!-- Block Header -->
-                <div class="mb-3 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
+                <div class="mb-3 flex items-center justify-between gap-3">
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button
+                            type="button"
+                            draggable="true"
+                            @dragstart="startDrag(index)"
+                            @dragend="finishDrag()"
+                            class="{{ $iconBtnCls }} cursor-grab active:cursor-grabbing"
+                            title="Drag to reorder"
+                            aria-label="Drag to reorder"
+                        >
+                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" /><circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" /></svg>
+                        </button>
                         <span
                             class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold tracking-wider text-gray-900 uppercase dark:bg-white/5 dark:text-gray-100"
-                            x-text="availableBlockTypes[block.type] || block.type"
+                            x-text="label(block.type)"
                         ></span>
-                        <span class="text-xs text-gray-400 dark:text-gray-500" x-text="'#' + (index + 1)"></span>
+                        <span class="shrink-0 text-xs text-gray-400 dark:text-gray-500" x-text="'#' + (index + 1)"></span>
+                        <template x-if="isInvalid(block)">
+                            <span
+                                class="truncate rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 dark:bg-red-900/20 dark:text-red-300"
+                                x-text="invalidHint(block)"
+                            ></span>
+                        </template>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                        <button
+                            type="button"
+                            @click="moveBlock(index, -1)"
+                            :disabled="index === 0"
+                            class="{{ $iconBtnCls }}"
+                            title="Move up"
+                            aria-label="Move block up"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
+                        </button>
+                        <button
+                            type="button"
+                            @click="moveBlock(index, 1)"
+                            :disabled="index === blocks.length - 1"
+                            class="{{ $iconBtnCls }}"
+                            title="Move down"
+                            aria-label="Move block down"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        <button
+                            type="button"
+                            @click="duplicateBlock(index)"
+                            class="{{ $iconBtnCls }}"
+                            title="Duplicate"
+                            aria-label="Duplicate block"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                        </button>
+                        <button
+                            type="button"
+                            @click="toggleCollapse(block)"
+                            class="{{ $iconBtnCls }}"
+                            :title="isCollapsed(block) ? 'Expand' : 'Collapse'"
+                            :aria-label="isCollapsed(block) ? 'Expand block' : 'Collapse block'"
+                        >
+                            <svg
+                                class="h-4 w-4 transition-transform"
+                                :class="isCollapsed(block) ? '-rotate-90' : ''"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
                         <button
                             type="button"
                             @click="removeBlock(index)"
                             class="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500 dark:text-gray-400 dark:hover:bg-red-900/20"
                             title="Delete"
+                            aria-label="Delete block"
                         >
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     </div>
                 </div>
 
+                <!-- Server-side validation messages for this block -->
+                <template x-if="errorsFor(block).length > 0">
+                    <ul class="mb-4 space-y-1 rounded-xl bg-red-50 p-3 text-xs text-red-600 dark:bg-red-900/20 dark:text-red-300">
+                        <template x-for="message in errorsFor(block)" :key="message">
+                            <li x-text="message"></li>
+                        </template>
+                    </ul>
+                </template>
+
                 <!-- Edit Panel -->
-                <div class="mt-4 border-t border-gray-100 pt-4 dark:border-white/10">
-                    <template x-if="block.type === 'paragraph'">
-                        <div
-                            x-data="{
-                                editorId: 'paragraph-editor-' + block.id,
-                                initEditor() {
-                                    this.$nextTick(() => {
-                                        if (CKEDITOR.instances[this.editorId])
-                                            CKEDITOR.instances[this.editorId].destroy(true);
-                                        const instance = CKEDITOR.replace(this.editorId, { height: 200 });
-                                        instance.on('change', () => {
-                                            document.getElementById(this.editorId).value = instance.getData();
-                                        });
-                                    });
-                                },
-                            }"
-                            x-init="initEditor()"
-                        >
-                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
-                            <textarea
-                                :id="editorId"
-                                x-model="block.attributes.content"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            ></textarea>
-                        </div>
+                <div x-show="! isCollapsed(block)" x-collapse class="mt-4 border-t border-gray-100 pt-4 dark:border-white/10">
+                    <template x-if="! isEditableType(block.type)">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            This block type has no inline editor yet. New
+                            <span x-text="label(block.type)"></span>
+                            blocks cannot be added, but the saved values of this one are preserved when you update the post.
+                        </p>
                     </template>
 
-                    <template x-if="block.type === 'heading'">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Heading Text</label>
-                                <input
-                                    type="text"
-                                    x-model="block.attributes.content"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                />
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Level</label>
-                                <select
-                                    x-model="block.attributes.level"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                >
-                                    <option value="h1">H1</option>
-                                    <option value="h2">H2</option>
-                                    <option value="h3">H3</option>
-                                    <option value="h4">H4</option>
-                                </select>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'quote'">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Quote</label>
-                                <textarea
-                                    x-model="block.attributes.content"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    rows="3"
-                                ></textarea>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                        >Author</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.author"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                        >Citation</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.cite"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'cta'">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                    >Title</label
-                                ><input
-                                    type="text"
-                                    x-model="block.attributes.title"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                />
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                    >Description</label
-                                ><textarea
-                                    x-model="block.attributes.description"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    rows="2"
-                                ></textarea>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                        >Button Text</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.button_text"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                        >Button URL</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.button_url"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'video'">
-                        <div
-                            class="space-y-4"
-                            x-data="{
-                                videoMode: block.attributes.src
-                                    ? block.attributes.src.startsWith('temp://') ||
-                                      block.attributes.src.startsWith('http')
-                                        ? 'url'
-                                        : 'upload'
-                                    : 'url',
-                                previewData: null,
-                                async detectVideo() {
-                                    if (! block.attributes.src) {
-                                        this.previewData = null;
-                                        return;
-                                    }
-                                    this.previewData = await $wire.detectVideoUrl(block.attributes.src);
-                                },
-                            }"
-                            x-init="detectVideo()"
-                        >
-                            <div class="mb-2 flex gap-4">
-                                <label class="flex cursor-pointer items-center gap-2"
-                                    ><input type="radio" x-model="videoMode" value="url" class="rounded-full" /><span
-                                        class="text-sm"
-                                        >External URL</span
-                                    ></label>
-                                <label class="flex cursor-pointer items-center gap-2"
-                                    ><input type="radio" x-model="videoMode" value="upload" class="rounded-full" /><span
-                                        class="text-sm"
-                                        >Upload File</span
-                                    ></label>
-                            </div>
-                            <div x-show="videoMode === 'url'">
-                                <input
-                                    type="url"
-                                    x-model="block.attributes.src"
-                                    @input.debounce="detectVideo()"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    placeholder="https://youtube.com/..."
-                                />
-                            </div>
-                            <div x-show="videoMode === 'upload'">
-                                <input
-                                    type="file"
-                                    @change="
-                                        $wire
-                                            .startVideoUpload(index)
-                                            .then(() => $wire.upload('videoUpload', $event.target.files[0]))
-                                    "
-                                    accept="video/mp4,video/webm"
-                                    class="w-full text-sm"
-                                />
-                            </div>
-
-                            <!-- Preview -->
-                            <div x-show="previewData && previewData.valid" class="mt-4">
-                                <template x-if="previewData && previewData.uses_iframe">
-                                    <div class="aspect-video w-full">
-                                        <iframe
-                                            :src="previewData.embed_url"
-                                            class="h-full w-full rounded-lg"
-                                            frameborder="0"
-                                            allowfullscreen
-                                        ></iframe>
-                                    </div>
-                                </template>
-                                <template x-if="previewData && ! previewData.uses_iframe">
-                                    <video :src="block.attributes.src" controls class="w-full rounded-lg"></video>
-                                </template>
-                                <p
-                                    class="mt-2 text-xs text-green-500"
-                                    x-text="'Source detected: ' + (previewData ? previewData.source_label : '')"
-                                ></p>
-                            </div>
-                            <div
-                                x-show="previewData && ! previewData.valid"
-                                class="mt-2 rounded-lg bg-red-50 p-2 text-xs text-red-500 dark:bg-red-900/20"
-                                x-text="previewData.error"
-                            ></div>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'image'">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL / Upload</label>
-                                <div class="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        x-model="block.attributes.src"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                    <button
-                                        type="button"
-                                        @click="$refs.imgInput.click()"
-                                        class="rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium dark:bg-white/5"
-                                    >
-                                        Upload
-                                    </button>
-                                    <input
-                                        type="file"
-                                        x-ref="imgInput"
-                                        class="hidden"
-                                        accept="image/*"
-                                        @change="
-                                            $wire.upload('imageUpload', $event.target.files[0], () =>
-                                                $wire.uploadImageForBlock(index),
-                                            )
-                                        "
-                                    />
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium">Alt Text</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.alt"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium">Caption</label
-                                    ><input
-                                        type="text"
-                                        x-model="block.attributes.caption"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'gallery'"
-                        ><div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium">Columns</label
-                                ><input
-                                    type="number"
-                                    x-model="block.attributes.columns"
-                                    min="1"
-                                    max="6"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
-                                />
-                            </div>
-                            <p class="text-xs text-gray-500">Gallery images managed in Media Library.</p>
-                        </div></template>
-
-                    <template x-if="block.type === 'list'">
-                        <div class="space-y-4">
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2"
-                                    ><input type="radio" x-model="block.attributes.type" value="ul" /><span
-                                        class="text-sm"
-                                        >Unordered</span
-                                    ></label>
-                                <label class="flex items-center gap-2"
-                                    ><input type="radio" x-model="block.attributes.type" value="ol" /><span
-                                        class="text-sm"
-                                        >Ordered</span
-                                    ></label>
-                            </div>
-                            <textarea
-                                x-model="block.attributes.itemsRaw"
-                                @input="block.attributes.items = $event.target.value.split('\n')"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
-                                rows="4"
-                                placeholder="Items (one per line)"
-                            ></textarea>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'alert'">
-                        <div class="space-y-4">
-                            <select
-                                x-model="block.attributes.type"
-                                class="w-full rounded-xl border bg-gray-50 px-4 py-2.5 text-sm dark:bg-white/5"
-                            >
-                                <option value="info">Info</option>
-                                <option value="warning">Warning</option>
-                                <option value="danger">Danger</option>
-                                <option value="success">Success</option>
-                            </select>
-                            <input
-                                type="text"
-                                x-model="block.attributes.title"
-                                class="w-full rounded-xl border bg-gray-50 px-4 py-2.5 text-sm"
-                                placeholder="Title"
-                            />
-                            <textarea
-                                x-model="block.attributes.content"
-                                class="w-full rounded-xl border bg-gray-50 px-4 py-2.5 text-sm"
-                                placeholder="Message"
-                            ></textarea>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'html'"
-                        ><div>
-                            <textarea
-                                x-model="block.attributes.content"
-                                class="w-full rounded-xl border bg-gray-50 px-4 py-2.5 font-mono text-sm"
-                                rows="6"
-                            ></textarea></div
-                    ></template>
-                    <template x-if="block.type === 'embed'"
-                        ><div class="space-y-4">
-                            <input
-                                type="url"
-                                x-model="block.attributes.url"
-                                class="w-full rounded-xl border px-4 py-2.5"
-                                placeholder="URL"
-                            /><input
-                                type="text"
-                                x-model="block.attributes.title"
-                                class="w-full rounded-xl border px-4 py-2.5"
-                                placeholder="Title"
-                            /></div
-                    ></template>
-                    <template x-if="block.type === 'divider'">
-                        <div class="space-y-4">
-                            <select
-                                x-model="block.attributes.style"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:focus:ring-[var(--color-admin-accent)]"
-                            >
-                                <option value="line">Line</option>
-                                <option value="dashed">Dashed</option>
-                                <option value="dotted">Dotted</option>
-                            </select>
-                            <select
-                                x-model="block.attributes.size"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:focus:ring-[var(--color-admin-accent)]"
-                            >
-                                <option value="sm">Small</option>
-                                <option value="md">Medium</option>
-                                <option value="lg">Large</option>
-                            </select>
-                        </div>
-                    </template>
-
-                    <template x-if="block.type === 'countdown'"
-                        ><div class="space-y-4">
-                            <input
-                                type="datetime-local"
-                                x-model="block.attributes.target_date"
-                                class="w-full rounded-xl border px-4 py-2.5"
-                            /><input
-                                type="text"
-                                x-model="block.attributes.label"
-                                class="w-full rounded-xl border px-4 py-2.5"
-                                placeholder="Label"
-                            /></div
-                    ></template>
-
-                    <template x-if="block.type === 'poll'">
-                        <div class="space-y-4">
-                            <input
-                                type="text"
-                                x-model="block.attributes.question"
-                                class="w-full rounded-xl border px-4 py-2.5 text-sm"
-                                placeholder="Question"
-                            />
-                            <div class="space-y-2">
-                                <template x-if="Array.isArray(block.attributes.options)">
-                                    <template x-for="(opt, optIdx) in block.attributes.options" :key="optIdx">
-                                        <div class="flex items-center gap-2">
-                                            <input
-                                                type="text"
-                                                x-model="block.attributes.options[optIdx]"
-                                                class="flex-1 rounded-xl border px-4 py-2 text-sm"
-                                            />
-                                            <button
-                                                type="button"
-                                                @click="block.attributes.options.splice(optIdx, 1)"
-                                                class="p-2 text-red-500"
-                                            >
-                                                X
-                                            </button>
-                                        </div>
-                                    </template>
-                                </template>
-                                <button
-                                    type="button"
-                                    @click="
-                                        if (! Array.isArray(block.attributes.options)) block.attributes.options = [];
-                                        block.attributes.options.push('New Option');
-                                    "
-                                    class="text-sm font-medium underline"
-                                >
-                                    Add Option
-                                </button>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label
-                                    ><input type="checkbox" x-model="block.attributes.allow_multiple" /> Allow
-                                    multiple</label>
-                                <label
-                                    ><input type="checkbox" x-model="block.attributes.show_results" /> Show
-                                    results</label>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="['columns', 'tabs', 'accordion'].includes(block.type)">
-                        <p class="text-sm text-gray-500">Complex layouts are managed in visual editor.</p>
-                    </template>
+                    @include('livewire.block-builder.fields', ['b' => 'block', 'nesting' => true])
                 </div>
             </div>
         </template>
     </div>
 
-    <!-- Add Block Button -->
-    <div class="relative" x-data="{ open: false }">
+    <!-- Add Block + Preview -->
+    <div class="flex items-center gap-3">
+        <div class="flex-1">
+            @include('livewire.block-builder.add-menu')
+        </div>
         <button
             type="button"
-            @click="open = ! open"
-            class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 font-medium text-gray-900 transition-colors hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
+            @click="openPreview($wire)"
+            class="rounded-2xl border border-gray-200 bg-white px-4 py-3 font-medium text-gray-900 transition-colors hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
         >
-            Add Block
+            Preview
         </button>
-        <div
-            x-show="open"
-            @click.outside="open = false"
-            x-cloak
-            class="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-white/10 dark:bg-[#16161D]"
-        >
-            <div class="max-h-64 overflow-y-auto p-2">
-                <template x-for="(label, type) in availableBlockTypes" :key="type">
-                    <button
-                        type="button"
-                        @click="
-                            addBlock(type);
-                            open = false;
-                        "
-                        class="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
-                        x-text="label"
-                    ></button>
-                </template>
-                <div
-                    x-show="Object.keys(availableBlockTypes).length === 0"
-                    class="p-4 text-center text-xs text-gray-500"
-                >
-                    No blocks registered in registry.
-                </div>
+    </div>
+
+    <!-- Draft preview modal -->
+    <div
+        x-show="previewOpen"
+        x-cloak
+        style="display: none"
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#0A0A0F]/90 p-4 backdrop-blur-sm"
+        @click.self="closePreview()"
+        @keydown.escape.window="closePreview()"
+    >
+        <div class="relative my-8 w-full max-w-3xl rounded-2xl border border-white/10 bg-white p-6 shadow-2xl dark:bg-[#16161D]">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Draft preview</h3>
+                <button type="button" @click="closePreview()" class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5" aria-label="Close preview">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
             </div>
+            <div x-show="previewLoading" class="py-12 text-center text-sm text-gray-500">Rendering preview…</div>
+            <div x-show="! previewLoading" x-html="previewHtml" class="prose max-w-none dark:prose-invert"></div>
+            <p x-show="! previewLoading && previewHtml === ''" class="py-8 text-center text-sm text-gray-500">Nothing to preview yet.</p>
         </div>
     </div>
 </div>

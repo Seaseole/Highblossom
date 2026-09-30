@@ -8,7 +8,9 @@ use App\Enums\VideoSourceType;
 use App\Services\VideoSourceDetector;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
+use Highblossom\ContentBlocks\Contracts\BlockInterface;
 use Highblossom\ContentBlocks\Services\BlockRegistry;
+use Highblossom\ContentBlocks\Services\BlockRenderer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
@@ -23,6 +25,40 @@ final class BlockBuilder extends Component
 {
     use WithFileUploads;
 
+    /**
+     * Block types that have an inline editor in the builder UI.
+     *
+     * Types registered in the block registry without an entry here are still
+     * rendered on the frontend and preserved on save, but are not offered in
+     * the "Add Block" menu because the builder cannot produce valid attributes
+     * for them yet.
+     *
+     * @var list<string>
+     */
+    private const EDITABLE_TYPES = [
+        'paragraph',
+        'heading',
+        'image',
+        'quote',
+        'code',
+        'list',
+        'cta',
+        'video',
+        'divider',
+        'alert',
+        'html',
+        'embed',
+        'countdown',
+        'poll',
+        'gallery',
+        'table',
+        'form',
+        'carousel',
+        'columns',
+        'tabs',
+        'accordion',
+    ];
+
     /** The field name used for storing block data. */
     #[Locked]
     public string $name = 'content';
@@ -33,82 +69,182 @@ final class BlockBuilder extends Component
     #[Validate(['nullable', 'image', 'max:61440'])]
     public $imageUpload = null;
 
-    /** The block index currently being uploaded to. */
-    public ?int $activeImageUploadIndex = null;
+    /** The block id targeted by the next image upload. */
+    public ?string $activeImageUploadId = null;
 
-    public int $uploadProgress = 0;
-
-    public ?int $uploadingBlockIndex = null;
+    /** The attribute path, relative to the target block, receiving the uploaded image. */
+    public string $activeImageUploadPath = 'src';
 
     /** The uploaded video file. */
     #[Validate(['nullable', 'file', 'max:61440'])]
     public $videoUpload = null;
 
-    public int $videoUploadProgress = 0;
+    public ?string $uploadingVideoBlockId = null;
 
-    public ?int $uploadingVideoBlockIndex = null;
+    /**
+     * Per-type builder metadata: label, addable flag, server defaults and required fields.
+     *
+     * @var array<string, array{label: string, editable: bool, defaults: array<string, mixed>, required: list<string>}>
+     */
+    public array $blockMeta = [];
 
-    public array $availableBlockTypes = [];
+    /**
+     * Server-side validation messages grouped by the block id they belong to.
+     *
+     * @var array<string, list<string>>
+     */
+    public array $blockErrors = [];
 
     /**
      * Initialize the block builder with the field name and existing block data.
      *
-     * @param array|null $value
+     * @param array<string, mixed>|string|null $value Block array, or the JSON string echoed back by old()
      */
     public function mount(string $name = 'content', $value = null): void
     {
         $this->name = $name;
-        $blocks = is_array($value) ? array_values($value) : [];
+        $blocks = $this->decodeBlocks($value);
 
         // Ensure all blocks have a unique ID and sequential keys
-        $this->blocks = array_map(function ($block) {
+        $this->blocks = array_values(array_map(function ($block) {
             if (! isset($block['id'])) {
                 $block['id'] = uniqid('block_', true);
             }
 
             return $block;
-        }, $blocks);
+        }, $blocks));
 
-        $this->loadAvailableBlocks();
+        $this->loadBlockMeta();
     }
 
     /**
-     * Load available block types from the registry.
+     * Normalise the incoming block value, which may be an array or a JSON string.
+     *
+     * @param array<string, mixed>|string|null $value
+     *
+     * @return list<array<string, mixed>>
      */
-    protected function loadAvailableBlocks(): void
+    private function decodeBlocks($value): array
     {
+        if (is_string($value) && $value !== '') {
+            $value = json_decode($value, true);
+        }
+
+        return is_array($value) ? array_values($value) : [];
+    }
+
+    /**
+     * Load per-type metadata from the block registry.
+     */
+    protected function loadBlockMeta(): void
+    {
+        if ($this->blockMeta !== []) {
+            return;
+        }
+
         $registry = app(BlockRegistry::class);
-        $types = $registry->types();
 
-        Log::debug('BlockBuilder: Loading available blocks', [
-            'count' => count($types),
-            'types' => $types,
-        ]);
+        $this->blockMeta = collect($registry->types())
+            ->mapWithKeys(function (string $type) use ($registry): array {
+                $block = $registry->get($type);
 
-        $this->availableBlockTypes = collect($types)
-            ->mapWithKeys(fn ($type) => [$type => ucfirst(str_replace('_', ' ', $type))])
+                if (! $block instanceof BlockInterface) {
+                    return [$type => ['label' => ucfirst($type), 'editable' => false, 'defaults' => [], 'required' => []]];
+                }
+
+                return [$type => [
+                    'label' => ucfirst(str_replace('_', ' ', $type)),
+                    'editable' => in_array($type, self::EDITABLE_TYPES, true),
+                    'defaults' => $block->getDefaultAttributes(),
+                    'required' => $this->requiredFields($block),
+                ]];
+            })
             ->toArray();
     }
 
+    /**
+     * Extract the top-level required attribute names from a block's validation rules.
+     *
+     * @return list<string>
+     */
+    private function requiredFields(BlockInterface $block): array
+    {
+        $required = [];
+
+        foreach ($block->getValidationRules() as $field => $rules) {
+            if (is_string($field) && ! str_contains($field, '.') && $this->ruleListHas($rules, 'required')) {
+                $required[] = $field;
+            }
+        }
+
+        return $required;
+    }
+
+    /**
+     * Determine whether a rule definition, in string or array form, contains the given rule.
+     */
+    private function ruleListHas(array|string $rules, string $name): bool
+    {
+        foreach ((array) $rules as $rule) {
+            if (is_string($rule) && in_array($name, explode('|', $rule), true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Map the flashed content.{index}.attributes errors onto the matching block ids.
+     *
+     * @return array<string, list<string>>
+     */
+    private function blockErrorMessages(): array
+    {
+        $errors = session('errors');
+
+        if ($errors === null || $errors->count() === 0) {
+            return [];
+        }
+
+        $mapped = [];
+
+        foreach ($this->blocks as $index => $block) {
+            $messages = $errors->get("content.{$index}.attributes");
+
+            if ($messages !== []) {
+                $mapped[$block['id']] = $messages;
+            }
+        }
+
+        return $mapped;
+    }
+
     // Block manipulation methods have been moved to Alpine.js for client-side performance.
+
+    /**
+     * Mark a block, by id, and its attribute path as the target for the next image upload.
+     */
+    public function setActiveImageUpload(string $blockId, string $path = 'src'): void
+    {
+        $this->activeImageUploadId = $blockId;
+        $this->activeImageUploadPath = $path;
+    }
 
     /**
      * Auto-upload when imageUpload property changes.
      */
     public function updatedImageUpload(): void
     {
-        // Use activeImageUploadIndex which is set by Alpine before upload
-        $blockIndex = $this->activeImageUploadIndex ?? $this->uploadingBlockIndex;
-
-        if ($this->imageUpload && $blockIndex !== null) {
-            $this->uploadImageForBlock($blockIndex);
+        if ($this->imageUpload && $this->activeImageUploadId !== null) {
+            $this->uploadImageForBlock();
         }
     }
 
     /**
-     * Upload an image for a specific block and notify the frontend.
+     * Upload an image for the targeted block attribute and notify the frontend.
      */
-    public function uploadImageForBlock(int $blockIndex): void
+    protected function uploadImageForBlock(): void
     {
         if (empty($this->imageUpload)) {
             Log::error('uploadImageForBlock called with empty imageUpload');
@@ -129,24 +265,15 @@ final class BlockBuilder extends Component
             return;
         }
 
-        $url = 'temp://'.$path;
-
-        Log::debug('uploadImageForBlock', [
-            'blockIndex' => $blockIndex,
-            'path' => $path,
-            'url' => $url,
-            'blocks_count' => count($this->blocks),
-        ]);
-
         $this->dispatch('image-uploaded', [
-            'index' => $blockIndex,
-            'url' => $url,
+            'id' => $this->activeImageUploadId,
+            'attribute' => $this->activeImageUploadPath,
+            'url' => 'temp://'.$path,
         ]);
 
         $this->imageUpload = null;
-        $this->uploadProgress = 0;
-        $this->activeImageUploadIndex = null;
-        $this->uploadingBlockIndex = null;
+        $this->activeImageUploadId = null;
+        $this->activeImageUploadPath = 'src';
 
         $this->dispatch('notify', message: 'Image uploaded successfully', type: 'success');
     }
@@ -197,27 +324,26 @@ final class BlockBuilder extends Component
             }
         }
 
-        if ($this->uploadingVideoBlockIndex !== null) {
+        if ($this->uploadingVideoBlockId !== null) {
             $this->dispatch('video-uploaded', [
-                'index' => $this->uploadingVideoBlockIndex,
+                'id' => $this->uploadingVideoBlockId,
                 'url' => $videoUrl,
                 'poster' => $thumbnailUrl,
             ]);
         }
 
         $this->videoUpload = null;
-        $this->videoUploadProgress = 0;
-        $this->uploadingVideoBlockIndex = null;
+        $this->uploadingVideoBlockId = null;
 
         $this->dispatch('notify', message: 'Video uploaded successfully', type: 'success');
     }
 
     /**
-     * Mark a block index as ready for video upload.
+     * Mark a block, by id, as ready for video upload.
      */
-    public function startVideoUpload(int $blockIndex): void
+    public function startVideoUpload(string $blockId): void
     {
-        $this->uploadingVideoBlockIndex = $blockIndex;
+        $this->uploadingVideoBlockId = $blockId;
     }
 
     /**
@@ -262,11 +388,43 @@ final class BlockBuilder extends Component
     }
 
     /**
+     * Render unsaved blocks through the production renderer for a draft preview.
+     *
+     * @return string HTML fragment; safe to inject into the preview modal.
+     */
+    public function renderPreview(string $content): string
+    {
+        if (strlen($content) > 2_000_000) {
+            return '<p class="text-sm text-red-500">Content is too large to preview.</p>';
+        }
+
+        $blocks = json_decode($content, true);
+
+        if (! is_array($blocks)) {
+            return '<p class="text-sm text-red-500">Content is not a valid block list.</p>';
+        }
+
+        $blocks = array_values(array_filter(
+            $blocks,
+            fn ($block) => is_array($block) && isset($block['type']) && is_string($block['type'])
+        ));
+
+        try {
+            return app(BlockRenderer::class)->renderMany($blocks);
+        } catch (\Throwable $e) {
+            Log::warning('Block preview rendering failed: '.$e->getMessage());
+
+            return '<p class="text-sm text-red-500">Preview could not be rendered.</p>';
+        }
+    }
+
+    /**
      * Render the block builder component.
      */
     public function render(): View
     {
-        $this->loadAvailableBlocks();
+        $this->loadBlockMeta();
+        $this->blockErrors = $this->blockErrorMessages();
 
         return view('livewire.block-builder');
     }

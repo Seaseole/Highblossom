@@ -157,14 +157,12 @@
                                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</label>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
+                                    <x-ui.checkbox
                                         name="working_hours[{{ $key }}][is_closed]"
                                         value="1"
-                                        {{ ($settings['working_hours'][$key]['is_closed'] ?? false) ? 'checked' : '' }}
-                                        class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
+                                        :checked="($settings['working_hours'][$key]['is_closed'] ?? false)"
+                                        label="Closed"
                                     />
-                                    <span class="text-sm text-gray-500">Closed</span>
                                 </div>
                                 <div class="flex flex-1 gap-4">
                                     <input

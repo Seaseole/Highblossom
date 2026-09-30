@@ -8,17 +8,7 @@ use App\Actions\SendContactMessage;
 use App\Actions\StoreQuoteAction;
 use App\Http\Requests\ContactFormRequest;
 use App\Http\Requests\QuoteFormRequest;
-use App\Models\AboutUsContent;
-use App\Models\GalleryCategory;
 use App\Models\GalleryImage;
-use App\Models\GlassSubCategory;
-use App\Models\GlassType;
-use App\Models\Post;
-use App\Models\Service;
-use App\Models\ServiceType;
-use App\Models\Staff;
-use App\Services\ContactNumberService;
-use App\Services\Settings\SettingsManager;
 use App\Services\SiteService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
@@ -32,11 +22,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class SiteController extends Controller
 {
     public function __construct(
-        protected StoreQuoteAction $storeQuoteAction,
-        protected ContactNumberService $contactNumberService,
         protected SiteService $siteService,
-        protected SendContactMessage $sendContactMessage,
-        protected SettingsManager $settings
+        protected StoreQuoteAction $storeQuoteAction,
+        protected SendContactMessage $sendContactMessage
     ) {}
 
     /**
@@ -58,15 +46,13 @@ class SiteController extends Controller
      */
     public function aboutUs()
     {
-        $content = AboutUsContent::active()->first();
+        $data = $this->siteService->getAboutUsData();
 
-        if (! $content) {
+        if ($data === null) {
             abort(404);
         }
 
-        $staff = Staff::where('is_active', true)->orderBy('order')->get();
-
-        return view('site.about-us', compact('content', 'staff'));
+        return view('site.about-us', $data);
     }
 
     /**
@@ -76,14 +62,9 @@ class SiteController extends Controller
      */
     public function services(Request $request)
     {
-        $perPage = 6;
-        $page = $request->input('page', 1);
-
-        $services = Service::active()
-            ->ordered()
-            ->paginate($perPage, ['*'], 'page', $page);
-
-        return view('site.services', compact('services'));
+        return view('site.services', $this->siteService->getServicesData(
+            (int) $request->input('page', 1)
+        ));
     }
 
     /**
@@ -93,21 +74,10 @@ class SiteController extends Controller
      */
     public function gallery(Request $request)
     {
-        $category = $request->input('category');
-        $perPage = 9;
-        $page = $request->input('page', 1);
-
-        $query = GalleryImage::active()->with('category')->ordered();
-
-        if ($category) {
-            $query->byCategory($category);
-        }
-
-        $images = $query->paginate($perPage, ['*'], 'page', $page);
-        $categories = GalleryCategory::active()->ordered()->get();
-        $galleryMetrics = $this->settings->gallery_metrics;
-
-        return view('site.gallery', compact('images', 'categories', 'category', 'galleryMetrics'));
+        return view('site.gallery', $this->siteService->getGalleryData(
+            $request->input('category'),
+            (int) $request->input('page', 1)
+        ));
     }
 
     /**
@@ -117,17 +87,7 @@ class SiteController extends Controller
      */
     public function galleryShow(GalleryImage $galleryImage)
     {
-        $galleryImage->load('category');
-
-        $relatedImages = GalleryImage::active()
-            ->with('category')
-            ->where('gallery_category_id', $galleryImage->gallery_category_id)
-            ->where('id', '!=', $galleryImage->id)
-            ->ordered()
-            ->take(3)
-            ->get();
-
-        return view('site.gallery-show', compact('galleryImage', 'relatedImages'));
+        return view('site.gallery-show', $this->siteService->getGalleryShowData($galleryImage));
     }
 
     /**
@@ -137,14 +97,7 @@ class SiteController extends Controller
      */
     public function contact()
     {
-        $whatsappDefault = $this->settings->whatsapp_number_default;
-        $whatsappAdditional = $this->settings->whatsapp_additional_numbers;
-        $primaryPhone = $this->settings->primary_phone;
-
-        $contactData = $this->siteService->getContactData();
-        $contactData['contactNumbers'] = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
-
-        return view('site.contact', $contactData);
+        return view('site.contact', $this->siteService->getContactData());
     }
 
     /**
@@ -154,17 +107,7 @@ class SiteController extends Controller
      */
     public function quote()
     {
-        $whatsappDefault = $this->settings->whatsapp_number_default;
-        $whatsappAdditional = $this->settings->whatsapp_additional_numbers;
-        $primaryPhone = $this->settings->primary_phone;
-
-        $glassTypes = GlassType::active()->ordered()->with('subCategories')->get();
-        $serviceTypes = ServiceType::active()->ordered()->get();
-        $glassSubCategories = GlassSubCategory::active()->ordered()->with('glassType')->get();
-
-        $contactNumbers = $this->contactNumberService->buildContactNumbers($whatsappDefault, $whatsappAdditional, $primaryPhone);
-
-        return view('site.quote', compact('contactNumbers', 'glassTypes', 'serviceTypes', 'glassSubCategories'));
+        return view('site.quote', $this->siteService->getQuotePageData());
     }
 
     /**
@@ -198,12 +141,11 @@ class SiteController extends Controller
      */
     public function blog(Request $request)
     {
-        // Pass initial URL parameters to the view for Livewire component
-        $search = $request->input('search', '');
-        $categorySlug = $request->input('category');
-        $tagSlug = $request->input('tag');
-
-        return view('blog.index', compact('search', 'categorySlug', 'tagSlug'));
+        return view('blog.index', [
+            'search' => $request->input('search', ''),
+            'categorySlug' => $request->input('category'),
+            'tagSlug' => $request->input('tag'),
+        ]);
     }
 
     /**
@@ -215,16 +157,6 @@ class SiteController extends Controller
      */
     public function blogShow(string $slug)
     {
-        $post = Post::published()->where('slug', $slug)->with('categories', 'tags')->firstOrFail();
-
-        $relatedPosts = Post::published()
-            ->where('id', '!=', $post->id)
-            ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $post->categories->pluck('id')))
-            ->with(['categories', 'tags'])
-            ->latest()
-            ->take(3)
-            ->get();
-
-        return view('blog.show', compact('post', 'relatedPosts'));
+        return view('blog.show', $this->siteService->getBlogShowData($slug));
     }
 }

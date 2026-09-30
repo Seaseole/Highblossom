@@ -1,4 +1,8 @@
-@if ($type === 'ordered')
+@php
+    $type = $type ?? 'unordered';
+@endphp
+
+@if ($type === 'ordered' || $type === 'ol')
     <ol @if ($class) class="{{ $class }}" @endif>
         @foreach ($items as $item)
             <li>{{ $item }}</li>

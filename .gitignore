@@ -36,3 +36,4 @@ CLAUDE.md
 .junie/guidelines.md
 .windsurf/workflows/review.md
 database/seeders/GalleryJourneySeeder.php
+tests/Feature/PublicPagesTest.php

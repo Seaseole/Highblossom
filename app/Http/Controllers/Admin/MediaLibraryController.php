@@ -24,12 +24,23 @@ final class MediaLibraryController
     /**
      * Display the media library (paginated). Supports HTMX partial rendering.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
         $images = GalleryImage::query()
             ->when($request->search, fn ($q) => $q->where('title', 'like', '%'.$request->search.'%'))
             ->orderBy('created_at', 'desc')
             ->paginate(12);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'images' => $images->map(fn (GalleryImage $image) => [
+                    'id' => $image->id,
+                    'name' => $image->title,
+                    'url' => $image->image_url,
+                    'alt' => $image->title,
+                ]),
+            ]);
+        }
 
         if ($request->header('HX-Request')) {
             return view('admin.media-library.partials.image-grid', compact('images'));

@@ -80,7 +80,9 @@
                 <div class="prose prose-invert max-w-none">
                     @if ($post->content && is_array($post->content))
                         @foreach ($post->content as $block)
-                            @block($block['type'], $block['attributes'] ?? [])
+                            <div class="{{ $loop->last ? '' : 'mb-8' }}">
+                                @block($block['type'], $block['attributes'] ?? [])
+                            </div>
                         @endforeach
                     @endif
                 </div>

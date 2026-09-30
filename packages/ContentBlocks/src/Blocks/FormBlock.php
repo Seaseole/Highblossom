@@ -42,7 +42,9 @@ final class FormBlock extends AbstractBlock
     public function getDefaultAttributes(): array
     {
         return [
-            'fields' => [],
+            'fields' => [
+                ['name' => '', 'label' => '', 'type' => 'text', 'required' => false, 'options' => []],
+            ],
             'submit_text' => 'Submit',
             'action_url' => null,
         ];

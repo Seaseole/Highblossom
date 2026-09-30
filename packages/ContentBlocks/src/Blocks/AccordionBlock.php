@@ -38,7 +38,9 @@ final class AccordionBlock extends AbstractBlock
     public function getDefaultAttributes(): array
     {
         return [
-            'items' => [],
+            'items' => [
+                ['title' => '', 'content' => ''],
+            ],
             'multiple_open' => false,
         ];
     }

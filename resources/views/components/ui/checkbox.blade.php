@@ -16,11 +16,11 @@
     $hasSlot = ! empty(trim($slot ?? ''));
 @endphp
 
-<label class="ui-checkbox-wrapper group inline-flex cursor-pointer items-center gap-3">
+<label class="{{ $attributes->get('class', '') }} ui-checkbox-wrapper group inline-flex cursor-pointer items-center gap-3">
     <input
         type="checkbox"
         id="{{ $id }}"
-        name="{{ $name }}"
+        @if ($name) name="{{ $name }}" @endif
         value="{{ $value }}"
         @if ($checked) checked @endif
         @if ($wireModel) wire:model="{{ $wireModel }}" @endif

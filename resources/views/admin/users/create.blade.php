@@ -92,15 +92,13 @@
                     <label class="mb-4 block text-sm font-medium text-gray-700 dark:text-gray-300">Roles</label>
                     <div class="max-h-64 space-y-2 overflow-y-auto rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
                         @foreach ($roles as $role)
-                            <label class="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-white/5">
-                                <input
-                                    type="checkbox"
-                                    name="roles[]"
-                                    value="{{ $role->name }}"
-                                    class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-white/20 dark:focus:ring-white"
-                                />
-                                <span class="text-sm text-gray-700 dark:text-gray-300">{{ $role->name }}</span>
-                            </label>
+                            <x-ui.checkbox
+                                :id="'role-' . $role->id"
+                                name="roles[]"
+                                value="{{ $role->name }}"
+                                label="{{ $role->name }}"
+                                class="w-full rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
+                            />
                         @endforeach
                     </div>
                 </div>
