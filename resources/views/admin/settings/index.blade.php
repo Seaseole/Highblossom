@@ -106,6 +106,22 @@
                                 class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                             />
                         </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Phone</label>
+                            <input
+                                type="text"
+                                name="secondary_phone"
+                                value="{{ old('secondary_phone', $settings['secondary_phone']) }}"
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                placeholder="+267 ..."
+                            />
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Optional second line. Shown on the contact page and in the footer when filled in.
+                            </p>
+                            @error('secondary_phone')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
                         <div class="space-y-2 md:col-span-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Address</label>
                             <textarea

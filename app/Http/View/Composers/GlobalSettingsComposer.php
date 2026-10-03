@@ -36,6 +36,7 @@ final readonly class GlobalSettingsComposer
             'primaryEmail' => $settings->get('primary_email'),
             'companyAddress' => $settings->get('address'),
             'primaryPhone' => $settings->get('primary_phone'),
+            'secondaryPhone' => $settings->get('secondary_phone'),
             'whatsappDefault' => $settings->get('whatsapp_number_default'),
             'whatsappAdditional' => $settings->get('whatsapp_additional_numbers'),
             'workingHours' => $settings->get('working_hours'),

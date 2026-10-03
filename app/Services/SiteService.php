@@ -201,7 +201,9 @@ final readonly class SiteService
         return $this->contactNumberService->buildContactNumbers(
             $this->settings->whatsapp_number_default,
             $this->settings->whatsapp_additional_numbers,
-            $this->settings->primary_phone
+            $this->settings->primary_phone,
+            // A cleared optional field is stored as null, not an empty string.
+            (string) $this->settings->secondary_phone
         );
     }
 }

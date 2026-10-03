@@ -55,6 +55,7 @@ final class SettingsManager
             'primary_email' => 'jseaseole@highblossom.net',
             'address' => 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana',
             'primary_phone' => '+267 123 4567',
+            'secondary_phone' => '',
             'whatsapp_number_default' => '+267 123 4567',
             'whatsapp_additional_numbers' => [],
             'working_hours' => [

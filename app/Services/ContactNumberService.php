@@ -14,10 +14,11 @@ final readonly class ContactNumberService
      * @param string $whatsappDefault    Default WhatsApp number
      * @param array  $whatsappAdditional Additional WhatsApp numbers
      * @param string $primaryPhone       Primary phone number
+     * @param string $secondaryPhone     Secondary phone number, empty when unused
      *
      * @return Collection Collection of contact number objects
      */
-    public function buildContactNumbers(string $whatsappDefault, array $whatsappAdditional, string $primaryPhone): Collection
+    public function buildContactNumbers(string $whatsappDefault, array $whatsappAdditional, string $primaryPhone, string $secondaryPhone): Collection
     {
         $contactNumbers = collect();
 
@@ -30,6 +31,11 @@ final readonly class ContactNumberService
         // Add primary phone if different
         if ($primaryPhone !== $whatsappDefault) {
             $contactNumbers->push($this->createNumberObject('Phone', $primaryPhone, false, false));
+        }
+
+        // Add the secondary line when set and not a duplicate of the numbers above
+        if ($secondaryPhone !== '' && $secondaryPhone !== $whatsappDefault && $secondaryPhone !== $primaryPhone) {
+            $contactNumbers->push($this->createNumberObject('Phone 2', $secondaryPhone, false, false));
         }
 
         return $contactNumbers;

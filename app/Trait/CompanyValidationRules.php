@@ -24,6 +24,7 @@ trait CompanyValidationRules
             'primary_email' => ['required', 'email', 'max:255'],
             'address' => ['required', 'string', 'max:500'],
             'primary_phone' => ['required', 'string', 'max:20'],
+            'secondary_phone' => ['nullable', 'string', 'max:20'],
             'whatsapp_number_default' => ['required', 'string', 'max:20'],
             'whatsapp_additional_numbers' => ['nullable', 'array'],
             'whatsapp_additional_numbers.*.label' => ['required', 'string', 'max:50'],

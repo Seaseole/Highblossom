@@ -189,6 +189,14 @@
                             >
                                 {{ $primaryPhone }}
                             </a>
+                            @if ($secondaryPhone)
+                                <a
+                                    href="tel:{{ str_replace([' ', '-', '(', ')'], '', $secondaryPhone) }}"
+                                    class="font-headline mt-1 block text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                                >
+                                    {{ $secondaryPhone }}
+                                </a>
+                            @endif
                         </div>
                     @endif
 

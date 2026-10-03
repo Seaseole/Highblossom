@@ -18,6 +18,7 @@ class CompanySettingSeeder extends Seeder
             'primary_email' => ['value' => 'sales@highblossom.net', 'type' => 'text'],
             'address' => ['value' => 'Plot 22147 Gaborone West Industrial site, Gaborone, Botswana', 'type' => 'text'],
             'primary_phone' => ['value' => '+267 123 4567', 'type' => 'text'],
+            'secondary_phone' => ['value' => '', 'type' => 'text'],
             'whatsapp_number_default' => ['value' => '+267 123 4567', 'type' => 'text'],
             'whatsapp_additional_numbers' => ['value' => [], 'type' => 'json'],
             'working_hours' => ['value' => [

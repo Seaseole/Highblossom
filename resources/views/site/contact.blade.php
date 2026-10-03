@@ -17,8 +17,8 @@
     <!-- Contact Methods Grid -->
     <section class="bg-[#0A0A0F] py-24">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-                @forelse ($contactNumbers->take(3) as $index => $number)
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                @forelse ($contactNumbers->take(4) as $index => $number)
                     <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
                         <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
                             @if ($number->is_whatsapp)
@@ -121,7 +121,7 @@
                             @endif
                         </p>
                         <a
-                            href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . $number->phone_number }}"
+                            href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . str_replace([' ', '-', '(', ')'], '', $number->phone_number) }}"
                             target="{{ $number->is_whatsapp ? '_blank' : '_self' }}"
                             class="btn-premium"
                         >

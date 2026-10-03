@@ -22,7 +22,7 @@ final class CompanySettingService
 {
     /** @var list<string> Fields that are saved as simple key-value pairs */
     private const SIMPLE_FIELDS = [
-        'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone',
+        'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone', 'secondary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
         'booking_lead_time_hours',
@@ -240,6 +240,7 @@ final class CompanySettingService
             'primary_email' => CompanySetting::get('primary_email', 'jseaseole@highblossom.net'),
             'address' => CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
             'primary_phone' => CompanySetting::get('primary_phone', '+267 123 4567'),
+            'secondary_phone' => CompanySetting::get('secondary_phone', ''),
             'whatsapp_number_default' => CompanySetting::get('whatsapp_number_default', '+267 123 4567'),
             'whatsapp_additional_numbers' => CompanySetting::get('whatsapp_additional_numbers', []),
             'working_hours' => CompanySetting::get('working_hours', $this->getDefaultWorkingHours()),
