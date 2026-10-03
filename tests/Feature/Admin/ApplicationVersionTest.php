@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin;
 
+use App\Models\ApplicationVersion;
 use App\Models\User;
 use App\Services\ApplicationVersionService;
+use Database\Seeders\ApplicationVersionSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -44,11 +46,12 @@ class ApplicationVersionTest extends TestCase
     public function test_the_versions_page_renders_with_the_current_release(): void
     {
         $this->actingAsVersionAdmin();
+        $this->seed(ApplicationVersionSeeder::class);
 
         $this->get(route('admin.versions.index'))
             ->assertOk()
             ->assertSee('Application Versions')
-            ->assertSee('1.2.0');
+            ->assertSee('1.3.1');
     }
 
     public function test_users_without_the_permission_cannot_manage_versions(): void
@@ -67,16 +70,27 @@ class ApplicationVersionTest extends TestCase
         ])->assertForbidden();
     }
 
-    public function test_the_baseline_version_is_seeded_by_the_migration(): void
+    public function test_the_release_history_is_seeded_from_the_baseline_onwards(): void
     {
         $this->actingAsVersionAdmin();
+
+        $this->seed(ApplicationVersionSeeder::class);
+        $this->seed(ApplicationVersionSeeder::class);
 
         $this->assertDatabaseHas('application_versions', [
             'version' => '1.2.0',
             'major' => 1,
             'minor' => 2,
             'patch' => 0,
+            'summary' => 'Baseline release',
         ]);
+
+        $this->assertSame(
+            ['1.2.0', '1.2.1', '1.3.0', '1.3.1'],
+            ApplicationVersion::query()->orderBy('id')->pluck('version')->all()
+        );
+
+        $this->assertSame('1.3.1', app(ApplicationVersionService::class)->current()?->version);
     }
 
     public function test_it_rejects_invalid_semantic_versions(): void
@@ -136,31 +150,42 @@ class ApplicationVersionTest extends TestCase
     public function test_current_version_is_cached_and_forgotten_on_record(): void
     {
         $this->actingAsVersionAdmin();
+        $this->seed(ApplicationVersionSeeder::class);
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame('1.2.0', $service->current()?->version);
+        $this->assertSame('1.3.1', $service->current()?->version);
         $this->assertTrue(Cache::has(ApplicationVersionService::CACHE_KEY));
 
         $service->record([
-            'version' => '1.3.0',
+            'version' => '1.4.0',
             'summary' => 'Feature release',
             'notes' => [],
             'released_at' => now()->toDateString(),
         ], User::factory()->create());
 
         $this->assertFalse(Cache::has(ApplicationVersionService::CACHE_KEY));
-        $this->assertSame('1.3.0', $service->current()?->version);
+        $this->assertSame('1.4.0', $service->current()?->version);
     }
 
     public function test_next_bump_suggestions_are_computed_from_the_current_version(): void
     {
         $this->actingAsVersionAdmin();
+        $this->seed(ApplicationVersionSeeder::class);
 
         Cache::forget(ApplicationVersionService::CACHE_KEY);
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame(['patch' => '1.2.1', 'minor' => '1.3.0', 'major' => '2.0.0'], $service->nextOptions());
+        $this->assertSame(['patch' => '1.3.2', 'minor' => '1.4.0', 'major' => '2.0.0'], $service->nextOptions());
+    }
+
+    public function test_bump_suggestions_fall_back_to_the_baseline_when_nothing_is_recorded(): void
+    {
+        $this->actingAsVersionAdmin();
+
+        Cache::forget(ApplicationVersionService::CACHE_KEY);
+
+        $this->assertSame(['patch' => '1.2.1', 'minor' => '1.3.0', 'major' => '2.0.0'], app(ApplicationVersionService::class)->nextOptions());
     }
 }
