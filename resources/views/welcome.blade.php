@@ -1,6 +1,6 @@
 <x-layouts::site title="Highblossom | Precision Automotive Glass">
     <!-- Hero Section - Cinematic Dark -->
-    <header class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
+    <header id="page-hero" class="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
         <style>
             @media (prefers-reduced-motion: reduce) {
                 .animate-fade-up,
@@ -12,10 +12,11 @@
         </style>
         {{-- Background Image with Overlay --}}
         <div class="absolute inset-0 z-0">
+            @php $heroImage = $featuredGalleryImages->first()?->image_url; @endphp
             <img
-                alt="Premium automotive glass installation"
+                alt="{{ $featuredGalleryImages->first()?->title ?? 'Automotive glass installation in progress' }}"
                 class="h-full w-full object-cover opacity-40"
-                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1920&q=80"
+                src="{{ $heroImage ?? 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1920&q=80' }}"
                 width="1920"
                 height="1080"
                 fetchpriority="high"
@@ -23,6 +24,7 @@
             />
             <div class="absolute inset-0 bg-gradient-to-b from-[#0A0A0F] via-[#0A0A0F]/80 to-[#0A0A0F]"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#0A0A0F] via-transparent to-[#0A0A0F]/50"></div>
+            <div class="grain-overlay pointer-events-none absolute inset-0" aria-hidden="true"></div>
         </div>
 
         {{-- Hero Content --}}
@@ -41,7 +43,7 @@
                     aria-labelledby="hero-heading"
                     class="font-headline mx-auto mb-4 text-2xl leading-[1.2] font-bold tracking-tight break-words hyphens-auto text-[#FAFAFA] sm:mb-6 sm:text-4xl sm:leading-[1.1] md:text-5xl lg:text-6xl"
                     style="perspective: 900px; min-height: 2.4em"
-                ></div>
+                ><span data-hero-seed>{{ __('site.home.hero_headline_animated')[0] ?? __('site.home.hero_headline_fallback') }}</span></div>
 
                 {{-- Subhead --}}
                 <p
@@ -69,7 +71,7 @@
                     </a>
                     <a
                         href="{{ route('gallery') }}"
-                        class="btn-glass btn-glass--accent glow-red-subtle pulse px-8 py-4 text-lg"
+                        class="btn-glass px-8 py-4 text-lg"
                     >
                         <span>{{ __('site.home.hero_view_work') }}</span>
                     </a>
@@ -240,7 +242,7 @@
                 </div>
                 <a
                     href="{{ route('services') }}"
-                    class="btn-glass btn-glass--accent glow-red-subtle pulse px-8 py-4 text-lg"
+                    class="btn-glass px-8 py-4 text-lg"
                 >
                     <span>{{ __('site.home.services_view_all') }}</span>
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,12 +256,12 @@
                 </a>
             </div>
 
-            {{-- Services Grid --}}
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {{-- Windscreens --}}
-                <div class="glass-card glass-card-hover group rounded-2xl p-8">
-                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                        <svg class="h-7 w-7 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {{-- Services Grid: lead card + compact rows (asymmetric) --}}
+            <div class="grid gap-6 lg:grid-cols-12">
+                {{-- Windscreens — lead --}}
+                <div class="glass-card glass-card-hover group flex flex-col rounded-3xl p-8 lg:col-span-5 lg:p-12">
+                    <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                        <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -268,15 +270,15 @@
                             ></path>
                         </svg>
                     </div>
-                    <h3 class="font-headline mb-3 text-xl font-bold text-[#FAFAFA]">
+                    <h3 class="font-headline mb-4 text-2xl font-bold tracking-tight text-[#FAFAFA] lg:text-3xl">
                         {{ __('site.home.windscreens') }}
                     </h3>
-                    <p class="mb-6 text-sm leading-relaxed text-[#FAFAFA]">
+                    <p class="mb-8 max-w-prose text-base leading-relaxed text-[#A1A1AA]">
                         {{ __('site.home.windscreens_description') }}
                     </p>
                     <a
                         href="{{ route('services') }}"
-                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-all group-hover:gap-3"
+                        class="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-all group-hover:gap-3"
                     >
                         {{ __('site.learn_more') }}
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,89 +287,38 @@
                     </a>
                 </div>
 
-                {{-- Side & Rear --}}
-                <div class="glass-card glass-card-hover group rounded-2xl p-8">
-                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                        <svg class="h-7 w-7 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-                            ></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-headline mb-3 text-xl font-bold text-[#FAFAFA]">{{ __('site.home.side_rear') }}</h3>
-                    <p class="mb-6 text-sm leading-relaxed text-[#FAFAFA]">
-                        {{ __('site.home.side_rear_description') }}
-                    </p>
-                    <a
-                        href="{{ route('services') }}"
-                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-all group-hover:gap-3"
-                    >
-                        {{ __('site.learn_more') }}
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
-
-                {{-- Heavy Machinery --}}
-                <div class="glass-card glass-card-hover group rounded-2xl p-8">
-                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                        <svg class="h-7 w-7 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                            ></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-headline mb-3 text-xl font-bold text-[#FAFAFA]">
-                        {{ __('site.home.heavy_machinery') }}
-                    </h3>
-                    <p class="mb-6 text-sm leading-relaxed text-[#FAFAFA]">
-                        {{ __('site.home.heavy_machinery_description') }}
-                    </p>
-                    <a
-                        href="{{ route('services') }}"
-                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-all group-hover:gap-3"
-                    >
-                        {{ __('site.learn_more') }}
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
-
-                {{-- Fleet Services --}}
-                <div class="glass-card glass-card-hover group rounded-2xl p-8">
-                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                        <svg class="h-7 w-7 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                            ></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-headline mb-3 text-xl font-bold text-[#FAFAFA]">
-                        {{ __('site.home.fleet_services') }}
-                    </h3>
-                    <p class="mb-6 text-sm leading-relaxed text-[#FAFAFA]">
-                        {{ __('site.home.fleet_services_description') }}
-                    </p>
-                    <a
-                        href="{{ route('services') }}"
-                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-all group-hover:gap-3"
-                    >
-                        {{ __('site.learn_more') }}
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
+                {{-- Side & Rear / Heavy Machinery / Fleet — compact rows --}}
+                <div class="flex flex-col gap-4 lg:col-span-7">
+                    @foreach ([
+                        ['key' => 'side_rear', 'path' => 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z'],
+                        ['key' => 'heavy_machinery', 'path' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+                        ['key' => 'fleet_services', 'path' => 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
+                    ] as $service)
+                        <div class="glass-card glass-card-hover group flex flex-1 items-start gap-5 rounded-2xl p-5 lg:p-6">
+                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                                <svg class="h-6 w-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $service['path'] }}"></path>
+                                </svg>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-headline mb-1 text-lg font-bold text-[#FAFAFA]">
+                                    {{ __('site.home.' . $service['key']) }}
+                                </h3>
+                                <p class="text-sm leading-relaxed text-[#A1A1AA]">
+                                    {{ __('site.home.' . $service['key'] . '_description') }}
+                                </p>
+                            </div>
+                            <a
+                                href="{{ route('services') }}"
+                                aria-label="{{ __('site.learn_more') }} — {{ __('site.home.' . $service['key']) }}"
+                                class="self-center text-[#DC2626] opacity-60 transition-all group-hover:translate-x-1 group-hover:opacity-100"
+                            >
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -388,7 +339,7 @@
                 </div>
                 <a
                     href="{{ route('gallery') }}"
-                    class="btn-glass btn-glass--accent glow-red-subtle pulse px-8 py-4 text-lg"
+                    class="btn-glass px-8 py-4 text-lg"
                 >
                     <span>{{ __('site.home.gallery_view_full') }}</span>
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -550,99 +501,41 @@
             </div>
 
             <div class="grid gap-8 lg:grid-cols-3">
-                {{-- Main Carousel Area --}}
-                <div class="lg:col-span-2">
-                    @if ($otherTestimonials->count() > 0)
-                        <div class="glass-card relative overflow-hidden rounded-2xl p-8" id="testimonialCarousel">
-                            {{-- Carousel Container --}}
-                            <div class="relative" id="carouselSlides">
-                                @foreach ($otherTestimonials as $index => $testimonial)
-                                    <div
-                                        class="carousel-slide absolute inset-0 transition-all duration-300 {{ $index === 0 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8' }}"
-                                        data-index="{{ $index }}"
-                                    >
-                                        {{-- Stars --}}
-                                        <div class="mb-6 flex gap-1">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <svg
-                                                    class="w-5 h-5 {{ $i <= $testimonial->rating ? 'text-[#DC2626]' : 'text-[#D4D4D8]' }}"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
-                                        </div>
-
-                                        {{-- Quote --}}
-                                        <blockquote class="mb-6 text-xl leading-relaxed text-[#FAFAFA]">
-                                            "{{ $testimonial->content }}"
-                                        </blockquote>
-
-                                        {{-- Author --}}
-                                        <div class="flex items-center gap-4">
-                                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#DC2626]/20">
-                                                <span class="text-lg font-bold text-[#DC2626]">{{ substr($testimonial->name, 0, 1) }}</span>
-                                            </div>
-                                            <div>
-                                                <div class="font-semibold text-[#FAFAFA]">{{ $testimonial->name }}</div>
-                                                @if ($testimonial->role)
-                                                    <div class="text-sm text-[#FAFAFA]">{{ $testimonial->role }}</div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+{{-- Quote wall --}}
+                <div class="grid gap-6 md:grid-cols-2 lg:col-span-2">
+                    @forelse ($otherTestimonials as $testimonial)
+                        <div class="glass-card flex flex-col rounded-2xl p-6 lg:p-8">
+                            <div class="mb-4 flex gap-1" role="img" aria-label="{{ $testimonial->rating }} out of 5 stars">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <svg class="h-4 w-4 {{ $i <= $testimonial->rating ? 'text-[#DC2626]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                @endfor
                             </div>
-
-                            {{-- Carousel Indicators --}}
-                            <div class="mt-8 flex justify-center gap-2" id="carouselIndicators">
-                                @foreach ($otherTestimonials as $index => $testimonial)
-                                    <button
-                                        data-slide="{{ $index }}"
-                                        class="carousel-indicator w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-[#DC2626] w-6' : 'bg-[#A1A1AA]' }}"
-                                    ></button>
-                                @endforeach
+                            <blockquote class="mb-6 flex-1 text-base leading-relaxed text-[#FAFAFA]">"{{ $testimonial->content }}"</blockquote>
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/20">
+                                    <span class="text-sm font-bold text-[#DC2626]">{{ substr($testimonial->name, 0, 1) }}</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-[#FAFAFA]">{{ $testimonial->name }}</div>
+                                    @if ($testimonial->role)
+                                        <div class="text-xs text-[#A1A1AA]">{{ $testimonial->role }}</div>
+                                    @endif
+                                </div>
                             </div>
-
-                            {{-- Navigation Arrows --}}
-                            <button
-                                id="prevSlide"
-                                class="absolute top-1/2 left-0 flex h-10 w-10 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full bg-[#DC2626]/20 transition-colors hover:bg-[#DC2626]/30"
-                            >
-                                <svg class="h-5 w-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-                            <button
-                                id="nextSlide"
-                                class="absolute top-1/2 right-0 flex h-10 w-10 translate-x-4 -translate-y-1/2 items-center justify-center rounded-full bg-[#DC2626]/20 transition-colors hover:bg-[#DC2626]/30"
-                            >
-                                <svg class="h-5 w-5 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-
-                            {{-- Spacer for absolute positioned content --}}
-                            <div class="h-[280px]"></div>
                         </div>
-                    @else
-                        <div class="glass-card rounded-2xl p-8 text-center">
+                    @empty
+                        <div class="glass-card rounded-2xl p-8 text-center md:col-span-2">
                             <div class="mb-4 text-[#FAFAFA]">
                                 <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                    ></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                 </svg>
                             </div>
                             <p class="text-[#FAFAFA]">{{ __('site.home.testimonials_no_testimonials') }}</p>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
-
                 {{-- Right Column: Featured Testimonial + Stats --}}
                 <div class="space-y-6">
                     {{-- Featured Testimonial Card --}}
@@ -688,6 +581,13 @@
                     @endif
 
                     {{-- Stats Grid --}}
+                    @php
+                        $ratings = $otherTestimonials->pluck('rating')->reject(fn ($r) => $r === null);
+                        if ($featuredTestimonial?->rating) {
+                            $ratings->push($featuredTestimonial->rating);
+                        }
+                        $avgRating = $ratings->isNotEmpty() ? number_format($ratings->avg(), 1) : null;
+                    @endphp
                     <div class="grid grid-cols-2 gap-4">
                         <div class="glass-card rounded-2xl p-4 text-center">
                             <div class="font-headline mb-1 text-2xl font-bold text-[#FAFAFA]">
@@ -696,7 +596,7 @@
                             <div class="text-xs text-[#FAFAFA]">{{ __('site.home.happy_clients') }}</div>
                         </div>
                         <div class="glass-card rounded-2xl p-4 text-center">
-                            <div class="font-headline mb-1 text-2xl font-bold text-[#FAFAFA]">4.9</div>
+                            <div class="font-headline mb-1 text-2xl font-bold text-[#FAFAFA]">{{ $avgRating ?? '4.8' }}</div>
                             <div class="text-xs text-[#FAFAFA]">{{ __('site.home.average_rating') }}</div>
                         </div>
                         <div class="glass-card rounded-2xl p-4 text-center">
@@ -713,94 +613,6 @@
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const carousel = document.getElementById('testimonialCarousel');
-            if (!carousel) return;
-
-            const slides = carousel.querySelectorAll('.carousel-slide');
-            const indicators = carousel.querySelectorAll('.carousel-indicator');
-            const prevBtn = document.getElementById('prevSlide');
-            const nextBtn = document.getElementById('nextSlide');
-
-            if (slides.length === 0) return;
-
-            let currentIndex = 0;
-            let interval = null;
-
-            function showSlide(index) {
-                slides.forEach((slide, i) => {
-                    if (i === index) {
-                        slide.classList.remove('opacity-0', 'translate-x-8');
-                        slide.classList.add('opacity-100', 'translate-x-0');
-                    } else {
-                        slide.classList.remove('opacity-100', 'translate-x-0');
-                        slide.classList.add('opacity-0', 'translate-x-8');
-                    }
-                });
-
-                indicators.forEach((indicator, i) => {
-                    if (i === index) {
-                        indicator.classList.remove('bg-[#A1A1AA]');
-                        indicator.classList.add('bg-[#DC2626]', 'w-6');
-                    } else {
-                        indicator.classList.remove('bg-[#DC2626]', 'w-6');
-                        indicator.classList.add('bg-[#A1A1AA]');
-                    }
-                });
-
-                currentIndex = index;
-            }
-
-            function nextSlide() {
-                const nextIndex = (currentIndex + 1) % slides.length;
-                showSlide(nextIndex);
-            }
-
-            function prevSlide() {
-                const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
-                showSlide(prevIndex);
-            }
-
-            function startAutoSlide() {
-                if (slides.length > 1) {
-                    interval = setInterval(nextSlide, 5000);
-                }
-            }
-
-            function resetAutoSlide() {
-                if (interval) {
-                    clearInterval(interval);
-                }
-                startAutoSlide();
-            }
-
-            // Event listeners
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function () {
-                    prevSlide();
-                    resetAutoSlide();
-                });
-            }
-
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function () {
-                    nextSlide();
-                    resetAutoSlide();
-                });
-            }
-
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', function () {
-                    showSlide(index);
-                    resetAutoSlide();
-                });
-            });
-
-            // Start auto-slide
-            startAutoSlide();
-        });
-    </script>
 
     <!-- CTA Section -->
     <section class="bg-gradient-to-b from-[#121218] to-[#0A0A0F] py-24 lg:py-32">
@@ -830,7 +642,7 @@
                             </svg>
                         </a>
                         <a href="{{ route('bookings.create') }}" class="btn-glass px-8 py-4 text-lg">
-                            <span>Book an Inspection</span>
+                            <span>Book an Appointment</span>
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     stroke-linecap="round"
@@ -992,6 +804,9 @@
 
             if (!container || !phrases || phrases.length === 0) return;
 
+            // Respect reduced motion: keep the server-rendered headline static.
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
             // Animation parameters from soft-blur-in spec
             const ENTER_DURATION = 648; // scaled from 900ms * 0.72
             const ENTER_STAGGER = 18; // scaled from 25ms * 0.72
@@ -1136,9 +951,10 @@
                 // Initial delay
                 await sleep(INITIAL_DELAY_MS);
 
-                // Create and animate first phrase
+                // Create and animate first phrase, replacing the static seed
                 let { title, units } = createPhrase(phrases[currentIndex]);
                 units.forEach((unit) => applyEnterFrom(unit));
+                container.querySelector('[data-hero-seed]')?.remove();
                 container.appendChild(title);
                 await enterAnimation(units);
 
@@ -1195,6 +1011,135 @@
             // Cleanup on page unload
             window.addEventListener('beforeunload', cleanup);
             window.addEventListener('pagehide', cleanup);
+        })();
+    </script>
+    {{-- Mobile Sticky Conversion Bar --}}
+    @php
+        $waNumber = preg_replace('/\D/', '', (string) ($whatsappDefault ?? ''));
+        $stickyContactUrl = $waNumber !== ''
+            ? 'https://wa.me/'.$waNumber.'?text='.urlencode('I would like a quote for automotive glass work.')
+            : (($primaryPhone ?? '') !== '' ? 'tel:'.preg_replace('/[\s()]/', '', $primaryPhone) : null);
+    @endphp
+    <div class="h-[88px] md:hidden" aria-hidden="true"></div>
+    <div
+        id="mobile-sticky-bar"
+        class="pointer-events-none fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
+        aria-hidden="true"
+    >
+        <div
+            id="mobile-sticky-inner"
+            class="flex translate-y-3 items-center gap-2 rounded-full border border-white/10 bg-[#0A0A0F]/85 p-1.5 opacity-0 shadow-2xl shadow-black/50 backdrop-blur-xl transition-all duration-300 ease-out"
+        >
+            <a
+                href="{{ route('quote') }}"
+                class="flex flex-[1.4] items-center justify-center gap-2 rounded-full bg-[#DC2626] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#DC2626]/30 transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
+            >
+                <span>{{ __('site.home.hero_get_quote') }}</span>
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </a>
+            @if ($stickyContactUrl)
+                <a
+                    href="{{ $stickyContactUrl }}"
+                    @if ($waNumber !== '') target="_blank" rel="noopener noreferrer" @endif
+                    class="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-[#FAFAFA] transition-all hover:border-emerald-400/40 hover:bg-emerald-400/10 active:scale-[0.98]"
+                >
+                    @if ($waNumber !== '')
+                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                    @else
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                    @endif
+                    <span>{{ $waNumber !== '' ? 'WhatsApp' : 'Call Us' }}</span>
+                </a>
+            @endif
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const bar = document.getElementById('mobile-sticky-bar');
+            const inner = document.getElementById('mobile-sticky-inner');
+            const hero = document.getElementById('page-hero');
+            if (!bar || !inner) return;
+
+            const HIDDEN = ['pointer-events-none', 'opacity-0', 'translate-y-3'];
+            const SHOWN = ['pointer-events-auto', 'opacity-100', 'translate-y-0'];
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                inner.classList.remove('duration-300', 'ease-out', 'translate-y-3');
+            }
+
+            let heroVisible = true;
+            let lastY = window.scrollY;
+            let ticking = false;
+            let visible = false;
+
+            function setState(show) {
+                if (show === visible) return;
+                visible = show;
+                inner.classList.remove(...(show ? HIDDEN : SHOWN));
+                inner.classList.add(...(show ? SHOWN : HIDDEN));
+                bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+            }
+
+            function evaluate() {
+                ticking = false;
+                const y = window.scrollY;
+                const doc = document.documentElement;
+                const nearBottom = y + window.innerHeight >= doc.scrollHeight - 120;
+
+                if (nearBottom) {
+                    lastY = y;
+                    setState(true);
+                    return;
+                }
+                if (heroVisible) {
+                    lastY = y;
+                    setState(false);
+                    return;
+                }
+
+                const delta = y - lastY;
+                if (Math.abs(delta) < 6) return;
+                lastY = y;
+                setState(delta < 0);
+            }
+
+            function onScroll() {
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(evaluate);
+                }
+            }
+
+            if (hero && 'IntersectionObserver' in window) {
+                new IntersectionObserver(
+                    (entries) => {
+                        heroVisible = entries[0].isIntersecting;
+                        evaluate();
+                    },
+                    { threshold: 0 }
+                ).observe(hero);
+            } else {
+                heroVisible = false;
+            }
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', onScroll, { passive: true });
+            evaluate();
+
+            window.addEventListener('pagehide', function cleanup() {
+                window.removeEventListener('scroll', onScroll);
+                window.removeEventListener('resize', onScroll);
+                window.removeEventListener('pagehide', cleanup);
+            });
         })();
     </script>
 </x-layouts::site>

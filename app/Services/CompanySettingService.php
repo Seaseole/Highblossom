@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\CompanySetting;
+use App\Services\Settings\SettingsManager;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
@@ -24,6 +25,7 @@ final class CompanySettingService
         'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
+        'booking_lead_time_hours',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
     ];
 
@@ -235,7 +237,7 @@ final class CompanySettingService
         return [
             'company_name' => CompanySetting::get('company_name', 'Highblossom PTY LTD'),
             'logo_text' => CompanySetting::get('logo_text', 'Highblossom'),
-            'primary_email' => CompanySetting::get('primary_email', 'info@highblossom.co.bw'),
+            'primary_email' => CompanySetting::get('primary_email', 'jseaseole@highblossom.net'),
             'address' => CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
             'primary_phone' => CompanySetting::get('primary_phone', '+267 123 4567'),
             'whatsapp_number_default' => CompanySetting::get('whatsapp_number_default', '+267 123 4567'),
@@ -246,6 +248,7 @@ final class CompanySettingService
             'date_format' => CompanySetting::get('date_format', 'd/M/Y'),
             'time_format' => CompanySetting::get('time_format', 'H:i'),
             'time_format_display' => CompanySetting::get('time_format_display', '12'),
+            'booking_lead_time_hours' => CompanySetting::get('booking_lead_time_hours', 2),
             'currency_symbol' => CompanySetting::get('currency_symbol', 'P'),
             'business_logo' => CompanySetting::get('business_logo', ''),
             'favicon' => CompanySetting::get('favicon', ''),
@@ -267,17 +270,12 @@ final class CompanySettingService
 
     /**
      * Get default working hours for all days of the week.
+     *
+     * Delegates to SettingsManager so the admin screen and the availability
+     * API can never drift apart on two separate hardcoded copies.
      */
     private function getDefaultWorkingHours(): array
     {
-        return [
-            'monday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'tuesday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'wednesday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'thursday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'friday' => ['open' => '08:00', 'close' => '17:30', 'is_closed' => false],
-            'saturday' => ['open' => '08:00', 'close' => '12:00', 'is_closed' => false],
-            'sunday' => ['open' => null, 'close' => null, 'is_closed' => true],
-        ];
+        return app(SettingsManager::class)->getDefaults()['working_hours'];
     }
 }

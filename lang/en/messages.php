@@ -50,10 +50,10 @@ return [
     'glass_type_updated' => 'Glass type updated successfully.',
     'glass_type_deleted' => 'Glass type deleted successfully.',
 
-    // Inspection messages
-    'inspection_created' => 'Inspection created successfully.',
-    'inspection_updated' => 'Inspection updated successfully.',
-    'inspection_deleted' => 'Inspection deleted successfully.',
+    // Appointment messages
+    'inspection_created' => 'Appointment created successfully.',
+    'inspection_updated' => 'Appointment updated successfully.',
+    'inspection_deleted' => 'Appointment deleted successfully.',
 
     // Absence messages
     'absence_created' => 'Absence recorded successfully.',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -93,8 +94,80 @@ class BookingSubmissionTest extends TestCase
             '_idempotency_token' => md5(uniqid()),
         ]);
 
-        $response->assertSessionHas('error');
+        $response->assertSessionHasErrors('scheduled_at');
         $this->assertDatabaseCount('bookings', 1);
+    }
+
+    public function test_same_day_booking_beyond_the_notice_window_is_accepted(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-05 09:00:00'));
+
+        $response = $this->post('/bookings', [
+            'client_name' => 'Test User',
+            'client_email' => 'test@example.com',
+            'client_phone' => '26712345678',
+            'vehicle_details' => 'Toyota Hilux 2020',
+            'scheduled_at' => '2026-10-05T14:00:00',
+            'location' => 'mobile',
+            'client_address' => 'Plot 123, Gaborone North',
+            '_idempotency_token' => md5(uniqid()),
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('bookings', [
+            'scheduled_at' => '2026-10-05 14:00:00',
+            'client_name' => 'Test User',
+        ]);
+    }
+
+    public function test_same_day_booking_inside_the_notice_window_is_rejected(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-05 09:00:00'));
+
+        $response = $this->post('/bookings', [
+            'client_name' => 'Test User',
+            'client_email' => 'test@example.com',
+            'client_phone' => '26712345678',
+            'vehicle_details' => 'Toyota Hilux 2020',
+            'scheduled_at' => '2026-10-05T10:00:00',
+            'location' => 'mobile',
+            '_idempotency_token' => md5(uniqid()),
+        ]);
+
+        $response->assertSessionHasErrors('scheduled_at');
+        $this->assertDatabaseCount('bookings', 0);
+    }
+
+    public function test_cancelled_booking_frees_its_slot_for_rebooking(): void
+    {
+        $slot = Carbon::parse('next Monday 10:00:00');
+
+        Booking::create([
+            'client_name' => 'Cancelled customer',
+            'client_email' => 'cancelled@example.com',
+            'client_phone' => '26700000000',
+            'vehicle_details' => 'Cancelled car',
+            'scheduled_at' => $slot,
+            'location' => 'workshop',
+            'status' => 'cancelled',
+            'total_price' => 0,
+        ]);
+
+        $response = $this->post('/bookings', [
+            'client_name' => 'Test User',
+            'client_email' => 'test@example.com',
+            'client_phone' => '26712345678',
+            'vehicle_details' => 'Toyota Hilux 2020',
+            'scheduled_at' => $slot->format('Y-m-d\TH:i:s'),
+            'location' => 'mobile',
+            'client_address' => 'Plot 123, Gaborone North',
+            '_idempotency_token' => md5(uniqid()),
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertDatabaseCount('bookings', 2);
     }
 
     public function test_missing_required_fields_returns_errors(): void

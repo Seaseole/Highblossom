@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'label' => 'Book an Inspection',
-    'title' => 'Book an Inspection',
+    'label' => 'Book an Appointment',
+    'title' => 'Book an Appointment',
     'description' => 'Schedule your windshield inspection at a time that suits you.',
 
     'wizard_step_1' => 'Date & Time',
@@ -17,6 +17,26 @@ return [
     'select_time' => 'Available time slots',
     'no_slots_available' => 'No slots available for this date. Please select another day.',
 
+    'day_today' => 'Today',
+    'pick_another_date' => 'Pick another date',
+    'hide_date_picker' => 'Hide calendar',
+    'no_upcoming_days' => 'No bookable days are open right now. Please check back soon.',
+    'period_morning' => 'Morning',
+    'period_afternoon' => 'Afternoon',
+    'selected' => 'Selected',
+    'day_closed' => 'We are closed on this day. Please choose another.',
+    'earliest_available' => 'Earliest you can book:',
+    'slots_load_failed' => 'We could not load the available times for this date.',
+    'retry' => 'Try again',
+
+    'slot_reason_too_late' => 'Too late to book',
+    'slot_reason_taken' => 'Already booked',
+    'slot_reason_closed' => 'Closed',
+
+    'slot_closed_day' => 'We are closed on that day. Please choose another date.',
+    'slot_too_late' => 'That time is too soon to book. Please choose a later time or another day.',
+    'slot_already_taken' => 'That time slot is no longer available. Please select another time.',
+
     'your_information' => 'Your Information',
     'your_info_description' => 'Please provide your contact details so we can confirm your booking.',
     'full_name_label' => 'Full Name',
@@ -30,13 +50,13 @@ return [
     'appointment_title' => 'Appointment Details',
     'appointment_description' => 'Choose your preferred date, time, and location.',
     'scheduled_at_label' => 'Preferred Date & Time',
-    'location_label' => 'Inspection Location',
+    'location_label' => 'Appointment Location',
     'select_location' => 'Select location',
     'location_mobile' => 'Mobile Service (at your location)',
     'location_workshop' => 'Our Workshop',
     'address_label' => 'Your Address',
 
-    'submit_booking' => 'Book Inspection',
+    'submit_booking' => 'Book Appointment',
     'submit_disclaimer' => 'By submitting this form, you agree to our terms and privacy policy.',
     'next' => 'Next',
     'back' => 'Back',

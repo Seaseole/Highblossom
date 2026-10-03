@@ -1,6 +1,6 @@
 <x-layouts::admin title="Company Settings">
     <div
-        class="mx-auto max-w-5xl space-y-10 py-10"
+        class="mx-auto max-w-5xl space-y-10 py-6 sm:py-10"
         x-data="{
         tab: '{{ request()->query('tab', 'general') }}',
         whatsappNumbers: {{ \Illuminate\Support\Js::from($settings['whatsapp_additional_numbers'] ?? []) }},
@@ -15,7 +15,7 @@
         },
         addNumber() { this.whatsappNumbers.push({ label: '', number: '' }); },
         removeNumber(index) { this.whatsappNumbers.splice(index, 1); },
-        addAnnouncement() { this.announcements.push({ text: '', link: '' }); },
+        addAnnouncement() { this.announcements.push({ text: '', link: '', expires_at: '' }); },
         removeAnnouncement(index) { this.announcements.splice(index, 1); }
     }"
     >
@@ -36,7 +36,7 @@
             <input type="hidden" name="tab" :value="tab" />
 
             <!-- Tabs Navigation -->
-            <div class="flex space-x-1 border-b border-gray-200 dark:border-white/10">
+            <div class="no-scrollbar flex gap-x-5 overflow-x-auto border-b border-gray-200 dark:border-white/10">
                 @foreach ([
                     'general' => 'General',
                     'hours' => 'Hours',
@@ -51,7 +51,7 @@
                         type="button"
                         @click="tab = '{{ $key }}'"
                         :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
-                        class="border-b-2 px-1 pb-4 text-sm font-medium transition-colors"
+                        class="shrink-0 whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors"
                     >
                         {{ $label }}
                     </button>
@@ -66,7 +66,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                 >
                     <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">General Information</h3>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -143,7 +143,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Weekly Business Hours</h3>
@@ -152,8 +152,8 @@
                             $days = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
                         @endphp
                         @foreach ($days as $key => $label)
-                            <div class="flex items-center gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                                <div class="w-32">
+                            <div class="flex flex-col items-start gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-center sm:gap-4">
+                                <div class="sm:w-32">
                                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</label>
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -164,22 +164,53 @@
                                         label="Closed"
                                     />
                                 </div>
-                                <div class="flex flex-1 gap-4">
+                                <div class="grid w-full flex-1 grid-cols-2 gap-2 sm:w-auto sm:gap-4">
                                     <input
                                         type="time"
                                         name="working_hours[{{ $key }}][open]"
                                         value="{{ $settings['working_hours'][$key]['open'] ?? '' }}"
-                                        class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
+                                        class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
                                     />
                                     <input
                                         type="time"
                                         name="working_hours[{{ $key }}][close]"
                                         value="{{ $settings['working_hours'][$key]['close'] ?? '' }}"
-                                        class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
+                                        class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
                                     />
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+
+                    <div class="mt-8 border-t border-gray-100 pt-6 dark:border-white/5">
+                        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Booking Rules</h3>
+                        <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">
+                            Customers are only offered slots on days that are open above. A day marked Closed shows no slots at all.
+                        </p>
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="space-y-2">
+                                <label
+                                    for="booking_lead_time_hours"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                >Minimum Booking Notice (hours)</label>
+                                <input
+                                    type="number"
+                                    id="booking_lead_time_hours"
+                                    name="booking_lead_time_hours"
+                                    min="0"
+                                    max="24"
+                                    step="1"
+                                    value="{{ old('booking_lead_time_hours', $settings['booking_lead_time_hours']) }}"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    How far ahead of the current time a customer must book. Set to 0 to allow same-day booking up to closing.
+                                </p>
+                                @error('booking_lead_time_hours')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -189,7 +220,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                     x-data="{
                         logoPreview: '{{ $settings['business_logo'] ? Storage::url($settings['business_logo']) : null }}',
@@ -273,7 +304,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Locale Settings</h3>
@@ -367,7 +398,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <div class="space-y-6">
@@ -431,7 +462,7 @@
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional WhatsApp Numbers</label>
                                 <div class="grid gap-4">
                                     <template x-for="(number, index) in whatsappNumbers" :key="index">
-                                        <div class="flex items-start gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+                                        <div class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:gap-4">
                                             <div class="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
                                                 <div class="space-y-1">
                                                     <input
@@ -455,7 +486,7 @@
                                             <button
                                                 type="button"
                                                 @click="removeNumber(index)"
-                                                class="mt-auto inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
+                                                class="inline-flex items-center justify-center gap-2 self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98] sm:self-auto sm:px-6"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -477,7 +508,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
@@ -497,7 +528,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <div class="flex items-center justify-between">
@@ -532,7 +563,7 @@
 
                         <div class="space-y-4">
                             <template x-for="(announcement, index) in announcements" :key="index">
-                                <div class="flex items-start gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-6 dark:border-white/5 dark:bg-white/5">
+                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
                                     <div class="flex-1 space-y-4">
                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div class="space-y-1.5">
@@ -579,12 +610,22 @@
                                                     />
                                                 </div>
                                             </div>
+                                            <div class="space-y-1.5 md:col-span-2">
+                                                <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Active Until</label>
+                                                <input
+                                                    type="datetime-local"
+                                                    :name="`announcements[${index}][expires_at]`"
+                                                    x-model="announcement.expires_at"
+                                                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                                />
+                                                <p class="text-[11px] text-gray-400">Leave blank to never expire. The message hides automatically after this date &amp; time.</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <button
                                         type="button"
                                         @click="removeAnnouncement(index)"
-                                        class="mt-auto inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
+                                        class="inline-flex items-center justify-center gap-2 self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98] sm:self-auto sm:px-6"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -604,7 +645,7 @@
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                 >
                     <div class="mb-6 space-y-1">

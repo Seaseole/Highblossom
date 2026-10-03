@@ -1,6 +1,6 @@
 <x-layouts::admin title="Create User">
     <div
-        class="mx-auto max-w-xl space-y-8 py-10"
+        class="mx-auto max-w-xl space-y-8 py-6 sm:py-10"
         x-data="{
             showPassword: false,
             minLen: 8,
@@ -30,7 +30,7 @@
         <form
             method="POST"
             action="{{ route('admin.users.store') }}"
-            class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+            class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
         >
             @csrf
 

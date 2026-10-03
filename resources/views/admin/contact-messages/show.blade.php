@@ -1,7 +1,7 @@
 <x-layouts::admin title="Message Details">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="space-y-1">
                 <a
                     href="{{ route('admin.contact-messages.index') }}"
@@ -26,7 +26,7 @@
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div class="space-y-8 lg:col-span-2">
                 <!-- Sender Information -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Sender Information</h2>
                     <dl class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div class="space-y-1">
@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Message Content -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Message</h2>
                     <p class="rounded-2xl border border-gray-100 bg-gray-50 p-6 text-sm leading-relaxed text-gray-600 dark:border-white/5 dark:bg-white/5 dark:text-gray-300">
                         {{ $message->message }}
@@ -67,7 +67,7 @@
 
             <div class="space-y-8">
                 <!-- Actions Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Actions</h2>
 
                     @if (! $message->is_read)

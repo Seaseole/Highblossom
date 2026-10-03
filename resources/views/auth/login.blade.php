@@ -79,20 +79,38 @@
 
             <button
                 type="button"
-                onclick="signInWithPasskey()"
-                class="group flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-[#E4E4E7] bg-white px-6 py-4 text-lg font-bold text-[#18181B] transition-all duration-300 hover:border-[#DC2626]/30 hover:bg-[#F9FAFB] focus:ring-4 focus:ring-[#DC2626]/10 focus:outline-none active:scale-[0.98]"
+                id="passkey-signin-btn"
+                onclick="signInWithPasskey(this)"
+                class="group flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-[#E4E4E7] bg-white px-6 py-4 text-lg font-bold text-[#18181B] transition-all duration-300 hover:border-[#DC2626]/30 hover:bg-[#F9FAFB] focus:ring-4 focus:ring-[#DC2626]/10 focus:outline-none active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
                 </svg>
-                <span>Sign in with Passkey</span>
+                <span id="passkey-signin-label">Sign in with Passkey</span>
             </button>
+
+            <div
+                id="passkey-error"
+                role="alert"
+                class="hidden rounded-2xl border border-[#DC2626]/30 bg-[#DC2626]/5 px-4 py-3 text-center text-sm font-medium text-[#B91C1C]"
+            ></div>
         </div>
     </form>
 
     <script>
-        async function signInWithPasskey() {
-            console.log('Starting passkey login...');
+        const PASSKEY_CANCELLED_NAMES = ['UserCancelledError', 'NotAllowedError', 'AbortError'];
+
+        function showPasskeyError(message) {
+            const box = document.getElementById('passkey-error');
+            box.textContent = message;
+            box.classList.remove('hidden');
+        }
+
+        async function signInWithPasskey(btn) {
+            const label = document.getElementById('passkey-signin-label');
+            document.getElementById('passkey-error').classList.add('hidden');
+            btn.disabled = true;
+            label.textContent = 'Waiting for passkey verification…';
             try {
                 const response = await window.Passkeys.verify();
                 console.log('Passkey login successful', response);
@@ -100,16 +118,28 @@
                 // Manual redirect if the library doesn't handle it
                 if (response && response.redirect) {
                     window.location.href = response.redirect;
+                    return;
                 }
             } catch (e) {
-                if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+                if (PASSKEY_CANCELLED_NAMES.includes(e.name)) {
                     console.log('Passkey login cancelled by user.');
                 } else {
                     console.error('Passkey login failed:', e);
-                    alert('Failed to sign in with passkey. Please try again or use your password.');
+                    showPasskeyError(e.message || 'Failed to sign in with passkey. Please try again or use your password.');
                 }
+            } finally {
+                btn.disabled = ! window.Passkeys.isSupported();
+                label.textContent = btn.disabled ? 'Passkeys are not supported in this browser' : 'Sign in with Passkey';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('passkey-signin-btn');
+            if (! window.Passkeys?.isSupported()) {
+                btn.disabled = true;
+                document.getElementById('passkey-signin-label').textContent = 'Passkeys are not supported in this browser';
+            }
+        });
     </script>
     @if (config('features.registration_enabled'))
         <div class="animate-fade-in-up mt-10 text-center delay-500">

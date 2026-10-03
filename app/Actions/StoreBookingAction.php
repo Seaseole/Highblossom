@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Events\BookingCreatedEvent;
-use App\Mail\BookingConfirmationMail;
 use App\Models\Booking;
+use App\Models\BookingEvent;
 use App\Models\User;
 use App\Notifications\NewBookingStaffNotification;
+use App\Services\BookingTimeline;
 use App\Services\Contracts\AvailabilityServiceInterface;
 use App\Services\IdempotencyService;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 /**
@@ -30,7 +29,8 @@ class StoreBookingAction
     public function __construct(
         protected Booking $booking,
         protected IdempotencyService $idempotencyService,
-        protected AvailabilityServiceInterface $availabilityService
+        protected AvailabilityServiceInterface $availabilityService,
+        protected BookingTimeline $timeline
     ) {}
 
     /**
@@ -47,7 +47,7 @@ class StoreBookingAction
 
         try {
             $booking = DB::transaction(function () use ($request) {
-                if (! $this->availabilityService->isSlotAvailable($request->input('scheduled_at'))) {
+                if (! $this->availabilityService->isSlotAvailableForUpdate($request->input('scheduled_at'))) {
                     return null;
                 }
 
@@ -65,7 +65,7 @@ class StoreBookingAction
 
             // Notifications — log failures but never break the response
             try {
-                Mail::to($booking->client_email)->queue(new BookingConfirmationMail($booking));
+                $this->timeline->record($booking, BookingEvent::TYPE_RECEIVED);
 
                 $staff = User::permission('update bookings')->get();
                 if ($staff->isNotEmpty()) {
@@ -81,20 +81,6 @@ class StoreBookingAction
                 'success' => true,
                 'message' => 'Your booking has been submitted successfully. We will contact you shortly.',
                 'booking' => $booking,
-            ];
-        } catch (QueryException $e) {
-            if (str_contains($e->getMessage(), 'bookings_scheduled_at_unique')) {
-                return [
-                    'success' => false,
-                    'message' => 'That time slot was just booked by someone else. Please choose a different time.',
-                ];
-            }
-
-            Log::error('Booking database error: '.$e->getMessage());
-
-            return [
-                'success' => false,
-                'message' => 'There was an error submitting your booking. Please try again.',
             ];
         } catch (\Exception $e) {
             Log::error('Booking submission error: '.$e->getMessage());

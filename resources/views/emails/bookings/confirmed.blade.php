@@ -3,7 +3,7 @@
 
 Hi {{ $booking->client_name }},
 
-Great news! Your booking has been confirmed and added to our inspection list.
+Great news! Your booking has been confirmed and added to our appointment list.
 
 **Vehicle Details:**
 {{ $booking->vehicle_details }}
@@ -19,6 +19,10 @@ Great news! Your booking has been confirmed and added to our inspection list.
 @endif
 
 Our team looks forward to serving you. If you need to make any changes, please reply to this email or contact our support team.
+
+@component('mail::button', ['url' => URL::signedRoute('bookings.confirmation', $booking)])
+View booking status
+@endcomponent
 
 Thanks,<br>
 {{ config('app.name') }}

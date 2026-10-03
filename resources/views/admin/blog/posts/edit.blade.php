@@ -1,5 +1,5 @@
 <x-layouts::admin title="Edit Blog Post">
-    <div class="mx-auto max-w-7xl space-y-8 py-10">
+    <div class="mx-auto max-w-7xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div class="space-y-1">
@@ -39,7 +39,7 @@
 
             <div class="space-y-8 lg:col-span-2">
                 <!-- Basic Info Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
@@ -62,13 +62,13 @@
                 </div>
 
                 <!-- Content Blocks -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Content</h2>
                     <livewire:block-builder name="content" :value="old('content', $post->content)" />
                 </div>
 
                 <!-- Categories & Tags -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Categories & Tags</h2>
 
                     <div class="space-y-4">
@@ -93,7 +93,7 @@
 
             <div class="space-y-8">
                 <!-- Publish Settings -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Publish Settings</h2>
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>

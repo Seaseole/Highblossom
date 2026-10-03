@@ -7,8 +7,8 @@ return [
     // Stats cards
     'bookings' => 'Bookings',
     'total_bookings' => 'Total bookings',
-    'inspections' => 'Inspections',
-    'pending_inspections' => 'Pending inspections',
+    'inspections' => 'Appointments',
+    'pending_inspections' => 'Pending appointments',
     'users' => 'Users',
     'active_users' => 'Active users',
     'quotes' => 'Quotes',

@@ -1,5 +1,5 @@
 <x-layouts::admin title="{{ __('admin-users.title') }}">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div class="space-y-1">
@@ -9,14 +9,14 @@
                 <p class="text-gray-500 dark:text-gray-400">Manage user accounts and permissions.</p>
             </div>
 
-            <div class="flex items-center gap-4">
-                <form method="GET" action="{{ route('admin.users.index') }}">
+            <div class="flex w-full flex-wrap items-center gap-4 md:w-auto">
+                <form method="GET" action="{{ route('admin.users.index') }}" class="flex-1 md:flex-none">
                     <input
                         type="text"
                         name="search"
                         value="{{ request('search') }}"
                         placeholder="{{ __('admin-users.search_placeholder') }}"
-                        class="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-[#0A0A0F] dark:focus:ring-white"
+                        class="w-full rounded-full border border-gray-200 bg-white px-4 py-2 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-[#0A0A0F] dark:focus:ring-white md:w-auto"
                     />
                 </form>
                 <a
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Table -->
-        <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+        <div class="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
             <table class="w-full min-w-[800px]">
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-white/10">

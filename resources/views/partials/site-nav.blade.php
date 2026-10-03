@@ -5,6 +5,10 @@
     @php
         $isAnnounceActive = $announcementActive ?? $settings->get('announcement_active', false);
         $announceList = $announcements ?? $settings->get('announcements', []);
+        $announceList = collect($announceList)
+            ->filter(fn ($a) => empty($a['expires_at'] ?? null) || \Carbon\Carbon::parse($a['expires_at'])->isFuture())
+            ->values()
+            ->all();
     @endphp
     @if ($isAnnounceActive && ! empty($announceList))
         <style>
@@ -162,7 +166,7 @@
                 Blog
             </a>
             <a href="{{ route('quote') }}" class="btn-premium px-5 py-2.5 text-sm"> Get Quote </a>
-            <a href="{{ route('bookings.create') }}" class="btn-glass px-5 py-2.5 text-sm"> Book Inspection </a>
+            <a href="{{ route('bookings.create') }}" class="btn-glass px-5 py-2.5 text-sm"> Book Appointment </a>
         </div>
 
         {{-- Right Side Actions --}}
@@ -245,7 +249,7 @@
 {{-- Mobile Menu --}}
 <div
     id="mobile-menu"
-    class="mobile-menu fixed top-0 right-0 z-[60] h-[100dvh] h-screen w-full max-w-sm border-l border-white/10 bg-[#121218]"
+    class="mobile-menu fixed top-0 right-0 z-[60] h-[100dvh] w-full max-w-sm border-l border-white/10 bg-[#121218]"
     aria-hidden="true"
     aria-label="Mobile navigation menu"
 >
@@ -265,7 +269,7 @@
         </div>
 
         {{-- Mobile Links --}}
-        <div class="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-8">
+        <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-8">
             <a
                 href="{{ route('home') }}"
                 onclick="closeMobileMenu()"
@@ -313,7 +317,7 @@
                 onclick="closeMobileMenu()"
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('bookings.create') ? 'text-[#DC2626]' : '' }}"
             >
-                Book Inspection
+                Book Appointment
             </a>
             <a
                 href="{{ route('contact') }}"
@@ -325,30 +329,39 @@
         </div>
 
         {{-- Mobile Footer --}}
-        <div class="flex-shrink-0 border-t border-white/10 px-6 py-6">
+        <div class="flex-shrink-0 border-t border-white/10 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             @if (Route::has('login'))
                 @auth
                     <a
                         href="{{ route('dashboard') }}"
                         onclick="closeMobileMenu()"
-                        class="flex items-center gap-3 text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                        class="flex w-full items-center justify-center gap-3 rounded-full bg-[#DC2626] px-6 py-3.5 text-base font-bold text-white transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
                     >
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        <span class="font-headline font-semibold">Dashboard</span>
+                        <span class="font-headline font-bold">Dashboard</span>
                     </a>
                 @else
                     <a
                         href="{{ route('login') }}"
                         onclick="closeMobileMenu()"
-                        class="flex items-center gap-3 text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                        class="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-base font-bold text-[#FAFAFA] transition-all hover:border-[#DC2626]/40 hover:bg-[#DC2626]/10 active:scale-[0.98]"
                     >
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                         </svg>
-                        <span class="font-headline font-semibold">Log in</span>
+                        <span class="font-headline font-bold">Log in</span>
                     </a>
+                    @if (\Illuminate\Support\Facades\Route::has('register') && config('features.registration_enabled'))
+                        <a
+                            href="{{ route('register') }}"
+                            onclick="closeMobileMenu()"
+                            class="mt-3 block text-center text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                        >
+                            Need an account? Register
+                        </a>
+                    @endif
                 @endauth
             @endif
         </div>

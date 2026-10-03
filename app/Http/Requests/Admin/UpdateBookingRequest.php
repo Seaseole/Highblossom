@@ -28,7 +28,6 @@ final class UpdateBookingRequest extends FormRequest
     {
         return [
             'total_price' => ['nullable', 'numeric', 'min:0'],
-            'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

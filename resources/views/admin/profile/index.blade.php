@@ -1,5 +1,5 @@
 <x-layouts::admin title="Profile">
-    <div class="mx-auto max-w-4xl space-y-10 py-10">
+    <div class="mx-auto max-w-4xl space-y-10 py-6 sm:py-10">
         <!-- Header -->
         <div class="space-y-1">
             <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Profile Settings</h1>
@@ -89,13 +89,13 @@
         }"
         >
             <!-- Tabs Navigation -->
-            <div class="mb-8 flex space-x-1 border-b border-gray-200 dark:border-white/10">
+            <div class="no-scrollbar mb-8 flex gap-x-5 overflow-x-auto border-b border-gray-200 dark:border-white/10">
                 @foreach (['profile' => 'Profile', 'appearance' => 'Appearance', 'security' => 'Security', 'passkeys' => 'Passkeys'] as $key => $label)
                     <button
                         type="button"
                         @click="tab = '{{ $key }}'"
                         :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
-                        class="border-b-2 px-1 pb-4 text-sm font-medium transition-colors"
+                        class="shrink-0 whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors"
                     >
                         {{ $label }}
                     </button>
@@ -112,7 +112,7 @@
                     x-transition:enter-end="opacity-100 translate-y-0"
                     class="space-y-8"
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h3>
                         <form action="{{ route('admin.profile.update') }}" method="POST" class="space-y-6">
                             @csrf
@@ -151,7 +151,7 @@
                     </div>
 
                     <!-- Delete Account -->
-                    <div class="rounded-3xl border border-red-100 bg-red-50 p-8 dark:border-red-900/30 dark:bg-red-950/10">
+                    <div class="rounded-3xl border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/10 sm:p-6 md:p-8">
                         <h3 class="mb-2 text-lg font-semibold text-red-700 dark:text-red-400">Delete Account</h3>
                         <p class="mb-6 max-w-lg text-sm text-red-600/80 dark:text-red-400/70">
                             Once your account is deleted, all of its resources and data will be permanently deleted.
@@ -176,7 +176,7 @@
                     class="space-y-8"
                     style="display: none"
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Appearance Settings</h3>
                         <form action="{{ route('admin.profile.appearance.update') }}" method="POST" class="space-y-6">
                             @csrf
@@ -225,7 +225,7 @@
                     class="space-y-8"
                     style="display: none"
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Update Password</h3>
                         <form
                             action="{{ route('admin.profile.password.update') }}"
@@ -342,7 +342,7 @@
                     </div>
 
                     <!-- TFA Component -->
-                    <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
                             Two-Factor Authentication
                         </h3>
@@ -364,7 +364,7 @@
                         @elseif ($user->two_factor_secret && ! $user->two_factor_confirmed_at)
                             {{-- Step 2: Setup (Unconfirmed) --}}
                             <div class="space-y-6">
-                                <div class="inline-block rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+                                <div class="inline-block max-w-full rounded-xl border border-gray-100 bg-gray-50 p-4 [&>svg]:mx-auto [&>svg]:block [&>svg]:h-auto [&>svg]:max-w-[220px] dark:border-white/5 dark:bg-white/5">
                                     {!! $qrCodeSvg !!}
                                 </div>
 
@@ -469,7 +469,7 @@
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
-                    class="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
                 >
                     <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Delete Account</h3>
                     <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
@@ -528,7 +528,7 @@
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
-                    class="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl dark:border-white/10 dark:bg-[#0A0A0F]"
+                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
                 >
                     <div class="mb-6 flex items-center justify-between">
                         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Recovery Codes</h3>

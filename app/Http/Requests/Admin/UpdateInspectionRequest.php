@@ -30,9 +30,12 @@ final class UpdateInspectionRequest extends FormRequest
         return [
             'staff_id' => ['sometimes', 'exists:users,id'],
             'scheduled_at' => ['sometimes', 'date'],
+            'started_at' => ['nullable', 'date'],
             'ended_at' => ['nullable', 'date', 'after:scheduled_at'],
             'location' => ['sometimes', 'string', 'max:255'],
             'type' => ['sometimes', Rule::in(['mobile', 'workshop'])],
+            // Free text that rides the completion email; never stored on the inspection.
+            'client_summary' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

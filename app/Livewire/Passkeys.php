@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Laravel\Passkeys\Actions\DeletePasskey;
@@ -63,13 +62,30 @@ class Passkeys extends Component
 
     /**
      * Rename a passkey after verifying ownership.
-     *
-     *
-     * @throws ModelNotFoundException
      */
     public function renamePasskey(int $passkeyId, string $newName)
     {
-        $passkey = Passkey::findOrFail($passkeyId);
+        $newName = trim($newName);
+
+        if ($newName === '' || mb_strlen($newName) > 255) {
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Passkey name must be between 1 and 255 characters.',
+            ]);
+
+            return;
+        }
+
+        $passkey = Passkey::find($passkeyId);
+
+        if (! $passkey) {
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Passkey not found. Refresh the page and try again.',
+            ]);
+
+            return;
+        }
 
         // Ensure the passkey belongs to the authenticated user
         if ($passkey->user_id !== Auth::id()) {

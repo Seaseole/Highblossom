@@ -45,6 +45,49 @@
                     </div>
                 </div>
 
+                @if ($booking->events->isNotEmpty())
+                    <div class="glass-card mb-10 rounded-2xl p-8 text-left md:p-10">
+                        <h2 class="font-headline mb-1 text-xl font-semibold text-[#FAFAFA]">
+                            {{ __('confirmation.progress') }}
+                        </h2>
+                        <p class="mb-6 text-sm text-[#A1A1AA]">{{ __('confirmation.progress_description') }}</p>
+
+                        <ol class="space-y-6">
+                            @foreach ($booking->events as $event)
+                                <li class="flex gap-4">
+                                    <div class="flex flex-col items-center">
+                                        <span
+                                            class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full {{ $loop->last ? 'bg-green-500' : 'border border-green-500/50 bg-green-500/30' }}"
+                                        ></span>
+                                        @unless ($loop->last)
+                                            <span class="mt-1 w-px flex-1 bg-white/10"></span>
+                                        @endunless
+                                    </div>
+                                    <div class="pb-1">
+                                        <p class="text-sm font-semibold text-[#FAFAFA]">
+                                            {{ __('confirmation.event_'.$event->type) }}
+                                        </p>
+                                        <p class="text-xs text-[#A1A1AA]">
+                                            {{ $event->happened_at->format('d/M/Y') }} ·
+                                            {{ $event->happened_at->format('H:i') }}
+                                        </p>
+                                        @if ($event->summary)
+                                            <p class="mt-1.5 text-sm text-[#A1A1AA]">{{ $event->summary }}</p>
+                                        @endif
+                                        @if ($event->type === 'rescheduled' && $event->previous_scheduled_at)
+                                            <p class="mt-1.5 text-xs text-[#A1A1AA]">
+                                                {{ __('confirmation.moved_from', [
+                                                    'slot' => $event->previous_scheduled_at->format('d/M/Y H:i'),
+                                                ]) }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </div>
+                @endif
+
                 <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
                     <a href="{{ route('home') }}" class="btn-glass w-full px-8 py-4 text-lg sm:w-auto">
                         <svg class="mr-2 inline h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

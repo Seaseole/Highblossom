@@ -1,5 +1,5 @@
 <x-layouts::admin title="Create Partner">
-    <div class="mx-auto max-w-xl space-y-8 py-10">
+    <div class="mx-auto max-w-xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div class="space-y-1">
@@ -18,7 +18,7 @@
             action="{{ route('admin.partners.store') }}"
             method="POST"
             enctype="multipart/form-data"
-            class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+            class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
             x-data="{
                 imagePreview: null,
                 handleFileSelect(event) {

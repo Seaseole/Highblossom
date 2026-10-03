@@ -4,6 +4,8 @@ window.bookingWizard = function () {
         activeMonthIndex: 0,
         totalMonths: 0,
         monthLabels: [],
+        stripDates: [],
+        showCalendar: false,
         scheduledAt: '',
         location: '',
         clientName: '',
@@ -12,34 +14,44 @@ window.bookingWizard = function () {
         vehicleDetails: '',
         clientAddress: '',
         slots: [],
-        loadingSlots: false,
+        slotsState: 'idle',
+        earliest: null,
+        reasonLabels: {},
+        periodLabels: {},
         selectedTime: '',
         selectedDate: '',
-        hasError: false,
         isSubmitting: false,
 
         init() {
-            const form = this.$root;
-            this.scheduledAt = form.dataset.scheduledAt || '';
-            this.location = form.dataset.location || '';
-            this.clientName = form.dataset.clientName || '';
-            this.clientEmail = form.dataset.clientEmail || '';
-            this.clientPhone = form.dataset.clientPhone || '';
-            this.vehicleDetails = form.dataset.vehicleDetails || '';
-            this.clientAddress = form.dataset.clientAddress || '';
-            this.hasError = form.dataset.hasError === 'true';
-            this.totalMonths = parseInt(form.dataset.monthsCount, 10) || 0;
-            this.monthLabels = JSON.parse(form.dataset.monthsLabels || '[]');
+            const root = this.$root;
+            this.scheduledAt = root.dataset.scheduledAt || '';
+            this.location = root.dataset.location || '';
+            this.clientName = root.dataset.clientName || '';
+            this.clientEmail = root.dataset.clientEmail || '';
+            this.clientPhone = root.dataset.clientPhone || '';
+            this.vehicleDetails = root.dataset.vehicleDetails || '';
+            this.clientAddress = root.dataset.clientAddress || '';
+            this.totalMonths = parseInt(root.dataset.monthsCount, 10) || 0;
+            this.monthLabels = JSON.parse(root.dataset.monthsLabels || '[]');
+            this.stripDates = JSON.parse(root.dataset.stripDates || '[]');
+            this.reasonLabels = JSON.parse(root.dataset.reasonLabels || '{}');
+            this.periodLabels = JSON.parse(root.dataset.periodLabels || '{}');
+            this.currentStep = parseInt(root.dataset.initialStep, 10) || 1;
 
-            if (this.scheduledAt) {
-                const parts = this.scheduledAt.split('T');
-                this.selectedDate = parts[0] || '';
-                this.selectedTime = parts[1] ? parts[1].substring(0, 5) : '';
-
-                if (this.selectedDate) {
-                    this.fetchSlots(this.selectedDate);
-                }
+            if (! this.scheduledAt) {
+                return;
             }
+
+            const parts = this.scheduledAt.split('T');
+            this.selectedDate = parts[0] || '';
+            this.selectedTime = parts[1] ? parts[1].substring(0, 5) : '';
+
+            if (! this.selectedDate) {
+                return;
+            }
+
+            this.showCalendar = ! this.stripDates.includes(this.selectedDate);
+            this.fetchSlots(this.selectedDate);
         },
 
         nextMonth() {
@@ -55,34 +67,110 @@ window.bookingWizard = function () {
         },
 
         fetchSlots(date) {
-            this.loadingSlots = true;
+            this.slotsState = 'loading';
             this.slots = [];
+            this.earliest = null;
 
             fetch(`/api/bookings/availability?date=${encodeURIComponent(date)}`, {
                 headers: {
                     'Accept': 'application/json',
                 },
             })
-                .then((response) => response.json())
+                .then((response) => {
+                    if (! response.ok) {
+                        throw new Error(`Availability lookup failed with status ${response.status}`);
+                    }
+
+                    return response.json();
+                })
                 .then((data) => {
-                    this.slots = data || [];
-                    this.loadingSlots = false;
+                    this.slots = data.slots || [];
+                    this.earliest = data.earliest || null;
+
+                    if (data.closed) {
+                        this.slotsState = 'closed';
+                    } else if (! this.slots.some((slot) => slot.available)) {
+                        this.slotsState = 'empty';
+                    } else {
+                        this.slotsState = 'ready';
+                    }
                 })
                 .catch(() => {
-                    this.loadingSlots = false;
+                    this.slotsState = 'error';
                 });
         },
 
         selectDate(date) {
+            if (this.selectedDate === date) {
+                return;
+            }
+
             this.selectedDate = date;
             this.selectedTime = '';
             this.scheduledAt = '';
             this.fetchSlots(date);
         },
 
-        selectSlot(time) {
-            this.selectedTime = time;
-            this.scheduledAt = `${this.selectedDate}T${time}:00`;
+        selectSlot(slot) {
+            if (! slot.available) {
+                return;
+            }
+
+            this.selectedTime = slot.time;
+            this.scheduledAt = `${this.selectedDate}T${slot.time}:00`;
+        },
+
+        reasonFor(slot) {
+            return this.reasonLabels[slot.status] || '';
+        },
+
+        get morningSlots() {
+            return this.slots.filter((slot) => parseInt(slot.time.slice(0, 2), 10) < 12);
+        },
+
+        get afternoonSlots() {
+            return this.slots.filter((slot) => parseInt(slot.time.slice(0, 2), 10) >= 12);
+        },
+
+        get slotGroups() {
+            return [
+                { key: 'morning', slots: this.morningSlots },
+                { key: 'afternoon', slots: this.afternoonSlots },
+            ].filter((group) => group.slots.length > 0);
+        },
+
+        get earliestLabel() {
+            if (! this.earliest) {
+                return '';
+            }
+
+            return `${this.earliest.day_label} - ${this.earliest.time_label}`;
+        },
+
+        get selectedDateLabel() {
+            if (! this.selectedDate) {
+                return '';
+            }
+
+            return new Date(`${this.selectedDate}T00:00:00`).toLocaleDateString(undefined, {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+            });
+        },
+
+        get selectedSlot() {
+            return this.slots.find((slot) => slot.time === this.selectedTime) || null;
+        },
+
+        get summary() {
+            if (! this.scheduledAt) {
+                return '';
+            }
+
+            const time = this.selectedSlot ? this.selectedSlot.label : this.selectedTime;
+
+            return `${this.selectedDateLabel} at ${time}`;
         },
 
         get canProceed() {

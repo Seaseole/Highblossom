@@ -1,7 +1,7 @@
 <x-layouts::admin title="Booking Details">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="space-y-1">
                 <a
                     href="{{ route('admin.bookings.index') }}"
@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div class="space-y-8 lg:col-span-2">
                 <!-- Client Information -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Client Information</h2>
                     <dl class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div class="space-y-1">
@@ -82,7 +82,7 @@
                 </div>
 
                 <!-- Vehicle Details -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Vehicle Details</h2>
                     <p class="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600 dark:border-white/5 dark:bg-white/5 dark:text-gray-300">
                         {{ $booking->vehicle_details }}
@@ -90,14 +90,14 @@
                 </div>
 
                 <!-- Inspection Panel -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Inspection</h2>
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Appointment</h2>
                     @if ($booking->inspection)
                         <div class="space-y-4">
                             <div class="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
                                 <div>
                                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                        Inspection #{{ $booking->inspection->id }}
+                                        Appointment #{{ $booking->inspection->id }}
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
                                         Assigned to: {{ $booking->inspection->staff->name ?? 'Unassigned' }}
@@ -111,7 +111,7 @@
                                 href="{{ route('admin.inspections.show', $booking->inspection) }}"
                                 class="inline-block w-full rounded-full bg-gray-900 px-6 py-2.5 text-center text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
                             >
-                                View Inspection
+                                View Appointment
                             </a>
                         </div>
                     @else
@@ -143,7 +143,7 @@
                                 type="submit"
                                 class="w-full rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
                             >
-                                Schedule Inspection
+                                Schedule Appointment
                             </button>
                         </form>
                     @endif
@@ -152,7 +152,7 @@
 
             <div class="space-y-8">
                 <!-- Status Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Status</h2>
                     @php
                         $statusColors = [
@@ -178,11 +178,21 @@
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
                         >
                             @foreach (['pending', 'confirmed', 'completed', 'cancelled'] as $status)
-                                <option value="{{ $status }}" {{ $booking->status === $status ? 'selected' : '' }}>
+                                <option
+                                    value="{{ $status }}"
+                                    {{ $booking->status === $status ? 'selected' : '' }}
+                                    {{ $booking->isCancelled() && ! in_array($status, ['pending', 'cancelled'], true) ? 'disabled' : '' }}
+                                >
                                     {{ ucfirst($status) }}
                                 </option>
                             @endforeach
                         </select>
+                        @if ($booking->isCancelled())
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Cancelled bookings are closed to the customer. Set the status back to Pending to put it
+                                back in play — the customer is not emailed again until you confirm it.
+                            </p>
+                        @endif
                         <button
                             type="submit"
                             class="w-full rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
@@ -192,9 +202,9 @@
                     </form>
                 </div>
 
-                <!-- Pricing & Notes Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Pricing & Notes</h2>
+                <!-- Pricing Card -->
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Pricing</h2>
                     <form action="{{ route('admin.bookings.update', $booking) }}" method="POST" class="space-y-4">
                         @csrf
                         @method('PATCH')
@@ -210,16 +220,6 @@
                             />
                         </div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Internal Notes</label>
-                            <!-- Note: The notes column might not exist in the database, this is handled gracefully if not fillable -->
-                            <textarea
-                                name="notes"
-                                rows="3"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            >{{ old('notes', $booking->notes ?? '') }}</textarea>
-                        </div>
-
                         <button
                             type="submit"
                             class="w-full rounded-full bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-900 transition-all hover:bg-gray-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
@@ -227,6 +227,56 @@
                             Save Changes
                         </button>
                     </form>
+                </div>
+
+                <!-- Activity Card -->
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {{ __('admin-bookings.activity') }}
+                    </h2>
+
+                    @if ($booking->inspection)
+                        <a
+                            href="{{ route('admin.inspections.show', $booking->inspection) }}"
+                            class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                            Appointment notes
+                        </a>
+                        @php
+                            $outstanding = $booking->inspection->notes->filter(fn ($note) => $note->isOpen())->count();
+                        @endphp
+                        @if ($outstanding > 0)
+                            <p class="text-xs font-medium text-amber-600 dark:text-amber-400">
+                                {{ trans_choice('admin-bookings.outstanding_actions', $outstanding, ['count' => $outstanding]) }}
+                            </p>
+                        @endif
+                    @endif
+
+                    @if ($booking->events->isEmpty())
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin-bookings.activity_empty') }}</p>
+                    @else
+                        <ol class="space-y-5">
+                            @foreach ($booking->events as $event)
+                                <li class="space-y-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ __('admin-bookings.event_'.$event->type) }}
+                                        <span class="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                            {{ $event->happened_at->format('M j, Y g:i A') }}
+                                        </span>
+                                    </p>
+                                    @if ($event->summary)
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ $event->summary }}</p>
+                                    @endif
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $event->actor?->name ?? 'System' }}
+                                        @unless ($event->isNotifiable())
+                                            · {{ __('admin-bookings.no_email') }}
+                                        @endunless
+                                    </p>
+                                </li>
+                            @endforeach
+                        </ol>
+                    @endif
                 </div>
 
                 <!-- Delete Action -->

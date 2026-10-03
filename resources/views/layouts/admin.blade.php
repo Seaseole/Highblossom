@@ -93,7 +93,7 @@
 
         <!-- Main Content -->
         <main class="admin-main flex-1 overflow-auto bg-white dark:bg-[#0A0A0F]">
-            <div class="p-8">
+            <div class="p-4 sm:p-8">
                 @if ($errors->any())
                     <div
                         class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
@@ -142,12 +142,16 @@
     @endphp
 
     <div class="fixed top-6 right-6 z-[8000]">
+        @php $appVersion = app(\App\Services\ApplicationVersionService::class)->current(); @endphp
         <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-sm {{ $envColor }}">
             <span class="relative flex items-center justify-center">
                 <span class="absolute inline-flex h-2 w-2 rounded-full {{ $envDotColor }} animate-pulse-dot"></span>
                 <span class="relative inline-flex h-2 w-2 rounded-full {{ $envDotColor }} opacity-75"></span>
             </span>
             <span class="text-xs font-semibold tracking-wide uppercase">{{ $environment }}</span>
+            @if ($appVersion)
+                <span class="font-mono text-xs font-semibold opacity-75" title="Application version">v{{ $appVersion->version }}</span>
+            @endif
         </div>
     </div>
 

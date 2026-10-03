@@ -8,6 +8,7 @@ use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -52,5 +53,24 @@ final class Booking extends Model
     public function inspection(): HasOne
     {
         return $this->hasOne(Inspection::class);
+    }
+
+    /**
+     * Get the customer-visible milestone history for this booking.
+     *
+     * This is the only history safe to render on the public status page; internal
+     * remarks live on Inspection::notes().
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(BookingEvent::class)->orderBy('happened_at');
+    }
+
+    /**
+     * Determine whether the booking has been cancelled.
+     */
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
     }
 }

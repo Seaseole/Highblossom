@@ -243,7 +243,7 @@
                             {{ __('contact.email') }}
                         </div>
                         <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
-                            {{ $primaryEmail ?? 'info@highblossom.co.bw' }}
+                            {{ $primaryEmail ?? 'jseaseole@highblossom.net' }}
                         </div>
                         <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.reply_within_24h') }}</p>
                         <a href="mailto:{{ $primaryEmail }}" class="btn-premium">

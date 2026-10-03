@@ -1,5 +1,5 @@
 <x-layouts::admin title="Edit Gallery Item">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div class="space-y-1">
@@ -31,7 +31,7 @@
 
             <div class="space-y-8 lg:col-span-2">
                 <!-- Details Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Project Title</label>
                         <input
@@ -107,7 +107,7 @@
 
             <div class="space-y-8">
                 <!-- Visuals Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Image</label>
                     <div
                         class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
@@ -148,7 +148,7 @@
                 </div>
 
                 <!-- Config Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
                         <input

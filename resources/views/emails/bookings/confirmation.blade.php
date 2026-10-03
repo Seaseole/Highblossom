@@ -18,7 +18,11 @@ Thank you for choosing Highblossom. We have received your booking request for th
 {{ $booking->client_address }}
 @endif
 
-We have received your request. Our staff will review your booking and send you a confirmation email once it has been approved and added to our inspection list.
+We have received your request. Our staff will review your booking and send you a confirmation email once it has been approved and added to our appointment list.
+
+@component('mail::button', ['url' => URL::signedRoute('bookings.confirmation', $booking)])
+View booking status
+@endcomponent
 
 Thanks,<br>
 {{ config('app.name') }}

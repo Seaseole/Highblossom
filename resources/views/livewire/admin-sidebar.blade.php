@@ -9,19 +9,19 @@
         'blog' => ['label' => 'Blog', 'icon' => 'newspaper', 'routes' => ['admin.posts', 'admin.categories', 'admin.tags']],
         'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles']],
         'media' => ['label' => 'Media', 'icon' => 'image', 'routes' => ['admin.media-library']],
-        'system' => ['label' => 'System', 'icon' => 'cog', 'routes' => ['admin.settings', 'admin.seo']],
+        'system' => ['label' => 'System', 'icon' => 'cog', 'routes' => ['admin.settings', 'admin.seo', 'admin.versions']],
     ];
 
     $isRouteActive = fn ($route) => str_starts_with($currentRoute, $route.'.') || $currentRoute === $route || ($route === 'dashboard' && $currentRoute === 'dashboard');
     $isGroupActive = fn ($groupRoutes) => collect($groupRoutes)->contains(fn ($r) => $isRouteActive($r));
     $getRouteName = fn ($route) => route($route === 'dashboard' ? 'dashboard' : ($route === 'admin.about-us' ? 'admin.about-us.edit' : ($route === 'admin.seo' ? 'admin.seo.static-routes' : $route.'.index')));
     $getRouteLabel = fn ($route) => [
-        'dashboard' => 'Dashboard', 'admin.bookings' => 'Bookings', 'admin.inspections' => 'Inspections', 'admin.quotes' => 'Quotes',
+        'dashboard' => 'Dashboard', 'admin.bookings' => 'Bookings', 'admin.inspections' => 'Appointments', 'admin.quotes' => 'Quotes',
         'admin.about-us' => 'About Us', 'admin.testimonials' => 'Testimonials', 'admin.services' => 'Services', 'admin.gallery' => 'Gallery',
         'admin.gallery-categories' => 'Gallery Categories', 'admin.partners' => 'Partners', 'admin.staff' => 'Staff',
         'admin.glass-types' => 'Glass Types', 'admin.service-types' => 'Service Types', 'admin.contact-messages' => 'Messages',
         'admin.posts' => 'Posts', 'admin.categories' => 'Categories', 'admin.tags' => 'Tags', 'admin.users' => 'Users',
-        'admin.roles' => 'Roles', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO',
+        'admin.roles' => 'Roles', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.versions' => 'Versions',
     ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
     $badges = [
         'admin.users' => $userCount,

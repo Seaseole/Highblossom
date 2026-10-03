@@ -1,5 +1,5 @@
 <x-layouts::admin title="Staff Absence Details">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="space-y-1">
             <a
@@ -16,7 +16,7 @@
         <!-- Content Grid -->
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <!-- Schedule Card -->
-            <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+            <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Schedule</h2>
                 <dl class="space-y-4">
                     <div class="space-y-1">
@@ -41,7 +41,7 @@
             </div>
 
             <!-- Staff Information Card -->
-            <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+            <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Staff Information</h2>
                 <dl class="space-y-4">
                     @if ($absence->staff)
@@ -63,7 +63,7 @@
         </div>
 
         <!-- Reason Card -->
-        <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+        <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
             <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Reason</h2>
             <p class="rounded-2xl border border-gray-100 bg-gray-50 p-6 text-sm leading-relaxed text-gray-600 dark:border-white/5 dark:bg-white/5 dark:text-gray-300">
                 {{ $absence->reason }}

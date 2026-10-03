@@ -1,13 +1,13 @@
-<x-layouts::admin title="Inspections">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+<x-layouts::admin title="Appointments">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
         <div class="space-y-1">
-            <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Inspections</h1>
-            <p class="text-gray-500 dark:text-gray-400">View and manage scheduled inspections.</p>
+            <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Appointments</h1>
+            <p class="text-gray-500 dark:text-gray-400">View and manage scheduled appointments.</p>
         </div>
 
         <!-- Table -->
-        <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+        <div class="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
             <table class="w-full min-w-[800px]">
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-white/10">
@@ -76,7 +76,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                No inspections found.
+                                No appointments found.
                             </td>
                         </tr>
                     @endforelse

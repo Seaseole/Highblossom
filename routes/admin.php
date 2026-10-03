@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AboutUsController;
+use App\Http\Controllers\Admin\ApplicationVersionController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanySettingController;
@@ -45,12 +46,20 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::put('inspections/{inspection}', [InspectionController::class, 'update'])->middleware('can:update inspections')->name('inspections.update');
     Route::delete('inspections/{inspection}', [InspectionController::class, 'destroy'])->middleware('can:update inspections')->name('inspections.destroy');
 
+    Route::post('inspections/{inspection}/notes', [InspectionController::class, 'storeNote'])->middleware('can:update inspections')->name('inspections.notes.store');
+    Route::patch('inspections/{inspection}/notes/{note}/done', [InspectionController::class, 'toggleNoteDone'])->middleware('can:update inspections')->name('inspections.notes.done');
+    Route::delete('inspections/{inspection}/notes/{note}', [InspectionController::class, 'destroyNote'])->middleware('can:update inspections')->name('inspections.notes.destroy');
+
     Route::get('absences', [StaffAbsenceController::class, 'index'])->middleware('can:manage absences')->name('absences.index');
     Route::get('absences/{absence}', [StaffAbsenceController::class, 'show'])->middleware('can:manage absences')->name('absences.show');
 
     // Settings
     Route::get('settings', [CompanySettingController::class, 'index'])->middleware('can:view settings')->name('settings.index');
     Route::put('settings', [CompanySettingController::class, 'update'])->middleware('can:update settings')->name('settings.update');
+
+    // Application versions
+    Route::get('versions', [ApplicationVersionController::class, 'index'])->middleware('can:manage versions')->name('versions.index');
+    Route::post('versions', [ApplicationVersionController::class, 'store'])->middleware('can:manage versions')->name('versions.store');
 
     // About Us
     Route::get('about-us', [AboutUsController::class, 'edit'])->middleware('can:manage pages')->name('about-us.edit');

@@ -73,6 +73,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage roles',
             'access admin panel',
 
+            // System
+            'manage versions',
+
             // dashboard
             'view dashboard',
 
@@ -115,6 +118,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view contact messages',
             'manage contact numbers',
             'manage absences',
+            'manage versions',
             'access admin panel',
         ]);
 

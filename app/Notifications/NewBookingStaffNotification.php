@@ -44,7 +44,7 @@ final class NewBookingStaffNotification extends Notification implements ShouldQu
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Action Required: New Inspection Booking')
+            ->subject('Action Required: New Appointment Booking')
             ->line("New booking from {$this->booking->client_name}.")
             ->action('View Booking', route('admin.bookings.show', $this->booking));
     }

@@ -1,7 +1,7 @@
 <x-layouts::admin title="Quote Details">
-    <div class="mx-auto max-w-5xl space-y-8 py-10">
+    <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="space-y-1">
                 <a
                     href="{{ route('admin.quotes.index') }}"
@@ -34,7 +34,7 @@
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div class="space-y-8 lg:col-span-2">
                 <!-- Customer Info -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Customer Information</h2>
                     <dl class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div class="space-y-1">
@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Asset Specs -->
-                <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Project Specifications</h2>
                     <dl class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div class="space-y-1">
@@ -90,7 +90,7 @@
 
             <div class="space-y-8">
                 <!-- Update Status -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Update Status</h2>
                     <form action="{{ route('admin.quotes.updateStatus', $quote) }}" method="POST" class="space-y-4">
                         @csrf
