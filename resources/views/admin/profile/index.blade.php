@@ -6,12 +6,54 @@
             <p class="text-gray-500 dark:text-gray-400">Manage your account settings and preferences.</p>
         </div>
 
+        <!-- Account Summary -->
+        <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+                <div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 dark:bg-white/10">
+                    @if ($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}" alt="Avatar of {{ $user->name }}" class="h-full w-full object-cover" />
+                    @else
+                        <span class="text-2xl font-semibold text-gray-500 dark:text-gray-300">{{ $user->initials() }}</span>
+                    @endif
+                </div>
+                <div class="min-w-0 flex-1 space-y-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $user->name }}</h2>
+                        @if ($user->email_verified_at)
+                            <span class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">Email verified</span>
+                        @else
+                            <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Email not verified</span>
+                        @endif
+                    </div>
+                    <p class="truncate text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                    @if ($user->phone)
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->phone }}</p>
+                    @endif
+                    <div class="flex flex-wrap gap-1.5">
+                        @forelse ($user->roles as $role)
+                            <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $role->name }}</span>
+                        @empty
+                            <span class="text-xs text-gray-400 dark:text-gray-500">No roles assigned</span>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="space-y-1 text-xs text-gray-500 dark:text-gray-400 sm:pt-1 sm:text-right">
+                    <p>Member since {{ $user->created_at->format('M j, Y') }}</p>
+                    <p>Terms: {{ $user->terms_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</p>
+                    <p>Privacy: {{ $user->privacy_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</p>
+                </div>
+            </div>
+        </div>
+
         <div
             x-data="{ 
             tab: '{{ request()->query('tab', 'profile') }}',
             showDeleteModal: false,
+            showEnableModal: false,
+            verifyingPassword: false,
+            enablePasswordError: '',
             showRecoveryCodesModal: false,
-            recoveryCodes: @json(session('recovery_codes', [])),
+            recoveryCodes: {{ json_encode(session('recovery_codes') ?? []) }},
             loadingCodes: false,
             confirmCode: '',
 
@@ -85,12 +127,43 @@
                     alert(e.message);
                 })
                 .finally(() => this.loadingCodes = false);
+            },
+
+            submitEnablePassword() {
+                this.enablePasswordError = '';
+                this.verifyingPassword = true;
+
+                fetch('{{ route('admin.profile.two-factor.confirm-password') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password: this.$refs.enable2faPassword.value })
+                })
+                .then(async r => {
+                    if (! r.ok) {
+                        const data = await r.json().catch(() => ({}));
+                        const errors = data.errors && data.errors.password;
+                        throw new Error((errors && errors[0]) || data.message || 'Unable to verify your password.');
+                    }
+                    return r.json();
+                })
+                .then(() => {
+                    this.$refs.enable2faForm.submit();
+                })
+                .catch(e => {
+                    this.enablePasswordError = e.message;
+                    this.verifyingPassword = false;
+                });
             }
         }"
         >
             <!-- Tabs Navigation -->
             <div class="no-scrollbar mb-8 flex gap-x-5 overflow-x-auto border-b border-gray-200 dark:border-white/10">
-                @foreach (['profile' => 'Profile', 'appearance' => 'Appearance', 'security' => 'Security', 'passkeys' => 'Passkeys'] as $key => $label)
+                @foreach (['profile' => 'Profile', 'appearance' => 'Appearance', 'security' => 'Security', 'passkeys' => 'Passkeys', 'sessions' => 'Sessions'] as $key => $label)
                     <button
                         type="button"
                         @click="tab = '{{ $key }}'"
@@ -114,7 +187,7 @@
                 >
                     <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h3>
-                        <form action="{{ route('admin.profile.update') }}" method="POST" class="space-y-6">
+                        <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                             @csrf
                             @method('PUT')
 
@@ -137,6 +210,26 @@
                                         class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                                     />
                                 </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value="{{ $user->phone }}"
+                                        placeholder="+1 555 000 1234"
+                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                    />
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar</label>
+                                    <input
+                                        type="file"
+                                        name="avatar"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm transition-all outline-none file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:file:bg-white dark:file:text-gray-900 dark:focus:ring-white"
+                                    />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">JPG, PNG or WebP, up to 2 MB. Leave empty to keep the current avatar.</p>
+                                </div>
                             </div>
 
                             <div class="pt-4">
@@ -148,6 +241,45 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+
+                    <!-- Activity -->
+                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
+                        <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Activity</h3>
+
+                        <dl class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            @foreach ([
+                                'Bookings' => $user->bookings_count,
+                                'Milestones logged' => $user->booking_events_count,
+                                'Inspection notes' => $user->inspection_notes_count,
+                            ] as $label => $count)
+                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ $label }}</dt>
+                                    <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ $count }}</dd>
+                                </div>
+                            @endforeach
+                        </dl>
+
+                        <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Recent bookings</h4>
+                        @if ($recentBookings->isEmpty())
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No bookings linked to this account yet.</p>
+                        @else
+                            <ul class="divide-y divide-gray-100 dark:divide-white/5">
+                                @foreach ($recentBookings as $booking)
+                                    <li class="flex items-center justify-between gap-4 py-3 text-sm">
+                                        <div class="min-w-0">
+                                            <p class="truncate font-medium text-gray-900 dark:text-white">{{ $booking->client_name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $booking->scheduled_at?->format('M j, Y H:i') ?? $booking->created_at->format('M j, Y') }}
+                                            </p>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-white/10 dark:text-gray-300">
+                                            {{ $booking->status }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
 
                     <!-- Delete Account -->
@@ -351,16 +483,17 @@
                         </p>
 
                         @if (! $user->two_factor_secret)
-                            {{-- Step 1: Enable --}}
-                            <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST">
+                            {{-- Step 1: Enable (password confirmed through the modal) --}}
+                            <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST" x-ref="enable2faForm" class="hidden">
                                 @csrf
-                                <button
-                                    type="submit"
-                                    class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                                >
-                                    Enable Two-Factor
-                                </button>
                             </form>
+                            <button
+                                type="button"
+                                @click="showEnableModal = true; $nextTick(() => $refs.enable2faPassword.focus())"
+                                class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                            >
+                                Enable Two-Factor
+                            </button>
                         @elseif ($user->two_factor_secret && ! $user->two_factor_confirmed_at)
                             {{-- Step 2: Setup (Unconfirmed) --}}
                             <div class="space-y-6">
@@ -382,14 +515,30 @@
                                         type="text"
                                         name="code"
                                         required
+                                        inputmode="numeric"
+                                        autocomplete="one-time-code"
                                         class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
                                         placeholder="Enter authentication code"
                                     />
+                                    @error('code')
+                                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <button
+                                            type="submit"
+                                            class="rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white dark:bg-white dark:text-gray-900"
+                                        >
+                                            Confirm
+                                        </button>
+                                    </div>
+                                </form>
+                                <form action="{{ route('admin.profile.two-factor.cancel') }}" method="POST" onsubmit="return confirm('Cancel two-factor setup? The QR code will be discarded.')">
+                                    @csrf
                                     <button
                                         type="submit"
-                                        class="rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white dark:bg-white dark:text-gray-900"
+                                        class="text-sm text-gray-500 underline-offset-4 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-200"
                                     >
-                                        Confirm
+                                        Cancel setup
                                     </button>
                                 </form>
                             </div>
@@ -446,6 +595,82 @@
                     style="display: none"
                 >
                     @livewire('passkeys')
+                </div>
+
+                <!-- Sessions Tab -->
+                <div
+                    x-show="tab === 'sessions'"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="space-y-6"
+                    style="display: none"
+                >
+                    @include('admin.profile.sessions-tab')
+                </div>
+            </div>
+
+            <!-- Enable Two-Factor Password Modal -->
+            <div
+                x-show="showEnableModal"
+                x-transition:enter="transition-opacity ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm dark:bg-black/60"
+                style="display: none"
+                @keydown.escape.window="showEnableModal = false"
+            >
+                <div
+                    x-show="showEnableModal"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
+                >
+                    <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Confirm Password</h3>
+                    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
+                        For your security, enter your password to enable two-factor authentication for this account.
+                    </p>
+
+                    <form @submit.prevent="submitEnablePassword()" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                            <input
+                                type="password"
+                                x-ref="enable2faPassword"
+                                name="password"
+                                autocomplete="current-password"
+                                :disabled="verifyingPassword"
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                            />
+                            <p x-show="enablePasswordError" x-text="enablePasswordError" class="text-xs text-red-600 dark:text-red-400"></p>
+                        </div>
+
+                        <div class="flex gap-4 pt-4">
+                            <button
+                                type="button"
+                                @click="showEnableModal = false"
+                                :disabled="verifyingPassword"
+                                class="flex-1 rounded-full bg-gray-100 px-4 py-2.5 font-medium text-gray-700 transition-all hover:bg-gray-200 disabled:opacity-50 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                :disabled="verifyingPassword"
+                                class="flex-1 rounded-full bg-gray-900 px-4 py-2.5 font-medium text-white transition-all hover:bg-gray-800 disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                            >
+                                <span x-show="! verifyingPassword">Verify</span>
+                                <span x-show="verifyingPassword">Verifying...</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

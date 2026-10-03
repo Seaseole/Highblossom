@@ -31,6 +31,8 @@ final class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique(User::class)->ignore(auth()->id())],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+()\s-]+$/'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

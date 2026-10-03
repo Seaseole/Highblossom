@@ -10,6 +10,10 @@ use Illuminate\Container\Attributes\Singleton;
 #[Singleton(name: 'users')]
 final class UserService
 {
+    public function __construct(
+        private readonly UserSessionService $userSessions,
+    ) {}
+
     public function create(array $data): User
     {
         $user = User::create([
@@ -25,6 +29,9 @@ final class UserService
         return $user;
     }
 
+    /**
+     * Update a user's details, revoking their sessions when an admin sets a new password.
+     */
     public function update(User $user, array $data): User
     {
         $user->update([
@@ -34,6 +41,14 @@ final class UserService
 
         if (! empty($data['password'])) {
             $user->update(['password' => bcrypt($data['password'])]);
+
+            // The acting admin's own session is not one of this user's, so this
+            // closes every device the target user is signed in on.
+            $this->userSessions->handlePasswordChanged(
+                $user,
+                session()->getId(),
+                auth()->user(),
+            );
         }
 
         if (isset($data['roles'])) {

@@ -82,6 +82,7 @@ final class SettingsManager
             'instagram_url' => '',
             'linkedin_url' => '',
             'announcement_active' => false,
+            'require_email_verification' => false,
             'announcements' => [],
             'gallery_metrics' => [],
             'quote_notification_emails' => '',

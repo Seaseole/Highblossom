@@ -25,7 +25,7 @@ final class CompanySettingService
         'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone', 'secondary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
-        'booking_lead_time_hours',
+        'booking_lead_time_hours', 'require_email_verification',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
     ];
 
@@ -259,6 +259,7 @@ final class CompanySettingService
             'instagram_url' => CompanySetting::get('instagram_url', 'https://instagram.com'),
             'linkedin_url' => CompanySetting::get('linkedin_url', 'https://linkedin.com'),
             'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
+            'require_email_verification' => filter_var(CompanySetting::get('require_email_verification', '0'), FILTER_VALIDATE_BOOLEAN),
             'announcement_active' => CompanySetting::get('announcement_active', false),
             'announcements' => CompanySetting::get('announcements', []),
             'gallery_metrics' => CompanySetting::get('gallery_metrics', [

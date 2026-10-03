@@ -1,10 +1,4 @@
 @php
-    $noteStyles = [
-        'added' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        'changed' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        'fixed' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-        'security' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
-    ];
     $bumpCaptions = [
         'patch' => 'Bug fixes',
         'minor' => 'Features',
@@ -25,6 +19,12 @@
             nextVersions: {{ \Illuminate\Support\Js::from($nextVersions) }},
             version: '{{ old('version', $nextVersions['patch']) }}',
             notes: {{ \Illuminate\Support\Js::from($initialNotes) }},
+            historyPages: {{ $historyPages }},
+            historyShown: {{ $releases->count() }},
+            historyTotal: {{ $historyTotal }},
+            historyHasMore: {{ $historyHasMore ? 'true' : 'false' }},
+            historyLoading: false,
+            historyError: false,
             init() {
                 this.modal = {{ $errors->any() ? 'true' : 'false' }};
             },
@@ -45,7 +45,46 @@
                 }
             },
             addNote() { this.notes.push({ type: 'changed', text: '' }); },
-            removeNote(index) { this.notes.splice(index, 1); }
+            removeNote(index) { this.notes.splice(index, 1); },
+            async loadMore() {
+                if (this.historyLoading) {
+                    return;
+                }
+
+                this.historyLoading = true;
+                this.historyError = false;
+
+                try {
+                    const response = await fetch('{{ route('admin.versions.history') }}?pages=' + (this.historyPages + 1), {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (! response.ok) {
+                        throw new Error('Unexpected response');
+                    }
+
+                    const fragment = new DOMParser()
+                        .parseFromString(await response.text(), 'text/html')
+                        .getElementById('release-timeline');
+
+                    if (! fragment) {
+                        throw new Error('Missing timeline fragment');
+                    }
+
+                    document.getElementById('release-timeline').replaceWith(fragment);
+
+                    this.historyPages = Number(fragment.dataset.pages);
+                    this.historyShown = Number(fragment.dataset.shown);
+                    this.historyTotal = Number(fragment.dataset.total);
+                    this.historyHasMore = fragment.dataset.hasMore === 'true';
+
+                    history.replaceState(null, '', '?pages=' + this.historyPages);
+                } catch (error) {
+                    this.historyError = true;
+                } finally {
+                    this.historyLoading = false;
+                }
+            }
         }"
     >
         <!-- Header -->
@@ -119,56 +158,40 @@
                 <p class="text-xs text-gray-400">Append-only — releases cannot be edited or deleted.</p>
             </div>
 
-            <ol class="relative mt-4 space-y-6 border-l border-gray-200 pl-6 dark:border-white/10 sm:pl-8">
-                @forelse ($releases as $release)
-                    <li class="relative">
-                        <span
-                            @class([
-                                'absolute -left-[31px] top-1.5 size-3 rounded-full border-2 bg-white dark:bg-[#0A0A0F] sm:-left-[39px]',
-                                'border-gray-900 dark:border-white' => $loop->first,
-                                'border-gray-300 dark:border-white/20' => ! $loop->first,
-                            ])
-                        ></span>
+            <div class="relative">
+                @include('admin.versions.timeline')
 
-                        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-white/10 dark:bg-[#0A0A0F]">
-                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                                <span @class([
-                                    'rounded-full px-3 py-1 font-mono text-sm font-semibold',
-                                    'bg-gray-900 text-white dark:bg-white dark:text-gray-900' => $loop->first,
-                                    'bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300' => ! $loop->first,
-                                ])>v{{ $release->version }}</span>
-                                @if ($loop->first)
-                                    <span class="text-[10px] font-bold tracking-widest text-emerald-600 uppercase dark:text-emerald-400">Current</span>
-                                @endif
-                                <span class="ml-auto text-xs text-gray-400 dark:text-gray-500">{{ $release->released_at->format('M j, Y') }}</span>
-                            </div>
+                {{-- Fades the cut-off text out so the list reads as unfinished rather than truncated. --}}
+                <div
+                    x-show="historyHasMore"
+                    @style(['display: none' => ! $historyHasMore])
+                    class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-white/60 to-white dark:via-[#0A0A0F]/60 dark:to-[#0A0A0F]"
+                    aria-hidden="true"
+                ></div>
+            </div>
 
-                            <p class="mt-3 text-sm font-medium text-gray-900 dark:text-white">{{ $release->summary }}</p>
+            <div class="flex flex-col items-center gap-3 pt-6">
+                <a
+                    x-show="historyHasMore"
+                    @style(['display: none' => ! $historyHasMore])
+                    href="?pages={{ $historyPages + 1 }}"
+                    :href="`?pages=${historyPages + 1}`"
+                    @click.prevent="loadMore()"
+                    :aria-busy="historyLoading.toString()"
+                    :class="historyLoading && 'pointer-events-none cursor-wait opacity-60'"
+                    class="rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-900 shadow-sm transition-all hover:border-gray-900 active:scale-[0.98] dark:border-white/10 dark:bg-[#0A0A0F] dark:text-white dark:hover:border-white"
+                >
+                    <span x-text="historyLoading ? 'Loading…' : `Load ${Math.min(historyTotal - historyShown, 5)} more releases`">Load more releases</span>
+                </a>
 
-                            @if (! empty($release->notes))
-                                <ul class="mt-3 space-y-2">
-                                    @foreach ($release->notes as $note)
-                                        <li class="flex flex-wrap items-start gap-2">
-                                            <span class="rounded px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase {{ $noteStyles[$note['type']] ?? $noteStyles['changed'] }}">
-                                                {{ $note['type'] }}
-                                            </span>
-                                            <span class="text-sm text-gray-600 dark:text-gray-300">{{ $note['text'] }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
+                <p class="text-xs text-gray-400 dark:text-gray-500" aria-live="polite">
+                    <span x-text="historyHasMore ? `Showing ${historyShown} of ${historyTotal} releases` : `All ${historyTotal} releases shown`">Showing {{ $releases->count() }} of {{ $historyTotal }} releases</span>
+                </p>
 
-                            @if ($release->creator)
-                                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Recorded by {{ $release->creator->name }}</p>
-                            @endif
-                        </div>
-                    </li>
-                @empty
-                    <li class="rounded-2xl border-2 border-dashed border-gray-100 p-8 text-center text-sm text-gray-500 dark:border-white/5">
-                        No releases recorded yet.
-                    </li>
-                @endforelse
-            </ol>
+                <p x-show="historyError" x-cloak class="text-xs text-red-600 dark:text-red-400">
+                    Could not load more releases. <button type="button" @click="loadMore()" class="font-medium underline">Try again</button>
+                </p>
+            </div>
         </div>
 
         <!-- Record release modal -->

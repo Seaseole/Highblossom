@@ -92,10 +92,14 @@
             </div>
         </div>
         <div class="animate-fade-in-up px-1 delay-500">
-            <div class="light-checkbox">
+            <div class="light-checkbox space-y-2">
                 <x-ui.checkbox name="terms" id="terms" required>
                     I agree to the
                     <a href="{{ route('terms') }}" class="font-bold text-[#DC2626] hover:text-[#B91C1C]">terms</a>
+                </x-ui.checkbox>
+                <x-ui.checkbox name="privacy" id="privacy" required>
+                    I agree to the
+                    <a href="{{ route('privacy') }}" class="font-bold text-[#DC2626] hover:text-[#B91C1C]">privacy policy</a>
                 </x-ui.checkbox>
             </div>
         </div>

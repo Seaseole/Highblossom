@@ -11,6 +11,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', LogoutController::class)->name('logout');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified.if_required'])->group(function () {
     // TODO: Migrate to controller + Blade view
 });

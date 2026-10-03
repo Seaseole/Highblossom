@@ -10,9 +10,11 @@ use App\Http\Requests\Admin\AppearanceRequest;
 use App\Http\Requests\Admin\PasswordUpdateRequest;
 use App\Http\Requests\Admin\ProfileUpdateRequest;
 use App\Services\ProfileService;
+use App\Services\UserSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Laravel\Fortify\Features;
 
@@ -23,6 +25,7 @@ final class ProfileController extends Controller
 {
     public function __construct(
         private readonly ProfileService $profileService,
+        private readonly UserSessionService $userSessions,
     ) {}
 
     /**
@@ -33,6 +36,8 @@ final class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $user->loadMissing('roles');
+        $user->loadCount(['bookings', 'bookingEvents', 'inspectionNotes']);
         $qrCodeSvg = null;
 
         if ($user->two_factor_secret && ! $user->two_factor_confirmed_at) {
@@ -42,6 +47,9 @@ final class ProfileController extends Controller
         return view('admin.profile.index', [
             'user' => $user,
             'qrCodeSvg' => $qrCodeSvg,
+            'recentBookings' => $user->bookings()->latest()->limit(5)->get(),
+            'activeSessions' => $this->userSessions->activeFor($user),
+            'sessionHistory' => $this->userSessions->historyFor($user),
         ]);
     }
 
@@ -52,7 +60,11 @@ final class ProfileController extends Controller
      */
     public function updateProfile(ProfileUpdateRequest $request)
     {
-        $this->profileService->updateProfile(auth()->user(), $request->validated());
+        $this->profileService->updateProfile(
+            auth()->user(),
+            $request->validated(),
+            $request->file('avatar')
+        );
 
         return back()->with('success', __('messages.profile_information_updated'));
     }
@@ -93,6 +105,31 @@ final class ProfileController extends Controller
     }
 
     /**
+     * Verify the user's password and mark the session as password-confirmed
+     * so the password.confirm-gated two-factor actions can proceed.
+     *
+     * @return JsonResponse
+     *
+     * @throws ValidationException
+     */
+    public function confirmPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! $this->profileService->verifyPassword(auth()->user(), $validated['password'])) {
+            throw ValidationException::withMessages([
+                'password' => __('validation.current_password'),
+            ]);
+        }
+
+        $request->session()->put('auth.password_confirmed_at', time());
+
+        return response()->json(['status' => 'confirmed']);
+    }
+
+    /**
      * Enable two-factor authentication for the user.
      *
      * @return RedirectResponse
@@ -128,6 +165,24 @@ final class ProfileController extends Controller
         session()->flash('recovery_codes', auth()->user()->recoveryCodes());
 
         return back()->with('success', __('messages.two_factor_enabled'));
+    }
+
+    /**
+     * Abandon an unconfirmed two-factor authentication setup.
+     *
+     * @return RedirectResponse
+     */
+    public function cancelTwoFactor()
+    {
+        if (! Features::canManageTwoFactorAuthentication()) {
+            return back()->withErrors(['error' => 'Two-factor authentication is not enabled.']);
+        }
+
+        if (! $this->profileService->cancelTwoFactorSetup(auth()->user())) {
+            return back()->withErrors(['error' => 'There is no pending two-factor authentication setup to cancel.']);
+        }
+
+        return back()->with('success', 'Two-factor authentication setup cancelled.');
     }
 
     /**

@@ -30,12 +30,16 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+            'terms' => ['required', 'accepted'],
+            'privacy' => ['required', 'accepted'],
         ])->validate();
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
         ]);
     }
 }

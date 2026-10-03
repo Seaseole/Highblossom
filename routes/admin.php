@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProfileSessionController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SeoController;
@@ -28,12 +29,13 @@ use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserSessionController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use Illuminate\Support\Facades\Route;
 use Lubusin\Decomposer\Controllers\DecomposerController;
 
 // Admin Portal
-Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('bookings', [BookingController::class, 'index'])->middleware('can:view bookings')->name('bookings.index');
     Route::get('bookings/{booking}', [BookingController::class, 'show'])->middleware('can:view bookings')->name('bookings.show');
     Route::patch('bookings/{booking}', [BookingController::class, 'update'])->middleware('can:update bookings')->name('bookings.update');
@@ -59,6 +61,7 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
 
     // Application versions
     Route::get('versions', [ApplicationVersionController::class, 'index'])->middleware('can:manage versions')->name('versions.index');
+    Route::get('versions/history', [ApplicationVersionController::class, 'history'])->middleware('can:manage versions')->name('versions.history');
     Route::post('versions', [ApplicationVersionController::class, 'store'])->middleware('can:manage versions')->name('versions.store');
 
     // About Us
@@ -183,6 +186,12 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::put('users/{user}', [UserController::class, 'update'])->middleware('can:manage users')->name('users.update');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->middleware('can:manage users')->name('users.destroy');
 
+    // Sessions
+    Route::get('sessions', [UserSessionController::class, 'index'])->middleware('can:manage user sessions')->name('sessions.index');
+    Route::get('users/{user}/sessions', [UserSessionController::class, 'user'])->middleware('can:manage user sessions')->name('sessions.user');
+    Route::post('sessions/{session}/revoke', [UserSessionController::class, 'revoke'])->middleware('can:manage user sessions')->name('sessions.revoke');
+    Route::post('users/{user}/sessions/revoke', [UserSessionController::class, 'revokeForUser'])->middleware('can:manage user sessions')->name('sessions.user.revoke');
+
     Route::get('roles', [RoleController::class, 'index'])->middleware('can:manage roles')->name('roles.index');
     Route::get('roles/create', [RoleController::class, 'create'])->middleware('can:manage roles')->name('roles.create');
     Route::post('roles', [RoleController::class, 'store'])->middleware('can:manage roles')->name('roles.store');
@@ -207,11 +216,15 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::put('profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('profile/appearance', [ProfileController::class, 'updateAppearance'])->name('profile.appearance.update');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    Route::post('profile/two-factor/enable', [ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
+    Route::post('profile/two-factor/confirm-password', [ProfileController::class, 'confirmPassword'])->middleware('throttle:6,1')->name('profile.two-factor.confirm-password');
+    Route::post('profile/two-factor/enable', [ProfileController::class, 'enableTwoFactor'])->middleware('password.confirm')->name('profile.two-factor.enable');
     Route::post('profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
-    Route::post('profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
+    Route::post('profile/two-factor/cancel', [ProfileController::class, 'cancelTwoFactor'])->middleware('password.confirm')->name('profile.two-factor.cancel');
+    Route::post('profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->middleware('password.confirm')->name('profile.two-factor.disable');
     Route::get('profile/two-factor/recovery-codes', [ProfileController::class, 'showRecoveryCodes'])->name('profile.two-factor.recovery-codes');
     Route::post('profile/two-factor/recovery-codes', [ProfileController::class, 'regenerateRecoveryCodes'])->name('profile.two-factor.regenerate-recovery-codes');
+    Route::delete('profile/sessions/revoke-others', [ProfileSessionController::class, 'revokeOthers'])->name('profile.sessions.revoke-others');
+    Route::delete('profile/sessions/{session}', [ProfileSessionController::class, 'destroy'])->name('profile.sessions.destroy');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Theme
@@ -220,6 +233,6 @@ Route::middleware(['auth', 'verified', 'can:access admin panel'])->prefix('admin
     Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
 });
 
-Route::middleware(['auth', 'verified', 'can:access admin panel'])->group(function () {
+Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:access admin panel'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });

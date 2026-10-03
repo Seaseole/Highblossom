@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureConsentRecorded;
+use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
 use App\Http\Middleware\ShareThemePreference;
+use App\Http\Middleware\TrackUserSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,12 +30,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             ShareThemePreference::class,
+            TrackUserSession::class,
         ]);
 
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'verified.if_required' => EnsureEmailIsVerifiedWhenRequired::class,
+            'consent.required' => EnsureConsentRecorded::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

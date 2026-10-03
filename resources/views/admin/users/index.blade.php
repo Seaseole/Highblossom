@@ -73,12 +73,22 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a
-                                    href="{{ route('admin.users.edit', $user) }}"
-                                    class="text-sm font-medium text-gray-900 transition-opacity hover:opacity-75 dark:text-white"
-                                >
-                                    {{ __('admin-users.edit_button') }}
-                                </a>
+                                <div class="flex items-center justify-end gap-4">
+                                    <a
+                                        href="{{ route('admin.users.edit', $user) }}"
+                                        class="text-sm font-medium text-gray-900 transition-opacity hover:opacity-75 dark:text-white"
+                                    >
+                                        {{ __('admin-users.edit_button') }}
+                                    </a>
+                                    @can('manage user sessions')
+                                        <a
+                                            href="{{ route('admin.sessions.user', $user) }}"
+                                            class="text-sm font-medium text-gray-500 transition-opacity hover:opacity-75 dark:text-gray-400"
+                                        >
+                                            {{ __('admin-sessions.nav') }}
+                                        </a>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @endforeach

@@ -5,11 +5,11 @@
     $group = [
         'dashboard' => ['label' => 'Overview', 'icon' => 'home', 'routes' => ['dashboard']],
         'bookings' => ['label' => 'Bookings', 'icon' => 'calendar', 'routes' => ['admin.bookings', 'admin.inspections', 'admin.quotes']],
-        'content' => ['label' => 'Content', 'icon' => 'document', 'routes' => ['admin.about-us', 'admin.testimonials', 'admin.services', 'admin.gallery', 'admin.gallery-categories', 'admin.partners', 'admin.staff', 'admin.glass-types', 'admin.service-types', 'admin.contact-messages']],
+        'content' => ['label' => 'Content', 'icon' => 'document-text', 'routes' => ['admin.about-us', 'admin.testimonials', 'admin.services', 'admin.gallery', 'admin.gallery-categories', 'admin.partners', 'admin.staff', 'admin.glass-types', 'admin.service-types', 'admin.contact-messages']],
         'blog' => ['label' => 'Blog', 'icon' => 'newspaper', 'routes' => ['admin.posts', 'admin.categories', 'admin.tags']],
-        'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles']],
-        'media' => ['label' => 'Media', 'icon' => 'image', 'routes' => ['admin.media-library']],
-        'system' => ['label' => 'System', 'icon' => 'cog', 'routes' => ['admin.settings', 'admin.seo', 'admin.versions']],
+        'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles', 'admin.sessions']],
+        'media' => ['label' => 'Media', 'icon' => 'photo', 'routes' => ['admin.media-library']],
+        'system' => ['label' => 'System', 'icon' => 'cog-6-tooth', 'routes' => ['admin.settings', 'admin.seo', 'admin.versions']],
     ];
 
     $isRouteActive = fn ($route) => str_starts_with($currentRoute, $route.'.') || $currentRoute === $route || ($route === 'dashboard' && $currentRoute === 'dashboard');
@@ -21,7 +21,7 @@
         'admin.gallery-categories' => 'Gallery Categories', 'admin.partners' => 'Partners', 'admin.staff' => 'Staff',
         'admin.glass-types' => 'Glass Types', 'admin.service-types' => 'Service Types', 'admin.contact-messages' => 'Messages',
         'admin.posts' => 'Posts', 'admin.categories' => 'Categories', 'admin.tags' => 'Tags', 'admin.users' => 'Users',
-        'admin.roles' => 'Roles', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.versions' => 'Versions',
+        'admin.roles' => 'Roles', 'admin.sessions' => 'Sessions', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.versions' => 'Versions',
     ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
     $badges = [
         'admin.users' => $userCount,
@@ -114,10 +114,7 @@
                                     @if (isset($badges[$route]))
                                         <span
                                             aria-hidden="true"
-                                            :class="isDark()
-                                                ? 'bg-white/15 text-gray-100'
-                                                : 'bg-gray-100 text-gray-700'"
-                                            class="min-w-[1.5rem] rounded-full px-2 py-0.5 text-center text-[0.7rem] font-semibold"
+                                            class="min-w-[1.5rem] rounded-full bg-gray-100 px-2 py-0.5 text-center text-[0.7rem] font-semibold text-gray-700 dark:bg-white/15 dark:text-gray-100"
                                         >
                                             {{ \Illuminate\Support\Number::abbreviate($badges[$route], maxPrecision: 1) }}
                                         </span>
@@ -167,11 +164,25 @@
     </div>
 
     {{-- Desktop Sidebar --}}
-    <div class="hidden border-r border-gray-200 bg-white lg:flex lg:h-full lg:w-64 lg:flex-col dark:border-white/5 dark:bg-[#0A0A0F]">
+    <div id="desktop-sidebar" class="relative hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-out lg:flex lg:h-full lg:w-64 lg:shrink-0 lg:flex-col sidebar-collapsed:lg:w-20 dark:border-white/5 dark:bg-[#0A0A0F]">
+        {{-- Collapse toggle — straddles the border so it stays put at both widths --}}
+        <button
+            type="button"
+            @click="$store.sidebar.toggle()"
+            class="absolute -right-3 top-20 z-10 hidden size-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-400 shadow-sm transition-colors hover:text-gray-900 lg:flex dark:border-white/10 dark:bg-[#0A0A0F] dark:text-gray-500 dark:hover:text-white"
+            aria-controls="desktop-sidebar"
+            :aria-expanded="(! $store.sidebar.collapsed).toString()"
+            :aria-label="$store.sidebar.collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        >
+            <span class="inline-flex transition-transform duration-200" :class="$store.sidebar.collapsed ? 'rotate-180' : ''">
+                <x-ui.icon name="chevron-double-left" size="xs" />
+            </span>
+        </button>
+
         {{-- Brand --}}
-        <div class="flex h-16 items-center border-b border-gray-100 px-6 dark:border-white/5">
+        <div class="flex h-16 items-center border-b border-gray-100 px-6 sidebar-collapsed:lg:px-4 dark:border-white/5">
             <a href="/" class="flex items-center gap-3" aria-label="Go to homepage">
-                <div class="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900">
+                <div class="flex aspect-square size-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900">
                     @if ($logoUrl)
                         <img src="{{ $logoUrl }}" alt="{{ $companyName }}" class="size-full object-cover" />
                     @else
@@ -180,7 +191,7 @@
                         </svg>
                     @endif
                 </div>
-                <span class="font-semibold text-gray-900 dark:text-white">{{ $companyName }}</span>
+                <span class="font-semibold text-gray-900 sidebar-collapsed:lg:hidden dark:text-white">{{ $companyName }}</span>
             </a>
         </div>
 
@@ -190,20 +201,25 @@
                 @php $active = $isGroupActive($groupData['routes']); @endphp
                 <div x-data="{ open: @js($active) }">
                     <button
-                        @click="open = ! open"
-                        class="flex w-full items-center justify-between px-3 py-2 text-[0.7rem] font-bold tracking-wider text-gray-400 uppercase hover:text-gray-900 dark:text-gray-500 dark:hover:text-white"
+                        type="button"
+                        @click="if ($store.sidebar.collapsed) { $store.sidebar.toggle(); open = true } else { open = ! open }"
+                        title="{{ $groupData['label'] }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[0.7rem] font-bold uppercase tracking-wider {{ $active ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white' }}"
                         :aria-expanded="open.toString()"
                     >
-                        {{ $groupData['label'] }}
+                        {{-- mx-auto only bites once the label collapses away, because flex-1
+                             on the label consumes the free space while the rail is open. --}}
+                        <x-ui.icon name="{{ $groupData['icon'] }}" size="xs" class="mx-auto" />
+                        <span class="flex-1 text-left sidebar-collapsed:lg:hidden">{{ $groupData['label'] }}</span>
                         <svg
-                            class="size-3 transition-transform duration-200"
+                            class="size-3 shrink-0 transition-transform duration-200 sidebar-collapsed:lg:hidden"
                             :class="open ? 'rotate-180' : ''"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                         ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                     </button>
-                    <div x-show="open" x-collapse.duration.200ms class="space-y-1">
+                    <div x-show="open && ! $store.sidebar.collapsed" x-collapse.duration.200ms class="space-y-1">
                         @foreach ($groupData['routes'] as $route)
                             <a
                                 href="{{ $getRouteName($route) }}"
@@ -216,8 +232,7 @@
                                 @if (isset($badges[$route]))
                                     <span
                                         aria-hidden="true"
-                                        :class="isDark() ? 'bg-white/15 text-gray-100' : 'bg-gray-100 text-gray-700'"
-                                        class="min-w-[1.5rem] rounded-full px-2 py-0.5 text-center text-[0.7rem] font-semibold"
+                                        class="min-w-[1.5rem] rounded-full bg-gray-100 px-2 py-0.5 text-center text-[0.7rem] font-semibold text-gray-700 dark:bg-white/15 dark:text-gray-100"
                                     >
                                         {{ \Illuminate\Support\Number::abbreviate($badges[$route], maxPrecision: 1) }}
                                     </span>
@@ -227,29 +242,31 @@
                     </div>
                 </div>
             @empty
-                <p class="px-3 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+                <p class="px-3 py-6 text-center text-sm text-gray-400 sidebar-collapsed:lg:hidden dark:text-gray-500">
                     No navigation items available.
                 </p>
             @endforelse
         </nav>
 
         {{-- User Section --}}
-        <div class="space-y-2 border-t border-gray-100 p-4 dark:border-white/5">
+        <div class="space-y-2 border-t border-gray-100 p-4 sidebar-collapsed:lg:p-2 dark:border-white/5">
             <button
                 wire:click="toggleTheme"
-                class="flex min-h-[44px] w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5"
+                aria-label="Change theme"
+                class="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5"
             >
-                Theme
-                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-white/10">{{ $theme }}</span>
+                <span class="flex-1 sidebar-collapsed:lg:hidden">Theme</span>
+                <span class="mx-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-white/10">{{ $theme }}</span>
             </button>
             <a
                 href="{{ route('admin.profile.index') }}"
+                aria-label="Your profile"
                 class="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/5"
             >
-                <div class="flex size-8 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
+                <div class="mx-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
                     {{ $user?->initials() ?? '?' }}
                 </div>
-                <div class="min-w-0 flex-1">
+                <div class="min-w-0 flex-1 sidebar-collapsed:lg:hidden">
                     <p class="truncate">{{ $user?->name ?? 'Guest' }}</p>
                 </div>
             </a>
@@ -257,9 +274,13 @@
                 @csrf
                 <button
                     type="submit"
-                    class="min-h-[44px] w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
+                    aria-label="Logout"
+                    class="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
                 >
-                    Logout
+                    <span class="flex-1 text-left sidebar-collapsed:lg:hidden">Logout</span>
+                    <span class="mx-auto hidden sidebar-collapsed:lg:block">
+                        <x-ui.icon name="power" size="xs" />
+                    </span>
                 </button>
             </form>
         </div>

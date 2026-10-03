@@ -33,6 +33,8 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
         ];
     }
 
@@ -43,6 +45,17 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model has never accepted the terms or privacy policy.
+     */
+    public function withoutConsent(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'terms_accepted_at' => null,
+            'privacy_accepted_at' => null,
         ]);
     }
 

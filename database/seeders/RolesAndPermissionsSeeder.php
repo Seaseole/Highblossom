@@ -71,6 +71,7 @@ class RolesAndPermissionsSeeder extends Seeder
             // Access Control
             'manage users',
             'manage roles',
+            'manage user sessions',
             'access admin panel',
 
             // System

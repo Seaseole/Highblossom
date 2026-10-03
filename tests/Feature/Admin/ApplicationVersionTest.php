@@ -10,6 +10,7 @@ use App\Services\ApplicationVersionService;
 use Database\Seeders\ApplicationVersionSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ViewErrorBag;
 use Spatie\Permission\Models\Role;
@@ -22,6 +23,23 @@ use Tests\TestCase;
 class ApplicationVersionTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Releases the timeline renders per page, mirroring the controller contract.
+     */
+    private const HISTORY_PER_PAGE = 5;
+
+    /**
+     * Seed the release history and return the version numbers, newest first.
+     *
+     * @return Collection<int, string>
+     */
+    private function seededVersions(): Collection
+    {
+        $this->seed(ApplicationVersionSeeder::class);
+
+        return ApplicationVersion::query()->newestFirst()->pluck('version');
+    }
 
     /**
      * Seed permissions and act as a user that can manage versions.
@@ -41,6 +59,7 @@ class ApplicationVersionTest extends TestCase
     public function test_guests_are_redirected_from_the_versions_page(): void
     {
         $this->get(route('admin.versions.index'))->assertRedirect(route('login'));
+        $this->get(route('admin.versions.history'))->assertRedirect(route('login'));
     }
 
     public function test_the_versions_page_renders_with_the_current_release(): void
@@ -51,7 +70,66 @@ class ApplicationVersionTest extends TestCase
         $this->get(route('admin.versions.index'))
             ->assertOk()
             ->assertSee('Application Versions')
-            ->assertSee('1.3.1');
+            ->assertSee('1.8.0');
+    }
+
+    public function test_the_timeline_shows_only_the_newest_releases_and_offers_more(): void
+    {
+        $this->actingAsVersionAdmin();
+        $ordered = $this->seededVersions();
+
+        $this->assertGreaterThan(self::HISTORY_PER_PAGE, $ordered->count(), 'The registry needs more releases than one page to exercise the timeline.');
+
+        $this->get(route('admin.versions.index'))
+            ->assertOk()
+            ->assertSee('v'.$ordered->first())
+            ->assertSee('v'.$ordered->get(self::HISTORY_PER_PAGE - 1))
+            ->assertDontSee('v'.$ordered->get(self::HISTORY_PER_PAGE))
+            ->assertSee('Showing '.self::HISTORY_PER_PAGE.' of '.$ordered->count().' releases');
+    }
+
+    public function test_the_history_fragment_appends_the_older_releases_without_page_chrome(): void
+    {
+        $this->actingAsVersionAdmin();
+        $ordered = $this->seededVersions();
+        $lastPage = (int) ceil($ordered->count() / self::HISTORY_PER_PAGE);
+
+        $this->get(route('admin.versions.history', ['pages' => $lastPage]))
+            ->assertOk()
+            ->assertSee('v'.$ordered->get(self::HISTORY_PER_PAGE))
+            ->assertSee('v'.$ordered->last())
+            ->assertSee('data-has-more="false"', false)
+            ->assertDontSee('Record Release')
+            ->assertDontSee('Current release');
+    }
+
+    public function test_the_history_fragment_clamps_page_requests_to_the_available_releases(): void
+    {
+        $this->actingAsVersionAdmin();
+        $ordered = $this->seededVersions();
+        $lastPage = (int) ceil($ordered->count() / self::HISTORY_PER_PAGE);
+
+        $this->get(route('admin.versions.history', ['pages' => $lastPage + 38]))
+            ->assertOk()
+            ->assertSee('data-pages="'.$lastPage.'"', false)
+            ->assertSee('data-shown="'.$ordered->count().'"', false)
+            ->assertSee('v'.$ordered->last());
+
+        $this->get(route('admin.versions.history', ['pages' => 'not-a-number']))
+            ->assertOk()
+            ->assertSee('data-pages="1"', false)
+            ->assertSee('data-shown="'.self::HISTORY_PER_PAGE.'"', false);
+    }
+
+    public function test_users_without_the_permission_cannot_read_the_history_fragment(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $user = User::factory()->create();
+        $user->assignRole(Role::findOrCreate('User', 'web'));
+        $this->actingAs($user);
+
+        $this->get(route('admin.versions.history', ['pages' => 2]))->assertForbidden();
     }
 
     public function test_users_without_the_permission_cannot_manage_versions(): void
@@ -86,11 +164,11 @@ class ApplicationVersionTest extends TestCase
         ]);
 
         $this->assertSame(
-            ['1.2.0', '1.2.1', '1.3.0', '1.3.1'],
+            ['1.2.0', '1.2.1', '1.3.0', '1.3.1', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0'],
             ApplicationVersion::query()->orderBy('id')->pluck('version')->all()
         );
 
-        $this->assertSame('1.3.1', app(ApplicationVersionService::class)->current()?->version);
+        $this->assertSame('1.8.0', app(ApplicationVersionService::class)->current()?->version);
     }
 
     public function test_it_rejects_invalid_semantic_versions(): void
@@ -154,18 +232,18 @@ class ApplicationVersionTest extends TestCase
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame('1.3.1', $service->current()?->version);
+        $this->assertSame('1.8.0', $service->current()?->version);
         $this->assertTrue(Cache::has(ApplicationVersionService::CACHE_KEY));
 
         $service->record([
-            'version' => '1.4.0',
+            'version' => '1.9.0',
             'summary' => 'Feature release',
             'notes' => [],
             'released_at' => now()->toDateString(),
         ], User::factory()->create());
 
         $this->assertFalse(Cache::has(ApplicationVersionService::CACHE_KEY));
-        $this->assertSame('1.4.0', $service->current()?->version);
+        $this->assertSame('1.9.0', $service->current()?->version);
     }
 
     public function test_next_bump_suggestions_are_computed_from_the_current_version(): void
@@ -177,7 +255,7 @@ class ApplicationVersionTest extends TestCase
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame(['patch' => '1.3.2', 'minor' => '1.4.0', 'major' => '2.0.0'], $service->nextOptions());
+        $this->assertSame(['patch' => '1.8.1', 'minor' => '1.9.0', 'major' => '2.0.0'], $service->nextOptions());
     }
 
     public function test_bump_suggestions_fall_back_to_the_baseline_when_nothing_is_recorded(): void

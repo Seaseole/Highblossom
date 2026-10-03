@@ -150,6 +150,30 @@
                                 placeholder="https://maps.app.goo.gl/..."
                             />
                         </div>
+                        <div class="space-y-3 border-t border-gray-100 pt-6 md:col-span-2 dark:border-white/10">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Account Security</label>
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">Require verified email addresses</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        When on, users whose email is not verified are sent to the verification page before they can
+                                        access the admin panel or settings. Registration emails a verification link.
+                                    </p>
+                                </div>
+                                <label class="group relative inline-flex shrink-0 cursor-pointer items-center">
+                                    <input type="hidden" name="require_email_verification" value="0" />
+                                    <input
+                                        type="checkbox"
+                                        name="require_email_verification"
+                                        value="1"
+                                        {{ $settings['require_email_verification'] ? 'checked' : '' }}
+                                        class="peer sr-only"
+                                    />
+                                    <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
+                                    <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Enforce</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

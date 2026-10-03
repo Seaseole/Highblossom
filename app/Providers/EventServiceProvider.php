@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Events\ContactMessageReceived;
+use App\Listeners\EndSessionOnLogout;
+use App\Listeners\RecordSessionLogin;
+use App\Listeners\RevokeSessionsOnPasswordReset;
 use App\Listeners\SendContactMessageEmail;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 /**
@@ -23,6 +29,15 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         ContactMessageReceived::class => [
             SendContactMessageEmail::class,
+        ],
+        Login::class => [
+            RecordSessionLogin::class,
+        ],
+        Logout::class => [
+            EndSessionOnLogout::class,
+        ],
+        PasswordReset::class => [
+            RevokeSessionsOnPasswordReset::class,
         ],
     ];
 

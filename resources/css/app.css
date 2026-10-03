@@ -3,6 +3,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@custom-variant sidebar-collapsed (&:where(html.sidebar-collapsed, html.sidebar-collapsed *));
+
 @utility no-scrollbar {
     scrollbar-width: none;
     &::-webkit-scrollbar {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\GlassTypeController;
 use App\Http\Controllers\Api\BookingAvailabilityController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteController;
@@ -25,6 +26,12 @@ Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->middleware('throttle:3,1')->name('contact.submit');
 Route::get('/terms', fn () => view('terms'))->name('terms');
 Route::get('/privacy', fn () => view('privacy'))->name('privacy');
+
+// Post-login consent capture (auth only, never gated itself)
+Route::middleware('auth')->group(function () {
+    Route::get('/consent', [ConsentController::class, 'show'])->name('consent');
+    Route::post('/consent', [ConsentController::class, 'store'])->name('consent.store');
+});
 
 // Blog
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');

@@ -148,13 +148,13 @@
                         action="{{ route('two-factor.login') }}"
                         id="two-factor-form"
                         class="space-y-8"
-                        x-data="{ code: '', submitting: false }"
+                        x-data="{ code: '', recoveryCode: '', submitting: false, mode: 'code' }"
                         x-init="
                             $nextTick(() => {
                                 $refs.codeInput.focus();
                             });
                             $watch('code', (value) => {
-                                if (value.length === 6 && ! submitting) {
+                                if (mode === 'code' && value.length === 6 && ! submitting) {
                                     submitting = true;
                                     $nextTick(() => {
                                         $el.submit();
@@ -171,18 +171,19 @@
                             <label
                                 for="code"
                                 class="mb-6 block px-1 text-center text-xs font-bold tracking-widest text-[#71717A] uppercase"
+                                x-text="mode === 'code' ? 'Authentication Code' : 'Recovery Code'"
                             >Authentication Code</label>
 
                             <!-- Real Hidden Input -->
                             <input
                                 id="code"
+                                x-show="mode === 'code'"
                                 type="text"
                                 name="code"
                                 x-model="code"
                                 x-ref="codeInput"
                                 maxlength="6"
-                                required
-                                autofocus
+                                :disabled="mode !== 'code'"
                                 inputmode="numeric"
                                 pattern="[0-9]*"
                                 class="absolute inset-0 z-10 h-full w-full cursor-text opacity-0"
@@ -191,8 +192,24 @@
                                 :readonly="submitting"
                             />
 
+                            <!-- Recovery Code Input -->
+                            <div x-show="mode === 'recovery'" x-cloak>
+                                <input
+                                    type="text"
+                                    name="recovery_code"
+                                    x-model="recoveryCode"
+                                    x-ref="recoveryInput"
+                                    :disabled="mode !== 'recovery'"
+                                    class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-4 py-4 text-center font-mono text-lg tracking-widest text-[#18181B] shadow-sm outline-none transition-all focus:border-[#DC2626] focus:ring-4 focus:ring-[#DC2626]/10"
+                                    placeholder="XXXXX-XXXXXXXX"
+                                    autocomplete="one-time-code"
+                                    spellcheck="false"
+                                />
+                            </div>
+
                             <!-- Visual Representation -->
                             <div
+                                x-show="mode === 'code'"
                                 class="relative z-0 flex justify-between gap-2 sm:gap-3"
                                 :class="{
                                     'opacity-50 pointer-events-none transition-opacity duration-300': submitting,
@@ -222,18 +239,28 @@
 
                             <!-- Loading Indicator -->
                             <div
-                                x-show="submitting"
+                                x-show="submitting && mode === 'code'"
                                 x-transition
                                 class="animate-fade-in-up mt-8 flex flex-col items-center justify-center gap-3"
                             >
                                 <div class="flex items-center gap-2">
                                     <svg class="h-5 w-5 animate-spin text-[#DC2626]" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                     <span class="text-sm font-bold tracking-[0.2em] text-[#DC2626] uppercase">Verifying Code...</span>
                                 </div>
                             </div>
+
+                            <button
+                                type="submit"
+                                x-show="mode === 'recovery'"
+                                x-cloak
+                                :disabled="submitting"
+                                class="mt-2 w-full rounded-2xl bg-[#18181B] px-4 py-4 text-sm font-bold tracking-widest text-white uppercase transition-all hover:bg-black disabled:opacity-50"
+                            >
+                                Verify Recovery Code
+                            </button>
 
                             @error('code')
                                 <div
@@ -248,6 +275,20 @@
                                     <p class="text-sm leading-tight font-medium text-red-700">{{ $message }}</p>
                                 </div>
                             @enderror
+                        </div>
+
+                        <div class="text-center">
+                            <button
+                                type="button"
+                                @click="
+                                    mode = mode === 'code' ? 'recovery' : 'code';
+                                    $nextTick(() => {
+                                        (mode === 'code' ? $refs.codeInput : $refs.recoveryInput).focus();
+                                    });
+                                "
+                                class="text-sm font-medium text-[#71717A] underline-offset-4 transition-colors hover:text-[#18181B] hover:underline"
+                                x-text="mode === 'code' ? 'Lost your device? Use a recovery code' : 'Use an authentication code instead'"
+                            ></button>
                         </div>
                     </form>
 

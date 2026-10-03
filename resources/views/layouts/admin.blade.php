@@ -49,6 +49,13 @@
             // Sync both our key and Flux's key so they stay in agreement
             localStorage.setItem('theme', theme);
             localStorage.setItem('flux.appearance', theme === 'auto' ? 'system' : theme);
+
+            // Restore the desktop sidebar rail width before paint, so the rail
+            // does not re-widen on every full-page admin navigation.
+            document.documentElement.classList.toggle(
+                'sidebar-collapsed',
+                localStorage.getItem('sidebarCollapsed') === 'true'
+            );
         })();
     </script>
 
@@ -176,7 +183,7 @@
     {{-- Global Toaster --}}
     <x-ui.toaster />
 
-    {{-- Alpine mobileMenu store — must be registered before Alpine initialises --}}
+    {{-- Alpine stores — must be registered before Alpine initialises --}}
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('mobileMenu', {
@@ -186,6 +193,17 @@
                 },
                 close() {
                     this.open = false;
+                },
+            });
+
+            Alpine.store('sidebar', {
+                // Seeded from the <html> class applied before paint, so the two
+                // can never disagree on first render.
+                collapsed: document.documentElement.classList.contains('sidebar-collapsed'),
+                toggle() {
+                    this.collapsed = !this.collapsed;
+                    document.documentElement.classList.toggle('sidebar-collapsed', this.collapsed);
+                    localStorage.setItem('sidebarCollapsed', String(this.collapsed));
                 },
             });
         });
