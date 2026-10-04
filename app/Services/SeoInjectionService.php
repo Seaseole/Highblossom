@@ -7,8 +7,10 @@ namespace App\Services;
 use App\Models\Contracts\HasSeoInterface;
 use App\Models\SeoStaticRoute;
 use App\Services\DataTransferObjects\SeoMetadata;
+use App\Services\Settings\SettingsManager;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 
 final class SeoInjectionService
 {
@@ -18,6 +20,7 @@ final class SeoInjectionService
         private readonly string $siteName,
         private readonly string $separator,
         private readonly ?string $defaultOgImage,
+        private readonly SettingsManager $settings,
     ) {}
 
     public function registerViewComposer(): void
@@ -86,8 +89,9 @@ final class SeoInjectionService
         }
 
         // Default OG image
-        if ($enhanced['og_image'] === null && $this->defaultOgImage !== null) {
-            $enhanced['og_image'] = $this->defaultOgImage;
+        $defaultImage = $this->resolveDefaultOgImage();
+        if ($enhanced['og_image'] === null && $defaultImage !== null) {
+            $enhanced['og_image'] = $defaultImage;
         }
 
         // Sync OG from meta if not set
@@ -114,12 +118,34 @@ final class SeoInjectionService
 
     private function getDefaultMetadata(?string $routeName): SeoMetadata
     {
+        $metaTitle = $this->settings->get('seo_meta_title');
+        $metaDescription = $this->settings->get('seo_meta_description');
+        $metaKeywords = $this->settings->get('seo_meta_keywords');
+
         return new SeoMetadata(
-            metaTitle: $this->siteName,
-            ogTitle: $this->siteName,
-            ogImage: $this->defaultOgImage,
+            metaTitle: filled($metaTitle) ? $metaTitle : $this->siteName,
+            metaDescription: filled($metaDescription) ? $metaDescription : null,
+            metaKeywords: filled($metaKeywords) ? $metaKeywords : null,
+            ogTitle: filled($metaTitle) ? $metaTitle : $this->siteName,
+            ogDescription: filled($metaDescription) ? $metaDescription : null,
+            ogImage: $this->resolveDefaultOgImage(),
             twitterCard: 'summary_large_image',
         );
+    }
+
+    /**
+     * Resolve the site-wide OG image, preferring the admin-configured
+     * meta image and falling back to the environment default.
+     */
+    private function resolveDefaultOgImage(): ?string
+    {
+        $image = $this->settings->get('seo_meta_image');
+
+        if (filled($image)) {
+            return Str::startsWith($image, ['http://', 'https://']) ? $image : asset('storage/'.$image);
+        }
+
+        return $this->defaultOgImage;
     }
 
     public function clearMetadata(): void

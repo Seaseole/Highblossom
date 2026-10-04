@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SeoSettingsRequest;
 use App\Http\Requests\Admin\SeoStaticRouteRequest;
 use App\Models\SeoStaticRoute;
 use App\Services\SeoService;
@@ -20,6 +21,28 @@ final class SeoController
     public function __construct(
         private readonly SeoService $seoService,
     ) {}
+
+    /**
+     * Display the site-wide SEO settings form.
+     */
+    public function settings(): View
+    {
+        return view('admin.seo.settings', [
+            'seo' => $this->seoService->getSettings(),
+        ]);
+    }
+
+    /**
+     * Persist the site-wide SEO settings.
+     */
+    public function updateSettings(SeoSettingsRequest $request): RedirectResponse
+    {
+        $this->seoService->updateSettings($request->validated(), $request);
+
+        return redirect()
+            ->route('admin.seo.settings')
+            ->with('success', __('messages.seo_saved'));
+    }
 
     /**
      * Display a listing of static routes with their SEO metadata.

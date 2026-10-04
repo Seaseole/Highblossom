@@ -9,6 +9,8 @@ use App\Services\Settings\SettingsManager;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Image;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -58,14 +60,33 @@ final class CompanySettingService
 
     /**
      * Persist environment variable changes from the data array.
+     *
+     * Only keys in {@see EnvEditor::SAFE_EDITABLE_KEYS} are written; unknown or
+     * secret keys from request input are silently ignored so a compromised
+     * admin session cannot overwrite APP_KEY, DB_*, etc.
      */
     private function handleEnvUpdate(array $data): void
     {
-        if (isset($data['env']) && is_array($data['env'])) {
-            foreach ($data['env'] as $key => $value) {
-                // Ignore empty or null values if you want, but env vars can be empty strings.
-                $this->envEditor->set((string) $key, (string) $value);
+        if (! isset($data['env']) || ! is_array($data['env'])) {
+            return;
+        }
+
+        if (Gate::denies('manage environment')) {
+            return;
+        }
+
+        $changed = false;
+
+        foreach ($data['env'] as $key => $value) {
+            // setEditable() rejects any key outside the admin allowlist.
+            if ($this->envEditor->setEditable((string) $key, (string) $value)) {
+                $changed = true;
             }
+        }
+
+        if ($changed) {
+            // Drop the cached config so newly written values take effect.
+            Artisan::call('config:clear');
         }
     }
 

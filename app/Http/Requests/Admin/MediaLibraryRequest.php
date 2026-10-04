@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\SafeStoredUploadPath;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -29,8 +30,8 @@ final class MediaLibraryRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'in:automotive,heavy_machinery,fleet,other'],
-            'upload' => ['nullable', 'image'],
-            'image_path' => ['nullable', 'string'],
+            'upload' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:10240'],
+            'image_path' => ['nullable', 'string', new SafeStoredUploadPath(['gallery', 'uploads', 'uploads/images', 'uploads/videos', 'uploads/videos/thumbnails'])],
         ];
     }
 }

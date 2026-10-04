@@ -66,6 +66,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewSchedulerList', function ($user) {
             return $user->hasRole('Super Admin') ? true : null;
         });
+        Gate::define('manage environment', function ($user) {
+            return $user->hasRole('Super Admin');
+        });
 
         Auditify::auth(function ($request) {
             // Option A: Check user role (e.g. if using Spatie Role package)

@@ -9,6 +9,7 @@ use App\Services\CompanySettingService;
 use App\Services\EnvEditor;
 use App\Services\SeoService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
@@ -27,12 +28,13 @@ final class CompanySettingController
      */
     public function index(): View
     {
-
         $settings = $this->settingService->getDefaultSettings();
         $availableRoutes = collect(config('seo.static_routes', []))->mapWithKeys(function ($route) {
             return [$route => $this->seoService->getRouteLabel($route)];
         })->toArray();
-        $envConfig = $this->envEditor->all();
+
+        // Only Super Admins see the environment tab, and only non-secret allowlisted keys are ever exposed.
+        $envConfig = Gate::allows('manage environment') ? $this->envEditor->displayable() : [];
 
         return view('admin.settings.index', compact('settings', 'availableRoutes', 'envConfig'));
     }

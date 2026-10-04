@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Actions\Seo;
 
+use App\Models\GalleryImage;
+use App\Models\Post;
 use App\Models\SeoStaticRoute;
 use Illuminate\Support\Collection;
 
 /**
  * Build the XML sitemap for the application.
  *
- * Collects indexable static routes from the database and generates
- * a valid XML sitemap with loc, lastmod, changefreq, and priority
- * elements for each URL.
+ * Collects indexable URLs from static route SEO records, published blog
+ * posts, and active gallery images, then generates a valid XML sitemap
+ * with loc, lastmod, changefreq, and priority elements for each URL.
  */
 final readonly class BuildSitemap
 {
@@ -40,25 +42,65 @@ final readonly class BuildSitemap
     }
 
     /**
-     * Collect all indexable route URLs from the database.
+     * Collect all indexable URLs from static routes and dynamic content.
      *
      * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
      */
     private function collectUrls(): Collection
     {
-        $urls = collect();
+        return $this->collectStaticRoutes()
+            ->merge($this->collectPosts())
+            ->merge($this->collectGalleryImages());
+    }
 
-        // Static routes
-        SeoStaticRoute::indexable()->get()->each(function ($route) use ($urls) {
-            $urls->push([
+    /**
+     * Collect indexable static route URLs from the database.
+     *
+     * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
+     */
+    private function collectStaticRoutes(): Collection
+    {
+        return SeoStaticRoute::indexable()->get()
+            ->map(fn (SeoStaticRoute $route): array => [
                 'loc' => $this->resolveRouteUrl($route->route_name),
                 'lastmod' => $route->updated_at?->format('Y-m-d'),
                 'changefreq' => $route->changefreq ?? 'monthly',
                 'priority' => number_format((float) ($route->priority ?? 0.5), 1),
             ]);
-        });
+    }
 
-        return $urls;
+    /**
+     * Collect URLs for published blog posts that allow indexing.
+     *
+     * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
+     */
+    private function collectPosts(): Collection
+    {
+        return Post::query()->published()->get()
+            ->filter(fn (Post $post): bool => $post->shouldIndex())
+            ->values()
+            ->map(fn (Post $post): array => [
+                'loc' => route('blog.show', ['slug' => $post->slug]),
+                'lastmod' => ($post->updated_at ?? $post->published_at)?->format('Y-m-d'),
+                'changefreq' => $post->getSitemapChangefreq(),
+                'priority' => number_format($post->getSitemapPriority(), 1),
+            ]);
+    }
+
+    /**
+     * Collect URLs for active gallery images.
+     *
+     * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
+     */
+    private function collectGalleryImages(): Collection
+    {
+        return GalleryImage::query()->active()->get()
+            ->map(fn (GalleryImage $image): array => [
+                'loc' => route('gallery.show', ['galleryImage' => $image]),
+                'lastmod' => $image->updated_at?->format('Y-m-d'),
+                'changefreq' => 'monthly',
+                'priority' => '0.5',
+            ]);
     }
 
     /**

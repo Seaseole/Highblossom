@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Services\SeoInjectionService;
+use App\Services\Settings\SettingsManager;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,11 +23,12 @@ final class SeoServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(SeoInjectionService::class, function () {
+        $this->app->singleton(SeoInjectionService::class, function ($app) {
             return new SeoInjectionService(
                 siteName: Config::get('seo.site_name', Config::get('app.name')),
                 separator: Config::get('seo.separator', '|'),
                 defaultOgImage: Config::get('seo.default_og_image'),
+                settings: $app->make(SettingsManager::class),
             );
         });
     }

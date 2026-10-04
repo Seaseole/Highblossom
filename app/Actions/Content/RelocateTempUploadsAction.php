@@ -109,7 +109,7 @@ final class RelocateTempUploadsAction
 
         $tempPath = $this->extractStoragePath($url, 'temp');
 
-        if ($tempPath && $tempDisk->exists($tempPath)) {
+        if ($this->isRelativeStoragePath($tempPath) && $tempDisk->exists($tempPath)) {
             $newPath = $this->moveToPermanent($tempPath, $tempDisk, $publicDisk, $destinationDir);
 
             if ($newPath) {
@@ -120,6 +120,28 @@ final class RelocateTempUploadsAction
         }
 
         return $url;
+    }
+
+    /**
+     * Guard against traversal or absolute paths extracted from block attributes.
+     */
+    private function isRelativeStoragePath(?string $path): bool
+    {
+        if ($path === null || $path === '' || str_contains($path, "\0") || str_contains($path, '\\')) {
+            return false;
+        }
+
+        if (str_starts_with($path, '/') || preg_match('/^[A-Za-z]:/', $path) === 1) {
+            return false;
+        }
+
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -4,17 +4,52 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use InvalidArgumentException;
+
 /**
  * Service for reading and writing .env configuration files.
+ *
+ * Writing is intentionally restricted to a fixed allowlist of non-secret keys
+ * via {@see setEditable()} and {@see displayable()}. The raw {@see set()} is
+ * kept public because trusted services (e.g. the SMTP editor) legitimately
+ * write MAIL_* keys, but it never renders values back to the browser and
+ * validates the key name so untrusted input cannot inject arbitrary keys.
  */
 final class EnvEditor
 {
+    /**
+     * Environment keys that admins may view and edit from the settings UI.
+     *
+     * Secrets (APP_KEY, DB_*, REDIS_*, MAIL_*, session/queue drivers, etc.)
+     * are deliberately excluded so they are never exposed to the browser.
+     *
+     * @var list<string>
+     */
+    public const SAFE_EDITABLE_KEYS = [
+        'APP_NAME',
+        'APP_URL',
+        'APP_TIMEZONE',
+        'APP_LOCALE',
+        'APP_FAKER_LOCALE',
+        'APP_FALLBACK_LOCALE',
+        'FEATURES_REGISTRATION_ENABLED',
+    ];
+
     /** @var string Path to the .env file */
     private string $path;
 
-    public function __construct()
+    public function __construct(?string $path = null)
     {
-        $this->path = base_path('.env');
+        $this->path = $path ?? base_path('.env');
+    }
+
+    /**
+     * Determine whether an environment key is safe to expose to the settings UI.
+     */
+    public static function isSafeEditableKey(string $key): bool
+    {
+        return in_array($key, self::SAFE_EDITABLE_KEYS, true)
+            || str_starts_with($key, 'FEATURES_');
     }
 
     /**
@@ -22,32 +57,52 @@ final class EnvEditor
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        if (! file_exists($this->path)) {
-            return $default;
+        return $this->all()[$key] ?? $default;
+    }
+
+    /**
+     * Get only the safe, non-secret editable key-value pairs for display.
+     *
+     * @return array<string, string>
+     */
+    public function displayable(): array
+    {
+        return array_filter(
+            $this->all(),
+            static fn (string $key): bool => self::isSafeEditableKey($key),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /**
+     * Set a value only when its key is in the admin allowlist.
+     *
+     * Untrusted request input must go through this method, never set() directly.
+     *
+     * @return bool Whether the key was accepted and written.
+     */
+    public function setEditable(string $key, string $value): bool
+    {
+        if (! self::isSafeEditableKey($key)) {
+            return false;
         }
 
-        $lines = file($this->path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->set($key, $value);
 
-        foreach ($lines as $line) {
-            if (str_starts_with(trim($line), '#')) {
-                continue;
-            }
-
-            [$envKey, $envValue] = $this->parseLine($line);
-
-            if ($envKey === $key) {
-                return $this->unquote($envValue);
-            }
-        }
-
-        return $default;
+        return true;
     }
 
     /**
      * Set a value in the .env file, creating or replacing the key.
+     *
+     * @throws InvalidArgumentException when the key name is not a valid env identifier.
      */
     public function set(string $key, mixed $value): void
     {
+        if (! preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $key)) {
+            throw new InvalidArgumentException("Invalid environment key [{$key}].");
+        }
+
         if (! file_exists($this->path)) {
             return;
         }
@@ -74,11 +129,13 @@ final class EnvEditor
             $lines[] = "{$key}={$newValue}";
         }
 
-        file_put_contents($this->path, implode(PHP_EOL, $lines).PHP_EOL);
+        $this->writeAtomically(implode(PHP_EOL, $lines).PHP_EOL);
     }
 
     /**
      * Get all key-value pairs from the .env file.
+     *
+     * @return array<string, mixed>
      */
     public function all(): array
     {
@@ -106,6 +163,8 @@ final class EnvEditor
 
     /**
      * Parse a single .env line into key and value.
+     *
+     * @return array{0: string, 1: string}
      */
     private function parseLine(string $line): array
     {
@@ -122,26 +181,52 @@ final class EnvEditor
     }
 
     /**
-     * Wrap a value in double quotes if it contains spaces or special characters.
+     * Persist contents atomically: write a temp file then rename over .env.
      */
-    private function quote(string $value): string
+    private function writeAtomically(string $contents): void
     {
-        if (str_contains($value, ' ') || str_contains($value, '#')) {
-            return '"'.$value.'"';
-        }
+        $tmp = $this->path.'.tmp.'.bin2hex(random_bytes(6));
 
-        return $value;
+        file_put_contents($tmp, $contents, LOCK_EX);
+        rename($tmp, $this->path);
     }
 
     /**
-     * Remove surrounding double quotes from a value.
+     * Quote a value only when it contains characters that are unsafe in an
+     * unquoted dotenv line. Simple tokens are left unquoted so dotenv keeps
+     * casting keywords like true/false/null to their scalar values.
+     */
+    private function quote(string $value): string
+    {
+        if (! preg_match('/[\s"#$\'\\\\`]/', $value)) {
+            return $value;
+        }
+
+        $escaped = str_replace(['\\', '"', '$', "\n", "\r", "\t"], ['\\\\', '\"', '\$', '\n', '', '\t'], $value);
+
+        return '"'.$escaped.'"';
+    }
+
+    /**
+     * Remove surrounding double quotes and reverse the escaping applied by quote().
      */
     private function unquote(string $value): string
     {
-        if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
-            return substr($value, 1, -1);
+        if (! (str_starts_with($value, '"') && str_ends_with($value, '"') && strlen($value) >= 2)) {
+            return $value;
         }
 
-        return $value;
+        $inner = substr($value, 1, -1);
+
+        return preg_replace_callback(
+            '/\\\\(.)/',
+            static fn (array $m): string => match ($m[1]) {
+                'n' => "\n",
+                'r' => '',
+                't' => "\t",
+                default => $m[1],
+            },
+            $inner
+        );
     }
 }

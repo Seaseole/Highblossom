@@ -50,6 +50,38 @@ class SeoStaticRouteSeeder extends Seeder
                 'priority' => 0.7,
                 'changefreq' => 'monthly',
             ],
+            [
+                'route_name' => 'about-us',
+                'meta_title' => 'About Us',
+                'meta_description' => 'Learn about Highblossom PTY LTD, Gaborone\'s trusted automotive glass specialists with over 20 years of precision installation experience.',
+                'og_type' => 'website',
+                'priority' => 0.6,
+                'changefreq' => 'monthly',
+            ],
+            [
+                'route_name' => 'blog',
+                'meta_title' => 'Blog',
+                'meta_description' => 'News, tips, and insights on automotive glass care, windscreen maintenance, and safety from the Highblossom team.',
+                'og_type' => 'website',
+                'priority' => 0.6,
+                'changefreq' => 'daily',
+            ],
+            [
+                'route_name' => 'terms',
+                'meta_title' => 'Terms and Conditions',
+                'meta_description' => 'Terms and conditions for Highblossom PTY LTD services, bookings, and warranty coverage.',
+                'og_type' => 'website',
+                'priority' => 0.3,
+                'changefreq' => 'yearly',
+            ],
+            [
+                'route_name' => 'privacy',
+                'meta_title' => 'Privacy Policy',
+                'meta_description' => 'How Highblossom PTY LTD collects, uses, and protects your personal information.',
+                'og_type' => 'website',
+                'priority' => 0.3,
+                'changefreq' => 'yearly',
+            ],
         ];
 
         foreach ($routes as $route) {

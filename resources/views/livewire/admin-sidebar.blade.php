@@ -9,19 +9,25 @@
         'blog' => ['label' => 'Blog', 'icon' => 'newspaper', 'routes' => ['admin.posts', 'admin.categories', 'admin.tags']],
         'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles', 'admin.sessions']],
         'media' => ['label' => 'Media', 'icon' => 'photo', 'routes' => ['admin.media-library']],
-        'system' => ['label' => 'System', 'icon' => 'cog-6-tooth', 'routes' => ['admin.settings', 'admin.seo', 'admin.versions']],
+        'system' => ['label' => 'System', 'icon' => 'cog-6-tooth', 'routes' => ['admin.settings', 'admin.seo', 'admin.cache', 'admin.versions']],
     ];
+
+    // Routes that need more than the shared 'access admin panel' gate
+    $routePermissions = ['admin.cache' => 'manage cache'];
+    $visibleRoutes = fn (array $routes) => collect($routes)
+        ->filter(fn ($r) => ! isset($routePermissions[$r]) || $user->can($routePermissions[$r]))
+        ->all();
 
     $isRouteActive = fn ($route) => str_starts_with($currentRoute, $route.'.') || $currentRoute === $route || ($route === 'dashboard' && $currentRoute === 'dashboard');
     $isGroupActive = fn ($groupRoutes) => collect($groupRoutes)->contains(fn ($r) => $isRouteActive($r));
-    $getRouteName = fn ($route) => route($route === 'dashboard' ? 'dashboard' : ($route === 'admin.about-us' ? 'admin.about-us.edit' : ($route === 'admin.seo' ? 'admin.seo.static-routes' : $route.'.index')));
+    $getRouteName = fn ($route) => route($route === 'dashboard' ? 'dashboard' : ($route === 'admin.about-us' ? 'admin.about-us.edit' : ($route === 'admin.seo' ? 'admin.seo.settings' : $route.'.index')));
     $getRouteLabel = fn ($route) => [
         'dashboard' => 'Dashboard', 'admin.bookings' => 'Bookings', 'admin.inspections' => 'Appointments', 'admin.quotes' => 'Quotes',
         'admin.about-us' => 'About Us', 'admin.testimonials' => 'Testimonials', 'admin.services' => 'Services', 'admin.gallery' => 'Gallery',
         'admin.gallery-categories' => 'Gallery Categories', 'admin.partners' => 'Partners', 'admin.staff' => 'Staff',
         'admin.glass-types' => 'Glass Types', 'admin.service-types' => 'Service Types', 'admin.contact-messages' => 'Messages',
         'admin.posts' => 'Posts', 'admin.categories' => 'Categories', 'admin.tags' => 'Tags', 'admin.users' => 'Users',
-        'admin.roles' => 'Roles', 'admin.sessions' => 'Sessions', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.versions' => 'Versions',
+        'admin.roles' => 'Roles', 'admin.sessions' => 'Sessions', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.cache' => 'Cache', 'admin.versions' => 'Versions',
     ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
     $badges = [
         'admin.users' => $userCount,
@@ -101,7 +107,7 @@
                             ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
                         <div x-show="open" x-collapse.duration.200ms class="space-y-1">
-                            @foreach ($groupData['routes'] as $route)
+                            @foreach ($visibleRoutes($groupData['routes']) as $route)
                                 <a
                                     href="{{ $getRouteName($route) }}"
                                     @click="$store.mobileMenu.close()"

@@ -76,6 +76,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // System
             'manage versions',
+            'manage cache',
 
             // dashboard
             'view dashboard',

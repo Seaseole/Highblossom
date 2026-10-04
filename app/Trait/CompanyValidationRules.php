@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Trait;
 
+use App\Rules\SafeStoredUploadPath;
+
 /**
  * Validation rules for company settings.
  *
@@ -14,7 +16,7 @@ trait CompanyValidationRules
     /**
      * Get the validation rules for company settings.
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, mixed>
      */
     public function validateCompanyRules(): array
     {
@@ -40,11 +42,11 @@ trait CompanyValidationRules
             'time_format_display' => ['required', 'in:12,24'],
             'booking_lead_time_hours' => ['required', 'integer', 'min:0', 'max:24'],
             'currency_symbol' => ['required', 'string', 'max:5'],
-            'business_logo' => ['nullable', 'image', 'max:2048'],
-            'business_logo_path' => ['nullable', 'string'],
+            'business_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
+            'business_logo_path' => ['nullable', 'string', new SafeStoredUploadPath(['settings', 'uploads', 'uploads/images'])],
             'remove_business_logo' => ['nullable', 'boolean'],
-            'favicon' => ['nullable', 'image', 'max:1024'],
-            'favicon_path' => ['nullable', 'string'],
+            'favicon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:1024'],
+            'favicon_path' => ['nullable', 'string', new SafeStoredUploadPath(['settings', 'uploads', 'uploads/images'])],
             'google_maps_api_key' => ['nullable', 'string', 'max:255'],
             'map_directions_link' => ['nullable', 'url', 'max:500'],
             'facebook_url' => ['nullable', 'url', 'max:255'],
@@ -61,8 +63,8 @@ trait CompanyValidationRules
             'gallery_metrics.*.label' => ['required', 'string', 'max:80'],
             'gallery_metrics.*.value' => ['required', 'string', 'max:20'],
             'gallery_metrics.*.suffix' => ['nullable', 'string', 'max:10'],
-            'env' => ['nullable', 'array'],
-            'env.*' => ['nullable', 'string'],
+            'env' => ['nullable', 'array', 'max:30'],
+            'env.*' => ['nullable', 'string', 'max:1000'],
         ];
 
     }

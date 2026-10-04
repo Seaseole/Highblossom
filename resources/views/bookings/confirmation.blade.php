@@ -14,7 +14,7 @@
                     {{ __('confirmation.title') }}
                 </h1>
                 <p class="mb-10 text-lg leading-relaxed text-[#A1A1AA]">
-                    {!! __('confirmation.message', ['name' => $booking->client_name, 'vehicle' => $booking->vehicle_details]) !!}
+                    {{ __('confirmation.message', ['name' => $booking->client_name, 'vehicle' => $booking->vehicle_details]) }}
                 </p>
 
                 <div class="glass-card mb-10 space-y-5 rounded-2xl p-8 text-left md:p-10">

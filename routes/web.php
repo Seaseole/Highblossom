@@ -24,8 +24,8 @@ Route::get('/quote', [SiteController::class, 'quote'])->name('quote');
 Route::post('/quote', [SiteController::class, 'submitQuote'])->middleware('throttle:3,1')->name('quote.submit');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::post('/contact', [SiteController::class, 'submitContact'])->middleware('throttle:3,1')->name('contact.submit');
-Route::get('/terms', fn () => view('terms'))->name('terms');
-Route::get('/privacy', fn () => view('privacy'))->name('privacy');
+Route::get('/terms', [SiteController::class, 'terms'])->name('terms');
+Route::get('/privacy', [SiteController::class, 'privacy'])->name('privacy');
 
 // Post-login consent capture (auth only, never gated itself)
 Route::middleware('auth')->group(function () {

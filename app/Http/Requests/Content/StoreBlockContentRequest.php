@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Content;
 
+use App\Rules\SafeStoredUploadPath;
 use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,7 +36,7 @@ final class StoreBlockContentRequest extends FormRequest
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
-            'featured_image_path' => 'nullable|string',
+            'featured_image_path' => ['nullable', 'string', new SafeStoredUploadPath(['uploads/blog', 'uploads/images', 'uploads', 'gallery'])],
             'featured_image_url' => 'nullable|url|max:500',
             'delete_featured_image' => 'nullable|boolean',
             'status' => 'required|in:draft,published',

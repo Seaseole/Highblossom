@@ -37,3 +37,15 @@ CLAUDE.md
 .windsurf/workflows/review.md
 database/seeders/GalleryJourneySeeder.php
 tests/Feature/PublicPagesTest.php
+tests/Feature/Uploads/Phase4UploadHardeningTest.php
+.gitignore
+tests/Feature/Seo/SeoSettingsTest.php
+tests/Feature/PublicSurfaceSecurityTest.php
+tests/Feature/Admin/ApplicationVersionTest.php
+tests/Feature/Admin/CacheManagementTest.php
+tests/Feature/Content/Phase2SanitizationTest.php
+tests/Feature/Seo/SitemapTest.php
+tests/Feature/Admin/ApplicationVersionTest.php
+tests/Feature/Settings/EnvironmentEditorSecurityTest.php
+tests/Unit/EnvEditorTest.php
+.gitignore

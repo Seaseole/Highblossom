@@ -31,15 +31,15 @@ final class AboutUsRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['nullable', 'string', 'max:500'],
-            'body' => ['required', 'string'],
-            'hero_image' => ['nullable', 'image', 'max:10240'],
+            'body' => ['required', 'string', 'max:60000'],
+            'hero_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
             'hero_image_path' => [
                 'nullable',
                 'string',
                 Rule::in($this->allowedHeroImagePaths()),
             ],
-            'mission' => ['nullable', 'string'],
-            'vision' => ['nullable', 'string'],
+            'mission' => ['nullable', 'string', 'max:60000'],
+            'vision' => ['nullable', 'string', 'max:60000'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

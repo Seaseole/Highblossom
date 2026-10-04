@@ -66,8 +66,10 @@ final class BlogPosts extends Component
         $query = Post::published()->with('categories', 'tags', 'author');
 
         if ($this->search) {
-            $query->where('title', 'like', '%'.$this->search.'%')
-                ->orWhere('excerpt', 'like', '%'.$this->search.'%');
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhere('excerpt', 'like', '%'.$this->search.'%');
+            });
         }
 
         if ($this->categorySlug) {

@@ -66,7 +66,7 @@ final class BlockBuilder extends Component
     public array $blocks = [];
 
     /** The uploaded image file. */
-    #[Validate(['nullable', 'image', 'max:61440'])]
+    #[Validate(['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:61440'])]
     public $imageUpload = null;
 
     /** The block id targeted by the next image upload. */
@@ -76,7 +76,7 @@ final class BlockBuilder extends Component
     public string $activeImageUploadPath = 'src';
 
     /** The uploaded video file. */
-    #[Validate(['nullable', 'file', 'max:61440'])]
+    #[Validate(['nullable', 'file', 'mimes:mp4,webm,mov,avi', 'max:61440'])]
     public $videoUpload = null;
 
     public ?string $uploadingVideoBlockId = null;

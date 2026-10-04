@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Observers\SitemapObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * Gallery images with categorisation and featured flag.
  * Maps to the `gallery_images` database table.
  */
+#[ObservedBy(SitemapObserver::class)]
 final class GalleryImage extends Model
 {
     protected $fillable = [

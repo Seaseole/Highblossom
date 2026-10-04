@@ -6,6 +6,8 @@
             <p class="text-gray-500 dark:text-gray-400">Manage SEO meta tags for static routes.</p>
         </div>
 
+        @include('admin.seo._tabs', ['seoTab' => 'static-routes'])
+
         <!-- Table -->
         <div class="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
             <table class="w-full min-w-[800px]">

@@ -45,8 +45,7 @@
                     'social' => 'Social',
                     'notifications' => 'Notifications',
                     'announcements' => 'Announcements',
-                    'system_config' => 'System Config',
-                ] as $key => $label)
+                ] + ($envConfig !== [] ? ['system_config' => 'System Config'] : []) as $key => $label)
                     <button
                         type="button"
                         @click="tab = '{{ $key }}'"
@@ -139,6 +138,11 @@
                                 class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                                 placeholder="AIzaSy..."
                             />
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                This key is sent to every visitor's browser, so restrict it in Google Cloud to your
+                                site domains and the Maps JavaScript API only. Store server-only keys in
+                                <code>.env</code> instead.
+                            </p>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Map Directions Link</label>
@@ -679,6 +683,7 @@
                     </div>
                 </div>
 
+                @if ($envConfig !== [])
                 <!-- System Config Tab -->
                 <div
                     x-show="tab === 'system_config'"
@@ -691,7 +696,7 @@
                     <div class="mb-6 space-y-1">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Config</h3>
                         <p class="text-sm text-gray-500">
-                            Read-only environment variables. Click an input to edit its value.
+                            Allowlisted environment variables. Secret values are never shown here.
                         </p>
                     </div>
 
@@ -738,6 +743,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
                 <div class="border-t border-gray-100 pt-6 dark:border-white/10">
                     <button

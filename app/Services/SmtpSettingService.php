@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -19,6 +20,9 @@ final class SmtpSettingService
 
     /**
      * Update SMTP settings in the .env file.
+     *
+     * An empty mail_password keeps the currently stored password, because the
+     * settings page never repopulates secret values into the form.
      */
     public function update(array $data): void
     {
@@ -26,10 +30,17 @@ final class SmtpSettingService
         $this->envEditor->set('MAIL_HOST', $data['mail_host']);
         $this->envEditor->set('MAIL_PORT', (string) $data['mail_port']);
         $this->envEditor->set('MAIL_USERNAME', $data['mail_username'] ?? '');
-        $this->envEditor->set('MAIL_PASSWORD', $data['mail_password'] ?? '');
+
+        $password = trim((string) ($data['mail_password'] ?? ''));
+        if ($password !== '') {
+            $this->envEditor->set('MAIL_PASSWORD', $password);
+        }
+
         $this->envEditor->set('MAIL_ENCRYPTION', $data['mail_encryption'] ?? '');
         $this->envEditor->set('MAIL_FROM_ADDRESS', $data['mail_from_address']);
         $this->envEditor->set('MAIL_FROM_NAME', $data['mail_from_name']);
+
+        Artisan::call('config:clear');
     }
 
     /**
@@ -48,6 +59,9 @@ final class SmtpSettingService
 
     /**
      * Get current SMTP settings from the .env file with defaults.
+     *
+     * The password is never returned to the view (write-only field) and is not
+     * included in any log context.
      */
     public function getSettings(): array
     {
@@ -56,14 +70,14 @@ final class SmtpSettingService
             'mail_host' => $this->envEditor->get('MAIL_HOST', ''),
             'mail_port' => $this->envEditor->get('MAIL_PORT', '587'),
             'mail_username' => $this->envEditor->get('MAIL_USERNAME', ''),
-            'mail_password' => $this->envEditor->get('MAIL_PASSWORD', ''),
+            'mail_password' => '',
             'mail_encryption' => $this->envEditor->get('MAIL_ENCRYPTION', 'tls'),
             'mail_from_address' => $this->envEditor->get('MAIL_FROM_ADDRESS', ''),
             'mail_from_name' => $this->envEditor->get('MAIL_FROM_NAME', config('app.name')),
         ];
 
-        if (! isset($settings['mail_mailer'])) {
-            Log::error('Settings mail_mailer missing', $settings);
+        if (($settings['mail_mailer'] ?? null) === null || $settings['mail_mailer'] === '') {
+            Log::error('Settings mail_mailer missing', ['host' => $settings['mail_host']]);
         }
 
         return $settings;

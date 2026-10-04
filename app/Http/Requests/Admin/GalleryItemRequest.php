@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\SafeStoredUploadPath;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -30,7 +31,7 @@ final class GalleryItemRequest extends FormRequest
             'title' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
-            'image_path' => ['nullable', 'string'],
+            'image_path' => ['nullable', 'string', new SafeStoredUploadPath(['gallery', 'uploads', 'uploads/blog', 'uploads/images', 'uploads/videos', 'uploads/videos/thumbnails'], 'placeholder.gif')],
             'remove_image' => ['nullable', 'boolean'],
             'gallery_category_id' => ['required', 'exists:gallery_categories,id'],
             'is_featured' => ['boolean'],

@@ -86,6 +86,11 @@ final class SettingsManager
             'announcements' => [],
             'gallery_metrics' => [],
             'quote_notification_emails' => '',
+            'seo_meta_title' => '',
+            'seo_meta_description' => '',
+            'seo_meta_keywords' => '',
+            'seo_meta_image' => '',
+            'google_site_verification' => '',
         ];
     }
 }

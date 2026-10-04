@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
+use Highblossom\ContentBlocks\Services\HtmlSanitizer;
 use Highblossom\ContentBlocks\Services\OEmbedResolver;
 
 /**
@@ -14,12 +15,15 @@ final class EmbedBlock extends AbstractBlock
 {
     private OEmbedResolver $resolver;
 
+    private HtmlSanitizer $sanitizer;
+
     /**
      * Create a new embed block instance.
      */
-    public function __construct(OEmbedResolver $resolver)
+    public function __construct(OEmbedResolver $resolver, HtmlSanitizer $sanitizer)
     {
         $this->resolver = $resolver;
+        $this->sanitizer = $sanitizer;
     }
 
     /**
@@ -36,8 +40,8 @@ final class EmbedBlock extends AbstractBlock
     public function getValidationRules(): array
     {
         return [
-            'url' => 'required|url',
-            'title' => 'nullable|string',
+            'url' => 'required|url|max:2048',
+            'title' => 'nullable|string|max:255',
         ];
     }
 
@@ -74,7 +78,7 @@ final class EmbedBlock extends AbstractBlock
             $embedData = $this->resolver->resolve($attributes['url']);
 
             if ($embedData) {
-                $attributes['embed_html'] = $embedData['html'];
+                $attributes['embed_html'] = $this->sanitizer->sanitizeEmbed((string) ($embedData['html'] ?? ''));
                 $attributes['embed_title'] = $embedData['title'];
                 $attributes['embed_thumbnail'] = $embedData['thumbnail_url'];
                 $attributes['embed_width'] = $embedData['width'];

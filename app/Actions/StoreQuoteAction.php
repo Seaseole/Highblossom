@@ -101,12 +101,8 @@ class StoreQuoteAction
      */
     private function handleImageUpload(Request $request): ?string
     {
-        // Use AJAX uploaded path if provided
-        if (! empty($request->input('image_path'))) {
-            return $request->input('image_path');
-        }
-
-        // Handle traditional file upload
+        // Handle traditional file upload only - the public form never adopts
+        // caller-supplied storage paths.
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');

@@ -33,5 +33,9 @@ return [
         'gallery',
         'quote',
         'contact',
+        'about-us',
+        'blog',
+        'terms',
+        'privacy',
     ],
 ];

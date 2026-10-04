@@ -123,6 +123,43 @@ class ApplicationVersionSeeder extends Seeder
                 ['type' => 'changed', 'text' => 'The timeline lives in its own partial shared by the page and the fragment response, so the two cannot drift apart, and the swapped region deliberately holds no Alpine bindings — the fade and the control are siblings driven by component state, so re-rendered entries need no re-initialisation.'],
             ],
         ],
+        [
+            'version' => '1.9.0',
+            'summary' => 'Security remediation: output escaping, env editor lockdown, rich-text sanitisation and upload hardening',
+            'released_at' => '2026-10-04',
+            'notes' => [
+                ['type' => 'security', 'text' => 'The booking confirmation page printed the visitor-supplied name and vehicle details with an unescaped echo inside the translated message, so markup submitted at booking time executed on the confirmation page. The message is now escaped.'],
+                ['type' => 'security', 'text' => 'JSON-LD blocks (seo/meta and blocks/seo) emitted raw JSON inside a script tag, letting a closing script sequence in saved SEO metadata break out of the element. They now encode with JSON_HEX_TAG and JSON_HEX_AMP.'],
+                ['type' => 'fixed', 'text' => 'The blog list search appended a bare OR clause for the excerpt match, which escaped the published constraint and let a search term surface draft posts. The two LIKE conditions are now grouped together.'],
+                ['type' => 'security', 'text' => 'The settings environment tab now reads and writes only a fixed allowlist of non-secret keys (app name, URL, timezone, locales, FEATURES_*). Secret keys such as APP_KEY, DB_*, REDIS_* and MAIL_* are ignored in request input and never rendered back to the browser.'],
+                ['type' => 'security', 'text' => 'Environment writes require the new manage environment gate (Super Admin only), which also guards the decomposer route. Writes go through a temp file and rename so concurrent saves cannot truncate .env, and values containing quotes, dollar signs, backticks or newlines are escaped so they round-trip instead of being interpolated.'],
+                ['type' => 'security', 'text' => 'The SMTP screen logged its whole settings array, including the mail password, and repopulated the password into the form. The log call is gone and the password is now write-only: an empty submission keeps the stored value.'],
+                ['type' => 'security', 'text' => 'Rich text that the site prints unescaped is now sanitised with HTMLPurifier: block-builder paragraphs and accordion item bodies at render time, and About-Us body, mission and vision at save time. Scripts, event handlers, javascript: URLs and iframes are stripped from stored HTML.'],
+                ['type' => 'security', 'text' => 'Embed blocks keep their provider iframe but the oEmbed payload passes through an embed-safe definition: http/https only, iframe attributes allowlisted, scripts and inline handlers removed, and an iframe declared to contain no nested markup.'],
+                ['type' => 'security', 'text' => 'Content-block and About-Us text fields carry explicit length limits (60,000 characters for rich bodies, 255 for titles and classes), so an oversized payload is rejected instead of overflowing the underlying TEXT columns.'],
+                ['type' => 'security', 'text' => 'Paths submitted as an already-uploaded file (image_path, featured_image_path, business_logo_path, favicon_path) are no longer free-form. A new rule accepts only a relative path the application itself generated: known upload folder, hashed file name, image extension. Traversal, absolute paths, URLs and .php or .svg targets are rejected before the code adopts or deletes anything.'],
+                ['type' => 'security', 'text' => 'The public quote form can no longer name a storage path as its attachment; only a real uploaded image is accepted. The AJAX uploader restricts its folder parameter to the directories the application writes into, and relocation from the temp disk refuses traversal or absolute references read from block attributes.'],
+                ['type' => 'security', 'text' => 'Upload rules now declare accepted mime types everywhere they were missing, which removes SVG from every image allowlist (it can carry script when opened directly) and limits the block builder video property to the container formats it already validated.'],
+                ['type' => 'fixed', 'text' => 'Video uploads trusted the client file name and moved the raw file into the public folder with move_uploaded_file. The service now stores on the public disk under a generated name after checking the extension, so a crafted file name cannot escape the videos directory.'],
+                ['type' => 'fixed', 'text' => 'The service edit form submitted the asset() URL in its hidden image_path instead of the stored relative key, a value the new path rule rightly rejects; it now round-trips the relative path so saving an unchanged image still works.'],
+                ['type' => 'added', 'text' => 'The Google Maps key field now states that the value ships to every visitors browser, so it must be domain-restricted in Google Cloud, and points server-only keys to .env.'],
+            ],
+        ],
+        [
+            'version' => '1.10.0',
+            'summary' => 'Search engine readiness: complete sitemap, site-wide SEO settings and cache management',
+            'released_at' => '2026-10-04',
+            'notes' => [
+                ['type' => 'added', 'text' => 'The sitemap now lists every indexable page: the nine static routes (including About Us, Blog, Terms and Privacy), all published posts and all active gallery images, each with its last-modified date. Publishing or editing content invalidates the cached sitemap immediately, so Google Search Console never sees a stale URL set.'],
+                ['type' => 'added', 'text' => 'A new SEO Settings page holds site-wide defaults — meta title, description, keywords and a share image — with live character counters, a Google search-result preview and a social-card preview that update as you type. Pages without their own SEO entry fall back to these values.'],
+                ['type' => 'added', 'text' => 'A Google Search Console verification token can be pasted into the settings page and is emitted on every public page, covering the HTML-tag verification method without a file upload.'],
+                ['type' => 'added', 'text' => 'A new Cache Management page lists five groups — company settings, SEO output, application version, application cache and framework cache — with entry counts and sizes, and lets you clear or optimize each one individually or all at once. User sessions live in their own table and are never touched.'],
+                ['type' => 'security', 'text' => 'Cache group actions are driven by a fixed registry behind the new manage cache permission, so no request ever names a raw cache key, artisan argument or filesystem path.'],
+                ['type' => 'fixed', 'text' => 'The Terms and Privacy pages moved from closure routes to controller actions, which unblocks route caching for the framework optimize action.'],
+                ['type' => 'fixed', 'text' => 'A static robots.txt stub in the public folder was shadowing the dynamic route on the web server, so the sitemap reference and admin disallow rules never reached crawlers. The stub is gone and the generated file is served.'],
+                ['type' => 'changed', 'text' => 'robots.txt now also disallows the booking and API paths alongside the existing admin and auth routes.'],
+            ],
+        ],
     ];
 
     /**

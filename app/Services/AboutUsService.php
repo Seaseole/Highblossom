@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\AboutUsContent;
+use Highblossom\ContentBlocks\Services\HtmlSanitizer;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
@@ -31,6 +32,11 @@ final class AboutUsService
      * @var int<1, 100>
      */
     private const HERO_QUALITY = 82;
+
+    /**
+     * Create a new About Us service instance.
+     */
+    public function __construct(private readonly HtmlSanitizer $sanitizer) {}
 
     /**
      * Get existing content or create with defaults if none exists.
@@ -62,9 +68,9 @@ final class AboutUsService
 
         $content->title = $data['title'];
         $content->subtitle = $data['subtitle'] ?? '';
-        $content->body = $data['body'];
-        $content->mission = $data['mission'] ?? '';
-        $content->vision = $data['vision'] ?? '';
+        $content->body = $this->sanitizeHtml($data['body']);
+        $content->mission = $this->sanitizeHtml($data['mission'] ?? '');
+        $content->vision = $this->sanitizeHtml($data['vision'] ?? '');
         $content->is_active = $data['is_active'] ?? false;
 
         $this->handleHeroImage($content, $request);
@@ -72,6 +78,18 @@ final class AboutUsService
         $content->save();
 
         return $content;
+    }
+
+    /**
+     * Sanitize a rich-text field, preserving safe markup while stripping active content.
+     */
+    private function sanitizeHtml(?string $html): string
+    {
+        if (blank($html)) {
+            return '';
+        }
+
+        return $this->sanitizer->sanitize((string) $html);
     }
 
     /**

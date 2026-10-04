@@ -98,7 +98,9 @@
                                 <input
                                     type="password"
                                     name="mail_password"
-                                    value="{{ old('mail_password', $settings['mail_password']) }}"
+                                    value="{{ old('mail_password') }}"
+                                    autocomplete="new-password"
+                                    placeholder="•••••••• (leave blank to keep current)"
                                     class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                                 />
                             </div>

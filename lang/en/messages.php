@@ -25,6 +25,12 @@ return [
     'seo_saved' => 'SEO settings saved successfully.',
     'seo_created' => 'SEO configuration created successfully.',
 
+    // Cache management messages
+    'cache_group_cleared' => ':group cache cleared.',
+    'cache_group_optimized' => ':group cache optimized.',
+    'cache_all_cleared' => 'All caches cleared.',
+    'cache_all_optimized' => 'All caches optimized.',
+
     // Booking messages
     'booking_created' => 'Booking created successfully.',
     'booking_updated' => 'Booking updated successfully.',

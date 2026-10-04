@@ -4,6 +4,9 @@
 
 {{-- Basic Meta Tags --}}
 <title>{{ $seoMetadata->metaTitle ?? config('seo.site_name') }}</title>
+@if (filled($googleSiteVerification ?? null))
+    <meta name="google-site-verification" content="{{ $googleSiteVerification }}" />
+@endif
 @if ($seoMetadata->metaDescription)
     <meta name="description" content="{{ $seoMetadata->metaDescription }}" />
 @endif
@@ -56,6 +59,6 @@
 {{-- JSON-LD Structured Data --}}
 @if ($seoMetadata->schemaJsonLd)
     <script type="application/ld+json">
-        {!! json_encode($seoMetadata->schemaJsonLd, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+        {!! json_encode($seoMetadata->schemaJsonLd, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}
     </script>
 @endif

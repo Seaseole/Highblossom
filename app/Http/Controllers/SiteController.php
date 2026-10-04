@@ -38,6 +38,22 @@ class SiteController extends Controller
     }
 
     /**
+     * Display the terms and conditions page.
+     */
+    public function terms(): View
+    {
+        return view('terms');
+    }
+
+    /**
+     * Display the privacy policy page.
+     */
+    public function privacy(): View
+    {
+        return view('privacy');
+    }
+
+    /**
      * Display the About Us page.
      *
      * @return View

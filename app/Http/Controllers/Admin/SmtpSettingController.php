@@ -8,7 +8,6 @@ use App\Http\Requests\Admin\SmtpSettingRequest;
 use App\Http\Requests\Admin\TestEmailRequest;
 use App\Services\SmtpSettingService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 /**
@@ -26,7 +25,6 @@ final class SmtpSettingController
     public function index(): View
     {
         $settings = $this->smtpService->getSettings();
-        Log::info('Settings:', $settings);
 
         return view('admin.smtp.index', compact('settings'));
     }

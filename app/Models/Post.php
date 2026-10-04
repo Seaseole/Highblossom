@@ -6,7 +6,9 @@ namespace App\Models;
 
 use App\Models\Concerns\HasSeo;
 use App\Models\Contracts\HasSeoInterface;
+use App\Observers\SitemapObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 #[Fillable(['title', 'slug', 'excerpt', 'content', 'featured_image_path', 'featured_image_url', 'status', 'published_at', 'user_id', 'seo_metadata'])]
+#[ObservedBy(SitemapObserver::class)]
 /**
  * Blog posts with SEO, categories, tags, and publishing workflow.
  * Maps to the `posts` database table.

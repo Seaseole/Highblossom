@@ -32,6 +32,8 @@ final readonly class GenerateRobotsTxt
             'Disallow: /login',
             'Disallow: /register',
             'Disallow: /password-reset',
+            'Disallow: /bookings/',
+            'Disallow: /api/',
         ];
 
         // Dynamic no-index routes

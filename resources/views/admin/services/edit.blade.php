@@ -22,7 +22,7 @@
         >
             @csrf
             @method('PUT')
-            <input type="hidden" name="image_path" value="{{ $service->image ?? '' }}" />
+            <input type="hidden" name="image_path" value="{{ $service->image_path ?? '' }}" />
             <input type="hidden" name="remove_image" value="0" />
 
             <div class="space-y-8 lg:col-span-2">

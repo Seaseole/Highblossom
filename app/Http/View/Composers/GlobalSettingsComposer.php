@@ -56,6 +56,7 @@ final readonly class GlobalSettingsComposer
             'announcementActive' => (bool) $settings->get('announcement_active'),
             'announcements' => $settings->get('announcements'),
             'galleryMetrics' => $settings->get('gallery_metrics'),
+            'googleSiteVerification' => $settings->get('google_site_verification'),
         ]);
     }
 }

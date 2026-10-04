@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\SafeStoredUploadPath;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -35,7 +36,7 @@ final class ServiceRequest extends FormRequest
             'features' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:500'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'image_path' => ['nullable', 'string'],
+            'image_path' => ['nullable', 'string', new SafeStoredUploadPath(['services', 'uploads', 'uploads/blog', 'uploads/images', 'uploads/videos', 'uploads/videos/thumbnails'], 'placeholder.gif')],
             'remove_image' => ['nullable', 'boolean'],
             'is_active' => ['boolean'],
             'sort_order' => ['nullable', 'integer'],

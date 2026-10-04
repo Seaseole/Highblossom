@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\ApplicationVersionController;
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\CacheController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\ContactMessageController;
@@ -172,11 +173,22 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::delete('quotes/{quote}', [QuoteController::class, 'destroy'])->middleware('can:update bookings')->name('quotes.destroy');
 
     // SEO Management
+    Route::get('seo/settings', [SeoController::class, 'settings'])->middleware('can:manage seo')->name('seo.settings');
+    Route::put('seo/settings', [SeoController::class, 'updateSettings'])->middleware('can:manage seo')->name('seo.settings.update');
     Route::get('seo/static-routes', [SeoController::class, 'index'])->middleware('can:manage seo')->name('seo.static-routes');
     Route::get('seo/create', [SeoController::class, 'create'])->middleware('can:manage seo')->name('seo.create');
     Route::post('seo', [SeoController::class, 'store'])->middleware('can:manage seo')->name('seo.store');
     Route::get('seo/{id}/edit', [SeoController::class, 'edit'])->middleware('can:manage seo')->name('seo.edit');
     Route::put('seo/{id}', [SeoController::class, 'update'])->middleware('can:manage seo')->name('seo.update');
+
+    // Cache Management
+    Route::prefix('cache')->name('cache.')->middleware('can:manage cache')->group(function () {
+        Route::get('/', [CacheController::class, 'index'])->name('index');
+        Route::post('clear-all', [CacheController::class, 'clearAll'])->middleware('throttle:5,1')->name('clear-all');
+        Route::post('optimize-all', [CacheController::class, 'optimizeAll'])->middleware('throttle:5,1')->name('optimize-all');
+        Route::post('{group}/clear', [CacheController::class, 'clear'])->where('group', 'settings|seo|versions|app|framework')->middleware('throttle:10,1')->name('clear');
+        Route::post('{group}/optimize', [CacheController::class, 'optimize'])->where('group', 'settings|seo|versions|framework')->middleware('throttle:10,1')->name('optimize');
+    });
 
     // Access Control
     Route::get('users', [UserController::class, 'index'])->middleware('can:manage users')->name('users.index');
@@ -230,7 +242,7 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     // Theme
     Route::post('theme', [ThemeController::class, 'store'])->name('theme.store');
 
-    Route::get('decompose', [DecomposerController::class, 'index'])->name('decompose');
+    Route::get('decompose', [DecomposerController::class, 'index'])->middleware('can:manage environment')->name('decompose');
 });
 
 Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:access admin panel'])->group(function () {
