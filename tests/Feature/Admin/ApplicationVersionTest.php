@@ -70,7 +70,7 @@ class ApplicationVersionTest extends TestCase
         $this->get(route('admin.versions.index'))
             ->assertOk()
             ->assertSee('Application Versions')
-            ->assertSee('1.10.0');
+            ->assertSee('1.11.0');
     }
 
     public function test_the_timeline_shows_only_the_newest_releases_and_offers_more(): void
@@ -164,11 +164,11 @@ class ApplicationVersionTest extends TestCase
         ]);
 
         $this->assertSame(
-            ['1.2.0', '1.2.1', '1.3.0', '1.3.1', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0'],
+            ['1.2.0', '1.2.1', '1.3.0', '1.3.1', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0', '1.11.0'],
             ApplicationVersion::query()->orderBy('id')->pluck('version')->all()
         );
 
-        $this->assertSame('1.10.0', app(ApplicationVersionService::class)->current()?->version);
+        $this->assertSame('1.11.0', app(ApplicationVersionService::class)->current()?->version);
     }
 
     public function test_it_rejects_invalid_semantic_versions(): void
@@ -232,18 +232,18 @@ class ApplicationVersionTest extends TestCase
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame('1.10.0', $service->current()?->version);
+        $this->assertSame('1.11.0', $service->current()?->version);
         $this->assertTrue(Cache::has(ApplicationVersionService::CACHE_KEY));
 
         $service->record([
-            'version' => '1.11.0',
+            'version' => '1.12.0',
             'summary' => 'Feature release',
             'notes' => [],
             'released_at' => now()->toDateString(),
         ], User::factory()->create());
 
         $this->assertFalse(Cache::has(ApplicationVersionService::CACHE_KEY));
-        $this->assertSame('1.11.0', $service->current()?->version);
+        $this->assertSame('1.12.0', $service->current()?->version);
     }
 
     public function test_next_bump_suggestions_are_computed_from_the_current_version(): void
@@ -255,7 +255,7 @@ class ApplicationVersionTest extends TestCase
 
         $service = app(ApplicationVersionService::class);
 
-        $this->assertSame(['patch' => '1.10.1', 'minor' => '1.11.0', 'major' => '2.0.0'], $service->nextOptions());
+        $this->assertSame(['patch' => '1.11.1', 'minor' => '1.12.0', 'major' => '2.0.0'], $service->nextOptions());
     }
 
     public function test_bump_suggestions_fall_back_to_the_baseline_when_nothing_is_recorded(): void

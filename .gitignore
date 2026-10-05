@@ -49,3 +49,6 @@ tests/Feature/Admin/ApplicationVersionTest.php
 tests/Feature/Settings/EnvironmentEditorSecurityTest.php
 tests/Unit/EnvEditorTest.php
 .gitignore
+tests/Feature/Admin/SeoStaticRouteTest.php
+tests/Feature/Admin/ApplicationVersionTest.php
+tests/Feature/Admin/ApplicationVersionTest.php

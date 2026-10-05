@@ -29,13 +29,7 @@ final class SeoStaticRouteRequest extends FormRequest
     {
         $routeId = $this->route('id');
 
-        return [
-            'route_name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('seo_static_routes', 'route_name')->ignore($routeId),
-            ],
+        $rules = [
             'meta_title' => ['nullable', 'string', 'max:70'],
             'meta_description' => ['nullable', 'string', 'max:300'],
             'meta_keywords' => ['nullable', 'string', 'max:255'],
@@ -51,6 +45,20 @@ final class SeoStaticRouteRequest extends FormRequest
             'priority' => ['numeric', 'between:0,1'],
             'changefreq' => ['in:always,hourly,daily,weekly,monthly,yearly,never'],
         ];
+
+        // route_name is only supplied when creating a static route; it is
+        // immutable and absent from the edit form, so it must not be
+        // required (or updatable) on PUT/PATCH requests.
+        if ($this->isMethod('post')) {
+            $rules['route_name'] = [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('seo_static_routes', 'route_name')->ignore($routeId),
+            ];
+        }
+
+        return $rules;
     }
 
     /**

@@ -159,7 +159,7 @@ final class SeoService
 
         $this->clearCache();
 
-        return $updated;
+        return $updated > 0;
     }
 
     public function getRouteLabel(string $routeName): string
@@ -184,11 +184,16 @@ final class SeoService
         ];
 
         $result = [
-            'route_name' => $data['route_name'] ?? null,
             'no_index' => $data['no_index'] ?? false,
             'priority' => $data['priority'] ?? 0.5,
             'changefreq' => $data['changefreq'] ?? 'monthly',
         ];
+
+        // route_name is only supplied on create; it is immutable and absent
+        // from update payloads, so omit it rather than nulling the column.
+        if (array_key_exists('route_name', $data)) {
+            $result['route_name'] = $data['route_name'];
+        }
 
         foreach ($fields as $field) {
             $result[$field] = ! empty($data[$field]) ? $data[$field] : null;

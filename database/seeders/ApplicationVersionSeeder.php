@@ -160,6 +160,18 @@ class ApplicationVersionSeeder extends Seeder
                 ['type' => 'changed', 'text' => 'robots.txt now also disallows the booking and API paths alongside the existing admin and auth routes.'],
             ],
         ],
+        [
+            'version' => '1.11.0',
+            'summary' => 'Sitemap reliability and static SEO editing fixes',
+            'released_at' => '2026-10-05',
+            'notes' => [
+                ['type' => 'fixed', 'text' => 'Google Search Console reported the sitemap was missing a required tag. The nine static SEO routes were never part of the default database seed, so a fresh deployment with no published posts or active gallery images produced an empty sitemap with no URL entries. The static-route seeder now runs on every seed, so those pages are always listed.'],
+                ['type' => 'fixed', 'text' => 'The sitemap can no longer be emitted empty: if no indexable content is found it falls back to the home page, guaranteeing at least one valid URL with a location for crawlers to read.'],
+                ['type' => 'fixed', 'text' => 'Re-seeding the static SEO routes now clears the cached sitemap and robots.txt, so a deployment no longer serves a stale or empty sitemap for up to 24 hours.'],
+                ['type' => 'fixed', 'text' => 'Editing a static SEO route failed with "The route name field is required." The route name is fixed when the entry is created and is deliberately absent from the edit form, but validation demanded it on every save. It is now required only when creating an entry and can no longer be changed afterwards.'],
+                ['type' => 'fixed', 'text' => 'Saving a static SEO route also raised a server error once validation passed, so editing an entry had never actually worked. Updates now persist correctly and leave the route name untouched.'],
+            ],
+        ],
     ];
 
     /**

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             GlassTypeSeeder::class,
             // ServiceTypeSeeder::class,
             // GallerySeeder::class,
+            SeoStaticRouteSeeder::class,
             ApplicationVersionSeeder::class,
         ]);
     }

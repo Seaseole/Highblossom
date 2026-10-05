@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\SeoStaticRoute;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class SeoStaticRouteSeeder extends Seeder
 {
@@ -90,5 +91,8 @@ class SeoStaticRouteSeeder extends Seeder
                 $route
             );
         }
+
+        Cache::forget('seo.sitemap');
+        Cache::forget('seo.robots');
     }
 }

@@ -29,6 +29,10 @@ final readonly class BuildSitemap
     {
         $urls = $this->collectUrls();
 
+        if ($urls->isEmpty()) {
+            $urls = collect([$this->fallbackUrl()]);
+        }
+
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'.PHP_EOL;
 
@@ -39,6 +43,25 @@ final readonly class BuildSitemap
         $xml .= '</urlset>';
 
         return $xml;
+    }
+
+    /**
+     * Build a fallback home-page URL entry.
+     *
+     * Ensures the sitemap always contains at least one valid <url> with a
+     * <loc> child, so an empty content set never emits a tag-less <urlset>
+     * that search engines reject as missing a required tag.
+     *
+     * @return array{loc: string, lastmod: string|null, changefreq: string, priority: string}
+     */
+    private function fallbackUrl(): array
+    {
+        return [
+            'loc' => $this->resolveRouteUrl('home'),
+            'lastmod' => null,
+            'changefreq' => 'weekly',
+            'priority' => '1.0',
+        ];
     }
 
     /**
