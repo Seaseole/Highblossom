@@ -19,8 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: Testing
     strategy:
+      # A failing PHP version must not cancel the others; it hid the real result for every run.
+      fail-fast: false
       matrix:
-        php-version: ['8.3', '8.4', '8.5']
+        # Locked Symfony 8.1 needs PHP >=8.4.1 and phpoffice/phpspreadsheet caps at <8.5.0,
+        # so composer install cannot resolve on 8.3 or 8.5.
+        php-version: ['8.4']
 
     steps:
       - name: Checkout code
