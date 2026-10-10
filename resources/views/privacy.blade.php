@@ -6,7 +6,7 @@
         <div class="prose prose-invert max-w-none">
             <p>
                 Highblossom (Pty) Ltd ("we," "us," or "our") operates the web platform accessible via
-                highblossom-pty-ltd-main-rrpi1d.free.laravel.cloud (the "Site"). We are committed to protecting and
+                https://highblossom.net (the "Site"). We are committed to protecting and
                 respecting your privacy in accordance with the laws of Botswana, specifically the Data Protection Act
                 (DPA), 2018.
             </p>
@@ -19,7 +19,7 @@
 
             <h2 class="mt-8 mb-4 text-2xl font-semibold">1. Data Controller</h2>
             <p>For the purposes of the Data Protection Act (2018), the data controller is:</p>
-            <p>Highblossom (Pty) Ltd<br />Gaborone, Botswana<br />Email: highblossom@gmail.com</p>
+            <p>Highblossom (Pty) Ltd<br />Gaborone, Botswana<br />Email: sales@highblossom.net</p>
 
             <h2 class="mt-8 mb-4 text-2xl font-semibold">2. Information We Collect</h2>
             <p>We may collect and process the following categories of personal data:</p>
@@ -122,7 +122,7 @@
                     the right to withdraw that consent at any time.
                 </li>
             </ul>
-            <p>To exercise any of these rights, please contact us directly at highblossom@gmail.com.</p>
+            <p>To exercise any of these rights, please contact us directly at sales@highblossom.net.</p>
 
             <h2 class="mt-8 mb-4 text-2xl font-semibold">9. Changes to This Privacy Policy</h2>
             <p>
@@ -136,7 +136,7 @@
                 If you have any questions about this Privacy Policy or our data handling practices, please contact us
                 at:
             </p>
-            <p>Email: highblossom@gmail.com</p>
+            <p>Email: sales@highblossom.net</p>
             <p>
                 If you feel your data rights have been infringed and we have not resolved your concern adequately, you
                 have the right to lodge a complaint with the Information Regulator under the Ministry of Communications,

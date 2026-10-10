@@ -259,7 +259,7 @@ final class CompanySettingService
         return [
             'company_name' => CompanySetting::get('company_name', 'Highblossom PTY LTD'),
             'logo_text' => CompanySetting::get('logo_text', 'Highblossom'),
-            'primary_email' => CompanySetting::get('primary_email', 'jseaseole@highblossom.net'),
+            'primary_email' => CompanySetting::get('primary_email', 'sales@highblossom.net'),
             'address' => CompanySetting::get('address', 'Plot 123, Main Road, Broadhurst, Gaborone, Botswana'),
             'primary_phone' => CompanySetting::get('primary_phone', '+267 123 4567'),
             'secondary_phone' => CompanySetting::get('secondary_phone', ''),

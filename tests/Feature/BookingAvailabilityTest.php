@@ -70,14 +70,28 @@ class BookingAvailabilityTest extends TestCase
         $this->assertSame([], array_filter($response->json('slots'), fn (array $slot): bool => $slot['available']));
     }
 
-    public function test_it_labels_slots_using_the_displayed_time_format(): void
+    public function test_it_labels_slots_using_the_twelve_hour_display_format(): void
     {
+        CompanySetting::set('time_format_display', '12');
+
         $this->travelTo(Carbon::parse('2026-10-05 09:00:00'));
 
         $this->getJson('/api/bookings/availability?date=2026-10-05')
             ->assertOk()
             ->assertJsonPath('slots.0.time', '08:00')
             ->assertJsonPath('slots.0.label', '08:00 AM');
+    }
+
+    public function test_it_labels_slots_using_the_twenty_four_hour_display_format(): void
+    {
+        CompanySetting::set('time_format_display', '24');
+
+        $this->travelTo(Carbon::parse('2026-10-05 09:00:00'));
+
+        $this->getJson('/api/bookings/availability?date=2026-10-05')
+            ->assertOk()
+            ->assertJsonPath('slots.0.time', '08:00')
+            ->assertJsonPath('slots.0.label', '08:00');
     }
 
     public function test_it_rejects_a_date_in_the_past(): void

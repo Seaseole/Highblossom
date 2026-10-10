@@ -6,7 +6,7 @@
         <div class="prose prose-invert max-w-none">
             <p>
                 Welcome to Highblossom (Pty) Ltd ("we," "us," or "our"). These Terms and Conditions ("Terms") govern
-                your use of our website located at highblossom-pty-ltd-main-rrpi1d.free.laravel.cloud (the "Site") and
+                your use of our website located at https://highblossom.net (the "Site") and
                 the booking or purchase of our automotive glass services.
             </p>
 
@@ -18,8 +18,8 @@
 
             <h2 class="mt-8 mb-4 text-2xl font-semibold">1. Company Information</h2>
             <p>Highblossom (Pty) Ltd is a registered proprietary limited company operating in Gaborone, Botswana.</p>
-            <p>Website: highblossom-pty-ltd-main-rrpi1d.free.laravel.cloud</p>
-            <p>Contact Email: highblossom@gmail.com</p>
+            <p>Website: https://highblossom.net</p>
+            <p>Contact Email: sales@highblossom.net</p>
 
             <h2 class="mt-8 mb-4 text-2xl font-semibold">
                 2. Compliance with Consumer Rights (Botswana Consumer Protection Act, 2018)
@@ -71,7 +71,7 @@
             <ul>
                 <li>
                     Injecting malicious code, viruses, or attempting unauthorized access to the application database,
-                    server, or cloud hosting environment (laravel.cloud).
+                    server, or cloud hosting environment.
                 </li>
                 <li>
                     Using automated scripts, scrapers, or bots to harvest data from our Site without explicit written
@@ -110,7 +110,7 @@
             <h2 class="mt-8 mb-4 text-2xl font-semibold">9. Resolution of Disputes</h2>
             <p>
                 If you are dissatisfied with any service rendered or have a dispute regarding these Terms, we encourage
-                you to contact us directly via email at highblossom@gmail.com to seek an amicable resolution.
+                you to contact us directly via email at sales@highblossom.net to seek an amicable resolution.
             </p>
             <p>
                 If a consumer complaint cannot be resolved directly with us within a reasonable timeframe, you maintain
