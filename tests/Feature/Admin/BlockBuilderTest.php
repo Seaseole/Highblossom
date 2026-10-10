@@ -8,6 +8,7 @@ use App\Livewire\BlockBuilder;
 use App\Models\GalleryImage;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Highblossom\ContentBlocks\Blocks\ImageBlock;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
@@ -299,7 +300,147 @@ class BlockBuilderTest extends TestCase
 
         $this->getJson(route('admin.media-library.index'))
             ->assertOk()
-            ->assertJsonStructure(['images' => [['id', 'name', 'url', 'alt']]])
+            ->assertJsonStructure(['images' => [['id', 'name', 'url', 'alt']], 'meta' => ['current_page', 'last_page', 'total', 'per_page', 'has_more']])
             ->assertJsonPath('images.0.name', 'Picker image');
+    }
+
+    /**
+     * The picker browses the library page by page; without the metadata it could
+     * only ever reach the newest page of results.
+     */
+    public function test_the_media_library_pages_and_filters_for_the_picker(): void
+    {
+        $this->actingAsAdmin();
+
+        foreach (['Alpha one', 'Alpha two', 'Bravo three'] as $index => $title) {
+            GalleryImage::create([
+                'title' => $title,
+                'image_path' => 'gallery/'.$index.'.jpg',
+                'is_active' => true,
+                'sort_order' => $index,
+            ]);
+        }
+
+        $firstPage = $this->getJson(route('admin.media-library.index', ['per_page' => 2, 'page' => 1]))
+            ->assertOk()
+            ->assertJsonCount(2, 'images')
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.last_page', 2)
+            ->assertJsonPath('meta.total', 3)
+            ->assertJsonPath('meta.has_more', true)
+            ->json('images');
+
+        $secondPage = $this->getJson(route('admin.media-library.index', ['per_page' => 2, 'page' => 2]))
+            ->assertOk()
+            ->assertJsonCount(1, 'images')
+            ->assertJsonPath('meta.has_more', false)
+            ->json('images');
+
+        // Paging must walk the library without repeating or skipping images.
+        $this->assertCount(3, array_unique([
+            ...array_column($firstPage, 'id'),
+            ...array_column($secondPage, 'id'),
+        ]));
+
+        $this->getJson(route('admin.media-library.index', ['search' => 'Bravo']))
+            ->assertOk()
+            ->assertJsonCount(1, 'images')
+            ->assertJsonPath('meta.total', 1);
+    }
+
+    public function test_an_image_block_accepts_an_ordered_set_of_images(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->post(route('admin.posts.store'), [
+            'title' => 'Image set post',
+            'status' => 'draft',
+            'content' => json_encode([
+                ['type' => 'image', 'attributes' => [
+                    'src' => '',
+                    'images' => [
+                        ['src' => 'http://localhost/storage/gallery/a.jpg', 'alt' => 'First', 'caption' => null],
+                        ['src' => 'http://localhost/storage/gallery/b.jpg', 'alt' => '', 'caption' => 'Second'],
+                    ],
+                ]],
+            ]),
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('posts', ['title' => 'Image set post']);
+    }
+
+    public function test_a_legacy_single_image_block_still_saves(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->post(route('admin.posts.store'), [
+            'title' => 'Legacy image post',
+            'status' => 'draft',
+            'content' => json_encode([
+                ['type' => 'image', 'attributes' => ['src' => 'uploads/images/only.jpg', 'alt' => 'Only', 'caption' => '']],
+            ]),
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('posts', ['title' => 'Legacy image post']);
+    }
+
+    public function test_an_image_set_entry_without_a_source_is_rejected(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->post(route('admin.posts.store'), [
+            'title' => 'Bad image set',
+            'status' => 'draft',
+            'content' => json_encode([
+                ['type' => 'image', 'attributes' => [
+                    'src' => '',
+                    'images' => [['src' => '', 'alt' => 'No source', 'caption' => null]],
+                ]],
+            ]),
+        ])->assertSessionHasErrors('content.0.attributes');
+    }
+
+    public function test_an_image_set_beyond_the_registered_cap_is_rejected(): void
+    {
+        $this->actingAsAdmin();
+
+        $images = array_map(
+            fn (int $index) => ['src' => 'uploads/images/'.$index.'.jpg', 'alt' => "Image {$index}", 'caption' => null],
+            range(1, ImageBlock::MAX_IMAGES + 1)
+        );
+
+        $this->post(route('admin.posts.store'), [
+            'title' => 'Oversized image set',
+            'status' => 'draft',
+            'content' => json_encode([['type' => 'image', 'attributes' => ['images' => $images]]]),
+        ])->assertSessionHasErrors('content.0.attributes');
+    }
+
+    public function test_the_image_block_defaults_start_with_an_empty_set(): void
+    {
+        $meta = Livewire::test(BlockBuilder::class)->instance()->blockMeta;
+
+        $this->assertSame([], $meta['image']['defaults']['images']);
+        $this->assertTrue($meta['image']['editable']);
+    }
+
+    public function test_the_preview_renders_an_image_set_as_a_viewer_ready_grid(): void
+    {
+        $html = Livewire::test(BlockBuilder::class)
+            ->instance()
+            ->renderPreview(json_encode([
+                ['type' => 'image', 'attributes' => [
+                    'src' => '',
+                    'images' => [
+                        ['src' => 'http://localhost/storage/gallery/a.jpg', 'alt' => 'First', 'caption' => 'Caption one'],
+                        ['src' => 'http://localhost/storage/gallery/b.jpg', 'alt' => 'Second', 'caption' => null],
+                    ],
+                ]],
+            ]));
+
+        $this->assertStringContainsString('data-lightbox-group', $html);
+        $this->assertStringContainsString('data-lightbox-item', $html);
+        $this->assertStringContainsString('Caption one', $html);
+        $this->assertStringContainsString('gallery/b.jpg', $html);
     }
 }

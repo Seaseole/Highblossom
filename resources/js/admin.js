@@ -16,22 +16,63 @@ document.addEventListener('alpine:init', () => {
     // Types whose editors host nested block lists; they cannot be added inside a nested list.
     const NESTING_TYPES = ['columns', 'tabs', 'carousel'];
 
+    // Mirrors Highblossom\ContentBlocks\Blocks\ImageBlock::MAX_IMAGES.
+    const IMAGE_SET_MAX = 24;
+
     // Media library picker used by <x-media-picker /> in the admin layout.
     window.Alpine.data('mediaPicker', () => ({
         field: null,
+        multiple: false,
+        max: IMAGE_SET_MAX,
         isOpen: false,
         images: [],
         loading: false,
+        searchTerm: '',
+        page: 1,
+        lastPage: 1,
+        hasMore: false,
+        total: 0,
         selectedImage: null,
+        selected: [],
 
-        async loadImages() {
+        init() {
+            this.$watch('searchTerm', () => {
+                this.page = 1;
+                this.loadImages();
+            });
+        },
+
+        open(detail) {
+            this.field = detail.field || null;
+            this.multiple = Boolean(detail.multiple);
+            this.max = detail.max || IMAGE_SET_MAX;
+            this.isOpen = true;
+            this.searchTerm = '';
+            this.page = 1;
+            this.selectedImage = null;
+            this.selected = [];
+
+            this.loadImages();
+        },
+
+        async loadImages(append = false) {
             this.loading = true;
             try {
-                const response = await fetch('/admin/media-library', {
+                const params = new URLSearchParams({ page: String(this.page), per_page: '24' });
+
+                if (this.searchTerm.trim()) params.set('search', this.searchTerm.trim());
+
+                const response = await fetch('/admin/media-library?' + params.toString(), {
                     headers: { 'Accept': 'application/json' },
                 });
                 const data = await response.json();
-                this.images = data.images || [];
+                const incoming = (data.images || []).filter((image) => image.url);
+
+                this.images = append ? [...this.images, ...incoming] : incoming;
+                this.page = data.meta?.current_page || this.page;
+                this.lastPage = data.meta?.last_page || 1;
+                this.hasMore = Boolean(data.meta?.has_more);
+                this.total = data.meta?.total ?? this.images.length;
             } catch (error) {
                 console.error('Failed to load images:', error);
             } finally {
@@ -39,25 +80,47 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        async uploadImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        loadMore() {
+            if (!this.hasMore || this.loading) return;
 
-            const formData = new FormData();
-            formData.append('upload', file);
-            formData.append('title', file.name.replace(/\.[^.]+$/, ''));
-            formData.append('category', 'other');
+            this.page += 1;
+            this.loadImages(true);
+        },
+
+        async uploadImage(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
 
             this.loading = true;
             try {
-                await fetch('/admin/media-library/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json',
-                    },
-                });
+                for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('upload', file);
+                    formData.append('title', file.name.replace(/\.[^.]+$/, ''));
+                    formData.append('category', 'other');
+
+                    const response = await fetch('/admin/media-library/upload', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) continue;
+
+                    const created = await response.json();
+
+                    if (!created?.url) continue;
+
+                    if (this.multiple) {
+                        this.addSelected({ id: created.id, url: created.url, alt: file.name });
+                    } else {
+                        this.selectedImage = { id: created.id, url: created.url, name: file.name };
+                    }
+                }
+
                 await this.loadImages();
             } catch (error) {
                 console.error('Failed to upload image:', error);
@@ -67,19 +130,59 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        selectImage(image) {
-            this.selectedImage = image;
+        isSelected(image) {
+            return this.selected.some((item) => item.id === image.id);
+        },
+
+        addSelected(image) {
+            if (this.isSelected(image) || this.selected.length >= this.max) return;
+
+            this.selected.push({ id: image.id, url: image.url, alt: image.alt || image.name || '' });
+        },
+
+        toggle(image) {
+            if (!this.multiple) {
+                this.selectedImage = this.selectedImage?.id === image.id ? null : image;
+
+                return;
+            }
+
+            if (this.isSelected(image)) {
+                this.selected = this.selected.filter((item) => item.id !== image.id);
+
+                return;
+            }
+
+            this.addSelected(image);
+        },
+
+        orderOf(image) {
+            return this.selected.findIndex((item) => item.id === image.id) + 1;
+        },
+
+        clearSelection() {
+            this.selected = [];
+            this.selectedImage = null;
         },
 
         confirmSelection() {
-            if (this.selectedImage && this.field) {
-                this.$dispatch('image-selected', {
-                    field: this.field,
-                    url: this.selectedImage.url,
-                });
+            if (!this.field) {
                 this.isOpen = false;
-                this.selectedImage = null;
+
+                return;
             }
+
+            if (this.multiple) {
+                if (this.selected.length) {
+                    this.$dispatch('images-selected', { field: this.field, items: [...this.selected] });
+                }
+            } else if (this.selectedImage) {
+                this.$dispatch('image-selected', { field: this.field, url: this.selectedImage.url });
+            }
+
+            this.isOpen = false;
+            this.selectedImage = null;
+            this.selected = [];
         },
     }));
 
@@ -129,6 +232,16 @@ document.addEventListener('alpine:init', () => {
 
                 if (block) this.setAttributePath(block, detail.field.slice(sep + 1), detail.url);
             });
+
+            window.addEventListener('images-selected', (e) => {
+                const detail = e.detail[0] || e.detail;
+                if (!detail || !detail.field || detail.field.indexOf(':') === -1) return;
+
+                const sep = detail.field.indexOf(':');
+                const block = this.findBlockById(detail.field.slice(0, sep));
+
+                if (block) this.appendPickedImages(block, detail.field.slice(sep + 1), detail.items || []);
+            });
         },
 
         newId() {
@@ -157,6 +270,15 @@ document.addEventListener('alpine:init', () => {
 
             if (block.type === 'countdown' && typeof a.target_date === 'string') {
                 a.target_date = a.target_date.slice(0, 16).replace(' ', 'T');
+            }
+
+            if (block.type === 'image') {
+                a.images = Array.isArray(a.images) ? a.images : [];
+                a.images.forEach((img) => {
+                    img.src = img.src || '';
+                    img.alt = img.alt || '';
+                    if (img.caption === undefined) img.caption = null;
+                });
             }
 
             if (block.type === 'gallery') {
@@ -301,10 +423,51 @@ document.addEventListener('alpine:init', () => {
         },
 
         /**
-         * Ask the media library picker to fill a block attribute.
+         * Read a dotted/numeric attribute path, e.g. images.0.src, on a block.
          */
-        openPicker(block, path) {
-            window.dispatchEvent(new CustomEvent('open-media-picker', { detail: { field: block.id + ':' + path } }));
+        getAttributePath(block, path) {
+            const parts = String(path).split('.');
+            let cursor = block.attributes;
+
+            for (const part of parts) {
+                cursor = cursor?.[part];
+
+                if (cursor === undefined || cursor === null) return null;
+            }
+
+            return cursor;
+        },
+
+        /**
+         * Ask the media library picker to fill a block attribute. Pass
+         * { multiple: true } to let the author pick a whole image set at once.
+         */
+        openPicker(block, path, options = {}) {
+            window.dispatchEvent(new CustomEvent('open-media-picker', {
+                detail: {
+                    field: block.id + ':' + path,
+                    multiple: Boolean(options.multiple),
+                    max: options.max || IMAGE_SET_MAX,
+                },
+            }));
+        },
+
+        /**
+         * Append media-library picks to a block's image array, skipping sources
+         * already present and respecting the per-block image cap.
+         */
+        appendPickedImages(block, path, items) {
+            const list = this.getAttributePath(block, path);
+
+            if (!Array.isArray(list)) return;
+
+            items.forEach((item) => {
+                if (!item?.url || list.length >= IMAGE_SET_MAX) return;
+
+                if (list.some((entry) => entry?.src === item.url)) return;
+
+                list.push({ src: item.url, alt: item.alt || '', caption: null });
+            });
         },
 
         defaults(type) {
@@ -346,6 +509,26 @@ document.addEventListener('alpine:init', () => {
         },
 
         // Entry editors -----------------------------------------------------
+
+        addImageSetEntry(block) {
+            block.attributes.images = block.attributes.images || [];
+            block.attributes.images.push({ src: '', alt: '', caption: null });
+        },
+
+        removeImageSetEntry(block, index) {
+            block.attributes.images.splice(index, 1);
+        },
+
+        moveImageSetEntry(block, index, direction) {
+            const list = block.attributes.images;
+            const to = index + direction;
+
+            if (to < 0 || to >= list.length) return;
+
+            const [entry] = list.splice(index, 1);
+
+            list.splice(to, 0, entry);
+        },
 
         addGalleryImage(block) {
             block.attributes.images.push({ src: '', alt: '', caption: null });
@@ -528,6 +711,9 @@ document.addEventListener('alpine:init', () => {
             switch (block.type) {
                 case 'gallery':
                     checkEntries(a.images, 'image', ['src', 'alt']);
+                    break;
+                case 'image':
+                    checkEntries(a.images, 'image', ['src']);
                     break;
                 case 'accordion':
                     checkEntries(a.items, 'item', ['title', 'content']);

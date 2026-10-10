@@ -67,13 +67,18 @@ final readonly class BuildSitemap
     /**
      * Collect all indexable URLs from static routes and dynamic content.
      *
+     * The collectors yield arrays, so the merge must start from a base collection:
+     * an empty `seo_static_routes` table leaves an Eloquent collection behind, whose
+     * `merge()` reads model keys and throws on the array items the other collectors
+     * return.
+     *
      * @return Collection<int, array{loc: string, lastmod: string|null, changefreq: string, priority: string}>
      */
     private function collectUrls(): Collection
     {
-        return $this->collectStaticRoutes()
-            ->merge($this->collectPosts())
-            ->merge($this->collectGalleryImages());
+        return collect($this->collectStaticRoutes()->all())
+            ->merge($this->collectPosts()->all())
+            ->merge($this->collectGalleryImages()->all());
     }
 
     /**
@@ -117,7 +122,7 @@ final readonly class BuildSitemap
      */
     private function collectGalleryImages(): Collection
     {
-        return GalleryImage::query()->active()->get()
+        return GalleryImage::query()->inGallery()->active()->get()
             ->map(fn (GalleryImage $image): array => [
                 'loc' => route('gallery.show', ['galleryImage' => $image]),
                 'lastmod' => $image->updated_at?->format('Y-m-d'),

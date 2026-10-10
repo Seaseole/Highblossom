@@ -27,6 +27,7 @@ final class GalleryService
     {
         $path = $this->resolveImagePath($request, null);
         $data['image_path'] = $path;
+        $data['source'] = GalleryImage::SOURCE_GALLERY;
 
         $galleryImage = GalleryImage::create($data);
 
@@ -56,6 +57,8 @@ final class GalleryService
         } else {
             $data['image_path'] = $newPath;
         }
+
+        $data['source'] = GalleryImage::SOURCE_GALLERY;
 
         $item->update($data);
 

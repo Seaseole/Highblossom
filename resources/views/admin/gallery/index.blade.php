@@ -92,11 +92,24 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex items-center justify-end gap-3 px-6 py-4 text-right">
                                 <a
                                     href="{{ route('admin.gallery.edit', $item) }}"
                                     class="text-sm font-medium text-gray-900 transition-opacity hover:opacity-75 dark:text-white"
                                 >Edit</a>
+                                @can('manage gallery')
+                                    <form
+                                        action="{{ route('admin.gallery.destroy', $item) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete this gallery item?');"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="text-sm font-medium text-red-600 transition-opacity hover:opacity-75 dark:text-red-400">
+                                            Delete
+                                        </button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

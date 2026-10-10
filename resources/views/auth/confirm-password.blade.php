@@ -13,7 +13,7 @@
         rel="stylesheet"
     />
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         @keyframes fade-in-up {
@@ -122,6 +122,8 @@
                         <p class="text-[#71717A]">This is a secure area. Please confirm your password.</p>
                     </div>
 
+                    <x-ui.alert-banner />
+
                     <form method="POST" action="{{ route('password.confirm') }}" class="space-y-6">
                         @csrf
 
@@ -134,23 +136,32 @@
                                 id="password"
                                 type="password"
                                 name="password"
-                                class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-5 py-4 text-[#18181B] placeholder-[#A1A1AA] shadow-sm transition-all duration-300 focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none"
+                                class="w-full rounded-2xl border bg-white/50 px-5 py-4 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('password') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
                                 placeholder="••••••••"
                                 required
                                 autofocus
+                                @if (\App\Support\AuthNotification::fieldMessages('password') !== []) aria-describedby="password-error" aria-invalid="true" @endif
                             />
-                            @error('password')
-                                <p class="mt-2 px-1 text-sm font-medium text-[#DC2626]">{{ $message }}</p>
-                            @enderror
+                            <x-ui.field-errors field="password" />
                         </div>
 
                         <div class="animate-fade-in-up pt-2 delay-300">
                             <button
                                 type="submit"
-                                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98]"
+                                data-submit-pending-button
+                                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
                             >
-                                <span>Confirm Password</span>
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span data-idle-state>Confirm Password</span>
+                                <span data-pending-state class="hidden">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        {{ __('auth.confirm_password.confirming') }}
+                                    </span>
+                                </span>
+                                <svg data-idle-state class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                 </svg>
                             </button>

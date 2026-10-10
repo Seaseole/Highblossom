@@ -99,9 +99,13 @@ return [
     | that it registers with the application. If necessary, you may change
     | these middleware but typically this provided default is preferred.
     |
+    | `registration.enabled` gates /register from the database-backed
+    | `enable_registration` company setting; it short-circuits for every
+    | other Fortify route.
+    |
     */
 
-    'middleware' => ['web'],
+    'middleware' => ['web', 'registration.enabled'],
 
     /*
     |--------------------------------------------------------------------------
@@ -143,8 +147,8 @@ return [
     |
     */
 
-    'features' => array_filter([
-        config('features.registration_enabled') ? Features::registration() : null,
+    'features' => [
+        Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
@@ -153,6 +157,6 @@ return [
             'window' => 1,
         ]),
         Features::passkeys(['confirmPassword' => false]),
-    ]),
+    ],
 
 ];

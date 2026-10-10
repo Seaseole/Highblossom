@@ -353,7 +353,7 @@
                         </svg>
                         <span class="font-headline font-bold">Log in</span>
                     </a>
-                    @if (\Illuminate\Support\Facades\Route::has('register') && config('features.registration_enabled'))
+                    @if (\Illuminate\Support\Facades\Route::has('register') && filter_var($settings['enable_registration'] ?? '0', FILTER_VALIDATE_BOOLEAN))
                         <a
                             href="{{ route('register') }}"
                             onclick="closeMobileMenu()"

@@ -1,6 +1,9 @@
 // Alpine configuration moved to site-alpine.js and admin.js
 
 
+import './passkey-signin';
+import './submit-pending';
+
 import { Passkeys } from '@laravel/passkeys';
 window.Passkeys = Passkeys;
 
@@ -37,6 +40,29 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             button.closest('[data-modal]').classList.add('hidden');
         });
+    });
+
+    // Show/hide password toggles. The auth pages boot no Alpine, so this stays vanilla.
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-password]');
+        if (!btn) return;
+
+        const input = document.getElementById(btn.dataset.togglePassword);
+        if (!input) return;
+
+        const reveal = input.type === 'password';
+        input.type = reveal ? 'text' : 'password';
+
+        btn.setAttribute('aria-label', reveal ? btn.dataset.hideLabel : btn.dataset.showLabel);
+        btn.setAttribute('aria-expanded', reveal ? 'true' : 'false');
+        btn.querySelector('[data-icon-eye]')?.classList.toggle('hidden', reveal);
+        btn.querySelector('[data-icon-eye-off]')?.classList.toggle('hidden', !reveal);
+
+        input.focus({ preventScroll: true });
+
+        if (reveal) {
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
     });
 
     const scrollImageSections = document.querySelectorAll('.js-scroll-with-image');

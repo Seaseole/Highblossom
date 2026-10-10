@@ -13,7 +13,7 @@
         rel="stylesheet"
     />
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         @keyframes fade-in-up {
@@ -130,13 +130,11 @@
                         </p>
                     </div>
 
-                    @if (session('resent'))
-                        <div class="animate-fade-in-up mb-6 rounded-2xl border border-green-500/20 bg-green-500/10 p-4 delay-200">
-                            <p class="text-sm font-medium text-green-600">
-                                A fresh verification link has been sent to your email address.
-                            </p>
-                        </div>
-                    @endif
+                    <x-ui.alert-banner
+                        :notification="session('resent')
+                            ? ['type' => 'success', 'message' => __('auth.verify_email.resent')]
+                            : \App\Support\AuthNotification::fromSession()"
+                    />
 
                     <div class="space-y-4">
                         <form
@@ -147,10 +145,20 @@
                             @csrf
                             <button
                                 type="submit"
-                                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98]"
+                                data-submit-pending-button
+                                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
                             >
-                                <span>Resend Email</span>
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span data-idle-state>Resend Email</span>
+                                <span data-pending-state class="hidden">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        {{ __('auth.verify_email.resending') }}
+                                    </span>
+                                </span>
+                                <svg data-idle-state class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                 </svg>
                             </button>

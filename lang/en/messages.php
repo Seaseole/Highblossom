@@ -46,6 +46,26 @@ return [
     'gallery_updated' => 'Gallery item updated successfully.',
     'gallery_deleted' => 'Gallery item deleted successfully.',
 
+    // Gallery category messages
+    'gallery_category_created' => 'Gallery category created successfully.',
+    'gallery_category_updated' => 'Gallery category updated successfully.',
+    'gallery_category_deleted' => 'Gallery category deleted successfully.',
+
+    // Category messages
+    'category_created' => 'Category created successfully.',
+    'category_updated' => 'Category updated successfully.',
+    'category_deleted' => 'Category deleted successfully.',
+
+    // Glass sub-category messages
+    'glass_sub_category_created' => 'Glass sub-category created successfully.',
+    'glass_sub_category_updated' => 'Glass sub-category updated successfully.',
+    'glass_sub_category_deleted' => 'Glass sub-category deleted successfully.',
+
+    // Tag messages
+    'tag_created' => 'Tag created successfully.',
+    'tag_updated' => 'Tag updated successfully.',
+    'tag_deleted' => 'Tag deleted successfully.',
+
     // Role messages
     'role_created' => 'Role created successfully.',
     'role_updated' => 'Role updated successfully.',

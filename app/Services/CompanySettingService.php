@@ -56,6 +56,7 @@ final class CompanySettingService
         $this->saveJsonFields($data);
         $this->handleEnvUpdate($data);
         CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
+        CompanySetting::set('enable_registration', $request->boolean('enable_registration') ? '1' : '0', 'boolean');
     }
 
     /**
@@ -281,6 +282,7 @@ final class CompanySettingService
             'linkedin_url' => CompanySetting::get('linkedin_url', 'https://linkedin.com'),
             'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
             'require_email_verification' => filter_var(CompanySetting::get('require_email_verification', '0'), FILTER_VALIDATE_BOOLEAN),
+            'enable_registration' => filter_var(CompanySetting::get('enable_registration', '0'), FILTER_VALIDATE_BOOLEAN),
             'announcement_active' => CompanySetting::get('announcement_active', false),
             'announcements' => CompanySetting::get('announcements', []),
             'gallery_metrics' => CompanySetting::get('gallery_metrics', [

@@ -122,6 +122,8 @@
                     </div>
                 @endif
 
+                @livewire('passkey-recovery-banner')
+
                 {{ $slot }}
             </div>
         </main>

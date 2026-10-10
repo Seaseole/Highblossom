@@ -32,7 +32,6 @@ final class EnvEditor
         'APP_LOCALE',
         'APP_FAKER_LOCALE',
         'APP_FALLBACK_LOCALE',
-        'FEATURES_REGISTRATION_ENABLED',
     ];
 
     /** @var string Path to the .env file */

@@ -19,6 +19,9 @@ final class MediaLibraryService
     /**
      * Create a new media library entry from request data.
      *
+     * Library rows are assets for content blocks, not gallery publications, so they
+     * stay inactive: the public gallery and sitemap only ever read gallery rows.
+     *
      * @throws \RuntimeException When no image is provided or upload fails
      */
     public function create(array $data, Request $request): GalleryImage
@@ -32,8 +35,9 @@ final class MediaLibraryService
         return GalleryImage::create([
             'title' => $data['title'],
             'image_path' => $imagePath,
+            'source' => GalleryImage::SOURCE_LIBRARY,
             'gallery_category_id' => GalleryCategory::query()->where('slug', $data['category'])->value('id'),
-            'is_active' => true,
+            'is_active' => false,
             'sort_order' => GalleryImage::max('sort_order') + 1,
         ]);
     }

@@ -177,6 +177,27 @@
                                     <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Enforce</span>
                                 </label>
                             </div>
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">Enable registration</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Allow new users to create an account from the site. When off, the register page and
+                                        sign-up links are hidden and direct visits to /register return Not Found.
+                                    </p>
+                                </div>
+                                <label class="group relative inline-flex shrink-0 cursor-pointer items-center">
+                                    <input type="hidden" name="enable_registration" value="0" />
+                                    <input
+                                        type="checkbox"
+                                        name="enable_registration"
+                                        value="1"
+                                        {{ $settings['enable_registration'] ? 'checked' : '' }}
+                                        class="peer sr-only"
+                                    />
+                                    <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
+                                    <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Allow</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -700,31 +721,8 @@
                         </p>
                     </div>
 
-                    @php
-                        $registrationEnabled = ($envConfig['FEATURES_REGISTRATION_ENABLED'] ?? 'true') === 'true';
-                    @endphp
-
-                    <div class="mb-6 flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                        <div class="space-y-1">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Enable Registration</h4>
-                            <p class="text-xs text-gray-500">Allow new users to register on the site.</p>
-                        </div>
-                        <label class="relative inline-flex cursor-pointer items-center">
-                            <input type="hidden" name="env[FEATURES_REGISTRATION_ENABLED]" value="false" />
-                            <input
-                                type="checkbox"
-                                name="env[FEATURES_REGISTRATION_ENABLED]"
-                                value="true"
-                                {{ $registrationEnabled ? 'checked' : '' }}
-                                class="peer sr-only"
-                            />
-                            <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                        </label>
-                    </div>
-
                     <div class="space-y-4">
                         @foreach ($envConfig as $key => $value)
-                            @if ($key === 'FEATURES_REGISTRATION_ENABLED') @continue @endif
                             <div class="space-y-2" x-data="{ editing: false }">
                                 <label class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">{{ $key }}</label>
                                 <input

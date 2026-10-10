@@ -7,10 +7,15 @@ namespace Highblossom\ContentBlocks\Blocks;
 use Highblossom\ContentBlocks\Services\AbstractBlock;
 
 /**
- * Image block with src, alt, caption and dimensions support.
+ * Image block: one image, or an ordered set of images rendered as a gallery.
  */
 class ImageBlock extends AbstractBlock
 {
+    /**
+     * Upper bound on the image set, keeping a post's block payload bounded.
+     */
+    public const MAX_IMAGES = 24;
+
     /**
      * Get the block type identifier.
      */
@@ -31,6 +36,10 @@ class ImageBlock extends AbstractBlock
             'width' => 'nullable|integer',
             'height' => 'nullable|integer',
             'class' => 'nullable|string',
+            'images' => 'nullable|array|max:'.self::MAX_IMAGES,
+            'images.*.src' => 'required|string',
+            'images.*.alt' => 'nullable|string',
+            'images.*.caption' => 'nullable|string',
         ];
     }
 
@@ -46,6 +55,7 @@ class ImageBlock extends AbstractBlock
             'width' => null,
             'height' => null,
             'class' => '',
+            'images' => [],
         ];
     }
 
@@ -61,6 +71,7 @@ class ImageBlock extends AbstractBlock
             'width' => 'integer',
             'height' => 'integer',
             'class' => 'string',
+            'images' => 'array',
         ];
     }
 }

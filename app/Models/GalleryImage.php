@@ -14,14 +14,29 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * Gallery images with categorisation and featured flag.
  * Maps to the `gallery_images` database table.
+ *
+ * The table backs two surfaces, told apart by `source`: the curated public
+ * gallery (see self::SOURCE_GALLERY) and the media library content blocks pick
+ * assets from (see self::SOURCE_LIBRARY). Only gallery rows may render publicly.
  */
 #[ObservedBy(SitemapObserver::class)]
 final class GalleryImage extends Model
 {
+    /**
+     * Row curated on the public gallery by the admin Gallery form.
+     */
+    public const SOURCE_GALLERY = 'gallery';
+
+    /**
+     * Row stored for content blocks by the media library.
+     */
+    public const SOURCE_LIBRARY = 'library';
+
     protected $fillable = [
         'title',
         'description',
         'image_path',
+        'source',
         'gallery_category_id',
         'category',
         'is_featured',
@@ -45,6 +60,18 @@ final class GalleryImage extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope query to rows belonging to the curated public gallery.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeInGallery($query)
+    {
+        return $query->where('source', self::SOURCE_GALLERY);
     }
 
     /**

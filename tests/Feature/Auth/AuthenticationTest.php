@@ -78,4 +78,14 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_the_login_page_offers_a_password_reveal_toggle(): void
+    {
+        $html = $this->get(route('login'))->getContent();
+
+        $this->assertStringContainsString('data-toggle-password="password"', $html);
+        $this->assertStringContainsString('aria-controls="password"', $html);
+        $this->assertStringContainsString('aria-label="Show password"', $html);
+        $this->assertStringContainsString('type="password"', $html);
+    }
 }

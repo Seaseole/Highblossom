@@ -103,6 +103,8 @@ class SiteController extends Controller
      */
     public function galleryShow(GalleryImage $galleryImage)
     {
+        abort_unless($galleryImage->source === GalleryImage::SOURCE_GALLERY, 404);
+
         return view('site.gallery-show', $this->siteService->getGalleryShowData($galleryImage));
     }
 

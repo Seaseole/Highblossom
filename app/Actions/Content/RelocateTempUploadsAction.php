@@ -62,11 +62,27 @@ final class RelocateTempUploadsAction
     }
 
     /**
-     * Process image block attributes.
+     * Process image block attributes, including an ordered image set.
      */
     private function processImageBlock(array $attributes, $tempDisk, $publicDisk): array
     {
         $attributes['src'] = $this->relocateFile($attributes['src'] ?? '', $tempDisk, $publicDisk, 'uploads/images');
+
+        $images = $attributes['images'] ?? [];
+
+        if (is_array($images)) {
+            foreach ($images as &$image) {
+                if (! is_array($image)) {
+                    continue;
+                }
+
+                $image['src'] = $this->relocateFile($image['src'] ?? '', $tempDisk, $publicDisk, 'uploads/images');
+            }
+
+            unset($image);
+
+            $attributes['images'] = $images;
+        }
 
         return $attributes;
     }

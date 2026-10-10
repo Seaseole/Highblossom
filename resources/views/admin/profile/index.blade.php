@@ -402,7 +402,7 @@
                                 <div></div>
                                 <div class="space-y-2">
                                     <div class="flex items-center justify-between">
-                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                                        <label for="password" class="text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
                                         <button
                                             type="button"
                                             @click="generatePassword()"
@@ -414,49 +414,57 @@
                                     <div class="relative">
                                         <input
                                             :type="showPassword ? 'text' : 'password'"
+                                            id="password"
                                             name="password"
                                             x-ref="passwordInput"
-                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                                             data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                                         />
                                         <button
                                             type="button"
                                             @click="showPassword = ! showPassword"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                            aria-controls="password"
+                                            :aria-expanded="showPassword ? 'true' : 'false'"
+                                            :aria-label="showPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-5 text-[#A1A1AA] transition-colors hover:text-[#71717A] focus:text-[#71717A] focus:outline-none"
                                         >
-                                            <svg x-show="
-                                                    ! showPassword
-                                                " class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg x-show="! showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" /></svg>
+                                            <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
+                                            </svg>
                                         </button>
                                     </div>
                                     <p class="text-xs text-gray-500" x-text="`Min ${minLen} characters`"></p>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                                    <label for="password_confirmation" class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                                     <div class="relative">
                                         <input
                                             :type="showConfirmPassword ? 'text' : 'password'"
+                                            id="password_confirmation"
                                             name="password_confirmation"
                                             x-ref="passwordConfirmInput"
-                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                                             data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                                         />
                                         <button
                                             type="button"
                                             @click="showConfirmPassword = ! showConfirmPassword"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                            aria-controls="password_confirmation"
+                                            :aria-expanded="showConfirmPassword ? 'true' : 'false'"
+                                            :aria-label="showConfirmPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-5 text-[#A1A1AA] transition-colors hover:text-[#71717A] focus:text-[#71717A] focus:outline-none"
                                         >
-                                            <svg x-show="
-                                                    ! showConfirmPassword
-                                                " class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg x-show="! showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" /></svg>
+                                            <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>

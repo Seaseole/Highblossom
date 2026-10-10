@@ -172,6 +172,19 @@ class ApplicationVersionSeeder extends Seeder
                 ['type' => 'fixed', 'text' => 'Saving a static SEO route also raised a server error once validation passed, so editing an entry had never actually worked. Updates now persist correctly and leave the route name untouched.'],
             ],
         ],
+        [
+            'version' => '1.12.0',
+            'summary' => 'Separate the public gallery from the media library, restore the admin flash messages, and move registration to the database',
+            'released_at' => '2026-10-10',
+            'notes' => [
+                ['type' => 'fixed', 'text' => 'Images added to a blog post or page through a content block\'s gallery picker also appeared on the public /gallery page and in sitemap.xml. The media library and the curated gallery share one table and the public gallery filtered only on is_active, so every library asset was effectively published. A new source column records whether a row is a curated gallery image or a library asset; the public gallery, its detail pages, the home-page featured strip, related images and the sitemap now read curated rows only.'],
+                ['type' => 'changed', 'text' => 'Uploading from the media library no longer marks the image active, since a library asset is not a gallery publication. Rows the admin Gallery form never saved were migrated to the library source and deactivated.'],
+                ['type' => 'fixed', 'text' => 'Creating, updating or deleting a Gallery Category, Blog Category, Glass Sub-Category or Blog Tag flashed a raw translation key such as messages.gallery_category_created instead of a message. The twelve missing strings now exist in lang/en/messages.php.'],
+                ['type' => 'fixed', 'text' => 'The admin Gallery and Gallery Categories lists had no way to delete an entry: the destroy route and service existed but no control ever reached them. Both lists now show a permission-gated Delete action beside Edit, each behind a confirmation prompt.'],
+                ['type' => 'added', 'text' => 'The "Enable Registration" switch moved from the environment file to Company Settings, General tab, "Account Security", beside the verified-email toggle. A database value cannot be read while config files load, so /register and register.store are no longer stripped at boot; an EnsureRegistrationIsEnabled middleware returns 404 while the setting is off and short-circuits on every other Fortify route.'],
+                ['type' => 'changed', 'text' => 'Registration now defaults to off, so a fresh install accepts no public sign-ups until an admin turns the switch on. The FEATURES_REGISTRATION_ENABLED key and its config/features.php file are gone.'],
+            ],
+        ],
     ];
 
     /**

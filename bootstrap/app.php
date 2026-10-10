@@ -1,7 +1,9 @@
 <?php
 
+use App\Actions\Auth\ResolvePasskeyLoginFailure;
 use App\Http\Middleware\EnsureConsentRecorded;
 use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
+use App\Http\Middleware\EnsureRegistrationIsEnabled;
 use App\Http\Middleware\ShareThemePreference;
 use App\Http\Middleware\TrackUserSession;
 use Illuminate\Foundation\Application;
@@ -39,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'verified.if_required' => EnsureEmailIsVerifiedWhenRequired::class,
             'consent.required' => EnsureConsentRecorded::class,
+            'registration.enabled' => EnsureRegistrationIsEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -52,9 +55,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            $failure = app(ResolvePasskeyLoginFailure::class)($request, $e);
+
             return response()->json([
-                'message' => collect($e->errors())->flatten()->first() ?? $e->getMessage(),
+                'message' => $failure['message']
+                    ?? collect($e->errors())->flatten()->first()
+                    ?? $e->getMessage(),
+                'reason' => $failure['reason'] ?? null,
                 'errors' => $e->errors(),
-            ], $e->status());
+            ], $e->status);
         });
     })->create();

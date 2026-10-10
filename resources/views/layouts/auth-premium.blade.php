@@ -64,7 +64,6 @@
     </style>
 </head>
 <body class="font-body min-h-[100dvh] bg-[#F9FAFB] text-[#18181B] antialiased selection:bg-[#DC2626] selection:text-white">
-    <x-ui.toaster />
     <div class="grid min-h-[100dvh] grid-cols-1 overflow-hidden lg:grid-cols-2">
         <!-- Left Column - Branding -->
         <div class="relative hidden flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#F43F5E] p-12 lg:flex">

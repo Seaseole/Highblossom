@@ -40,7 +40,7 @@ final readonly class SiteService
             'featuredTestimonial' => Testimonial::where('is_featured', true)->active()->first(),
             'otherTestimonials' => Testimonial::active()->where('is_featured', false)->ordered()->get(),
             'featuredServices' => Service::active()->ordered()->take(3)->get(),
-            'featuredGalleryImages' => GalleryImage::featured()->active()->with('category')->ordered()->take(3)->get(),
+            'featuredGalleryImages' => GalleryImage::inGallery()->featured()->active()->with('category')->ordered()->take(3)->get(),
             'timeFormatDisplay' => $this->settings->time_format_display,
         ];
     }
@@ -114,7 +114,7 @@ final readonly class SiteService
      */
     public function getGalleryData(?string $category = null, int $page = 1, int $perPage = 9): array
     {
-        $query = GalleryImage::active()->with('category')->ordered();
+        $query = GalleryImage::inGallery()->active()->with('category')->ordered();
 
         if ($category) {
             $query->byCategory($category);
@@ -137,7 +137,8 @@ final readonly class SiteService
     {
         $galleryImage->load('category');
 
-        $relatedImages = GalleryImage::active()
+        $relatedImages = GalleryImage::inGallery()
+            ->active()
             ->with('category')
             ->where('gallery_category_id', $galleryImage->gallery_category_id)
             ->where('id', '!=', $galleryImage->id)

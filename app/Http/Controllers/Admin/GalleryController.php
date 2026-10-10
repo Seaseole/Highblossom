@@ -26,6 +26,7 @@ final class GalleryController
     public function index(): View
     {
         $items = GalleryImage::query()
+            ->inGallery()
             ->with('category')
             ->latest()
             ->paginate(15);

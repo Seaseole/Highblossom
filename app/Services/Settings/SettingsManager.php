@@ -83,6 +83,7 @@ final class SettingsManager
             'linkedin_url' => '',
             'announcement_active' => false,
             'require_email_verification' => false,
+            'enable_registration' => false,
             'announcements' => [],
             'gallery_metrics' => [],
             'quote_notification_emails' => '',

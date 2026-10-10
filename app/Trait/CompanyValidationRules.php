@@ -54,6 +54,7 @@ trait CompanyValidationRules
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'quote_notification_emails' => ['nullable', 'string', 'max:500'],
             'require_email_verification' => ['nullable', 'in:0,1'],
+            'enable_registration' => ['nullable', 'boolean'],
             'announcement_active' => ['nullable', 'boolean'],
             'announcements' => ['nullable', 'array'],
             'announcements.*.text' => ['required', 'string', 'max:500'],

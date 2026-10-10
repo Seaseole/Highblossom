@@ -60,7 +60,8 @@
 <template x-if="{{ $b }}.type === 'image'">
     <div class="space-y-4">
         <div>
-            <label class="{{ $labelCls }}">Image</label>
+            <label class="{{ $labelCls }}">Single Image</label>
+            <p class="mb-2 text-xs text-gray-400">Used when the image set below is empty.</p>
             <div class="flex items-center gap-2">
                 <input type="text" x-model="{{ $b }}.attributes.src" class="{{ $inputCls }}" placeholder="Image URL" />
                 <button type="button" @click="openPicker({{ $b }}, 'src')" class="{{ $btnCls }}">Library</button>
@@ -83,6 +84,63 @@
             <div>
                 <label class="{{ $labelCls }}">Caption</label>
                 <input type="text" x-model="{{ $b }}.attributes.caption" class="{{ $inputCls }}" />
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 dark:border-white/10">
+            <div class="mb-2 flex items-center justify-between">
+                <div>
+                    <label class="{{ $labelCls }} mb-0">Image Set</label>
+                    <p class="text-xs text-gray-400">Shown as a grid with a full-screen viewer. Up to 24 images.</p>
+                </div>
+                <button
+                    type="button"
+                    @click="openPicker({{ $b }}, 'images', { multiple: true })"
+                    :disabled="{{ $b }}.attributes.images.length >= 24"
+                    class="{{ $btnCls }} shrink-0 disabled:opacity-40"
+                >
+                    Select from Library
+                </button>
+            </div>
+            <div class="space-y-3">
+                <template x-for="(img, ii) in {{ $b }}.attributes.images" :key="ii">
+                    <div class="{{ $entryCls }}">
+                        <div class="flex items-center gap-2">
+                            <img :src="img.src" alt="" class="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover dark:border-white/10" />
+                            <input type="text" x-model="{{ $b }}.attributes.images[ii].src" class="{{ $inputCls }}" placeholder="Image URL" />
+                            <button type="button" @click="openPicker({{ $b }}, 'images.' + ii + '.src')" class="{{ $btnCls }}">Library</button>
+                            <label class="{{ $btnCls }} cursor-pointer">
+                                Upload
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    accept="image/*"
+                                    @change="$wire.setActiveImageUpload({{ $b }}.id, 'images.' + ii + '.src').then(() => $wire.upload('imageUpload', $event.target.files[0]))"
+                                />
+                            </label>
+                            <button type="button" @click="moveImageSetEntry({{ $b }}, ii, -1)" :disabled="ii === 0" class="{{ $removeIconCls }}" title="Move up" aria-label="Move image up">
+                                ↑
+                            </button>
+                            <button type="button" @click="moveImageSetEntry({{ $b }}, ii, 1)" :disabled="ii === {{ $b }}.attributes.images.length - 1" class="{{ $removeIconCls }}" title="Move down" aria-label="Move image down">
+                                ↓
+                            </button>
+                            <button type="button" @click="removeImageSetEntry({{ $b }}, ii)" class="{{ $removeIconCls }}" title="Remove image" aria-label="Remove image">
+                                X
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" x-model="{{ $b }}.attributes.images[ii].alt" class="{{ $inputCls }}" placeholder="Alt text" />
+                            <input type="text" x-model="{{ $b }}.attributes.images[ii].caption" class="{{ $inputCls }}" placeholder="Caption" />
+                        </div>
+                        <p x-show="! img.alt" class="text-xs text-amber-600 dark:text-amber-400">
+                            No alt text — this image will score poorly on accessibility and search.
+                        </p>
+                    </div>
+                </template>
+                <div class="flex items-center justify-between">
+                    <button type="button" @click="addImageSetEntry({{ $b }})" class="{{ $addEntryCls }}">Add Image</button>
+                    <span class="text-xs text-gray-400" x-text="{{ $b }}.attributes.images.length + ' / 24'"></span>
+                </div>
             </div>
         </div>
     </div>

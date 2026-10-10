@@ -136,5 +136,7 @@
                 </a>
             </div>
         </div>
+
+        <x-blog.image-lightbox />
     </div>
 </x-layouts::site>

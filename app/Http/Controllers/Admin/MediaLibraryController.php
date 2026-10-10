@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\MediaLibraryRequest;
 use App\Models\GalleryImage;
 use App\Services\MediaLibraryService;
 use App\Services\MediaRegistryService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,15 +24,17 @@ final class MediaLibraryController
 
     /**
      * Display the media library (paginated). Supports HTMX partial rendering.
+     *
+     * The JSON response is the media picker's browsing surface, so it carries
+     * pagination metadata and a caller-chosen page size alongside the images.
      */
     public function index(Request $request): View|JsonResponse
     {
-        $images = GalleryImage::query()
-            ->when($request->search, fn ($q) => $q->where('title', 'like', '%'.$request->search.'%'))
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
-
         if ($request->expectsJson()) {
+            $perPage = max(1, min(48, $request->integer('per_page', 24)));
+
+            $images = $this->search($request)->paginate($perPage, ['*'], 'page', max(1, $request->integer('page', 1)));
+
             return response()->json([
                 'images' => $images->map(fn (GalleryImage $image) => [
                     'id' => $image->id,
@@ -39,14 +42,37 @@ final class MediaLibraryController
                     'url' => $image->image_url,
                     'alt' => $image->title,
                 ]),
+                'meta' => [
+                    'current_page' => $images->currentPage(),
+                    'last_page' => $images->lastPage(),
+                    'total' => $images->total(),
+                    'per_page' => $images->perPage(),
+                    'has_more' => $images->hasMorePages(),
+                ],
             ]);
         }
+
+        $images = $this->search($request)->paginate(12);
 
         if ($request->header('HX-Request')) {
             return view('admin.media-library.partials.image-grid', compact('images'));
         }
 
         return view('admin.media-library.index', compact('images'));
+    }
+
+    /**
+     * Library query filtered by the optional title search term.
+     *
+     * The id tie-breaker keeps the pages the picker walks through stable when
+     * several images share a created_at second.
+     */
+    private function search(Request $request): Builder
+    {
+        return GalleryImage::query()
+            ->when($request->search, fn ($q) => $q->where('title', 'like', '%'.$request->search.'%'))
+            ->orderBy('created_at', 'desc')
+            ->orderByDesc('id');
     }
 
     /**

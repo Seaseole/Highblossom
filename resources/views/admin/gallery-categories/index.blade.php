@@ -55,11 +55,24 @@
                                     {{ $galleryCategory->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex items-center justify-end gap-3 px-6 py-4 text-right">
                                 <a
                                     href="{{ route('admin.gallery-categories.edit', $galleryCategory) }}"
                                     class="text-sm font-medium text-gray-900 transition-opacity hover:opacity-75 dark:text-white"
                                 >Edit</a>
+                                @can('manage gallery')
+                                    <form
+                                        action="{{ route('admin.gallery-categories.destroy', $galleryCategory) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Delete this category? Its gallery items are kept but become uncategorised.');"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="text-sm font-medium text-red-600 transition-opacity hover:opacity-75 dark:text-red-400">
+                                            Delete
+                                        </button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

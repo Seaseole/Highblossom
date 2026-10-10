@@ -8,6 +8,15 @@
         <p class="text-[#71717A]">Fill in your details to get started</p>
     </div>
 
+    <x-ui.alert-banner />
+
+    @php
+        $nameErrors = \App\Support\AuthNotification::fieldMessages('name');
+        $emailErrors = \App\Support\AuthNotification::fieldMessages('email');
+        $passwordErrors = \App\Support\AuthNotification::fieldMessages('password');
+        $confirmationErrors = \App\Support\AuthNotification::fieldMessages('password_confirmation');
+    @endphp
+
     <form method="POST" action="{{ route('register') }}" class="space-y-5">
         @csrf
 
@@ -18,12 +27,14 @@
                 id="name"
                 type="text"
                 name="name"
-                class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-5 py-3.5 text-[#18181B] placeholder-[#A1A1AA] shadow-sm transition-all duration-300 focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none"
+                class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('name') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
                 placeholder="John Doe"
                 required
                 autofocus
                 value="{{ old('name') }}"
+                @if ($nameErrors !== []) aria-describedby="name-error" aria-invalid="true" @endif
             />
+            <x-ui.field-errors field="name" />
         </div>
 
         <div class="animate-fade-in-up delay-300">
@@ -33,11 +44,13 @@
                 id="email"
                 type="email"
                 name="email"
-                class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-5 py-3.5 text-[#18181B] placeholder-[#A1A1AA] shadow-sm transition-all duration-300 focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none"
+                class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('email') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
                 placeholder="you@example.com"
                 required
                 value="{{ old('email') }}"
+                @if ($emailErrors !== []) aria-describedby="email-error" aria-invalid="true" @endif
             />
+            <x-ui.field-errors field="email" />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -61,14 +74,16 @@
                     id="password"
                     type="password"
                     name="password"
-                    class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-5 py-3.5 text-[#18181B] placeholder-[#A1A1AA] shadow-sm transition-all duration-300 focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none"
+                    class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('password') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
                     placeholder="••••••••"
                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                     data-min="12"
                     data-max="64"
                     autocomplete="new-password"
                     required
+                    @if ($passwordErrors !== []) aria-describedby="password-error" aria-invalid="true" @endif
                 />
+                <x-ui.field-errors field="password" />
             </div>
             <div id="pw-hint" class="hidden text-[10px] text-[#A1A1AA] italic"></div>
             <div class="animate-fade-in-up delay-400">
@@ -83,12 +98,14 @@
                     id="password_confirmation"
                     type="password"
                     name="password_confirmation"
-                    class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-5 py-3.5 text-[#18181B] placeholder-[#A1A1AA] shadow-sm transition-all duration-300 focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none"
+                    class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('password_confirmation') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
                     placeholder="••••••••"
                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                     autocomplete="new-password"
                     required
+                    @if ($confirmationErrors !== []) aria-describedby="password_confirmation-error" aria-invalid="true" @endif
                 />
+                <x-ui.field-errors field="password_confirmation" />
             </div>
         </div>
         <div class="animate-fade-in-up px-1 delay-500">
@@ -102,14 +119,26 @@
                     <a href="{{ route('privacy') }}" class="font-bold text-[#DC2626] hover:text-[#B91C1C]">privacy policy</a>
                 </x-ui.checkbox>
             </div>
+            <x-ui.field-errors field="terms" />
+            <x-ui.field-errors field="privacy" />
         </div>
         <div class="animate-fade-in-up pt-2 delay-500">
             <button
                 type="submit"
-                class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98]"
+                data-submit-pending-button
+                class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
             >
-                <span>Create Account</span>
-                <svg class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span data-idle-state>Create Account</span>
+                <span data-pending-state class="hidden">
+                    <span class="flex items-center gap-2">
+                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ __('auth.register.creating_account') }}
+                    </span>
+                </span>
+                <svg data-idle-state class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                 </svg>
             </button>

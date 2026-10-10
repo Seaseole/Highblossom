@@ -36,10 +36,13 @@
             @endforeach
         @endif
 
-        // Listen for Livewire-dispatched toast events (from PHP components)
-        Livewire.on('toast', (data) => {
-            this.addToast(data.type, data.message, data.duration || 5000);
-        });
+        // Listen for Livewire-dispatched toast events (from PHP components).
+        // The site and auth layouts render this component without Livewire on the page.
+        if (typeof Livewire !== 'undefined') {
+            Livewire.on('toast', (data) => {
+                this.addToast(data.type, data.message, data.duration || 5000);
+            });
+        }
     }
 }"
     @toast.window="addToast($event.detail.type, $event.detail.message, $event.detail.duration || 5000)"

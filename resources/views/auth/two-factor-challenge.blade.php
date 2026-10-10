@@ -143,6 +143,8 @@
                         <p class="text-[#71717A]">Enter the 6-digit code from your app</p>
                     </div>
 
+                    <x-ui.alert-banner />
+
                     <form
                         method="POST"
                         action="{{ route('two-factor.login') }}"
@@ -262,19 +264,8 @@
                                 Verify Recovery Code
                             </button>
 
-                            @error('code')
-                                <div
-                                    x-show="! submitting"
-                                    class="animate-fade-in-up mt-6 flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-4"
-                                >
-                                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm leading-tight font-medium text-red-700">{{ $message }}</p>
-                                </div>
-                            @enderror
+                            <x-ui.field-errors field="code" />
+                            <x-ui.field-errors field="recovery_code" />
                         </div>
 
                         <div class="text-center">
