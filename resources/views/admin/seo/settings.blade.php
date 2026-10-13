@@ -2,9 +2,7 @@
     @php
         $siteHost = parse_url(config('app.url'), PHP_URL_HOST) ?: config('app.name');
         $storedImage = (string) $seo['meta_image'];
-        $metaImageUrl = $storedImage !== '' && ! \Illuminate\Support\Str::startsWith($storedImage, ['http://', 'https://'])
-            ? asset('storage/'.$storedImage)
-            : ($storedImage ?: null);
+        $metaImageUrl = media_url($storedImage) ?: null;
     @endphp
 
     <div class="mx-auto max-w-6xl space-y-8 py-6 sm:py-10">

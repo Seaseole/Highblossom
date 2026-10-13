@@ -185,6 +185,35 @@ class ApplicationVersionSeeder extends Seeder
                 ['type' => 'changed', 'text' => 'Registration now defaults to off, so a fresh install accepts no public sign-ups until an admin turns the switch on. The FEATURES_REGISTRATION_ENABLED key and its config/features.php file are gone.'],
             ],
         ],
+        [
+            'version' => '1.13.0',
+            'summary' => 'Durable media: the public disk can move to object storage without losing existing files',
+            'released_at' => '2026-10-11',
+            'notes' => [
+                ['type' => 'added', 'text' => 'The public disk — where every uploaded image, video and document is written — is now driver-switchable through PUBLIC_DISK_DRIVER: a local folder behind the /storage symlink in development, or an S3-compatible bucket in production. Media therefore survives a Laravel Cloud deployment instead of living on the ephemeral instance disk. Uploads still target the disk by name, so no call site changed, and league/flysystem-aws-s3-v3 is now required to make the previously dead s3 disk block usable.'],
+                ['type' => 'added', 'text' => 'One MediaUrl resolver (plus the media_url() helper) understands the four shapes a stored media value can legitimately hold — disk-relative path, legacy /storage/ path, legacy absolute URL, and a genuinely external URL it must leave untouched — and resolves the first three against whichever disk is active. An external CDN link is no longer mistaken for our own media.'],
+                ['type' => 'changed', 'text' => 'Uploads now persist a disk-relative path instead of an absolute URL. The temp-upload relocation action, video upload service and the image, gallery and video content blocks all wrote asset("storage/…") strings into the database, so every one of those rows was bound to the host that wrote it and went stale on a domain change or a move to a bucket; they now store the path and resolve it at render time.'],
+                ['type' => 'fixed', 'text' => 'Media that would break as soon as the disk left the local filesystem now resolves through it: user avatar, staff and partner images, post featured images, service and gallery URLs, the admin sidebar logo, the site head, nav and footer partials, the error and minimal layouts, and the About-Us and SEO screens. Most called Storage::url(), which resolves the default disk rather than the public one and only worked by accident; the rest used asset("storage/…") and bypassed disk config entirely.'],
+                ['type' => 'added', 'text' => 'A migration normalises the media already stored in the database into disk-relative paths, including structured attributes inside saved content blocks, so historical rows become portable. Rich-text HTML deliberately keeps its absolute URLs: a relative path in stored HTML resolves against the page, not the media disk. The reverse is a no-op because the original URLs are not retained.'],
+                ['type' => 'added', 'text' => 'A media:migrate-to-s3 command copies the local media folder into the bucket for the cutover, with --dry-run to see the plan, --prefix to move one folder, --force to overwrite, and existing keys skipped so it is safe to re-run.'],
+                ['type' => 'fixed', 'text' => 'The video poster frame is now extracted from the PHP upload temp file before the video is stored, because an object store exposes no readable local path for FFmpeg to open, and storing the upload moves the temp file away. Storing a video whose frame cannot be read returns the video with no thumbnail instead of failing.'],
+                ['type' => 'changed', 'text' => 'The bucket-backed public disk sets throw and report, so a rejected upload fails loudly and is logged instead of silently discarding media, and the block builder resolves its editor previews against the active disk base URL rather than assuming /storage.'],
+                ['type' => 'security', 'text' => '.env.example documents the cutover: PUBLIC_DISK_DRIVER drives media storage, FILESYSTEM_DISK never resolves it and must stay local, AWS_DEFAULT_REGION must be "auto" for Cloud Object Storage, and the bucket credentials exist only as Laravel Cloud shared secrets and are never committed.'],
+                ['type' => 'added', 'text' => 'Coverage for the resolver and for every media-carrying block: MediaUrl unit tests, and a block test that renders relative, legacy-path, legacy-absolute and external values through the production renderer and asserts the URL each one emits.'],
+            ],
+        ],
+        [
+            'version' => '1.14.0',
+            'summary' => 'Video block embeds reliably: deferred YouTube player and a stated referrer policy',
+            'released_at' => '2026-10-11',
+            'notes' => [
+                ['type' => 'fixed', 'text' => 'On the hosted site a YouTube video block reported "too many redirects" where its preview thumbnail should have appeared, and nothing played. The player iframe was built during page render, so the visitor first had to clear the platform\'s third-party consent-cookie exchange — browsers that block third-party cookies loop there instead of showing the video. The block now renders the platform thumbnail with a play control and builds the iframe only on click.'],
+                ['type' => 'added', 'text' => 'The thumbnail layer is a real link to the video\'s watch page, so the block still works where JavaScript is unavailable and never depends on the embed host to render something. The play control carries an aria-label.'],
+                ['type' => 'changed', 'text' => 'Every embedded provider iframe — YouTube, Vimeo, Dailymotion and Facebook — and the block builder\'s live preview now declare referrerpolicy="strict-origin-when-cross-origin", matching the attribute in the embed snippet each provider hands out.'],
+                ['type' => 'changed', 'text' => 'YouTube embed URLs carry ?feature=oembed in both renderers, so the editor preview and the published page request the same player instead of two different ones. Tracking parameters never reach the embed URL: a link pasted as youtu.be/ID?si=… still resolves to the bare ID.'],
+                ['type' => 'added', 'text' => 'VideoEmbedFacadeTest asserts that a YouTube block ships zero iframes and issues no request to the embed host before the click, that the deferred player carries the correct source and referrer policy, that all four providers declare the policy, and that uploaded files and non-YouTube providers keep their previous markup.'],
+            ],
+        ],
     ];
 
     /**

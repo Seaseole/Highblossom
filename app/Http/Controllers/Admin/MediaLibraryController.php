@@ -40,6 +40,7 @@ final class MediaLibraryController
                     'id' => $image->id,
                     'name' => $image->title,
                     'url' => $image->image_url,
+                    'path' => $image->image_path,
                     'alt' => $image->title,
                 ]),
                 'meta' => [
@@ -85,6 +86,7 @@ final class MediaLibraryController
 
             return response()->json([
                 'url' => $image->image_url,
+                'path' => $image->image_path,
                 'id' => $image->id,
             ]);
         } catch (\RuntimeException $e) {

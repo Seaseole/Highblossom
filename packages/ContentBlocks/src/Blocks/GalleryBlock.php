@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 
 /**
  * Gallery block for displaying image collections.
@@ -55,5 +56,19 @@ final class GalleryBlock extends AbstractBlock
             'images' => 'array',
             'columns' => 'int',
         ];
+    }
+
+    /**
+     * Get data to pass to the view, with media references resolved to URLs.
+     */
+    protected function getViewData(array $attributes): array
+    {
+        foreach ($attributes['images'] ?? [] as $index => $image) {
+            if (is_array($image)) {
+                $attributes['images'][$index]['src'] = MediaUrl::asset($image['src'] ?? null) ?? '';
+            }
+        }
+
+        return $attributes;
     }
 }

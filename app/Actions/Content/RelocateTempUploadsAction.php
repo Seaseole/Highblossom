@@ -131,7 +131,10 @@ final class RelocateTempUploadsAction
             if ($newPath) {
                 Log::info("Relocated file from temp: {$tempPath} -> {$newPath}");
 
-                return asset('storage/'.$newPath);
+                // Store the disk-relative path, never a URL: the public disk is
+                // driver-switchable, so a persisted URL would go stale on a
+                // host change or a move to object storage.
+                return $newPath;
             }
         }
 
@@ -227,13 +230,8 @@ final class RelocateTempUploadsAction
             $filename = basename($tempPath);
             $newPath = $destinationDir.'/'.$filename;
 
-            // Ensure destination directory exists
-            $dirPath = dirname($publicDisk->path($newPath));
-            if (! is_dir($dirPath)) {
-                mkdir($dirPath, 0755, true);
-            }
-
-            // Read from temp and write to public
+            // Read from temp and write to public. Object storage has no
+            // directories, so keys are created implicitly by put().
             $content = $tempDisk->get($tempPath);
             $publicDisk->put($newPath, $content);
 

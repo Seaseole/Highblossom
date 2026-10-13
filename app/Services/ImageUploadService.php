@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\ImageException;
 use Illuminate\Support\Facades\Image;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Service for handling image uploads via the admin AJAX uploader.
@@ -64,7 +64,7 @@ final class ImageUploadService
 
         return [
             'path' => $path,
-            'url' => Storage::url($path),
+            'url' => MediaUrl::asset($path) ?? '',
         ];
     }
 }

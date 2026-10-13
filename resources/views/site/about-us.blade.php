@@ -7,7 +7,7 @@
                     @if ($content->hero_image)
                         <div class="about-hero js-scroll-with-image relative mb-8 overflow-hidden rounded-[2.5rem]">
                             <img
-                                src="{{ Storage::url($content->hero_image) }}"
+                                src="{{ media_url($content->hero_image) }}"
                                 alt="About Highblossom"
                                 class="h-[420px] w-full object-cover transition-transform duration-1000 ease-out hover:scale-[1.02]"
                             />

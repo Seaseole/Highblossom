@@ -14,7 +14,7 @@
         @if ($existingPath)
             <div class="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10">
                 <img
-                    src="{{ Storage::url($existingPath) }}"
+                    src="{{ media_url($existingPath) }}"
                     alt="{{ $post->title ?? 'Featured image' }}"
                     class="h-full w-full object-cover"
                 />

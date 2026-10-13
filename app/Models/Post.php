@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Concerns\HasSeo;
 use App\Models\Contracts\HasSeoInterface;
 use App\Observers\SitemapObserver;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -134,11 +135,11 @@ final class Post extends Model implements HasSeoInterface
     public function getFeaturedImageUrlAttribute(): ?string
     {
         if ($this->attributes['featured_image_url'] ?? null) {
-            return $this->attributes['featured_image_url'];
+            return MediaUrl::asset($this->attributes['featured_image_url']);
         }
 
         if ($this->featured_image_path) {
-            return asset('storage/'.$this->featured_image_path);
+            return MediaUrl::asset($this->featured_image_path);
         }
 
         return null;

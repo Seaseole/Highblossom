@@ -10,7 +10,8 @@
     initialBlocks: {{ Js::from($blocks ?? []) }},
     blockMeta: {{ Js::from($blockMeta ?? []) }},
     blockErrors: {{ Js::from($blockErrors ?? []) }},
-    name: @js($name)
+    name: @js($name),
+    mediaBase: @js(rtrim(Storage::disk('public')->url(''), '/'))
 })"
 >
     <!-- Invalid block summary -->

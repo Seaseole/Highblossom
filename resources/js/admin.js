@@ -117,7 +117,7 @@ document.addEventListener('alpine:init', () => {
                     if (this.multiple) {
                         this.addSelected({ id: created.id, url: created.url, alt: file.name });
                     } else {
-                        this.selectedImage = { id: created.id, url: created.url, name: file.name };
+                        this.selectedImage = { id: created.id, url: created.url, path: created.path, name: file.name };
                     }
                 }
 
@@ -137,7 +137,7 @@ document.addEventListener('alpine:init', () => {
         addSelected(image) {
             if (this.isSelected(image) || this.selected.length >= this.max) return;
 
-            this.selected.push({ id: image.id, url: image.url, alt: image.alt || image.name || '' });
+            this.selected.push({ id: image.id, url: image.url, path: image.path, alt: image.alt || image.name || '' });
         },
 
         toggle(image) {
@@ -177,7 +177,11 @@ document.addEventListener('alpine:init', () => {
                     this.$dispatch('images-selected', { field: this.field, items: [...this.selected] });
                 }
             } else if (this.selectedImage) {
-                this.$dispatch('image-selected', { field: this.field, url: this.selectedImage.url });
+                this.$dispatch('image-selected', {
+                    field: this.field,
+                    url: this.selectedImage.url,
+                    path: this.selectedImage.path,
+                });
             }
 
             this.isOpen = false;
@@ -191,6 +195,7 @@ document.addEventListener('alpine:init', () => {
         blockMeta: config.blockMeta || {},
         blockErrors: config.blockErrors || {},
         fieldName: config.name || 'content',
+        mediaBase: config.mediaBase || '',
         collapsed: [],
         lastRemoved: null,
         dragIndex: null,
@@ -198,6 +203,26 @@ document.addEventListener('alpine:init', () => {
         previewOpen: false,
         previewHtml: '',
         previewLoading: false,
+
+        // Block attributes store disk-relative media paths, so editor previews
+        // must be resolved against whichever base URL the public disk uses.
+        mediaSrc(value) {
+            if (! value) {
+                return '';
+            }
+
+            if (/^(https?:|temp:|data:|blob:)/i.test(value)) {
+                return value;
+            }
+
+            let path = String(value).replace(/^\/+/, '');
+
+            if (path.startsWith('storage/')) {
+                path = path.slice('storage/'.length);
+            }
+
+            return this.mediaBase + '/' + path;
+        },
 
         init() {
             this.blocks.forEach((block) => this.prepareBlock(block));
@@ -230,7 +255,7 @@ document.addEventListener('alpine:init', () => {
                 const sep = detail.field.indexOf(':');
                 const block = this.findBlockById(detail.field.slice(0, sep));
 
-                if (block) this.setAttributePath(block, detail.field.slice(sep + 1), detail.url);
+                if (block) this.setAttributePath(block, detail.field.slice(sep + 1), detail.path || detail.url);
             });
 
             window.addEventListener('images-selected', (e) => {
@@ -462,11 +487,15 @@ document.addEventListener('alpine:init', () => {
             if (!Array.isArray(list)) return;
 
             items.forEach((item) => {
-                if (!item?.url || list.length >= IMAGE_SET_MAX) return;
+                // Persist the disk-relative path so the reference survives a
+                // host or driver change; fall back to the URL for older payloads.
+                const src = item?.path || item?.url;
 
-                if (list.some((entry) => entry?.src === item.url)) return;
+                if (!src || list.length >= IMAGE_SET_MAX) return;
 
-                list.push({ src: item.url, alt: item.alt || '', caption: null });
+                if (list.some((entry) => entry?.src === src)) return;
+
+                list.push({ src, alt: item.alt || '', caption: null });
             });
         },
 

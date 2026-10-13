@@ -4,7 +4,7 @@
 <title>{{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}</title>
 
 @if ($favicon ?? false)
-    <link rel="icon" href="{{ Storage::url($favicon) }}" sizes="any" />
+    <link rel="icon" href="{{ media_url($favicon) }}" sizes="any" />
 @endif
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

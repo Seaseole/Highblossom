@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\Theme;
 use Database\Factories\UserFactory;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Passkeys\Contracts\PasskeyUser;
@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function getAvatarUrlAttribute(): ?string
     {
-        return $this->avatar_path ? Storage::url($this->avatar_path) : null;
+        return $this->avatar_path ? MediaUrl::asset($this->avatar_path) : null;
     }
 
     /**

@@ -28,8 +28,8 @@ final class VideoUploadController
             return response()->json([
                 'success' => true,
                 'path' => $result['path'],
-                'url' => asset($result['path']),
-                'thumbnail' => $result['thumbnail'] ? asset($result['thumbnail']) : null,
+                'url' => media_url($result['path']),
+                'thumbnail' => media_url($result['thumbnail']),
             ]);
         } catch (\RuntimeException $e) {
             return response()->json([

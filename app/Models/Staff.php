@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\StaffFactory;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Staff extends Model
 {
@@ -28,6 +28,6 @@ class Staff extends Model
      */
     public function getPhotoUrlAttribute(): string
     {
-        return $this->photo_path ? Storage::url($this->photo_path) : asset('placeholder.gif');
+        return $this->photo_path ? MediaUrl::asset($this->photo_path) : asset('placeholder.gif');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 
 /**
  * Image block: one image, or an ordered set of images rendered as a gallery.
@@ -73,5 +74,24 @@ class ImageBlock extends AbstractBlock
             'class' => 'string',
             'images' => 'array',
         ];
+    }
+
+    /**
+     * Get data to pass to the view, with media references resolved to URLs.
+     *
+     * Stored values are disk-relative paths, so they must be resolved against
+     * whichever driver backs the public disk at render time.
+     */
+    protected function getViewData(array $attributes): array
+    {
+        $attributes['src'] = MediaUrl::asset($attributes['src'] ?? null) ?? '';
+
+        foreach ($attributes['images'] ?? [] as $index => $image) {
+            if (is_array($image)) {
+                $attributes['images'][$index]['src'] = MediaUrl::asset($image['src'] ?? null) ?? '';
+            }
+        }
+
+        return $attributes;
     }
 }

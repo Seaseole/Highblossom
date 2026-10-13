@@ -106,7 +106,7 @@
                 <template x-for="(img, ii) in {{ $b }}.attributes.images" :key="ii">
                     <div class="{{ $entryCls }}">
                         <div class="flex items-center gap-2">
-                            <img :src="img.src" alt="" class="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover dark:border-white/10" />
+                            <img :src="mediaSrc(img.src)" alt="" class="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover dark:border-white/10" />
                             <input type="text" x-model="{{ $b }}.attributes.images[ii].src" class="{{ $inputCls }}" placeholder="Image URL" />
                             <button type="button" @click="openPicker({{ $b }}, 'images.' + ii + '.src')" class="{{ $btnCls }}">Library</button>
                             <label class="{{ $btnCls }} cursor-pointer">
@@ -238,11 +238,11 @@
         <div x-show="previewData && previewData.valid" class="mt-4">
             <template x-if="previewData && previewData.uses_iframe">
                 <div class="aspect-video w-full">
-                    <iframe :src="previewData.embed_url" class="h-full w-full rounded-lg" frameborder="0" allowfullscreen></iframe>
+                    <iframe :src="previewData.embed_url" referrerpolicy="strict-origin-when-cross-origin" class="h-full w-full rounded-lg" frameborder="0" allowfullscreen></iframe>
                 </div>
             </template>
             <template x-if="previewData && ! previewData.uses_iframe">
-                <video :src="{{ $b }}.attributes.src" controls class="w-full rounded-lg"></video>
+                <video :src="mediaSrc({{ $b }}.attributes.src)" controls class="w-full rounded-lg"></video>
             </template>
             <p class="mt-2 text-xs text-green-500" x-text="'Source detected: ' + (previewData ? previewData.source_label : '')"></p>
         </div>

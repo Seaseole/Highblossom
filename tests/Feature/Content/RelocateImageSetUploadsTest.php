@@ -38,8 +38,8 @@ class RelocateImageSetUploadsTest extends TestCase
 
         $relocated = app(RelocateTempUploadsAction::class)->execute($blocks);
 
-        $this->assertStringContainsString('storage/uploads/images/first.jpg', $relocated[0]['attributes']['images'][0]['src']);
-        $this->assertStringContainsString('storage/uploads/images/second.jpg', $relocated[0]['attributes']['images'][1]['src']);
+        $this->assertSame('uploads/images/first.jpg', $relocated[0]['attributes']['images'][0]['src']);
+        $this->assertSame('uploads/images/second.jpg', $relocated[0]['attributes']['images'][1]['src']);
         $this->assertTrue(Storage::disk('public')->exists('uploads/images/first.jpg'));
         $this->assertTrue(Storage::disk('public')->exists('uploads/images/second.jpg'));
         $this->assertFalse(Storage::disk('temp')->exists('uploads/images/first.jpg'));
@@ -77,6 +77,6 @@ class RelocateImageSetUploadsTest extends TestCase
 
         $relocated = app(RelocateTempUploadsAction::class)->execute($blocks);
 
-        $this->assertStringContainsString('storage/uploads/images/legacy.jpg', $relocated[0]['attributes']['src']);
+        $this->assertSame('uploads/images/legacy.jpg', $relocated[0]['attributes']['src']);
     }
 }

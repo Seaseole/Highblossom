@@ -154,7 +154,7 @@
                                 @if ($content->hero_image)
                                     <div class="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10">
                                         <img
-                                            src="{{ Storage::url($content->hero_image) }}"
+                                            src="{{ media_url($content->hero_image) }}"
                                             alt="Hero"
                                             class="h-full w-full object-cover"
                                         />

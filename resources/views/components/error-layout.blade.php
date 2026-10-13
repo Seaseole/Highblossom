@@ -45,7 +45,7 @@
 
             @if ($businessLogo)
                 <img
-                    src="{{ Storage::url($businessLogo) }}"
+                    src="{{ media_url($businessLogo) }}"
                     alt="{{ $logoText }}"
                     class="h-10 w-auto rounded-lg object-contain transition-transform duration-200 group-hover:scale-105"
                 />

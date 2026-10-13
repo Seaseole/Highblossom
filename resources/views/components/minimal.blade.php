@@ -18,7 +18,7 @@
             @if ($businessLogo)
                 <div class="mb-6 flex justify-center">
                     <img
-                        src="{{ Storage::url($businessLogo) }}"
+                        src="{{ media_url($businessLogo) }}"
                         alt="{{ $logoText }}"
                         class="h-16 w-auto rounded-lg object-contain shadow-lg"
                     />

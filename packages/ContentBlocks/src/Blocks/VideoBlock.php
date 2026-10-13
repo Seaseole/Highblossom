@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Highblossom\ContentBlocks\Blocks;
 
 use Highblossom\ContentBlocks\Services\AbstractBlock;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 
 /**
  * Video block supporting YouTube, Vimeo, Dailymotion, Facebook, and local files.
@@ -65,17 +66,25 @@ class VideoBlock extends AbstractBlock
     }
 
     /**
-     * Get data to pass to the view, including detected source type.
+     * Get data to pass to the view, with media references resolved to URLs.
+     *
+     * Resolution runs before detection so a bucket-hosted file is classified
+     * from the URL it will actually be served from.
      */
     protected function getViewData(array $attributes): array
     {
-        $src = $attributes['src'] ?? '';
+        $src = MediaUrl::asset($attributes['src'] ?? '') ?? '';
+        $poster = MediaUrl::asset($attributes['poster'] ?? '') ?? '';
 
         return array_merge($attributes, [
+            'src' => $src,
+            'poster' => $poster,
             'source_type' => $this->detectSourceType($src),
             'video_id' => $this->extractVideoId($src),
             'embed_url' => $this->getEmbedUrl($src),
             'full_url' => $this->getFullUrl($src),
+            'thumbnail_url' => $this->getThumbnailUrl($src),
+            'watch_url' => $this->getWatchUrl($src),
         ]);
     }
 
@@ -144,7 +153,7 @@ class VideoBlock extends AbstractBlock
         }
 
         return match ($type) {
-            'youtube' => "https://www.youtube.com/embed/{$videoId}",
+            'youtube' => "https://www.youtube.com/embed/{$videoId}?feature=oembed",
             'vimeo' => "https://player.vimeo.com/video/{$videoId}",
             'dailymotion' => "https://www.dailymotion.com/embed/video/{$videoId}",
             'facebook' => 'https://www.facebook.com/plugins/video.php?href='.urlencode($src).'&show_text=0',
@@ -157,11 +166,38 @@ class VideoBlock extends AbstractBlock
      */
     protected function getFullUrl(string $src): string
     {
-        if (str_starts_with($src, 'http://') || str_starts_with($src, 'https://')) {
-            return $src;
+        return MediaUrl::asset($src) ?? '';
+    }
+
+    /**
+     * Get the platform thumbnail shown behind the click-to-play facade.
+     *
+     * Only YouTube is facaded: it is the one provider whose embed can stall a
+     * first paint, and its thumbnail CDN needs no consent cookies.
+     */
+    protected function getThumbnailUrl(string $src): ?string
+    {
+        if ($this->detectSourceType($src) !== 'youtube') {
+            return null;
         }
 
-        return asset(ltrim($src, '/'));
+        $videoId = $this->extractYouTubeId($src);
+
+        return $videoId === null ? null : "https://i.ytimg.com/vi/{$videoId}/hqdefault.jpg";
+    }
+
+    /**
+     * Get the canonical watch URL, used as the no-JavaScript fallback link.
+     */
+    protected function getWatchUrl(string $src): ?string
+    {
+        if ($this->detectSourceType($src) !== 'youtube') {
+            return null;
+        }
+
+        $videoId = $this->extractYouTubeId($src);
+
+        return $videoId === null ? null : "https://www.youtube.com/watch?v={$videoId}";
     }
 
     /**

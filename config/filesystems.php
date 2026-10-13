@@ -38,7 +38,29 @@ return [
             'report' => false,
         ],
 
-        'public' => [
+        /*
+        | The public disk is driver-switchable: a local folder behind the
+        | /storage symlink in development, or a bucket in production. Every
+        | upload in the application targets this disk by name, so switching
+        | the driver here is what moves media off the ephemeral instance.
+        */
+
+        'public' => env('PUBLIC_DISK_DRIVER', 'local') === 's3' ? [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'auto'),
+            'bucket' => env('AWS_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'url' => env('AWS_URL'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            // The bucket is served publicly through AWS_URL, so uploads are
+            // written with a public-read ACL.
+            'visibility' => 'public',
+            // Surface failures: a silently dropped upload means lost media.
+            'throw' => true,
+            'report' => true,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
@@ -51,7 +73,7 @@ return [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
+            'region' => env('AWS_DEFAULT_REGION', 'auto'),
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),

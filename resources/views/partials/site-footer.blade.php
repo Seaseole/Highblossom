@@ -7,7 +7,7 @@
                 <a href="{{ route('home') }}" class="transition-opacity hover:opacity-80">
                     <x-logo-trust-badge
                         :business-name="$logoText"
-                        :icon-src="$businessLogo ? Storage::url($businessLogo) : null"
+                        :icon-src="$businessLogo ? media_url($businessLogo) : null"
                         font-size="text-xl font-bold font-headline"
                         :show-badge="false"
                     />

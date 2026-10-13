@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\PartnerFactory;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Business partner/affiliate logos and links.
@@ -29,6 +29,6 @@ class Partner extends Model
      */
     public function getLogoUrlAttribute(): string
     {
-        return Storage::url($this->logo_path);
+        return MediaUrl::asset($this->logo_path) ?? '';
     }
 }

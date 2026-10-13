@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -61,11 +62,11 @@ final class Service extends Model
     public function getFullImageUrlAttribute(): ?string
     {
         if ($this->image_url) {
-            return $this->image_url;
+            return MediaUrl::asset($this->image_url);
         }
 
         if ($this->image_path) {
-            return asset('storage/'.$this->image_path);
+            return MediaUrl::asset($this->image_path);
         }
 
         return null;

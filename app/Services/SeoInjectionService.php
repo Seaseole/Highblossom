@@ -8,9 +8,9 @@ use App\Models\Contracts\HasSeoInterface;
 use App\Models\SeoStaticRoute;
 use App\Services\DataTransferObjects\SeoMetadata;
 use App\Services\Settings\SettingsManager;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 
 final class SeoInjectionService
 {
@@ -142,7 +142,7 @@ final class SeoInjectionService
         $image = $this->settings->get('seo_meta_image');
 
         if (filled($image)) {
-            return Str::startsWith($image, ['http://', 'https://']) ? $image : asset('storage/'.$image);
+            return MediaUrl::asset($image);
         }
 
         return $this->defaultOgImage;

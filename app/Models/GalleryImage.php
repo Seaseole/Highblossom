@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Observers\SitemapObserver;
+use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -140,6 +141,6 @@ final class GalleryImage extends Model
             return null;
         }
 
-        return asset('storage/'.$this->image_path);
+        return MediaUrl::asset($this->image_path);
     }
 }

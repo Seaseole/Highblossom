@@ -81,7 +81,7 @@ final class VideoSourceDetector
         }
 
         return match ($type) {
-            VideoSourceType::YOUTUBE => "https://www.youtube.com/embed/{$videoId}",
+            VideoSourceType::YOUTUBE => "https://www.youtube.com/embed/{$videoId}?feature=oembed",
             VideoSourceType::VIMEO => "https://player.vimeo.com/video/{$videoId}",
             VideoSourceType::DAILYMOTION => "https://www.dailymotion.com/embed/video/{$videoId}",
             VideoSourceType::FACEBOOK => 'https://www.facebook.com/plugins/video.php?href='.urlencode($src).'&show_text=0',

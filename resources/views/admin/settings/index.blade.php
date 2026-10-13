@@ -288,8 +288,8 @@
                     class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
                     style="display: none"
                     x-data="{
-                        logoPreview: '{{ $settings['business_logo'] ? Storage::url($settings['business_logo']) : null }}',
-                        faviconPreview: '{{ $settings['favicon'] ? Storage::url($settings['favicon']) : (file_exists(public_path('favicon.ico')) ? '/favicon.ico' : null) }}',
+                        logoPreview: '{{ $settings['business_logo'] ? media_url($settings['business_logo']) : null }}',
+                        faviconPreview: '{{ $settings['favicon'] ? media_url($settings['favicon']) : (file_exists(public_path('favicon.ico')) ? '/favicon.ico' : null) }}',
                         handleFileSelect(event, previewKey) {
                             const file = event.target.files[0];
                             if (file) this[previewKey] = URL.createObjectURL(file);
