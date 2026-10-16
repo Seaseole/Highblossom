@@ -8,6 +8,7 @@ use App\Http\View\Composers\GlobalSettingsComposer;
 use App\Services\AvailabilityService;
 use App\Services\Contracts\AvailabilityServiceInterface;
 use App\Services\Settings\SettingsManager;
+use App\Support\SystemOverview\ProbeRunner;
 use Auditify\Facades\Auditify;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
@@ -35,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SettingsManager::class, SettingsManager::class);
 
         $this->app->singleton(AvailabilityServiceInterface::class, AvailabilityService::class);
+
+        // Shared for the request so one section is measured at most once, however
+        // many times the page, an export, or a card asks for it.
+        $this->app->singleton(ProbeRunner::class);
     }
 
     /**
@@ -45,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
         LogViewer::auth(function ($request) {
             return $request->user() && $request->user()->hasRole('Super Admin');
         });
+
+        // Schedule::alwaysOnOneServer();
 
         $this->configureDefaults();
 

@@ -45,26 +45,42 @@ final class ContentBlockCleanupService
     }
 
     /**
+     * Count temp uploads that the nightly cleanup would delete, without deleting them.
+     */
+    public function countOrphanedUploads(int $retentionHours = 24): int
+    {
+        $cutoffDate = now()->subHours($retentionHours);
+        $disk = Storage::disk('temp');
+
+        if (! $disk->exists('uploads')) {
+            return 0;
+        }
+
+        $referencedPaths = $this->getReferencedFilePaths();
+        $orphans = 0;
+
+        foreach ($disk->allFiles('uploads') as $file) {
+            if ($this->isOrphanedUpload($file, $cutoffDate, $disk, $referencedPaths)) {
+                $orphans++;
+            }
+        }
+
+        return $orphans;
+    }
+
+    /**
      * Determine if an orphaned file should be deleted and delete it if so.
      */
     private function shouldDeleteOrphanedFile(string $file, Carbon $cutoffDate, $disk, array $referencedPaths): string
     {
-        $filePath = 'temp://'.$file;
-        $fileTimestamp = $disk->lastModified($file);
-        $fileDate = \DateTime::createFromFormat('U', (string) $fileTimestamp);
-
-        if (! $fileDate || $fileDate >= $cutoffDate) {
-            return 'skipped';
-        }
-
-        if (in_array($filePath, $referencedPaths, true)) {
+        if (! $this->isOrphanedUpload($file, $cutoffDate, $disk, $referencedPaths)) {
             return 'skipped';
         }
 
         if ($disk->delete($file)) {
             Log::info('ContentBlocks: Deleted orphaned temp file', [
                 'file' => $file,
-                'age_hours' => $cutoffDate->diffInHours($fileDate),
+                'age_hours' => $cutoffDate->diffInHours($this->fileDate($disk, $file)),
             ]);
 
             return 'deleted';
@@ -73,6 +89,28 @@ final class ContentBlockCleanupService
         Log::warning('ContentBlocks: Failed to delete orphaned temp file', ['file' => $file]);
 
         return 'error';
+    }
+
+    /**
+     * Whether a temp upload is past retention and referenced by no post content.
+     */
+    private function isOrphanedUpload(string $file, Carbon $cutoffDate, $disk, array $referencedPaths): bool
+    {
+        $fileDate = $this->fileDate($disk, $file);
+
+        if ($fileDate === null || $fileDate >= $cutoffDate) {
+            return false;
+        }
+
+        return ! in_array('temp://'.$file, $referencedPaths, true);
+    }
+
+    /**
+     * The last-modified moment of a temp file, or null when it cannot be read.
+     */
+    private function fileDate($disk, string $file): ?\DateTime
+    {
+        return \DateTime::createFromFormat('U', (string) $disk->lastModified($file)) ?: null;
     }
 
     /**

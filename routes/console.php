@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\WarmSystemOverviewProbe;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -19,3 +20,10 @@ Schedule::command('sessions:prune')
     ->dailyAt('03:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/prune-user-sessions.log'));
+
+// Warm the heavy system overview sections so an admin never pays for a file
+// system walk, whoever opens the page last.
+Schedule::job(new WarmSystemOverviewProbe)
+    ->twiceDaily(1, 13)
+    ->name('system-overview-warm')
+    ->withoutOverlapping();

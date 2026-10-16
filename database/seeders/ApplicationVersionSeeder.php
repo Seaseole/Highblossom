@@ -214,6 +214,31 @@ class ApplicationVersionSeeder extends Seeder
                 ['type' => 'added', 'text' => 'VideoEmbedFacadeTest asserts that a YouTube block ships zero iframes and issues no request to the embed host before the click, that the deferred player carries the correct source and referrer policy, that all four providers declare the policy, and that uploaded files and non-YouTube providers keep their previous markup.'],
             ],
         ],
+        [
+            'version' => '1.15.0',
+            'summary' => 'System overview dashboard: cost-tiered diagnostics, package inventory, posture checklist and a redacted export',
+            'released_at' => '2026-10-15',
+            'notes' => [
+                ['type' => 'added', 'text' => 'A new /admin/system-overview dashboard reports the running application as nine independently measured sections: application, security posture, PHP runtime, database, backing stores, queue and scheduler, sessions, storage and cache, and dependencies. Each caches on its own, so one unavailable service cannot blank the page, and a probe that throws becomes a failed card with the exception left in the log. Values come from the running configuration, never from .env.'],
+                ['type' => 'added', 'text' => 'Sections are separated by cost rather than by topic. Six light sections are measured while the page renders, about 47 ms for the whole page. The two heavy ones — the storage walk and the dependency lock files — are never measured inside a page request: a queue job warms them twice daily, each card offers "Measure now" and "Warm in background", and an unmeasured card shows a placeholder instead of blocking. Every file-system walk is capped at 30,000 files or 500 ms.'],
+                ['type' => 'added', 'text' => 'The Dependencies card carries a searchable package inventory under the totals: free-text search over names and descriptions debounced at 300 ms, a Composer/npm filter, and 15 rows a page, with no DataTables. composer.lock is about a megabyte of JSON, so the parsed rows and the totals are cached against the lock files\' modified-time and size fingerprint — editing a dependency invalidates the entry by comparison instead of by TTL, and a keystroke filters an array rather than re-reading the file.'],
+                ['type' => 'added', 'text' => 'A Security Posture card states the verdicts a reviewer asks for before trusting an install: debug mode, the registration and email-verification switches, which second factors Fortify offers and how many privileged accounts actually confirm one, whether the runtime directories are writable, free disk space, whether every client is trusted as a proxy, a .env left inside public/, the Vite dev marker that silently breaks asset delivery when it goes stale, and whether the audit trail is recording.'],
+                ['type' => 'added', 'text' => 'A redacted JSON export sits behind its own "export system overview" permission rather than reusing the view permission, because reading the dashboard and taking a copy of it off the server are different risks; it stays Super Admin only. The file names what it withheld, keeps only each line\'s label, value, status and hint, takes heavy sections from cache so an export never walks the file system, and records every download in the audit trail with its section, line and withheld counts.'],
+                ['type' => 'security', 'text' => 'Lines a probe marks sensitive never travel in the export: the database endpoint and the trusted-proxy ranges are filtered out, and coverage asserts that a seeded database or SMTP password appears neither on the page nor in the file. Package homepages read from composer.lock are treated as a link only when they use http or https; any other scheme is dropped rather than handed to the view as a clickable URL.'],
+                ['type' => 'changed', 'text' => 'The admin sidebar lists the page under its System group behind the new permission, and "Re-measure" drops every cached section and hands the heavy ones back to the queue.'],
+            ],
+        ],
+        [
+            'version' => '1.16.0',
+            'summary' => 'System overview authorization: lines are revealed per reader, and the Database card works on sqlite',
+            'released_at' => '2026-10-16',
+            'notes' => [
+                ['type' => 'security', 'text' => 'Sections are cached under one key with no user dimension, so a line measured for a reader entitled to it reached the next reader who was not. A line now declares the ability it needs and the section is filtered when it is read: the cache keeps the full measurement, and the database endpoint reaches the page only for a reader holding "manage environment". Probes no longer branch on who is asking, so a warm-up running with nobody authenticated cannot delete lines for readers entitled to them.'],
+                ['type' => 'fixed', 'text' => 'The Database card failed on every sqlite run. PRAGMA page_size and page_count return a row keyed by the pragma name, so reading index zero of the cast row threw "Undefined array key 0" and the section degraded to "This section could not be measured". Development never noticed because the local connection is MariaDB and never takes that branch; a regression test now measures the section on sqlite.'],
+                ['type' => 'security', 'text' => 'The heavy-section card refuses readers who lack the view permission, so a component id alone cannot drive "Measure now" or background warming through the Livewire update endpoint. The package inventory card already refused.'],
+                ['type' => 'changed', 'text' => 'Hiding a line also removes its severity from the section verdict, so a finding a reader may not see no longer marks their card as needing attention or counts in the page summary.'],
+            ],
+        ],
     ];
 
     /**

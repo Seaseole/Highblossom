@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\StaffAbsenceController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\SystemOverviewController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ThemeController;
@@ -188,6 +189,13 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
         Route::post('optimize-all', [CacheController::class, 'optimizeAll'])->middleware('throttle:5,1')->name('optimize-all');
         Route::post('{group}/clear', [CacheController::class, 'clear'])->where('group', 'settings|seo|versions|app|framework')->middleware('throttle:10,1')->name('clear');
         Route::post('{group}/optimize', [CacheController::class, 'optimize'])->where('group', 'settings|seo|versions|framework')->middleware('throttle:10,1')->name('optimize');
+    });
+
+    // System Overview
+    Route::prefix('system-overview')->name('system-overview.')->middleware('can:view system overview')->group(function () {
+        Route::get('/', [SystemOverviewController::class, 'index'])->name('index');
+        Route::post('refresh', [SystemOverviewController::class, 'refresh'])->middleware('throttle:10,1')->name('refresh');
+        Route::post('export', [SystemOverviewController::class, 'export'])->middleware(['can:export system overview', 'throttle:6,1'])->name('export');
     });
 
     // Access Control
