@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -51,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             return $request->user() && $request->user()->hasRole('Super Admin');
         });
 
-        // Schedule::alwaysOnOneServer();
+        Schedule::alwaysOnOneServer();
 
         $this->configureDefaults();
 
