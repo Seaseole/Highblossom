@@ -55,6 +55,7 @@ trait CompanyValidationRules
             'quote_notification_emails' => ['nullable', 'string', 'max:500'],
             'require_email_verification' => ['nullable', 'in:0,1'],
             'enable_registration' => ['nullable', 'boolean'],
+            'session_idle_timeout_minutes' => ['nullable', 'integer', 'min:0', 'max:4320'],
             'announcement_active' => ['nullable', 'boolean'],
             'announcements' => ['nullable', 'array'],
             'announcements.*.text' => ['required', 'string', 'max:500'],

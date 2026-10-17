@@ -11,6 +11,8 @@ enum SessionEndReason: string
 {
     case LOGOUT = 'logout';
     case EXPIRED = 'expired';
+    case ORPHANED = 'orphaned';
+    case IDLE_TIMEOUT = 'idle_timeout';
     case REVOKED_BY_USER = 'revoked_by_user';
     case REVOKED_BY_ADMIN = 'revoked_by_admin';
     case PASSWORD_CHANGED = 'password_changed';
@@ -23,6 +25,8 @@ enum SessionEndReason: string
         return match ($this) {
             self::LOGOUT => 'Signed out',
             self::EXPIRED => 'Expired',
+            self::ORPHANED => 'Session row lost',
+            self::IDLE_TIMEOUT => 'Idle timeout',
             self::REVOKED_BY_USER => 'Revoked by user',
             self::REVOKED_BY_ADMIN => 'Revoked by admin',
             self::PASSWORD_CHANGED => 'Password changed',

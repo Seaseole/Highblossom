@@ -3,6 +3,14 @@
         $attention = collect($sections)->filter(
             fn ($section) => in_array($section->status->value, ['warn', 'fail'], true)
         );
+
+        // Only the Sessions card carries an action, and only for a reader who may
+        // already revoke sessions from the list it links to.
+        $pruneAction = Gate::allows('manage user sessions') ? [
+            'route' => 'admin.sessions.prune',
+            'label' => __('messages.system_overview_prune_now'),
+            'confirm' => __('messages.system_overview_prune_confirm'),
+        ] : null;
     @endphp
 
     <div class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10">
@@ -85,7 +93,10 @@
                         :key="'system-overview-section-'.$section->key"
                     />
                 @else
-                    @include('admin.system-overview.card', ['section' => $section])
+                    @include('admin.system-overview.card', [
+                        'section' => $section,
+                        'action' => $section->key === 'sessions' ? $pruneAction : null,
+                    ])
                 @endif
             @endforeach
         </div>

@@ -89,6 +89,9 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::get('posts', [PostController::class, 'index'])->middleware('can:view blog')->name('posts.index');
     Route::get('posts/create', [PostController::class, 'create'])->middleware('can:create blog')->name('posts.create');
     Route::post('posts', [PostController::class, 'store'])->middleware('can:create blog')->name('posts.store');
+    // Registered before the {post} wildcard so "bulk-status" is not read as a slug.
+    Route::put('posts/bulk-status', [PostController::class, 'bulkStatus'])->middleware('can:update blog')->name('posts.bulk-status');
+    Route::patch('posts/{post}/status', [PostController::class, 'updateStatus'])->middleware('can:update blog')->name('posts.status');
     Route::get('posts/{post}/edit', [PostController::class, 'edit'])->middleware('can:update blog')->name('posts.edit');
     Route::put('posts/{post}', [PostController::class, 'update'])->middleware('can:update blog')->name('posts.update');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->middleware('can:delete blog')->name('posts.destroy');
@@ -209,6 +212,8 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     // Sessions
     Route::get('sessions', [UserSessionController::class, 'index'])->middleware('can:manage user sessions')->name('sessions.index');
     Route::get('users/{user}/sessions', [UserSessionController::class, 'user'])->middleware('can:manage user sessions')->name('sessions.user');
+    // Registered before the {session} wildcard so "prune" is not read as a ledger row id.
+    Route::post('sessions/prune', [UserSessionController::class, 'prune'])->middleware('can:manage user sessions')->name('sessions.prune');
     Route::post('sessions/{session}/revoke', [UserSessionController::class, 'revoke'])->middleware('can:manage user sessions')->name('sessions.revoke');
     Route::post('users/{user}/sessions/revoke', [UserSessionController::class, 'revokeForUser'])->middleware('can:manage user sessions')->name('sessions.user.revoke');
 

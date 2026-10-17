@@ -9,7 +9,6 @@ return [
     // Table headers
     'image' => 'Image',
     'title_header' => 'Title',
-    'icon' => 'Icon',
     'status' => 'Status',
     'actions' => 'Actions',
 

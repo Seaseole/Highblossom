@@ -18,35 +18,18 @@
             method="POST"
             action="{{ route('admin.posts.store') }}"
             enctype="multipart/form-data"
+            x-data="postEditor"
+            x-on:submit="guardSubmit($event)"
+            x-on:input="refreshCounts()"
+            x-on:change="refreshCounts()"
             class="grid grid-cols-1 gap-8 lg:grid-cols-3"
         >
             @csrf
 
-            <input type="hidden" name="content" id="content-input" />
+            <input type="hidden" name="content" id="content-input" value="{{ old('content') }}" />
 
             <div class="space-y-8 lg:col-span-2">
-                <!-- Basic Info Card -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value="{{ old('title') }}"
-                            required
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                        />
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Excerpt</label>
-                        <textarea
-                            name="excerpt"
-                            rows="3"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                        ></textarea>
-                    </div>
-                </div>
+                @include('admin.blog.posts.partials.basic-info', ['post' => null])
 
                 <!-- Content Blocks -->
                 <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
@@ -54,53 +37,11 @@
                     <livewire:block-builder name="content" :value="old('content')" />
                 </div>
 
-                <!-- Categories & Tags -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Categories & Tags</h2>
-
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categories</label>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($categories as $category)
-                                <label class="cursor-pointer rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white">
-                                    <input
-                                        type="checkbox"
-                                        name="categories[]"
-                                        value="{{ $category->id }}"
-                                        class="sr-only"
-                                    />
-                                    {{ $category->name }}
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+                @include('admin.blog.posts.partials.taxonomy', ['post' => null])
             </div>
 
             <div class="space-y-8">
-                <!-- Publish Settings -->
-                <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Publish Settings</h2>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                        <select
-                            name="status"
-                            required
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                        >
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Published At</label>
-                        <input
-                            type="datetime-local"
-                            name="published_at"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                        />
-                    </div>
-                </div>
+                @include('admin.blog.posts.partials.publish-settings', ['post' => null])
 
                 <x-blog.featured-image :existing-path="old('featured_image_path')" />
 

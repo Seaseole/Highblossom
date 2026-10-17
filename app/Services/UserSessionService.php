@@ -251,30 +251,6 @@ final class UserSessionService
     }
 
     /**
-     * Reconcile sessions the framework let lapse and drop history past retention.
-     *
-     * @return array{closed: int, purged: int}
-     */
-    public function prune(?int $retentionDays = null): array
-    {
-        $retentionDays ??= (int) config('user-sessions.history_retention_days');
-
-        // Rows idle past the framework lifetime are already dead even though the
-        // driver only garbage-collects them lazily. They are closed as of the last
-        // moment we saw them, which is the most truthful timestamp available.
-        $closed = UserSession::stale()->update([
-            'ended_at' => DB::raw('last_seen_at'),
-            'end_reason' => SessionEndReason::EXPIRED->value,
-        ]);
-
-        $purged = UserSession::whereNotNull('ended_at')
-            ->where('ended_at', '<', now()->subDays($retentionDays))
-            ->delete();
-
-        return ['closed' => $closed, 'purged' => $purged];
-    }
-
-    /**
      * Revoke a user's other sessions after a password change, when enabled.
      */
     public function handlePasswordChanged(User $user, ?string $currentSessionId, ?Authenticatable $actor = null): int

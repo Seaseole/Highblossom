@@ -26,6 +26,29 @@ final class Post extends Model implements HasSeoInterface
 {
     use HasSeo;
 
+    /**
+     * Character limits enforced on the admin form and by validation, kept here so
+     * the two can never drift apart.
+     */
+    public const TITLE_MAX = 120;
+
+    public const EXCERPT_MAX = 300;
+
+    /**
+     * Workflow states. `archived` posts keep their content but leave the public site,
+     * because the published scope only ever matches `published`.
+     */
+    public const STATUSES = ['draft', 'published', 'archived'];
+
+    /**
+     * Block attribute keys that hold author-written prose, used for the read-time
+     * estimate. Media and structural attributes are deliberately excluded.
+     */
+    private const PROSE_KEYS = [
+        'content', 'title', 'label', 'description', 'question', 'options',
+        'items', 'headers', 'rows', 'text', 'submit_text', 'button_text', 'cite',
+    ];
+
     protected $casts = [
         'content' => 'array',
         'published_at' => 'datetime',
@@ -143,6 +166,90 @@ final class Post extends Model implements HasSeoInterface
         }
 
         return null;
+    }
+
+    /**
+     * Whether the post is published but held back for a future publish date.
+     */
+    public function isScheduled(): bool
+    {
+        return $this->status === 'published' && $this->published_at !== null && $this->published_at->isFuture();
+    }
+
+    /**
+     * Whether readers can actually reach this post right now.
+     */
+    public function isLive(): bool
+    {
+        return $this->status === 'published' && $this->published_at !== null && ! $this->isScheduled();
+    }
+
+    /**
+     * The unfinished parts that block publishing, as short field labels.
+     *
+     * @return array<int, string>
+     */
+    public function missingPublishRequirements(): array
+    {
+        $missing = [];
+
+        if (empty($this->content)) {
+            $missing[] = 'content';
+        }
+
+        if (trim((string) $this->excerpt) === '') {
+            $missing[] = 'excerpt';
+        }
+
+        if ($this->relationLoaded('categories') ? $this->categories->isEmpty() : ! $this->categories()->exists()) {
+            $missing[] = 'category';
+        }
+
+        return $missing;
+    }
+
+    /**
+     * Estimated minutes to read, based on the prose held by the content blocks.
+     */
+    public function readTimeMinutes(): int
+    {
+        $words = str_word_count($this->plainText());
+
+        return $words > 0 ? max(1, (int) ceil($words / 200)) : 1;
+    }
+
+    /**
+     * Flatten the prose out of the content blocks so it can be counted or previewed.
+     */
+    public function plainText(): string
+    {
+        return trim(strip_tags($this->collectProse($this->content ?? [])));
+    }
+
+    /**
+     * Recursively gather string values held under the prose attribute keys.
+     */
+    private function collectProse(mixed $value): string
+    {
+        if (! is_array($value)) {
+            return '';
+        }
+
+        $parts = [];
+
+        foreach ($value as $key => $item) {
+            if (is_array($item)) {
+                $parts[] = $this->collectProse($item);
+
+                continue;
+            }
+
+            if (is_string($item) && in_array($key, self::PROSE_KEYS, true)) {
+                $parts[] = $item;
+            }
+        }
+
+        return implode(' ', $parts);
     }
 
     /**

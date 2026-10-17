@@ -176,7 +176,7 @@ final readonly class SiteService
      */
     public function getBlogShowData(string $slug): array
     {
-        $post = Post::published()->where('slug', $slug)->with('categories', 'tags')->firstOrFail();
+        $post = Post::published()->where('slug', $slug)->with(['categories', 'tags', 'author'])->firstOrFail();
 
         $relatedPosts = Post::published()
             ->where('id', '!=', $post->id)

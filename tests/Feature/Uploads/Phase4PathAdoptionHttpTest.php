@@ -43,7 +43,6 @@ final class Phase4PathAdoptionHttpTest extends TestCase
         $service = Service::create([
             'title' => 'Windscreen Replacement',
             'slug' => 'windscreen-replacement',
-            'icon' => 'fa-car',
             'short_description' => 'Replacement',
             'image_path' => 'services/'.self::HASH.'.webp',
             'is_active' => true,

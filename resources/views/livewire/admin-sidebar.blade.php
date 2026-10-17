@@ -149,9 +149,7 @@
                     href="{{ route('admin.profile.index') }}"
                     class="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/5"
                 >
-                    <div class="flex size-8 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                        {{ $user?->initials() ?? '?' }}
-                    </div>
+                    <x-user-avatar :user="$user" size="sm" />
                     <div class="min-w-0 flex-1">
                         <p class="truncate">{{ $user?->name ?? 'Guest' }}</p>
                     </div>
@@ -269,9 +267,7 @@
                 aria-label="Your profile"
                 class="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/5"
             >
-                <div class="mx-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                    {{ $user?->initials() ?? '?' }}
-                </div>
+                <x-user-avatar :user="$user" size="sm" class="mx-auto" />
                 <div class="min-w-0 flex-1 sidebar-collapsed:lg:hidden">
                     <p class="truncate">{{ $user?->name ?? 'Guest' }}</p>
                 </div>

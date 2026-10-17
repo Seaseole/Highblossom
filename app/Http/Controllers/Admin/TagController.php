@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\TagRequest;
 use App\Models\Tag;
 use App\Services\TagService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -40,11 +41,19 @@ final class TagController
     /**
      * Store a newly created tag in storage.
      *
-     * @return RedirectResponse
+     * @return RedirectResponse|JsonResponse
      */
     public function store(TagRequest $request)
     {
-        $this->tagService->create($request->validated());
+        $tag = $this->tagService->create($request->validated());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'id' => $tag->getKey(),
+                'name' => $tag->name,
+                'slug' => $tag->slug,
+            ], 201);
+        }
 
         return redirect()
             ->route('admin.tags.index')

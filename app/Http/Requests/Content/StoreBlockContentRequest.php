@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Content;
 
+use App\Models\Post;
 use App\Rules\SafeStoredUploadPath;
 use Highblossom\ContentBlocks\Services\BlockRegistry;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 /**
@@ -32,19 +34,32 @@ final class StoreBlockContentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
+            'title' => ['required', 'string', 'max:'.Post::TITLE_MAX],
+            'excerpt' => ['nullable', 'string', 'max:'.Post::EXCERPT_MAX],
             'content' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'featured_image_path' => ['nullable', 'string', new SafeStoredUploadPath(['uploads/blog', 'uploads/images', 'uploads', 'gallery'])],
             'featured_image_url' => 'nullable|url|max:500',
             'delete_featured_image' => 'nullable|boolean',
-            'status' => 'required|in:draft,published',
-            'published_at' => 'nullable|date',
+            'status' => ['required', Rule::in(Post::STATUSES)],
+            'published_at' => ['nullable', 'date'],
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+        ];
+    }
+
+    /**
+     * Custom messages so the publish gate reads as guidance rather than a rule id.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'title.max' => 'The title must not exceed '.Post::TITLE_MAX.' characters.',
+            'excerpt.max' => 'The excerpt must not exceed '.Post::EXCERPT_MAX.' characters.',
         ];
     }
 
@@ -55,7 +70,32 @@ final class StoreBlockContentRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $this->validateContentBlocks($validator);
+            $this->validatePublishReadiness($validator);
         });
+    }
+
+    /**
+     * Refuse to publish a post that would read as unfinished, while leaving drafts open.
+     */
+    private function validatePublishReadiness(Validator $validator): void
+    {
+        if ($this->input('status') !== 'published') {
+            return;
+        }
+
+        $blocks = json_decode((string) $this->input('content'), true);
+
+        if (! is_array($blocks) || $blocks === []) {
+            $validator->errors()->add('content', 'Add at least one content block before publishing.');
+        }
+
+        if (trim((string) $this->input('excerpt')) === '') {
+            $validator->errors()->add('excerpt', 'An excerpt is required before publishing.');
+        }
+
+        if (array_filter((array) $this->input('categories', [])) === []) {
+            $validator->errors()->add('categories', 'Choose at least one category before publishing.');
+        }
     }
 
     /**
@@ -153,8 +193,13 @@ final class StoreBlockContentRequest extends FormRequest
             ? json_decode($validated['content'], true) ?? []
             : [];
 
-        // Generate slug from title
-        $validated['slug'] = Str::slug($validated['title']);
+        // Generate a slug that will not collide with an existing post.
+        $validated['slug'] = $this->uniqueSlugFor($validated['title']);
+
+        // The post form always offers both chip groups, so an absent key means the
+        // author cleared them rather than that the field was never present.
+        $validated['categories'] ??= [];
+        $validated['tags'] ??= [];
 
         // Set published_at if publishing
         if ($validated['status'] === 'published' && empty($validated['published_at'])) {
@@ -162,5 +207,26 @@ final class StoreBlockContentRequest extends FormRequest
         }
 
         return $validated;
+    }
+
+    /**
+     * Build a slug for the title, disambiguating against every other post.
+     */
+    private function uniqueSlugFor(string $title): string
+    {
+        $base = Str::slug($title) ?: 'post';
+        $current = $this->route('post');
+        $slug = $base;
+        $suffix = 2;
+
+        while (Post::where('slug', $slug)
+            ->when($current instanceof Post, fn ($query) => $query->whereKeyNot($current->getKey()))
+            ->exists()
+        ) {
+            $slug = $base.'-'.$suffix;
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

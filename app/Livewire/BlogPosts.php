@@ -54,6 +54,50 @@ final class BlogPosts extends Component
     }
 
     /**
+     * Whether any filter is narrowing the listing.
+     */
+    #[Computed]
+    public function filtered(): bool
+    {
+        return $this->search !== '' || $this->categorySlug !== null || $this->tagSlug !== null;
+    }
+
+    /**
+     * The newest published post, promoted to the hero card on the unfiltered view.
+     */
+    #[Computed]
+    public function featuredPost(): ?Post
+    {
+        if ($this->filtered() || $this->publishedTotal < 2) {
+            return null;
+        }
+
+        return Post::published()->with(['categories', 'tags', 'author'])->orderByDesc('published_at')->first();
+    }
+
+    /**
+     * Every published post count per category, for the filter tabs.
+     *
+     * @return Collection<int, Category>
+     */
+    #[Computed]
+    public function categoryTabs(): Collection
+    {
+        return Category::withCount(['posts' => fn ($query) => $query->published()])
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * How many posts are live, so the hero can be skipped without a second query.
+     */
+    #[Computed]
+    public function publishedTotal(): int
+    {
+        return Post::published()->count();
+    }
+
+    /**
      * Get the paginated, filtered list of published posts.
      *
      * @return LengthAwarePaginator
@@ -82,16 +126,13 @@ final class BlogPosts extends Component
             $query->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id));
         }
 
-        // Debug: Log the SQL query
-        // \Log::debug('BlogPosts SQL: '.$query->latest()->toSql());
-        // \Log::debug('BlogPosts bindings: '.json_encode($query->latest()->getBindings()));
+        if ($featured = $this->featuredPost) {
+            $query->whereKeyNot($featured->getKey());
+        }
 
-        $result = $query->latest()->paginate($this->perPage);
-
-        // Debug: Log the count
-        // \Log::debug('BlogPosts count: '.$result->total());
-
-        return $result;
+        // Not ->latest(): Eloquent's concrete latest() shadows Post::scopeLatest,
+        // so it would order by created_at and tie for posts saved in the same second.
+        return $query->orderByDesc('published_at')->orderByDesc('id')->paginate($this->perPage);
     }
 
     /**
@@ -147,7 +188,6 @@ final class BlogPosts extends Component
     public function updateSearch(string $search): void
     {
         $this->search = $search;
-        unset($this->posts);
         $this->resetPage();
     }
 
@@ -211,6 +251,11 @@ final class BlogPosts extends Component
      */
     public function render()
     {
-        return view('livewire.blog-posts');
+        return view('livewire.blog-posts', [
+            'featured' => $this->featuredPost,
+            'posts' => $this->posts,
+            'categoryTabs' => $this->categoryTabs,
+            'tags' => $this->tags,
+        ]);
     }
 }

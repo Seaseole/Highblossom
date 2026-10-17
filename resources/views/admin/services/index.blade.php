@@ -31,9 +31,6 @@
                             {{ __('admin-services.title_header') }}
                         </th>
                         <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                            {{ __('admin-services.icon') }}
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
                             {{ __('admin-services.status') }}
                         </th>
                         <th class="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -66,11 +63,6 @@
                                 <div class="max-w-xs truncate text-sm text-gray-500 dark:text-gray-400">
                                     {{ $service->short_description }}
                                 </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="rounded-lg bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-white/5 dark:text-gray-400">
-                                    {{ $service->icon ?? 'no_icon' }}
-                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $service->is_active ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400' }}">

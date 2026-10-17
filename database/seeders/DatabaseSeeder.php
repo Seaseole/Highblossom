@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\ServiceSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,9 +27,9 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             GalleryCategorySeeder::class,
             AboutUsContentSeeder::class,
-            // ServiceSeeder::class,
             GlassTypeSeeder::class,
-            // ServiceTypeSeeder::class,
+            ServiceTypeSeeder::class,
+            ServiceSeeder::class,
             // GallerySeeder::class,
             SeoStaticRouteSeeder::class,
             ApplicationVersionSeeder::class,

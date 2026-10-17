@@ -11,8 +11,12 @@ use App\Http\Requests\Admin\RevokeSessionRequest;
 use App\Http\Requests\Admin\SessionFilterRequest;
 use App\Models\User;
 use App\Models\UserSession;
+use App\Services\SessionManager;
 use App\Services\UserSessionService;
+use App\Support\SystemOverview\ProbeRunner;
+use Auditify\Facades\Auditify;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -67,6 +71,35 @@ final class UserSessionController extends Controller
         );
 
         return back()->with('success', __('admin-sessions.sessions_revoked_by_admin', ['count' => $count]));
+    }
+
+    /**
+     * Run the session reconciliation now, sparing the session doing the asking.
+     *
+     * The same code path the hourly schedule takes, so the button cannot produce a
+     * different result from the job.
+     */
+    public function prune(Request $request, SessionManager $sessionManager, ProbeRunner $probes): RedirectResponse
+    {
+        $result = $sessionManager->prune(exceptSessionId: $request->session()->getId());
+
+        Auditify::logActivity('Prune sessions', null, null, [
+            'deleted' => $result['deleted'],
+            'closed' => $result['closed'],
+            'expired' => $result['expired'],
+            'orphaned' => $result['orphaned'],
+            'idle' => $result['idle'],
+            'purged' => $result['purged'],
+        ]);
+
+        // The card caches its measurement, so re-measure it or the redirect renders
+        // the numbers from before the prune.
+        $probes->warm('sessions');
+
+        return back()->with('success', __('messages.system_overview_pruned', [
+            'deleted' => $result['deleted'],
+            'closed' => $result['closed'],
+        ]));
     }
 
     /**

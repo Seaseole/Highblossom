@@ -1,4 +1,4 @@
-<div>
+<div class="flex flex-wrap items-center gap-3">
     @if ($search)
         <span class="inline-flex items-center gap-2 rounded-full border border-[#DC2626]/20 bg-[#DC2626]/10 px-3 py-1 text-sm text-[#DC2626]">
             Search: {{ $search }}

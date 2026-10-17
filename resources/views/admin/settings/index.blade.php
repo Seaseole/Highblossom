@@ -198,6 +198,31 @@
                                     <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Allow</span>
                                 </label>
                             </div>
+                            <div class="flex items-center justify-between gap-4 border-t border-gray-100 pt-5 dark:border-white/10">
+                                <div class="space-y-1">
+                                    <label for="session_idle_timeout_minutes" class="text-sm text-gray-700 dark:text-gray-300">
+                                        Session idle timeout (minutes)
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Close a signed-in session after this many minutes without activity, even while it is still
+                                        inside the {{ config('session.lifetime') }}-minute lifetime. Set to 0 to leave the lifetime in
+                                        charge. The hourly prune applies it, so an idle session can outlive this by up to an hour.
+                                    </p>
+                                    @error('session_idle_timeout_minutes')
+                                        <p class="text-xs text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <input
+                                    type="number"
+                                    id="session_idle_timeout_minutes"
+                                    name="session_idle_timeout_minutes"
+                                    min="0"
+                                    max="4320"
+                                    step="1"
+                                    value="{{ old('session_idle_timeout_minutes', $settings['session_idle_timeout_minutes']) }}"
+                                    class="w-24 shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

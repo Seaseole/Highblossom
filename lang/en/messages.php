@@ -39,6 +39,10 @@ return [
     'system_overview_measuring' => 'Measuring…',
     'system_overview_warming' => 'Waiting for a worker to finish measuring.',
     'system_overview_warm_in_background' => 'Warm in background',
+    'system_overview_prune_now' => 'Prune now',
+    // Read inside a single-quoted confirm() in an HTML attribute, so it carries no apostrophe.
+    'system_overview_prune_confirm' => 'Delete expired session rows and close the sign-ins that lapsed? Anyone holding an expired session will have to sign in again.',
+    'system_overview_pruned' => 'Deleted :deleted expired session row(s) and closed :closed sign-in(s).',
     'system_overview_heavy_hint' => 'This section walks the file system, so it is measured outside the page request.',
     'system_overview_measured' => 'Measured in :ms ms · :when',
     'system_overview_never_measured' => 'Not measured yet.',
@@ -149,4 +153,10 @@ return [
     'post_created' => 'Post created successfully.',
     'post_updated' => 'Post updated successfully.',
     'post_deleted' => 'Post deleted successfully.',
+    'post_published' => '":title" is now live.',
+    'post_unpublished' => '":title" has been moved back to draft.',
+    'post_archived' => '":title" has been archived and removed from the site.',
+    'posts_publish_blocked' => 'Cannot publish — this post is still missing: :fields.',
+    'posts_publish_blocked_bulk' => 'Cannot publish :count of the selected posts — open each one to add its excerpt, category and content.',
+    'posts_status_updated' => ':count posts set to :status.',
 ];

@@ -32,7 +32,6 @@ final class ServiceRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'short_description' => ['required', 'string'],
             'full_description' => ['nullable', 'string'],
-            'icon' => ['nullable', 'string', 'max:50'],
             'features' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:500'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

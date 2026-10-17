@@ -60,7 +60,6 @@ return [
     'title' => 'Title',
     'content' => 'Content',
     'image' => 'Image',
-    'icon' => 'Icon',
     'url' => 'URL',
     'slug' => 'Slug',
     'sort_order' => 'Sort Order',

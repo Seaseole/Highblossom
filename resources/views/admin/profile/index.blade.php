@@ -247,11 +247,12 @@
                     <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                         <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Activity</h3>
 
-                        <dl class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <dl class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             @foreach ([
                                 'Bookings' => $user->bookings_count,
                                 'Milestones logged' => $user->booking_events_count,
                                 'Inspection notes' => $user->inspection_notes_count,
+                                'Blog posts' => $user->posts_count,
                             ] as $label => $count)
                                 <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
                                     <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ $label }}</dt>
@@ -275,6 +276,32 @@
                                         </div>
                                         <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-white/10 dark:text-gray-300">
                                             {{ $booking->status }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+
+                        <div class="mb-2 mt-8 flex items-center justify-between gap-4">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Recent blog posts</h4>
+                            <a href="{{ route('admin.posts.index', ['user' => $user->id]) }}" class="text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">View all</a>
+                        </div>
+                        @if ($recentPosts->isEmpty())
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No blog posts yet.</p>
+                        @else
+                            <ul class="divide-y divide-gray-100 dark:divide-white/5">
+                                @foreach ($recentPosts as $post)
+                                    <li class="flex items-center justify-between gap-4 py-3 text-sm">
+                                        <div class="min-w-0">
+                                            <a href="{{ route('admin.posts.edit', $post) }}" class="block truncate font-medium text-gray-900 hover:underline dark:text-white">
+                                                {{ $post->title }}
+                                            </a>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ ($post->published_at ?? $post->created_at)->format('M j, Y') }}
+                                            </p>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-white/10 dark:text-gray-300">
+                                            {{ $post->status }}
                                         </span>
                                     </li>
                                 @endforeach

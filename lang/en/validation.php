@@ -178,7 +178,6 @@ return [
         'status' => 'status',
         'role' => 'role',
         'image' => 'image',
-        'icon' => 'icon',
     ],
 
 ];

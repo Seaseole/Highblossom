@@ -17,7 +17,7 @@ final class CategoryService
      */
     public function create(array $data): Category
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = $this->uniqueSlug($data['name']);
 
         return Category::create($data);
     }
@@ -27,7 +27,7 @@ final class CategoryService
      */
     public function update(Category $category, array $data): Category
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = $this->uniqueSlug($data['name'], $category);
 
         $category->update($data);
 
@@ -40,5 +40,25 @@ final class CategoryService
     public function delete(Category $category): void
     {
         $category->delete();
+    }
+
+    /**
+     * Build a slug that will not collide with another category's unique slug.
+     */
+    private function uniqueSlug(string $name, ?Category $current = null): string
+    {
+        $base = Str::slug($name) ?: 'category';
+        $slug = $base;
+        $suffix = 2;
+
+        while (Category::where('slug', $slug)
+            ->when($current, fn ($query) => $query->whereKeyNot($current->getKey()))
+            ->exists()
+        ) {
+            $slug = $base.'-'.$suffix;
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

@@ -1,5 +1,6 @@
 @php
     $recalculate = $recalculate ?? false;
+    $action = $action ?? null;
 @endphp
 
 <section
@@ -89,6 +90,16 @@
                 <span wire:loading.remove wire:target="measure">{{ __('messages.system_overview_measure_now') }}</span>
                 <span wire:loading wire:target="measure">{{ __('messages.system_overview_measuring') }}</span>
             </button>
+        @endif
+
+        @if ($action !== null)
+            <form method="POST" action="{{ route($action['route']) }}" onsubmit="return confirm('{{ $action['confirm'] }}');">
+                @csrf
+                <button
+                    type="submit"
+                    class="rounded-lg border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-300 dark:hover:bg-amber-500/10"
+                >{{ $action['label'] }}</button>
+            </form>
         @endif
     </footer>
 </section>

@@ -190,6 +190,370 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
+    // Character counter wired to a single field; the field keeps its native value
+    // as the source of truth so server-side old() repopulation still works.
+    window.Alpine.data('charCount', (max) => ({
+        max: max,
+        count: 0,
+
+        init() {
+            const field = this.$el.querySelector('[name]');
+
+            this.count = field ? field.value.length : 0;
+        },
+
+        nearLimit() {
+            return this.count > this.max * 0.9;
+        },
+    }));
+
+    // Publish gate for the post editor. Every rule is re-checked server-side by
+    // StoreBlockContentRequest; this only stops an obviously doomed submit, so all
+    // state is read back from the form rather than tracked separately.
+    window.Alpine.data('postEditor', () => ({
+        status: 'draft',
+        excerptLength: 0,
+        categoryCount: 0,
+        tagCount: 0,
+        blockCount: 0,
+        blocked: [],
+        forceDraft: false,
+
+        init() {
+            this.refreshCounts();
+
+            window.addEventListener('blocks-changed', () => this.refreshCounts());
+        },
+
+        refreshCounts() {
+            const form = this.$el;
+            const excerpt = form.querySelector('[name="excerpt"]');
+            const content = form.querySelector('#content-input');
+            const status = form.querySelector('[name="status"]');
+
+            this.excerptLength = excerpt ? excerpt.value.trim().length : 0;
+            this.categoryCount = form.querySelectorAll('input[name="categories[]"]:checked').length;
+            this.tagCount = form.querySelectorAll('input[name="tags[]"]:checked').length;
+            this.status = status ? status.value : 'draft';
+
+            try {
+                this.blockCount = JSON.parse(content ? content.value : '[]').length;
+            } catch (error) {
+                this.blockCount = 0;
+            }
+        },
+
+        missing() {
+            const missing = [];
+
+            if (! this.blockCount) missing.push('at least one content block');
+            if (! this.excerptLength) missing.push('an excerpt');
+            if (! this.categoryCount) missing.push('a category');
+
+            return missing;
+        },
+
+        guardSubmit(event) {
+            this.refreshCounts();
+
+            if (this.forceDraft || this.status !== 'published') return;
+
+            const missing = this.missing();
+
+            if (missing.length) {
+                event.preventDefault();
+                this.blocked = missing;
+            }
+        },
+
+        saveAsDraft() {
+            const status = this.$el.querySelector('[name="status"]');
+
+            if (status) status.value = 'draft';
+
+            this.status = 'draft';
+            this.blocked = [];
+            this.forceDraft = true;
+            this.$el.requestSubmit();
+        },
+    }));
+
+    // Quick-add modal for the post editor's category and tag chips. The created option
+    // is cloned from an inert <template> and ticked, so the post form keeps its unsaved
+    // state and the page never navigates.
+    window.Alpine.data('taxonomy', (routes) => ({
+        kind: null,
+        name: '',
+        errors: [],
+        saving: false,
+        routes: routes,
+
+        get isOpen() {
+            return this.kind !== null;
+        },
+
+        get title() {
+            return this.kind === 'category' ? 'New category' : 'New tag';
+        },
+
+        open(kind) {
+            this.kind = kind;
+            this.name = '';
+            this.errors = [];
+
+            this.$nextTick(() => {
+                document.body.style.overflow = 'hidden';
+
+                if (this.$refs.input) this.$refs.input.focus();
+            });
+        },
+
+        close() {
+            if (! this.isOpen) return;
+
+            this.kind = null;
+            this.errors = [];
+            document.body.style.overflow = '';
+        },
+
+        // @alpinejs/focus is not installed, so x-trap is unavailable and the cycle is
+        // written by hand or focus would escape behind the overlay.
+        trap(event) {
+            if (event.key !== 'Tab' || ! this.$refs.dialog) return;
+
+            const focusables = Array.from(this.$refs.dialog.querySelectorAll('input, button'))
+                .filter((el) => ! el.disabled);
+
+            if (! focusables.length) return;
+
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (! event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        },
+
+        async save() {
+            if (this.saving || ! this.isOpen) return;
+
+            this.saving = true;
+            this.errors = [];
+
+            try {
+                const response = await fetch(this.routes[this.kind], {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    },
+                    body: JSON.stringify({ name: this.name }),
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (! response.ok) {
+                    this.errors = Object.values(data.errors ?? {}).flat();
+
+                    if (! this.errors.length) {
+                        this.errors = [data.message || 'Could not save.'];
+                    }
+
+                    return;
+                }
+
+                const kind = this.kind;
+
+                this.addChip(kind, data);
+                this.close();
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'success', message: data.name + ' added and selected.' },
+                }));
+            } catch (error) {
+                this.errors = ['Network error — nothing was saved.'];
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        addChip(kind, created) {
+            const list = document.getElementById(kind + '-chip-list');
+            const template = document.getElementById(kind + '-chip-template');
+
+            if (! list || ! template) return;
+
+            const chip = template.content.firstElementChild.cloneNode(true);
+            const input = chip.querySelector('input');
+
+            input.name = kind === 'category' ? 'categories[]' : 'tags[]';
+            input.value = String(created.id);
+            input.checked = true;
+            chip.querySelector('span').textContent = kind === 'category' ? created.name : '#' + created.name;
+
+            document.getElementById(kind + '-chip-empty')?.remove();
+            list.append(chip);
+
+            // Bubbles to the form's change listener, which refreshes the publish checklist.
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+    }));
+
+    // Status control for the posts index: a menu opened by clicking the status pill
+    // or right-clicking a row, plus a multi-select bulk bar. Both paths post JSON and
+    // repaint the affected pills in place rather than reloading the table.
+    window.Alpine.data('postsTable', (bulkUrl) => ({
+        bulkUrl: bulkUrl,
+        statuses: {},
+        selected: [],
+        menu: { open: false, x: 0, y: 0, id: null, url: '' },
+        busy: false,
+
+        init() {
+            this.rows().forEach((row) => {
+                this.statuses[row.dataset.postId] = row.dataset.status;
+            });
+
+            document.addEventListener('click', (event) => {
+                if (! event.target.closest('[data-status-menu], [data-status-trigger]')) {
+                    this.menu.open = false;
+                }
+            });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') this.menu.open = false;
+            });
+        },
+
+        rows() {
+            return Array.from(this.$el.querySelectorAll('[data-post-row]'));
+        },
+
+        label(postId) {
+            return {
+                draft: 'Draft',
+                published: 'Published',
+                scheduled: 'Scheduled',
+                archived: 'Archived',
+            }[this.statuses[postId]] || '';
+        },
+
+        pillClass(postId) {
+            const status = this.statuses[postId];
+
+            if (status === 'published') return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400';
+            if (status === 'scheduled') return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+            if (status === 'archived') return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
+
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
+        },
+
+        // The menu only ever offers the states the row is not already in.
+        offers(status) {
+            const current = this.statuses[this.menu.id];
+
+            if (current === undefined || current === status) return false;
+
+            // A scheduled post is already published, so publishing it again is a no-op.
+            return ! (status === 'published' && current === 'scheduled');
+        },
+
+        toggleAll(event) {
+            // Checkbox values arrive as strings, so select-all must too or the
+            // x-model comparison leaves every box visually unchecked.
+            this.selected = event.target.checked
+                ? this.rows().map((row) => row.dataset.postId)
+                : [];
+        },
+
+        get allSelected() {
+            return this.selected.length > 0 && this.selected.length === this.rows().length;
+        },
+
+        openMenu(event, postId, url) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.menu = {
+                open: true,
+                x: Math.min(event.clientX, window.innerWidth - 200),
+                y: Math.min(event.clientY, window.innerHeight - 180),
+                id: postId,
+                url: url,
+            };
+        },
+
+        async setStatus(status) {
+            const postId = this.menu.id;
+
+            this.menu.open = false;
+
+            if (postId === null) return;
+
+            const result = await this.send(this.menu.url, { status });
+
+            if (result) this.applyStatuses(result.statuses);
+        },
+
+        async bulkSetStatus(status) {
+            const ids = [...this.selected];
+
+            if (! ids.length) return;
+
+            const result = await this.send(this.bulkUrl, { status, posts: ids });
+
+            if (! result) return;
+
+            this.applyStatuses(result.statuses);
+            this.selected = [];
+        },
+
+        applyStatuses(map) {
+            Object.entries(map || {}).forEach(([postId, key]) => {
+                this.statuses[postId] = key;
+            });
+        },
+
+        async send(url, payload) {
+            if (this.busy) return null;
+
+            this.busy = true;
+
+            try {
+                const response = await fetch(url, {
+                    method: url === this.bulkUrl ? 'PUT' : 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                this.toast(response.ok ? 'success' : 'error', data.message || 'Could not update the post status.');
+
+                return response.ok ? data : null;
+            } catch (error) {
+                this.toast('error', 'Network error — the status was not changed.');
+
+                return null;
+            } finally {
+                this.busy = false;
+            }
+        },
+
+        toast(type, message) {
+            window.dispatchEvent(new CustomEvent('toast', { detail: { type, message } }));
+        },
+    }));
+
     window.Alpine.data('blockBuilder', (config) => ({
         blocks: Array.isArray(config.initialBlocks) ? config.initialBlocks : [],
         blockMeta: config.blockMeta || {},
@@ -823,6 +1187,8 @@ document.addEventListener('alpine:init', () => {
         sync() {
             const input = document.querySelector(`input[name="${this.fieldName}"]`);
             if (input) input.value = JSON.stringify(this.blocks);
+
+            window.dispatchEvent(new CustomEvent('blocks-changed', { detail: { count: this.blocks.length } }));
         },
 
         /**

@@ -37,7 +37,7 @@ final class ProfileController extends Controller
     {
         $user = auth()->user();
         $user->loadMissing('roles');
-        $user->loadCount(['bookings', 'bookingEvents', 'inspectionNotes']);
+        $user->loadCount(['bookings', 'bookingEvents', 'inspectionNotes', 'posts']);
         $qrCodeSvg = null;
 
         if ($user->two_factor_secret && ! $user->two_factor_confirmed_at) {
@@ -48,6 +48,7 @@ final class ProfileController extends Controller
             'user' => $user,
             'qrCodeSvg' => $qrCodeSvg,
             'recentBookings' => $user->bookings()->latest()->limit(5)->get(),
+            'recentPosts' => $user->posts()->orderByDesc('created_at')->orderByDesc('id')->limit(5)->get(),
             'activeSessions' => $this->userSessions->activeFor($user),
             'sessionHistory' => $this->userSessions->historyFor($user),
         ]);

@@ -15,10 +15,14 @@ Schedule::command('content-blocks:cleanup-orphaned-uploads')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/cleanup-orphaned-uploads.log'));
 
-// Close lapsed sessions and trim device history daily at 3 AM
+// Delete expired session rows and close the sign-ins that lapsed. Hourly rather
+// than nightly because a stale row is a wrong number on the overview card for a
+// whole day otherwise, and the overlap lock expires after 10 minutes so a run
+// killed mid-sweep cannot suppress the next 23 hours of them.
 Schedule::command('sessions:prune')
-    ->dailyAt('03:00')
-    ->withoutOverlapping()
+    ->hourly()
+    ->withoutOverlapping(10)
+    ->onOneServer()
     ->appendOutputTo(storage_path('logs/prune-user-sessions.log'));
 
 // Warm the heavy system overview sections so an admin never pays for a file

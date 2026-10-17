@@ -84,6 +84,7 @@ final class SettingsManager
             'announcement_active' => false,
             'require_email_verification' => false,
             'enable_registration' => false,
+            'session_idle_timeout_minutes' => 0,
             'announcements' => [],
             'gallery_metrics' => [],
             'quote_notification_emails' => '',

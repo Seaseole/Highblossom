@@ -27,7 +27,7 @@ final class CompanySettingService
         'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone', 'secondary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
-        'booking_lead_time_hours', 'require_email_verification',
+        'booking_lead_time_hours', 'require_email_verification', 'session_idle_timeout_minutes',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
     ];
 
@@ -283,6 +283,7 @@ final class CompanySettingService
             'quote_notification_emails' => (string) CompanySetting::get('quote_notification_emails', ''),
             'require_email_verification' => filter_var(CompanySetting::get('require_email_verification', '0'), FILTER_VALIDATE_BOOLEAN),
             'enable_registration' => filter_var(CompanySetting::get('enable_registration', '0'), FILTER_VALIDATE_BOOLEAN),
+            'session_idle_timeout_minutes' => (int) CompanySetting::get('session_idle_timeout_minutes', 0),
             'announcement_active' => CompanySetting::get('announcement_active', false),
             'announcements' => CompanySetting::get('announcements', []),
             'gallery_metrics' => CompanySetting::get('gallery_metrics', [

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -40,11 +41,19 @@ final class CategoryController
     /**
      * Store a newly created category in storage.
      *
-     * @return RedirectResponse
+     * @return RedirectResponse|JsonResponse
      */
     public function store(CategoryRequest $request)
     {
-        $this->categoryService->create($request->validated());
+        $category = $this->categoryService->create($request->validated());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'id' => $category->getKey(),
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ], 201);
+        }
 
         return redirect()
             ->route('admin.categories.index')

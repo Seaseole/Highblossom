@@ -9,6 +9,7 @@ use App\Enums\LoginMethod;
 use App\Enums\SessionEndReason;
 use App\Models\User;
 use App\Models\UserSession;
+use App\Services\SessionManager;
 use App\Services\UserSessionService;
 use DateTimeInterface;
 use Illuminate\Auth\Events\Logout;
@@ -289,7 +290,7 @@ class UserSessionTrackingTest extends TestCase
         $lapsed = $this->seedSession($user, self::SESSION_ID, now()->subMinutes(180));
         $live = $this->seedSession($user, self::OTHER_SESSION_ID);
 
-        $result = $this->service()->prune();
+        $result = $this->manager()->prune();
 
         $this->assertSame(1, $result['closed']);
         $this->assertSame(0, $result['purged']);
@@ -311,7 +312,7 @@ class UserSessionTrackingTest extends TestCase
         $expired = $this->endedSession($user, self::SESSION_ID, now()->subDays(91));
         $recent = $this->endedSession($user, self::OTHER_SESSION_ID, now()->subDays(30));
 
-        $result = $this->service()->prune();
+        $result = $this->manager()->prune();
 
         $this->assertSame(1, $result['purged']);
         $this->assertDatabaseMissing('user_sessions', ['id' => $expired->getKey()]);
@@ -427,6 +428,14 @@ class UserSessionTrackingTest extends TestCase
     private function service(): UserSessionService
     {
         return $this->app->make(UserSessionService::class);
+    }
+
+    /**
+     * Resolve the reconciliation service the prune command uses.
+     */
+    private function manager(): SessionManager
+    {
+        return $this->app->make(SessionManager::class);
     }
 
     /**

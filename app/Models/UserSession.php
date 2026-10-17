@@ -7,11 +7,14 @@ namespace App\Models;
 use App\Enums\DeviceType;
 use App\Enums\LoginMethod;
 use App\Enums\SessionEndReason;
+use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * One row per session lifecycle for a user: signed in, last seen, and closed.
@@ -110,6 +113,45 @@ final class UserSession extends Model
     }
 
     /**
+     * Restrict to sign-ins that are genuinely usable right now: open, inside the
+     * lifetime, and still backed by a framework session row that has not expired.
+     *
+     * Falls back to `active()` on a driver with no session table to join against,
+     * so the ledger stays readable when sessions live in a cache or array store.
+     *
+     * @param Builder<self> $query
+     */
+    public function scopeLive(Builder $query): Builder
+    {
+        $query = $this->scopeActive($query);
+        $table = self::sessionTable();
+
+        return $table === null ? $query : $query->whereExists(self::frameworkRow($table, valid: true));
+    }
+
+    /**
+     * Restrict to open rows whose framework session row is gone.
+     *
+     * Only rows past the grace window count, so a prune running while a request is
+     * still being served cannot close a session whose framework row is written at
+     * the end of that same request.
+     *
+     * @param Builder<self> $query
+     */
+    public function scopeOrphaned(Builder $query): Builder
+    {
+        $query->whereNull('ended_at')
+            ->whereNotNull('session_id')
+            ->where('last_seen_at', '<=', now()->subMinutes((int) config('user-sessions.orphan_grace_minutes')));
+
+        $table = self::sessionTable();
+
+        return $table === null
+            ? $query->whereRaw('1 = 0')
+            : $query->whereNotExists(self::frameworkRow($table, valid: false));
+    }
+
+    /**
      * Restrict to sessions belonging to one user.
      *
      * @param Builder<self> $query
@@ -125,6 +167,38 @@ final class UserSession extends Model
     public static function cutoff(): DateTimeInterface
     {
         return now()->subMinutes(self::lifetimeMinutes());
+    }
+
+    /**
+     * The same cutoff as a UNIX timestamp, which is the unit the framework session
+     * table stores `last_activity` in.
+     */
+    public static function frameworkCutoff(): int
+    {
+        return self::cutoff()->getTimestamp();
+    }
+
+    /**
+     * The framework session table, or null when sessions are not stored in the database.
+     */
+    private static function sessionTable(): ?string
+    {
+        return config('session.driver') === 'database' ? (string) config('session.table', 'sessions') : null;
+    }
+
+    /**
+     * Correlate a ledger row with its framework session row.
+     *
+     * @return Closure(QueryBuilder): void
+     */
+    private static function frameworkRow(string $table, bool $valid): Closure
+    {
+        return function (QueryBuilder $exists) use ($table, $valid): void {
+            $exists->select(DB::raw(1))
+                ->from($table)
+                ->whereColumn($table.'.id', 'user_sessions.session_id')
+                ->when($valid, fn (QueryBuilder $query) => $query->where($table.'.last_activity', '>', self::frameworkCutoff()));
+        };
     }
 
     /**

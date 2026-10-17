@@ -27,6 +27,8 @@ final class PostService
         $this->relocateContentImages($data);
         $this->syncPolls($data);
 
+        $data['user_id'] = $request->user()?->getKey();
+
         $post = Post::create($data);
 
         $this->syncRelations($post, $data);
@@ -48,6 +50,43 @@ final class PostService
         $this->syncRelations($post, $data);
 
         return $post->fresh();
+    }
+
+    /**
+     * Move a post between draft and published without touching its other fields.
+     */
+    public function updateStatus(Post $post, string $status): Post
+    {
+        $post->status = $status;
+
+        if ($status === 'published' && $post->published_at === null) {
+            $post->published_at = now();
+        }
+
+        $post->save();
+
+        return $post;
+    }
+
+    /**
+     * Apply a status change to many posts at once.
+     *
+     * @param iterable<Post> $posts
+     */
+    public function bulkUpdateStatus(iterable $posts, string $status): int
+    {
+        $changed = 0;
+
+        foreach ($posts as $post) {
+            if ($post->status === $status) {
+                continue;
+            }
+
+            $this->updateStatus($post, $status);
+            $changed++;
+        }
+
+        return $changed;
     }
 
     /**
@@ -128,11 +167,11 @@ final class PostService
      */
     private function syncRelations(Post $post, array $data): void
     {
-        if (isset($data['categories'])) {
+        if (array_key_exists('categories', $data)) {
             $post->categories()->sync($data['categories']);
         }
 
-        if (isset($data['tags'])) {
+        if (array_key_exists('tags', $data)) {
             $post->tags()->sync($data['tags']);
         }
     }
