@@ -158,76 +158,78 @@
             </div>
         </div>
     </div>
-</x-layouts::admin>
 
-<script src="{{ asset('js/image-upload.js') }}"></script>
-<script>
-    function mediaLibrary() {
-        return {
-            activeTab: 'browse',
-            showModal: false,
-            selectedImage: {},
-            init() {
-                window.addEventListener('open-image-preview', (e) => {
-                    this.fetchImageDetails(e.detail.id);
-                });
-            },
-            async fetchImageDetails(id) {
-                try {
-                    const response = await fetch(`/admin/media-library/${id}`);
-                    this.selectedImage = await response.json();
-                    this.showModal = true;
-                } catch (error) {
-                    console.error(error);
-                }
-            },
-            selectImage() {
-                window.dispatchEvent(new CustomEvent('image-selected', { detail: { url: this.selectedImage.url } }));
-                this.showModal = false;
-            },
-            async deleteImage() {
-                if (!confirm('Are you sure?')) return;
-                try {
-                    await fetch(`/admin/media-library/${this.selectedImage.id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                    });
-                    window.location.reload();
-                } catch (error) {
-                    console.error(error);
-                }
-            },
-        };
-    }
-
-    (function () {
-        const initMediaLibrary = function () {
-            if (typeof ImageUploader !== 'undefined') {
-                new ImageUploader({
-                    fileInput: document.querySelector('input[name="upload"]'),
-                    previewContainer: document.getElementById('media-image-preview'),
-                    progressContainer: document.getElementById('media-image-progress'),
-                    hiddenInput: document.getElementById('media-image-path'),
-                    uploadUrl: '{{ route("admin.image-upload") }}',
-                    csrfToken: '{{ csrf_token() }}',
-                    folder: 'uploads',
-                    maxSize: 5 * 1024 * 1024, // 5MB
-                    acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
-                    onUploadComplete: function (response) {
-                        console.log('Image uploaded successfully:', response);
-                        window.location.reload();
+    @push('scripts')
+        <script src="{{ asset('js/image-upload.js') }}"></script>
+        <script>
+            function mediaLibrary() {
+                return {
+                    activeTab: 'browse',
+                    showModal: false,
+                    selectedImage: {},
+                    init() {
+                        window.addEventListener('open-image-preview', (e) => {
+                            this.fetchImageDetails(e.detail.id);
+                        });
                     },
-                    onUploadError: function (message) {
-                        console.error('Upload error:', message);
+                    async fetchImageDetails(id) {
+                        try {
+                            const response = await fetch(`/admin/media-library/${id}`);
+                            this.selectedImage = await response.json();
+                            this.showModal = true;
+                        } catch (error) {
+                            console.error(error);
+                        }
                     },
-                });
+                    selectImage() {
+                        window.dispatchEvent(new CustomEvent('image-selected', { detail: { url: this.selectedImage.url } }));
+                        this.showModal = false;
+                    },
+                    async deleteImage() {
+                        if (!confirm('Are you sure?')) return;
+                        try {
+                            await fetch(`/admin/media-library/${this.selectedImage.id}`, {
+                                method: 'DELETE',
+                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            });
+                            window.location.reload();
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                };
             }
-        };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initMediaLibrary);
-        } else {
-            initMediaLibrary();
-        }
-    })();
-</script>
+            (function () {
+                const initMediaLibrary = function () {
+                    if (typeof ImageUploader !== 'undefined') {
+                        new ImageUploader({
+                            fileInput: document.querySelector('input[name="upload"]'),
+                            previewContainer: document.getElementById('media-image-preview'),
+                            progressContainer: document.getElementById('media-image-progress'),
+                            hiddenInput: document.getElementById('media-image-path'),
+                            uploadUrl: '{{ route("admin.image-upload") }}',
+                            csrfToken: '{{ csrf_token() }}',
+                            folder: 'uploads',
+                            maxSize: 5 * 1024 * 1024, // 5MB
+                            acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'],
+                            onUploadComplete: function (response) {
+                                console.log('Image uploaded successfully:', response);
+                                window.location.reload();
+                            },
+                            onUploadError: function (message) {
+                                console.error('Upload error:', message);
+                            },
+                        });
+                    }
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initMediaLibrary);
+                } else {
+                    initMediaLibrary();
+                }
+            })();
+        </script>
+    @endpush
+</x-layouts::admin>

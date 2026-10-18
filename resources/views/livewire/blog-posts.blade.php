@@ -17,6 +17,7 @@
                         <h2 class="font-headline text-2xl leading-tight font-bold text-[#FAFAFA] md:text-4xl">
                             <a
                                 href="{{ route('blog.show', $featured->slug) }}"
+                                wire:navigate
                                 class="relative z-10 transition-colors hover:text-[#DC2626]"
                             >
                                 {{ $featured->title }}
@@ -48,6 +49,7 @@
                             @foreach ($featured->tags->take(3) as $tag)
                                 <a
                                     href="{{ route('blog', ['tag' => $tag->slug]) }}"
+                                    wire:navigate
                                     class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-[#FAFAFA] backdrop-blur-sm transition-colors hover:border-[#DC2626]/40 hover:text-[#DC2626]"
                                 >
                                     {{ $tag->name }}
@@ -66,6 +68,7 @@
             <nav class="-mb-px flex flex-wrap items-center gap-1" aria-label="Blog categories">
                 <a
                     href="{{ route('blog') }}"
+                    wire:navigate
                     class="border-b-2 px-4 py-3 text-sm font-medium transition-colors {{ ! $categorySlug && ! $tagSlug ? 'border-[#DC2626] text-[#FAFAFA]' : 'border-transparent text-[#A1A1AA] hover:border-white/30 hover:text-[#FAFAFA]' }}"
                 >
                     All
@@ -74,6 +77,7 @@
                 @foreach ($categoryTabs as $tab)
                     <a
                         href="{{ route('blog', ['category' => $tab->slug]) }}"
+                        wire:navigate
                         class="border-b-2 px-4 py-3 text-sm font-medium transition-colors {{ $categorySlug === $tab->slug ? 'border-[#DC2626] text-[#FAFAFA]' : 'border-transparent text-[#A1A1AA] hover:border-white/30 hover:text-[#FAFAFA]' }}"
                     >
                         {{ $tab->name }}
@@ -92,6 +96,7 @@
                 @foreach ($tags as $tag)
                     <a
                         href="{{ route('blog', ['tag' => $tag->slug]) }}"
+                        wire:navigate
                         wire:key="tag-{{ $tag->id }}"
                         class="rounded-full border px-3 py-1.5 text-xs transition-all duration-200 {{ $tagSlug === $tag->slug ? 'border-[#DC2626]/40 bg-[#DC2626]/10 text-[#DC2626]' : 'border-white/10 bg-white/5 text-[#A1A1AA] hover:border-[#DC2626]/30 hover:text-[#DC2626]' }}"
                     >
@@ -147,6 +152,7 @@
                             <h3 class="font-headline mt-3 line-clamp-2 text-xl leading-snug font-bold text-[#FAFAFA]">
                                 <a
                                     href="{{ route('blog.show', $post->slug) }}"
+                                    wire:navigate
                                     class="relative z-10 transition-colors duration-300 group-hover:text-[#DC2626]"
                                 >
                                     {{ $post->title }}
@@ -181,7 +187,7 @@
                 Showing {{ $posts->firstItem() }}–{{ $posts->lastItem() }} of {{ number_format($shownTotal) }} posts
             </p>
 
-            <div class="mt-6">{{ $posts->links() }}</div>
+            <div class="mt-6">{{ $posts->links('vendor.pagination.site') }}</div>
         </div>
     @else
         <div class="py-20 text-center lg:py-28">

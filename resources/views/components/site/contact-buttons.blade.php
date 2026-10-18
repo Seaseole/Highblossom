@@ -20,6 +20,7 @@
     @if ($showQuote)
         <a
             href="{{ route('quote') }}"
+            wire:navigate
             class="btn-premium glow-red {{ $base }} {{ $focus }}"
         >
             <span>{{ $quoteLabel ?? __('site.home.cta_band_quote') }}</span>

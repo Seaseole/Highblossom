@@ -76,11 +76,19 @@
     @include('partials.whatsapp-fab')
     @include('partials.cookie-consent')
 
+    {{-- Structured data lives in the body so each navigation carries only its own page's schema. --}}
+    <x-seo.schema />
+
     <!-- Custom Toast Notification -->
     <x-ui.toaster />
 
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    {{-- wire:navigate is a Livewire directive, and Livewire only auto-injects its bundle on
+         pages that render a component. Most public pages render none, so load it explicitly. --}}
+    @livewireScripts
+
     @stack('scripts')
 </body>
 </html>

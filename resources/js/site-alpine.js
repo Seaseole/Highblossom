@@ -1,13 +1,25 @@
-import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
 
-window.Alpine = Alpine;
-Alpine.plugin(collapse);
+// Livewire 4 ships and boots the one Alpine instance the public site runs on. Importing
+// alpinejs here as well started a second copy, and components registered on either one
+// were invisible to the other, so these registrations are queued and applied when
+// Livewire's Alpine reaches alpine:init.
+const registrations = [];
+
+document.addEventListener('alpine:init', () => {
+    window.Alpine.plugin(collapse);
+
+    registrations.forEach((register) => register());
+});
+
+const siteAlpine = {
+    data: (...args) => registrations.push(() => window.Alpine.data(...args)),
+};
 
 // Full-screen viewer for content-block image sets. It reads its slides from the
 // tiles already in the DOM, so blocks stay inert markup and the page mounts this
 // once per post.
-Alpine.data('cbImageLightbox', () => ({
+siteAlpine.data('cbImageLightbox', () => ({
     isOpen: false,
     slides: [],
     index: 0,
@@ -98,7 +110,7 @@ Alpine.data('cbImageLightbox', () => ({
 
 // Blog command palette: Ctrl/Cmd+K from anywhere on the blog, predictive results,
 // and search history kept in the browser only.
-Alpine.data('blogSearchPalette', () => ({
+siteAlpine.data('blogSearchPalette', () => ({
     STORAGE_KEY: 'highblossom-blog-search',
     HISTORY_LIMIT: 6,
     MIN_QUERY: 2,
@@ -123,23 +135,26 @@ Alpine.data('blogSearchPalette', () => ({
     request: 0,
     lastFocused: null,
     bodyOverflow: '',
+    openHandler: null,
+    keyHandler: null,
 
     init() {
         this.endpoint = this.$el.dataset.endpoint;
         this.listing = this.$el.dataset.listing;
         this.history = this.readHistory();
 
-        // Bound here rather than with x-on:...window, because the triggers live in a
-        // Livewire component and Livewire runs its own Alpine instance. The trigger
-        // hands itself over so focus can return to it even where a click does not
-        // focus the button (Safari).
-        window.addEventListener('blog-search:open', (event) => {
+        // Bound directly rather than with x-on:...window: the header trigger sits in plain
+        // Blade outside this component's tree. The trigger hands itself over so focus can
+        // return to it even where a click does not focus the button (Safari).
+        this.openHandler = (event) => {
             if (!this.open) this.show(event.detail?.trigger);
-        });
+        };
+        this.keyHandler = (event) => this.onGlobalKey(event);
+
+        window.addEventListener('blog-search:open', this.openHandler);
+        window.addEventListener('keydown', this.keyHandler);
 
         this.fetch('');
-
-        window.addEventListener('keydown', (event) => this.onGlobalKey(event));
 
         this.$watch('open', (open) => {
             if (open) {
@@ -153,6 +168,13 @@ Alpine.data('blogSearchPalette', () => ({
         });
     },
 
+    // window listeners outlive the element, and wire:navigate replaces the whole body,
+    // so they have to come back off or every blog view stacks another Ctrl/Cmd+K handler.
+    destroy() {
+        if (this.openHandler) window.removeEventListener('blog-search:open', this.openHandler);
+        if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+    },
+
     /**
      * Fill the palette's resting state from the cache or a fresh request.
      */
@@ -163,6 +185,9 @@ Alpine.data('blogSearchPalette', () => ({
     },
 
     onGlobalKey(event) {
+        // A copy left behind by an earlier view must not answer the shortcut.
+        if (!this.$el?.isConnected) return;
+
         const key = (event.key || '').toLowerCase();
 
         if ((event.ctrlKey || event.metaKey) && key === 'k') {
@@ -585,5 +610,3 @@ Alpine.data('blogSearchPalette', () => ({
         }
     },
 }));
-
-Alpine.start();

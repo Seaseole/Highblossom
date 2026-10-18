@@ -69,7 +69,7 @@
                     class="animate-fade-up flex flex-col items-center justify-center gap-4 sm:flex-row"
                     style="animation-delay: 300ms"
                 >
-                    <a href="{{ route('quote') }}" class="btn-premium-md glow-red-subtle">
+                    <a href="{{ route('quote') }}" wire:navigate class="btn-premium-md glow-red-subtle">
                         <span>{{ __('site.home.hero_get_quote') }}</span>
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -82,6 +82,7 @@
                     </a>
                     <a
                         href="{{ route('gallery') }}"
+                        wire:navigate
                         class="btn-glass px-8 py-4 text-lg"
                     >
                         <span>{{ __('site.home.hero_view_work') }}</span>
@@ -256,6 +257,7 @@
                 </div>
                 <a
                     href="{{ route('services') }}"
+                    wire:navigate
                     class="btn-glass px-8 py-4 text-lg"
                 >
                     <span>{{ __('site.home.services_view_all') }}</span>
@@ -306,6 +308,7 @@
                     </div>
                     <a
                         href="{{ route('gallery') }}"
+                        wire:navigate
                         class="btn-glass min-h-[44px] px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg"
                     >
                         <span>{{ __('site.home.gallery_view_full') }}</span>
@@ -326,6 +329,7 @@
                     @foreach ($featuredGalleryImages as $image)
                         <a
                             href="{{ route('gallery') }}"
+                            wire:navigate
                             class="group relative block overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121218]"
                             aria-label="{{ __('site.home.gallery_view_full') }} — {{ $image->title }}"
                         >
@@ -469,6 +473,7 @@
 
                     <a
                         href="{{ route('bookings.create') }}"
+                        wire:navigate
                         class="btn-glass inline-flex min-h-[44px] items-center px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg"
                     >
                         <span>{{ __('site.book_appointment') }}</span>
@@ -737,7 +742,6 @@
                 }
             }
 
-            // Cleanup on page navigation
             function cleanup() {
                 isRunning = false;
                 activeAnimations.forEach((animation) => {
@@ -757,9 +761,17 @@
                 runAnimationLoop();
             }
 
-            // Cleanup on page unload
-            window.addEventListener('beforeunload', cleanup);
-            window.addEventListener('pagehide', cleanup);
+            // This IIFE re-runs on every view of the home page, so the teardown itself is
+            // bound once per document and always disposes the newest copy. pagehide alone
+            // is not enough: wire:navigate never fires it.
+            window.__heroAnimationCleanup = cleanup;
+
+            if (! window.__heroTeardownBound) {
+                window.__heroTeardownBound = true;
+                window.addEventListener('beforeunload', () => window.__heroAnimationCleanup?.());
+                window.addEventListener('pagehide', () => window.__heroAnimationCleanup?.());
+                document.addEventListener('livewire:navigate', () => window.__heroAnimationCleanup?.());
+            }
         })();
     </script>
     {{-- Mobile Sticky Conversion Bar: Call and WhatsApp always within reach. --}}
@@ -862,14 +874,17 @@
                 }
             }
 
+            let heroObserver = null;
+
             if (hero && 'IntersectionObserver' in window) {
-                new IntersectionObserver(
+                heroObserver = new IntersectionObserver(
                     (entries) => {
                         heroVisible = entries[0].isIntersecting;
                         evaluate();
                     },
                     { threshold: 0 }
-                ).observe(hero);
+                );
+                heroObserver.observe(hero);
             } else {
                 heroVisible = false;
             }
@@ -878,11 +893,20 @@
             window.addEventListener('resize', onScroll, { passive: true });
             evaluate();
 
-            window.addEventListener('pagehide', function cleanup() {
+            // Re-runs on every view of the home page, so one document-level teardown is
+            // bound and handed the newest disposer each time. pagehide never fires on a
+            // wire:navigate, so the observer and listeners would otherwise leak per visit.
+            window.__stickyBarCleanup = function cleanup() {
                 window.removeEventListener('scroll', onScroll);
                 window.removeEventListener('resize', onScroll);
-                window.removeEventListener('pagehide', cleanup);
-            });
+                heroObserver?.disconnect();
+            };
+
+            if (! window.__stickyBarTeardownBound) {
+                window.__stickyBarTeardownBound = true;
+                window.addEventListener('pagehide', () => window.__stickyBarCleanup?.());
+                document.addEventListener('livewire:navigate', () => window.__stickyBarCleanup?.());
+            }
         })();
     </script>
 </x-layouts::site>

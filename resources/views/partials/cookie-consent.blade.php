@@ -20,8 +20,8 @@
         <p class="mb-8 text-sm leading-relaxed text-[#A1A1AA]">
             We use cookies to enhance your experience, analyze site traffic, and provide personalized services. By
             clicking "Accept", you agree to our
-            <a href="{{ route('privacy') }}" class="font-semibold text-[#DC2626] hover:underline">Privacy Policy</a> and
-            <a href="{{ route('terms') }}" class="font-semibold text-[#DC2626] hover:underline">Terms of Service</a>.
+            <a href="{{ route('privacy') }}" wire:navigate class="font-semibold text-[#DC2626] hover:underline">Privacy Policy</a> and
+            <a href="{{ route('terms') }}" wire:navigate class="font-semibold text-[#DC2626] hover:underline">Terms of Service</a>.
         </p>
 
         <div class="flex flex-col gap-3">

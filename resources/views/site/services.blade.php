@@ -86,7 +86,7 @@
                                     @endforeach
                                 </ul>
                             @endif
-                            <a href="{{ route('quote') }}" class="btn-premium">
+                            <a href="{{ route('quote') }}" wire:navigate class="btn-premium">
                                 <span>{{ __('services.get_quote_service') }}</span>
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -114,7 +114,7 @@
                                     @endforeach
                                 </ul>
                             @endif
-                            <a href="{{ route('quote') }}" class="btn-premium">
+                            <a href="{{ route('quote') }}" wire:navigate class="btn-premium">
                                 <span>{{ __('services.get_quote_service') }}</span>
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -158,6 +158,7 @@
                 <div class="mt-16 text-center">
                     <a
                         href="{{ route('services', ['page' => $services->currentPage() + 1]) }}"
+                        wire:navigate
                         class="btn-glass px-8 py-4 text-lg"
                     >
                         <span>{{ __('services.load_more') }}</span>

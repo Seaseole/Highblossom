@@ -34,8 +34,9 @@
         @endif
 
         {{-- Every tile uses the same labelled link; the bare chevron variant is gone. --}}
-        <a
-            href="{{ $link }}"
+        <x-site.link
+            :href="$link"
+            prefetch
             class="mt-auto inline-flex min-h-[44px] items-center gap-2 self-start text-sm font-semibold text-[#DC2626] transition-all hover:text-[#B91C1C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
             aria-label="{{ __('site.learn_more') }} — {{ $service->title }}"
         >
@@ -43,6 +44,6 @@
             <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-        </a>
+        </x-site.link>
     </div>
 </article>

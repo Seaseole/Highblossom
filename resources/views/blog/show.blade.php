@@ -18,6 +18,7 @@
                 @if ($post->categories->isNotEmpty())
                     <a
                         href="{{ route('blog', ['category' => $post->categories->first()->slug]) }}"
+                        wire:navigate
                         class="text-xs font-semibold tracking-wider text-[#DC2626] uppercase transition-colors hover:text-[#B91C1C]"
                     >
                         {{ $post->categories->first()->name }}
@@ -55,6 +56,7 @@
                         @foreach ($post->tags as $tag)
                             <a
                                 href="{{ route('blog', ['tag' => $tag->slug]) }}"
+                                wire:navigate
                                 class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[#A1A1AA] transition-colors hover:border-[#DC2626]/30 hover:text-[#DC2626]"
                             >
                                 #{{ $tag->name }}
@@ -102,6 +104,7 @@
                                     <h3 class="font-headline line-clamp-2 text-base leading-snug font-semibold text-[#FAFAFA]">
                                         <a
                                             href="{{ route('blog.show', $relatedPost->slug) }}"
+                                            wire:navigate
                                             class="relative z-10 transition-colors group-hover:text-[#DC2626]"
                                         >
                                             {{ $relatedPost->title }}
@@ -121,6 +124,7 @@
             <div class="mt-12">
                 <a
                     href="{{ route('blog') }}"
+                    wire:navigate
                     class="inline-flex items-center text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
                 >
                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

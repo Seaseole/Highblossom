@@ -423,6 +423,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <a
                     href="{{ route('quote') }}"
+                    wire:navigate
                     class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
                 >
                     <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
@@ -442,6 +443,7 @@
 
                 <a
                     href="{{ route('services') }}"
+                    wire:navigate
                     class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
                 >
                     <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
@@ -461,6 +463,7 @@
 
                 <a
                     href="{{ route('gallery') }}"
+                    wire:navigate
                     class="glass-card group rounded-2xl p-8 transition-all hover:bg-white/[0.06]"
                 >
                     <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">

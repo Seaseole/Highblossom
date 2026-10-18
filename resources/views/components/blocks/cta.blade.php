@@ -30,11 +30,11 @@
             <p class="text-lg {{ $textClass }} mb-6">{{ $text }}</p>
         @endif
 
-        <a
-            href="{{ $button_url }}"
+        <x-site.link
+            :href="$button_url"
             class="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg shadow-sm {{ $buttonClass }} transition-colors"
         >
             {{ $button_text }}
-        </a>
+        </x-site.link>
     </div>
 </section>

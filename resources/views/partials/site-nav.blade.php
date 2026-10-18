@@ -89,13 +89,10 @@
                                     @endphp
                                     <div class="ticker-item mx-4 text-[11px] font-medium tracking-wide text-white">
                                         @if (! empty($link))
-                                            <a
-                                                href="{{ $link }}"
-                                                class="flex items-center gap-1 transition-colors hover:text-white/80"
-                                            >
+                                            <x-site.link :href="$link" class="flex items-center gap-1 transition-colors hover:text-white/80">
                                                 <span>{{ $announcement['text'] }}</span>
                                                 <span class="material-symbols-outlined text-[12px] opacity-80">arrow_forward</span>
-                                            </a>
+                                            </x-site.link>
                                         @else
                                             <span>{{ $announcement['text'] }}</span>
                                         @endif
@@ -121,7 +118,7 @@
 
     <div class="mx-auto flex w-full max-w-[1400px] items-center justify-between px-6 py-4 lg:px-8">
         {{-- Logo --}}
-        <a href="{{ route('home') }}" class="transition-opacity hover:opacity-80">
+        <a href="{{ route('home') }}" wire:navigate.hover class="transition-opacity hover:opacity-80">
             <x-logo-trust-badge
                 :business-name="$logoText"
                 :icon-src="$businessLogo ? media_url($businessLogo) : null"
@@ -137,36 +134,41 @@
         <div class="hidden items-center gap-8 md:flex">
             <a
                 href="{{ route('home') }}"
+                wire:navigate.hover
                 class="nav-link {{ request()->routeIs('home') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight"
             >
                 Home
             </a>
             <a
                 href="{{ route('about-us') }}"
+                wire:navigate.hover
                 class="nav-link {{ request()->routeIs('about-us') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight"
             >
                 About Us
             </a>
             <a
                 href="{{ route('services') }}"
+                wire:navigate.hover
                 class="nav-link {{ request()->routeIs('services') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight"
             >
                 Services
             </a>
             <a
                 href="{{ route('gallery') }}"
+                wire:navigate.hover
                 class="nav-link {{ request()->routeIs('gallery') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight"
             >
                 Gallery
             </a>
             <a
                 href="{{ route('blog') }}"
+                wire:navigate.hover
                 class="nav-link {{ request()->routeIs('blog') ? 'active' : '' }} font-headline font-semibold text-sm tracking-tight"
             >
                 Blog
             </a>
-            <a href="{{ route('quote') }}" class="btn-premium min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.get_quote') }} </a>
-            <a href="{{ route('bookings.create') }}" class="btn-glass min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.book_appointment') }} </a>
+            <a href="{{ route('quote') }}" wire:navigate.hover class="btn-premium min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.get_quote') }} </a>
+            <a href="{{ route('bookings.create') }}" wire:navigate.hover class="btn-glass min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.book_appointment') }} </a>
         </div>
 
         {{-- Right Side Actions --}}
@@ -284,6 +286,8 @@
                 id="mobile-menu-btn"
                 class="p-2 text-[#FAFAFA] transition-colors hover:text-[#DC2626] md:hidden"
                 aria-label="Toggle menu"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
             >
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -320,6 +324,7 @@
             <a
                 href="{{ route('home') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('home') ? 'text-[#DC2626]' : '' }}"
             >
                 Home
@@ -327,6 +332,7 @@
             <a
                 href="{{ route('about-us') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('about-us') ? 'text-[#DC2626]' : '' }}"
             >
                 About Us
@@ -334,6 +340,7 @@
             <a
                 href="{{ route('services') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('services') ? 'text-[#DC2626]' : '' }}"
             >
                 Services
@@ -341,6 +348,7 @@
             <a
                 href="{{ route('gallery') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('gallery') ? 'text-[#DC2626]' : '' }}"
             >
                 Gallery
@@ -348,6 +356,7 @@
             <a
                 href="{{ route('blog') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('blog') ? 'text-[#DC2626]' : '' }}"
             >
                 Blog
@@ -355,6 +364,7 @@
             <a
                 href="{{ route('quote') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="mt-2 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#DC2626] px-6 text-base font-bold text-white transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
             >
                 {{ __('site.get_quote') }}
@@ -362,6 +372,7 @@
             <a
                 href="{{ route('bookings.create') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-base font-bold text-[#FAFAFA] transition-all hover:border-[#DC2626]/40 hover:bg-[#DC2626]/10 active:scale-[0.98]"
             >
                 {{ __('site.book_appointment') }}
@@ -399,6 +410,7 @@
             <a
                 href="{{ route('contact') }}"
                 onclick="closeMobileMenu()"
+                wire:navigate
                 class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('contact') ? 'text-[#DC2626]' : '' }}"
             >
                 Contact
@@ -452,6 +464,14 @@
     <script>
         (function () {
             'use strict';
+
+            // This push re-runs on every wire:navigate page view. The handlers below live
+            // on `document`, so without this guard each navigation stacks another copy.
+            if (window.siteNavBound) {
+                return;
+            }
+
+            window.siteNavBound = true;
 
             const TRANSITION_DURATION = 400; // ms — matches CSS .mobile-menu transition
 
@@ -509,39 +529,51 @@
             // Expose globally for onclick handlers on anchor tags
             window.closeMobileMenu = closeMobileMenu;
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-                const mobileMenuClose = document.getElementById('mobile-menu-close');
-                const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            // Delegated rather than bound to the elements themselves: wire:navigate
+            // replaces the whole <body>, so any direct binding points at a detached node
+            // from the previous page.
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('#mobile-menu-btn')) {
+                    openMobileMenu();
 
-                if (mobileMenuBtn) {
-                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
-                    mobileMenuBtn.setAttribute('aria-controls', 'mobile-menu');
-                    mobileMenuBtn.addEventListener('click', openMobileMenu);
+                    return;
                 }
-                if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
-                if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
 
-                // Close on Escape key
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && isOpen) closeMobileMenu();
-                });
+                if (e.target.closest('#close-announcement-btn')) {
+                    const bar = document.getElementById('announcement-ticker-bar');
 
-                // Close Announcement Bar
-                const closeAnnouncementBtn = document.getElementById('close-announcement-btn');
-                if (closeAnnouncementBtn) {
-                    closeAnnouncementBtn.addEventListener('click', function () {
-                        const bar = document.getElementById('announcement-ticker-bar');
-                        if (bar) {
-                            bar.style.height = '0px';
-                            bar.style.paddingTop = '0px';
-                            bar.style.paddingBottom = '0px';
-                            bar.style.opacity = '0';
-                            bar.style.borderBottomWidth = '0px';
-                            sessionStorage.setItem('dismissed_announcement', 'true');
-                        }
-                    });
+                    if (bar) {
+                        bar.style.height = '0px';
+                        bar.style.paddingTop = '0px';
+                        bar.style.paddingBottom = '0px';
+                        bar.style.opacity = '0';
+                        bar.style.borderBottomWidth = '0px';
+                        sessionStorage.setItem('dismissed_announcement', 'true');
+                    }
+
+                    return;
                 }
+
+                if (e.target.closest('#mobile-menu-close') || e.target.closest('#mobile-menu-overlay')) {
+                    closeMobileMenu();
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && isOpen) closeMobileMenu();
+            });
+
+            // The menu markup comes back closed from the next page, so the closure has to
+            // agree with it; otherwise the first tap after navigating is swallowed by the
+            // isOpen guard and the drawer stops opening.
+            document.addEventListener('livewire:navigated', function () {
+                if (closeTimer) {
+                    clearTimeout(closeTimer);
+                    closeTimer = null;
+                }
+
+                isOpen = false;
+                document.body.style.overflow = '';
             });
         })();
     </script>

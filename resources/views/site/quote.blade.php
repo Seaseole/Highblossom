@@ -509,57 +509,58 @@
             </div>
         </div>
     </section>
-</x-layouts::site>
 
-<script>
-    // Function to load sub-categories via AJAX
-    function loadSubCategories(glassTypeId) {
-        if (!glassTypeId) {
-            return Promise.resolve([]);
-        }
+    @push('scripts')
+        <script>
+            // Called from the Alpine glass-type select above, so it has to be a global.
+            function loadSubCategories(glassTypeId) {
+                if (!glassTypeId) {
+                    return Promise.resolve([]);
+                }
 
-        return fetch(`{{ route('api.glass-types.sub-categories', ':id') }}`.replace(':id', glassTypeId))
-            .then((response) => response.json())
-            .then((data) => data.sub_categories || [])
-            .catch((error) => {
-                console.error('Error loading sub-categories:', error);
-                return [];
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('file-upload');
-        const preview = document.getElementById('quote-image-preview');
-
-        if (! input || ! preview) {
-            return;
-        }
-
-        // The photo travels with the multipart submit, so the preview only needs
-        // to confirm the selection locally rather than upload it first.
-        input.addEventListener('change', function () {
-            const file = input.files[0];
-            preview.replaceChildren();
-
-            if (! file) {
-                return;
+                return fetch(`{{ route('api.glass-types.sub-categories', ':id') }}`.replace(':id', glassTypeId))
+                    .then((response) => response.json())
+                    .then((data) => data.sub_categories || [])
+                    .catch((error) => {
+                        console.error('Error loading sub-categories:', error);
+                        return [];
+                    });
             }
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'relative aspect-video w-full overflow-hidden rounded-xl border border-white/5 shadow-sm';
+            const input = document.getElementById('file-upload');
+            const preview = document.getElementById('quote-image-preview');
 
-            const img = document.createElement('img');
-            img.className = 'h-full w-full object-cover';
-            img.alt = '';
-            img.addEventListener('load', () => URL.revokeObjectURL(img.src), { once: true });
-            img.src = URL.createObjectURL(file);
+            // No DOMContentLoaded wrapper: this push is a body script, so it already runs
+            // after the markup exists, and on every wire:navigate visit it runs again
+            // against that visit's fresh, unbound elements.
+            if (input && preview) {
+                // The photo travels with the multipart submit, so the preview only needs
+                // to confirm the selection locally rather than upload it first.
+                input.addEventListener('change', function () {
+                    const file = input.files[0];
+                    preview.replaceChildren();
 
-            const caption = document.createElement('p');
-            caption.className = 'mt-2 text-xs text-[#71717A]';
-            caption.textContent = file.name;
+                    if (! file) {
+                        return;
+                    }
 
-            wrapper.append(img);
-            preview.append(wrapper, caption);
-        });
-    });
-</script>
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative aspect-video w-full overflow-hidden rounded-xl border border-white/5 shadow-sm';
+
+                    const img = document.createElement('img');
+                    img.className = 'h-full w-full object-cover';
+                    img.alt = '';
+                    img.addEventListener('load', () => URL.revokeObjectURL(img.src), { once: true });
+                    img.src = URL.createObjectURL(file);
+
+                    const caption = document.createElement('p');
+                    caption.className = 'mt-2 text-xs text-[#71717A]';
+                    caption.textContent = file.name;
+
+                    wrapper.append(img);
+                    preview.append(wrapper, caption);
+                });
+            }
+        </script>
+    @endpush
+</x-layouts::site>

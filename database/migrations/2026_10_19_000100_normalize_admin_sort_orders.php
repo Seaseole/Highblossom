@@ -33,13 +33,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create(self::SNAPSHOT_TABLE, function (Blueprint $table) {
-            $table->id();
-            $table->string('table_name');
-            $table->string('column_name');
-            $table->unsignedBigInteger('row_id');
-            $table->integer('old_value')->nullable();
-        });
+        // Guarded because a failed attempt leaves this table behind: CREATE TABLE is DDL,
+        // so MySQL commits it immediately and the surrounding transaction cannot undo it.
+        // The renumbered rows inside that transaction do roll back, which makes re-running
+        // safe, and the leftover table is empty, so the snapshot below still starts clean.
+        if (! Schema::hasTable(self::SNAPSHOT_TABLE)) {
+            Schema::create(self::SNAPSHOT_TABLE, function (Blueprint $table) {
+                $table->id();
+                $table->string('table_name');
+                $table->string('column_name');
+                $table->unsignedBigInteger('row_id');
+                $table->integer('old_value')->nullable();
+            });
+        }
 
         DB::transaction(function (): void {
             foreach (SortOrderRenumberPlan::build() as $group) {
@@ -64,9 +70,10 @@ return new class extends Migration
                         ->update([$group['column'] => $row['new']]);
                 }
 
-                collect($snapshots)->chunk(500)->each(
-                    fn (array $chunk) => DB::table(self::SNAPSHOT_TABLE)->insert($chunk)
-                );
+                // Chunked because MySQL rejects an INSERT that is too large for one packet.
+                foreach (collect($snapshots)->chunk(500) as $chunk) {
+                    DB::table(self::SNAPSHOT_TABLE)->insert($chunk->all());
+                }
             }
         });
     }

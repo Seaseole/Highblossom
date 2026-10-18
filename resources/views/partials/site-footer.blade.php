@@ -4,7 +4,7 @@
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
             {{-- Brand Column --}}
             <div class="lg:col-span-1">
-                <a href="{{ route('home') }}" class="transition-opacity hover:opacity-80">
+                <a href="{{ route('home') }}" wire:navigate class="transition-opacity hover:opacity-80">
                     <x-logo-trust-badge
                         :business-name="$logoText"
                         :icon-src="$businessLogo ? media_url($businessLogo) : null"
@@ -118,6 +118,7 @@
                 @else
                     <a
                         href="{{ route('services') }}"
+                        wire:navigate
                         class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
                     >
                         {{ __('site.services') }}
@@ -132,6 +133,7 @@
                     <li>
                         <a
                             href="{{ route('home') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             {{ __('site.nav_home') }}
@@ -140,6 +142,7 @@
                     <li>
                         <a
                             href="{{ route('about-us') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             {{ __('site.about') }}
@@ -148,6 +151,7 @@
                     <li>
                         <a
                             href="{{ route('gallery') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             Our Work
@@ -156,6 +160,7 @@
                     <li>
                         <a
                             href="{{ route('blog') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             {{ __('site.blog') }}
@@ -164,6 +169,7 @@
                     <li>
                         <a
                             href="{{ route('quote') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             {{ __('site.get_quote') }}
@@ -172,6 +178,7 @@
                     <li>
                         <a
                             href="{{ route('contact') }}"
+                            wire:navigate
                             class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             {{ __('site.contact') }}
@@ -251,12 +258,14 @@
                 <div class="flex items-center gap-6">
                     <a
                         href="{{ route('privacy') }}"
+                        wire:navigate
                         class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
                     >
                         Privacy Policy
                     </a>
                     <a
                         href="{{ route('terms') }}"
+                        wire:navigate
                         class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
                     >
                         Terms of Service
@@ -271,6 +280,7 @@
                     Crafted with care by
                     <a
                         href="{{ route('home') }}"
+                        wire:navigate
                         class="font-medium text-[#A1A1AA] transition-colors duration-200 hover:text-[#DC2626]"
                     >Eugene Seaseole</a>
                 </span>

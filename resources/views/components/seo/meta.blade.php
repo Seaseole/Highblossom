@@ -55,10 +55,3 @@
 @if ($seoMetadata->twitterImage)
     <meta name="twitter:image" content="{{ $seoMetadata->twitterImage }}" />
 @endif
-
-{{-- JSON-LD Structured Data --}}
-@if ($seoMetadata->schemaJsonLd)
-    <script type="application/ld+json">
-        {!! json_encode($seoMetadata->schemaJsonLd, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}
-    </script>
-@endif

@@ -37,12 +37,12 @@
 
             @if ($cta_text)
                 <div class="mt-8">
-                    <a
-                        href="{{ $cta_url }}"
+                    <x-site.link
+                        :href="$cta_url"
                         class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
                     >
                         {{ $cta_text }}
-                    </a>
+                    </x-site.link>
                 </div>
             @endif
         </div>

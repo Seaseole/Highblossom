@@ -21,6 +21,7 @@
             <div class="mb-16 flex flex-wrap justify-center gap-3">
                 <a
                     href="{{ route('gallery') }}"
+                    wire:navigate
                     class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ !$category ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}"
                 >
                     {{ __('gallery.all_projects') }}
@@ -28,6 +29,7 @@
                 @foreach ($categories as $cat)
                     <a
                         href="{{ route('gallery', ['category' => $cat->slug]) }}"
+                        wire:navigate
                         class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ $category === $cat->slug ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}"
                     >
                         {{ $cat->name }}
@@ -65,6 +67,7 @@
                                 </button>
                                 <a
                                     href="{{ route('gallery.show', $image) }}"
+                                    wire:navigate
                                     class="rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-[#FAFAFA] backdrop-blur-md transition-colors hover:bg-white/20"
                                 >
                                     {{ __('gallery.project_details') }}
@@ -90,6 +93,7 @@
                 <div class="mt-16 text-center">
                     <a
                         href="{{ route('gallery', array_merge(request()->all(), ['page' => $images->currentPage() + 1])) }}"
+                        wire:navigate
                         class="btn-glass px-8 py-4 text-lg"
                     >
                         <span>{{ __('gallery.load_more') }}</span>
@@ -177,17 +181,30 @@
             ])->toArray();
         @endphp
 
-        const galleryImages = @json($galleryData);
+        // The dataset is per page (category filter, load-more), so this has to re-run on
+        // every view, wire:navigate included. Everything lives in a closure: a bare
+        // top-level `const` threw a redeclaration SyntaxError the second time a visitor
+        // reached the gallery, silently killing the lightbox.
+        (function () {
+            const galleryImages = @json($galleryData);
 
-        let currentImageIndex = 0;
+            let currentImageIndex = 0;
 
-        function openLightbox(index) {
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightbox-img');
-            const infoDiv = document.getElementById('lightbox-info');
-            currentImageIndex = index;
+            function openLightbox(index) {
+                const lightbox = document.getElementById('lightbox');
+                const img = document.getElementById('lightbox-img');
+                const infoDiv = document.getElementById('lightbox-info');
 
-            if (galleryImages.length > 0 && index < galleryImages.length) {
+                if (!lightbox || !img || !infoDiv) {
+                    return;
+                }
+
+                currentImageIndex = index;
+
+                if (index < 0 || index >= galleryImages.length) {
+                    return;
+                }
+
                 img.src = galleryImages[index].src;
                 img.alt = galleryImages[index].title;
 
@@ -222,43 +239,64 @@
                 }
 
                 infoDiv.innerHTML = infoHtml;
-            } else {
-                return;
+
+                lightbox.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
             }
 
-            lightbox.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+            function closeLightbox() {
+                const lightbox = document.getElementById('lightbox');
 
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            lightbox.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
+                if (lightbox) {
+                    lightbox.classList.add('hidden');
+                }
 
-        function nextImage() {
-            if (galleryImages.length === 0) {
-                return;
+                document.body.style.overflow = '';
             }
 
-            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
-            openLightbox(currentImageIndex);
-        }
+            function nextImage() {
+                if (galleryImages.length === 0) {
+                    return;
+                }
 
-        function prevImage() {
-            if (galleryImages.length === 0) {
-                return;
+                currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+                openLightbox(currentImageIndex);
             }
 
-            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
-            openLightbox(currentImageIndex);
-        }
+            function prevImage() {
+                if (galleryImages.length === 0) {
+                    return;
+                }
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowRight') nextImage();
-            if (e.key === 'ArrowLeft') prevImage();
-        });
+                currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+                openLightbox(currentImageIndex);
+            }
+
+            // The inline onclick handlers in the markup resolve these by name, so each
+            // view republishes them against its own dataset.
+            window.openLightbox = openLightbox;
+            window.closeLightbox = closeLightbox;
+            window.nextImage = nextImage;
+            window.prevImage = prevImage;
+        })();
+
+        // Bound once per document, and a no-op anywhere the lightbox is not actually open,
+        // so Escape and the arrow keys stop throwing on the rest of the site.
+        if (! window.galleryLightboxKeysBound) {
+            window.galleryLightboxKeysBound = true;
+
+            document.addEventListener('keydown', function (e) {
+                const lightbox = document.getElementById('lightbox');
+
+                if (!lightbox || lightbox.classList.contains('hidden')) {
+                    return;
+                }
+
+                if (e.key === 'Escape') window.closeLightbox();
+                if (e.key === 'ArrowRight') window.nextImage();
+                if (e.key === 'ArrowLeft') window.prevImage();
+            });
+        }
     </script>
     @endpush
 </x-layouts::site>

@@ -20,6 +20,7 @@
                     <nav class="mb-8 flex items-center gap-2 text-sm text-[#A1A1AA]">
                         <a
                             href="{{ route('gallery') }}"
+                            wire:navigate
                             class="transition-colors hover:text-[#DC2626]"
                         >{{ __('gallery-show.gallery') }}</a>
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +89,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('quote') }}" class="btn-premium w-full justify-center">
+                    <a href="{{ route('quote') }}" wire:navigate class="btn-premium w-full justify-center">
                         <span>{{ __('gallery-show.request_similar') }}</span>
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -114,6 +115,7 @@
                     </div>
                     <a
                         href="{{ route('gallery', ['category' => $galleryImage->category]) }}"
+                        wire:navigate
                         class="hidden items-center gap-2 font-semibold text-[#A1A1AA] transition-colors hover:text-[#DC2626] md:flex"
                     >
                         <span>{{ __('gallery-show.view_all') }} {{ str_replace('_', ' ', ucfirst($galleryImage->category->name)) }}</span>
@@ -125,7 +127,7 @@
 
                 <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
                     @foreach ($relatedImages as $related)
-                        <a href="{{ route('gallery.show', $related) }}" class="group block">
+                        <a href="{{ route('gallery.show', $related) }}" wire:navigate class="group block">
                             <div class="glass-card relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-white/5">
                                 <img
                                     src="{{ $related->image_url }}"
@@ -159,13 +161,13 @@
                     </h2>
                     <p class="mb-12 text-xl leading-relaxed text-[#A1A1AA]">{{ __('gallery-show.cta_description') }}</p>
                     <div class="flex flex-col items-center justify-center gap-6 sm:flex-row">
-                        <a href="{{ route('quote') }}" class="btn-premium w-full sm:w-auto">
+                        <a href="{{ route('quote') }}" wire:navigate class="btn-premium w-full sm:w-auto">
                             <span>{{ __('gallery-show.get_free_quote') }}</span>
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </a>
-                        <a href="{{ route('contact') }}" class="btn-ghost w-full sm:w-auto">
+                        <a href="{{ route('contact') }}" wire:navigate class="btn-ghost w-full sm:w-auto">
                             <span>{{ __('gallery-show.contact_team') }}</span>
                         </a>
                     </div>

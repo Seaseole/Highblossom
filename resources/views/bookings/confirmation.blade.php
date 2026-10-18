@@ -159,10 +159,10 @@
                     @endif
 
                     <div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <a href="{{ route('home') }}" class="btn-glass w-full px-6 py-3 sm:w-auto">
+                        <a href="{{ route('home') }}" wire:navigate class="btn-glass w-full px-6 py-3 sm:w-auto">
                             {{ __('confirmation.return_home') }}
                         </a>
-                        <a href="{{ route('bookings.create') }}" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--booking-accent)] px-6 text-sm font-semibold text-[var(--booking-accent-ink)] hover:bg-[var(--booking-accent-strong)]">
+                        <a href="{{ route('bookings.create') }}" wire:navigate class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--booking-accent)] px-6 text-sm font-semibold text-[var(--booking-accent-ink)] hover:bg-[var(--booking-accent-strong)]">
                             @lang('booking.book_another')
                         </a>
                     </div>

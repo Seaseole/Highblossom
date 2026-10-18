@@ -185,7 +185,7 @@
                     {{-- Failure, including a tripped rate limit --}}
                     <div x-show="failed" class="px-3 py-8 text-center">
                         <p class="text-sm text-[#A1A1AA]">Search is unavailable right now. Please try again in a moment.</p>
-                        <a href="{{ route('blog') }}" class="mt-2 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
+                        <a href="{{ route('blog') }}" wire:navigate class="mt-2 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
                     </div>
 
                     {{-- Nothing matched --}}
@@ -193,7 +193,7 @@
                         <p class="font-headline text-base font-semibold text-[#FAFAFA]">
                             No results for &ldquo;<span x-text="clean(query)"></span>&rdquo;
                         </p>
-                        <a href="{{ route('blog') }}" class="mt-3 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
+                        <a href="{{ route('blog') }}" wire:navigate class="mt-3 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
                     </div>
                 </div>
 
