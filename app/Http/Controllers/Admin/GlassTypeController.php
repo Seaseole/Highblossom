@@ -57,7 +57,7 @@ final readonly class GlassTypeController
      */
     public function edit(GlassType $glassType): View
     {
-        $glassSubCategories = $this->glassSubCategoryService->getByGlassType($glassType);
+        $glassSubCategories = $this->glassSubCategoryService->getAllByGlassType($glassType);
 
         return view('admin.glass-types.edit', compact('glassType', 'glassSubCategories'));
     }

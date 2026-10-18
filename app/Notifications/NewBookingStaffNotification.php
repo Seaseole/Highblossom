@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Mail\NewBookingStaffMail;
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
  * Notification sent to staff when a new booking is created.
+ *
+ * Renders the shared branded mailable rather than a stock MailMessage so the
+ * staff notice matches every other email the shop sends.
  */
 final class NewBookingStaffNotification extends Notification implements ShouldQueue
 {
@@ -41,11 +44,9 @@ final class NewBookingStaffNotification extends Notification implements ShouldQu
      *
      * @param mixed $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): NewBookingStaffMail
     {
-        return (new MailMessage)
-            ->subject('Action Required: New Appointment Booking')
-            ->line("New booking from {$this->booking->client_name}.")
-            ->action('View Booking', route('admin.bookings.show', $this->booking));
+        return (new NewBookingStaffMail($this->booking))
+            ->to($notifiable->routeNotificationFor('mail', $this) ?? $notifiable->email);
     }
 }

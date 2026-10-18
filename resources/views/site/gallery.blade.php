@@ -67,23 +67,20 @@
                                     href="{{ route('gallery.show', $image) }}"
                                     class="rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-[#FAFAFA] backdrop-blur-md transition-colors hover:bg-white/20"
                                 >
-                                    Project Details
+                                    {{ __('gallery.project_details') }}
                                 </a>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <!-- Placeholder fallback -->
-                    <div class="col-span-1 flex flex-col items-center justify-center pt-16 pb-20 md:col-span-2 md:pt-32 lg:col-span-3">
-                        <img
-                            src="{{ asset('placeholder.gif') }}"
-                            alt="Gallery placeholder"
-                            class="mb-8 h-auto w-full max-w-md rounded-2xl"
-                        />
-                        <div class="text-center">
-                            <h3 class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">No Gallery Items Yet</h3>
-                            <p class="text-[#A1A1AA]">Check back soon to see our latest projects</p>
-                        </div>
+                    <div class="col-span-1 flex flex-col items-center justify-center pt-16 pb-20 text-center md:col-span-2 md:pt-32 lg:col-span-3">
+                        <h3 class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                            {{ __('gallery.no_projects') }}
+                        </h3>
+                        <p class="mb-8 max-w-md text-[#A1A1AA]">
+                            {{ __('gallery.no_projects_description') }}
+                        </p>
+                        <x-site.contact-buttons size="lg" />
                     </div>
                 @endforelse
             </div>
@@ -95,7 +92,7 @@
                         href="{{ route('gallery', array_merge(request()->all(), ['page' => $images->currentPage() + 1])) }}"
                         class="btn-glass px-8 py-4 text-lg"
                     >
-                        <span>Load More Projects</span>
+                        <span>{{ __('gallery.load_more') }}</span>
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -111,7 +108,7 @@
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div class="mb-12 text-center">
                     <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
-                        Performance Metrics
+                        {{ __('gallery.performance_metrics') }}
                     </div>
                 </div>
                 <div class="grid grid-cols-1 {{ count($galleryMetrics) >= 3 ? 'md:grid-cols-3' : (count($galleryMetrics) === 2 ? 'md:grid-cols-2' : '') }} gap-6">
@@ -131,7 +128,8 @@
     @endif
 
     <!-- Lightbox -->
-    <div id="lightbox" class="fixed inset-0 z-50 hidden">
+    @if ($images->count() > 0)
+        <div id="lightbox" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-[#0A0A0F]/95 backdrop-blur-xl" onclick="closeLightbox()"></div>
         <button
             onclick="closeLightbox()"
@@ -164,9 +162,9 @@
             </div>
         </div>
     </div>
-</x-layouts::site>
+    @endif
 
-@push('scripts')
+    @push('scripts')
     <script>
         @php
             $galleryData = $images->map(fn ($img) => [
@@ -225,17 +223,7 @@
 
                 infoDiv.innerHTML = infoHtml;
             } else {
-                // Fallback for static images
-                const fallbackImages = [
-                    { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=80' },
-                    { src: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80' },
-                    { src: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80' },
-                    { src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80' },
-                    { src: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80' },
-                    { src: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&q=80' },
-                ];
-                img.src = fallbackImages[index].src;
-                infoDiv.innerHTML = '';
+                return;
             }
 
             lightbox.classList.remove('hidden');
@@ -249,14 +237,20 @@
         }
 
         function nextImage() {
-            const total = Math.max(galleryImages.length, 6);
-            currentImageIndex = (currentImageIndex + 1) % total;
+            if (galleryImages.length === 0) {
+                return;
+            }
+
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
             openLightbox(currentImageIndex);
         }
 
         function prevImage() {
-            const total = Math.max(galleryImages.length, 6);
-            currentImageIndex = (currentImageIndex - 1 + total) % total;
+            if (galleryImages.length === 0) {
+                return;
+            }
+
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
             openLightbox(currentImageIndex);
         }
 
@@ -266,4 +260,5 @@
             if (e.key === 'ArrowLeft') prevImage();
         });
     </script>
-@endpush
+    @endpush
+</x-layouts::site>

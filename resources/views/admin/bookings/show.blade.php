@@ -41,6 +41,9 @@
                             <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Phone</dt>
                             <dd class="text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $booking->client_phone ?? '—' }}
+                                @if ($booking->prefers_whatsapp)
+                                    <span class="ml-2 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Prefers WhatsApp</span>
+                                @endif
                             </dd>
                         </div>
                         @if ($booking->location === 'mobile' && $booking->client_address)
@@ -67,6 +70,11 @@
                             <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Scheduled At</dt>
                             <dd class="text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $booking->scheduled_at ? $booking->scheduled_at->format('F j, Y g:i A') : 'TBC' }}
+                                @if ($booking->ends_at)
+                                    <span class="mt-0.5 block text-xs font-normal text-gray-500 dark:text-gray-400">
+                                        runs to {{ $booking->ends_at->format('g:i A') }} ({{ $booking->durationMinutes() }} min)
+                                    </span>
+                                @endif
                             </dd>
                         </div>
                         <div class="space-y-1">
@@ -84,9 +92,43 @@
                 <!-- Vehicle Details -->
                 <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Vehicle Details</h2>
+                    <dl class="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Service</dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->service_type?->label() ?? '—' }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Damage</dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->damage_type?->label() ?? '—' }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Vehicle</dt>
+                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $booking->vehicleSummary() ?: '—' }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                            <dt class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Reference</dt>
+                            <dd class="font-mono text-sm font-medium text-gray-900 dark:text-white">{{ $booking->displayReference() }}</dd>
+                        </div>
+                    </dl>
                     <p class="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600 dark:border-white/5 dark:bg-white/5 dark:text-gray-300">
-                        {{ $booking->vehicle_details }}
+                        {{ $booking->vehicle_details ?: 'No additional notes.' }}
                     </p>
+
+                    @if ($booking->damage_photo_path)
+                        <a
+                            href="{{ media_url($booking->damage_photo_path) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="mt-4 inline-flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+                        >
+                            <img
+                                src="{{ media_url($booking->damage_photo_path) }}"
+                                alt="Damage reported for {{ $booking->displayReference() }}"
+                                class="h-16 w-16 rounded-lg object-cover"
+                            />
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">View damage photo</span>
+                        </a>
+                    @endif
                 </div>
 
                 <!-- Inspection Panel -->

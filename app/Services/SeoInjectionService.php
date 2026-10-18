@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Models\Contracts\HasSeoInterface;
 use App\Models\SeoStaticRoute;
+use App\Services\Contact\ContactDetails;
 use App\Services\DataTransferObjects\SeoMetadata;
+use App\Services\Seo\LocalBusinessSchema;
 use App\Services\Settings\SettingsManager;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +16,19 @@ use Illuminate\Support\Facades\View;
 
 final class SeoInjectionService
 {
+    /**
+     * Routes that must never be indexed, whatever the SEO database says.
+     *
+     * A booking confirmation is a signed page holding one client's name, phone
+     * number and vehicle, and the URL stays valid forever, so the guard belongs
+     * in code rather than in a row an editor could delete.
+     *
+     * @var array<int, string>
+     */
+    private const NON_INDEXABLE_ROUTES = [
+        'bookings.confirmation',
+    ];
+
     private ?SeoMetadata $currentMetadata = null;
 
     public function __construct(
@@ -49,6 +64,45 @@ final class SeoInjectionService
     }
 
     private function resolveMetadata(): SeoMetadata
+    {
+        return $this->withBusinessSchema(
+            $this->markPrivateRoutes($this->resolvePageMetadata())
+        );
+    }
+
+    /**
+     * Force noindex onto routes that carry personal data.
+     */
+    private function markPrivateRoutes(SeoMetadata $metadata): SeoMetadata
+    {
+        $routeName = Route::currentRouteName();
+
+        if ($routeName === null || ! in_array($routeName, self::NON_INDEXABLE_ROUTES, true)) {
+            return $metadata;
+        }
+
+        return $metadata->withOverrides([
+            'no_index' => true,
+            'canonical_url' => null,
+            'robots' => null,
+        ]);
+    }
+
+    /**
+     * Attach the site's LocalBusiness node when the page did not bring its own.
+     */
+    private function withBusinessSchema(SeoMetadata $metadata): SeoMetadata
+    {
+        if ($metadata->schemaJsonLd !== null) {
+            return $metadata;
+        }
+
+        $schema = LocalBusinessSchema::build($this->settings, ContactDetails::fromSettings($this->settings));
+
+        return $schema === null ? $metadata : $metadata->withOverrides(['schema_json_ld' => $schema]);
+    }
+
+    private function resolvePageMetadata(): SeoMetadata
     {
         $routeName = Route::currentRouteName();
 

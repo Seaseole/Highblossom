@@ -6,6 +6,11 @@
         whatsappNumbers: {{ \Illuminate\Support\Js::from($settings['whatsapp_additional_numbers'] ?? []) }},
         workingHours: {{ \Illuminate\Support\Js::from($settings['working_hours'] ?? []) }},
         announcements: {{ \Illuminate\Support\Js::from($settings['announcements'] ?? []) }},
+        factTiles: {{ \Illuminate\Support\Js::from($settings['home_fact_tiles'] ?? []) }},
+        warrantyHighlights: {{ \Illuminate\Support\Js::from($settings['home_warranty_highlights'] ?? []) }},
+        processSteps: {{ \Illuminate\Support\Js::from($settings['home_process_steps'] ?? []) }},
+        faqs: {{ \Illuminate\Support\Js::from($settings['home_faqs'] ?? []) }},
+        heroPreview: '{{ $settings['hero_image'] ? media_url($settings['hero_image']) : null }}',
         init() {
             this.$watch('tab', value => {
                 const url = new URL(window.location.href);
@@ -16,7 +21,15 @@
         addNumber() { this.whatsappNumbers.push({ label: '', number: '' }); },
         removeNumber(index) { this.whatsappNumbers.splice(index, 1); },
         addAnnouncement() { this.announcements.push({ text: '', link: '', expires_at: '' }); },
-        removeAnnouncement(index) { this.announcements.splice(index, 1); }
+        removeAnnouncement(index) { this.announcements.splice(index, 1); },
+        addFactTile() { this.factTiles.push({ label: '', value: '', suffix: '' }); },
+        removeFactTile(index) { this.factTiles.splice(index, 1); },
+        addHighlight() { this.warrantyHighlights.push({ title: '', text: '' }); },
+        removeHighlight(index) { this.warrantyHighlights.splice(index, 1); },
+        addStep() { this.processSteps.push({ title: '', text: '' }); },
+        removeStep(index) { this.processSteps.splice(index, 1); },
+        addFaq() { this.faqs.push({ question: '', answer: '' }); },
+        removeFaq(index) { this.faqs.splice(index, 1); }
     }"
     >
         <!-- Header -->
@@ -41,6 +54,7 @@
                     'general' => 'General',
                     'hours' => 'Hours',
                     'assets' => 'Branding',
+                    'homepage' => 'Homepage',
                     'localization' => 'Locale',
                     'social' => 'Social',
                     'notifications' => 'Notifications',
@@ -300,6 +314,120 @@
                                     <p class="text-xs text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <div class="space-y-2">
+                                <label
+                                    for="booking_slot_interval_minutes"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                >Slot Interval (minutes)</label>
+                                <input
+                                    type="number"
+                                    id="booking_slot_interval_minutes"
+                                    name="booking_slot_interval_minutes"
+                                    min="15"
+                                    max="240"
+                                    step="15"
+                                    value="{{ old('booking_slot_interval_minutes', $settings['booking_slot_interval_minutes']) }}"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Gap between the start of one offered time and the next. A job must still finish by closing time.
+                                </p>
+                                @error('booking_slot_interval_minutes')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="space-y-2">
+                                <label
+                                    for="booking_capacity_workshop"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                >Workshop Bays</label>
+                                <input
+                                    type="number"
+                                    id="booking_capacity_workshop"
+                                    name="booking_capacity_workshop"
+                                    min="0"
+                                    max="20"
+                                    step="1"
+                                    value="{{ old('booking_capacity_workshop', $settings['booking_capacity_workshop']) }}"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    How many workshop jobs can overlap at once. Each staff absence you record removes one from this.
+                                </p>
+                                @error('booking_capacity_workshop')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="space-y-2">
+                                <label
+                                    for="booking_capacity_mobile"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                >Mobile Units</label>
+                                <input
+                                    type="number"
+                                    id="booking_capacity_mobile"
+                                    name="booking_capacity_mobile"
+                                    min="0"
+                                    max="20"
+                                    step="1"
+                                    value="{{ old('booking_capacity_mobile', $settings['booking_capacity_mobile']) }}"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    How many mobile fittings can run at the same time. Mobile and workshop pools are counted separately.
+                                </p>
+                                @error('booking_capacity_mobile')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mt-8 space-y-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Job Duration (minutes)</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                How long each service holds a bay or a van. This is what decides the last slot of the day.
+                            </p>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                @foreach (app(App\Services\Settings\SettingsManager::class)->getDefaults()['booking_service_durations'] ?? [] as $serviceKey => $defaultDuration)
+                                    <div class="space-y-2">
+                                        <label
+                                            for="booking_service_durations_{{ $serviceKey }}"
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                        >{{ \Illuminate\Support\Str::headline((string) $serviceKey) }}</label>
+                                        <input
+                                            type="number"
+                                            id="booking_service_durations_{{ $serviceKey }}"
+                                            name="booking_service_durations[{{ $serviceKey }}]"
+                                            min="15"
+                                            max="480"
+                                            step="15"
+                                            value="{{ old('booking_service_durations.'.$serviceKey, $settings['booking_service_durations'][$serviceKey] ?? $defaultDuration) }}"
+                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                        />
+                                        @error('booking_service_durations.'.$serviceKey)
+                                            <p class="text-xs text-red-500">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Closed Dates</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Public holidays and one-off closures. These override the weekly hours above.
+                                </p>
+                            </div>
+                            <a
+                                href="{{ route('admin.bookings.closures.index') }}"
+                                class="inline-flex min-h-[40px] items-center rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                            >
+                                Manage closed dates
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -609,6 +737,275 @@
                             rows="3"
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                         >{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Homepage Tab -->
+                <div
+                    x-show="tab === 'homepage'"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="space-y-10 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    style="display: none"
+                >
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Homepage Content</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Every heading, number and band on the public homepage. A section with no content hides itself.
+                        </p>
+                    </div>
+
+                    {{-- Hero --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero</h4>
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Tagline</label>
+                                <input
+                                    type="text"
+                                    name="home_tagline"
+                                    value="{{ old('home_tagline', $settings['home_tagline']) }}"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Used as the page title and the hero heading.</p>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Years Of Experience</label>
+                                <input
+                                    type="text"
+                                    name="home_years_experience"
+                                    value="{{ old('home_years_experience', $settings['home_years_experience']) }}"
+                                    placeholder="20+"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Shown in the hero badge. Leave blank to hide the badge.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4" x-data="{ removeHero: false }">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Hero Image</label>
+                            <input type="hidden" name="remove_hero_image" :value="removeHero ? 1 : 0" />
+                            <div
+                                class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
+                                @click="if (! removeHero) $refs.heroInput.click();"
+                            >
+                                <template x-if="heroPreview && ! removeHero">
+                                    <img :src="heroPreview" class="max-h-[220px] w-full object-cover" />
+                                </template>
+                                <template x-if="! heroPreview || removeHero">
+                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload a hero banner</span>
+                                </template>
+                            </div>
+                            <input
+                                type="file"
+                                name="hero_image"
+                                x-ref="heroInput"
+                                class="hidden"
+                                accept="image/jpeg,image/png,image/webp"
+                                @change="
+                                    if ($event.target.files[0]) heroPreview = URL.createObjectURL($event.target.files[0]);
+                                    removeHero = false;
+                                "
+                            />
+                            <button
+                                type="button"
+                                @click="removeHero = true; heroPreview = null;"
+                                x-show="heroPreview && ! removeHero"
+                                class="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
+                            >
+                                Remove Hero Image
+                            </button>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Cropped to 1920×1080 and served as WebP. Without one, the hero shows its dark gradient backdrop.</p>
+                            @error('hero_image')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Fact tiles --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Fact Tiles</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Up to four. Replaces the rating counters until real reviews back them.</p>
+                            </div>
+                            <button
+                                type="button"
+                                @click="factTiles.length < 4 && addFactTile()"
+                                class="text-sm font-medium text-gray-900 hover:underline dark:text-white"
+                            >
+                                + Add Tile
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <template x-for="(tile, index) in factTiles" :key="index">
+                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
+                                    <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+                                        <div class="space-y-1.5">
+                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Label</label>
+                                            <input type="text" :name="`home_fact_tiles[${index}][label]`" x-model="tile.label" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Value</label>
+                                            <input type="text" :name="`home_fact_tiles[${index}][value]`" x-model="tile.value" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Suffix</label>
+                                            <input type="text" :name="`home_fact_tiles[${index}][suffix]`" x-model="tile.suffix" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="removeFactTile(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    {{-- Warranty --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Warranty Band</h4>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Heading</label>
+                            <input
+                                type="text"
+                                name="home_warranty_heading"
+                                value="{{ old('home_warranty_heading', $settings['home_warranty_heading']) }}"
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea
+                                name="home_warranty_text"
+                                rows="3"
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                            >{{ old('home_warranty_text', $settings['home_warranty_text']) }}</textarea>
+                        </div>
+
+                        <div class="space-y-4 border-t border-gray-100 pt-6 dark:border-white/10">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Up to three highlight cards.</p>
+                                <button type="button" @click="warrantyHighlights.length < 3 && addHighlight()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Highlight</button>
+                            </div>
+                            <template x-for="(highlight, index) in warrantyHighlights" :key="index">
+                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
+                                    <div class="flex-1 space-y-3">
+                                        <input type="text" :name="`home_warranty_highlights[${index}][title]`" x-model="highlight.title" placeholder="Title" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                        <textarea :name="`home_warranty_highlights[${index}][text]`" x-model="highlight.text" rows="2" placeholder="One-line benefit" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
+                                    </div>
+                                    <button type="button" @click="removeHighlight(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    {{-- Urgency band --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Urgency Band</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Sits between services and the process steps, with call and WhatsApp buttons.</p>
+                            </div>
+                            <label class="group relative inline-flex cursor-pointer items-center">
+                                <input type="checkbox" name="home_urgency_enabled" value="1" {{ $settings['home_urgency_enabled'] ? 'checked' : '' }} class="peer sr-only" />
+                                <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
+                                <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase group-hover:text-gray-900 dark:group-hover:text-white">Active</span>
+                            </label>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
+                            <input
+                                type="text"
+                                name="home_urgency_text"
+                                value="{{ old('home_urgency_text', $settings['home_urgency_text']) }}"
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                            />
+                        </div>
+                    </div>
+
+                    {{-- Call to action bands --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Call-To-Action Bands</h4>
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Repeated Band Heading</label>
+                                <input type="text" name="home_cta_heading" value="{{ old('home_cta_heading', $settings['home_cta_heading']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Final CTA Heading</label>
+                                <input type="text" name="home_final_cta_heading" value="{{ old('home_final_cta_heading', $settings['home_final_cta_heading']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Repeated Band Text</label>
+                                <textarea name="home_cta_text" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_cta_text', $settings['home_cta_text']) }}</textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Final CTA Text</label>
+                                <textarea name="home_final_cta_text" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_final_cta_text', $settings['home_final_cta_text']) }}</textarea>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">WhatsApp Pre-Filled Message</label>
+                                <input type="text" name="home_whatsapp_message" value="{{ old('home_whatsapp_message', $settings['home_whatsapp_message']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Attached to every WhatsApp link on the site, including the bubble and the mobile bar.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Where we fit --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Where We Fit</h4>
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Service Area</label>
+                                <textarea name="home_service_area" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_service_area', $settings['home_service_area']) }}</textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Mobile Coverage</label>
+                                <textarea name="home_mobile_coverage" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_mobile_coverage', $settings['home_mobile_coverage']) }}</textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">The workshop address and directions link come from General and Social settings.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Process steps --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Process Steps</h4>
+                            <button type="button" @click="processSteps.length < 4 && addStep()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Step</button>
+                        </div>
+                        <template x-for="(step, index) in processSteps" :key="index">
+                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
+                                <div class="flex-1 space-y-3">
+                                    <input type="text" :name="`home_process_steps[${index}][title]`" x-model="step.title" placeholder="Title" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                    <textarea :name="`home_process_steps[${index}][text]`" x-model="step.text" rows="2" placeholder="Description" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
+                                </div>
+                                <button type="button" @click="removeStep(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- FAQs --}}
+                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Frequently Asked Questions</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Rendered as accordions and emitted as FAQPage structured data.</p>
+                            </div>
+                            <button type="button" @click="faqs.length < 8 && addFaq()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Question</button>
+                        </div>
+                        <template x-for="(faq, index) in faqs" :key="index">
+                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
+                                <div class="flex-1 space-y-3">
+                                    <input type="text" :name="`home_faqs[${index}][question]`" x-model="faq.question" placeholder="Question" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                    <textarea :name="`home_faqs[${index}][answer]`" x-model="faq.answer" rows="3" placeholder="Answer" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
+                                </div>
+                                <button type="button" @click="removeFaq(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                            </div>
+                        </template>
+                        @error('home_faqs.*.answer')
+                            <p class="text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 

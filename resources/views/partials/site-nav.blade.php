@@ -165,12 +165,41 @@
             >
                 Blog
             </a>
-            <a href="{{ route('quote') }}" class="btn-premium px-5 py-2.5 text-sm"> Get Quote </a>
-            <a href="{{ route('bookings.create') }}" class="btn-glass px-5 py-2.5 text-sm"> Book Appointment </a>
+            <a href="{{ route('quote') }}" class="btn-premium min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.get_quote') }} </a>
+            <a href="{{ route('bookings.create') }}" class="btn-glass min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.book_appointment') }} </a>
         </div>
 
         {{-- Right Side Actions --}}
         <div class="flex items-center gap-4">
+            {{-- Call / WhatsApp: always one tap away, desktop --}}
+            <div class="hidden items-center gap-3 lg:flex">
+                @if ($contact->hasPhone())
+                    <a
+                        href="{{ $contact->telHref($contact->primaryPhone) }}"
+                        class="flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                    >
+                        <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        <span>{{ $contact->primaryPhone }}</span>
+                    </a>
+                @endif
+                @if ($contact->hasWhatsapp())
+                    <a
+                        href="{{ $contact->whatsappHref() }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="flex min-h-[44px] items-center justify-center rounded-full border border-emerald-400/25 bg-white/5 px-3 text-[#FAFAFA] transition-colors hover:border-emerald-400/50 hover:bg-emerald-400/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                        title="WhatsApp"
+                    >
+                        <span class="sr-only">{{ __('site.home.cta_band_whatsapp') }}</span>
+                        <svg class="h-5 w-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                    </a>
+                @endif
+            </div>
+
             {{-- Social Media Icons --}}
             <div class="hidden items-center gap-3 md:flex">
                 @if ($facebookUrl)
@@ -308,17 +337,47 @@
             <a
                 href="{{ route('quote') }}"
                 onclick="closeMobileMenu()"
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('quote') ? 'text-[#DC2626]' : '' }}"
+                class="mt-2 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#DC2626] px-6 text-base font-bold text-white transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
             >
-                Get Quote
+                {{ __('site.get_quote') }}
             </a>
             <a
                 href="{{ route('bookings.create') }}"
                 onclick="closeMobileMenu()"
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('bookings.create') ? 'text-[#DC2626]' : '' }}"
+                class="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-base font-bold text-[#FAFAFA] transition-all hover:border-[#DC2626]/40 hover:bg-[#DC2626]/10 active:scale-[0.98]"
             >
-                Book Appointment
+                {{ __('site.book_appointment') }}
             </a>
+            @if ($contact->hasPhone() || $contact->hasWhatsapp())
+                <div class="flex gap-3">
+                    @if ($contact->hasPhone())
+                        <a
+                            href="{{ $contact->telHref($contact->primaryPhone) }}"
+                            onclick="closeMobileMenu()"
+                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 text-sm font-bold text-[#FAFAFA] transition-colors hover:border-[#DC2626]/40"
+                        >
+                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                            <span>{{ __('site.home.sticky_call') }}</span>
+                        </a>
+                    @endif
+                    @if ($contact->hasWhatsapp())
+                        <a
+                            href="{{ $contact->whatsappHref() }}"
+                            onclick="closeMobileMenu()"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-white/5 px-4 text-sm font-bold text-[#FAFAFA] transition-colors hover:border-emerald-400/50"
+                        >
+                            <svg class="h-5 w-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                            <span>{{ __('site.home.sticky_whatsapp') }}</span>
+                        </a>
+                    @endif
+                </div>
+            @endif
             <a
                 href="{{ route('contact') }}"
                 onclick="closeMobileMenu()"

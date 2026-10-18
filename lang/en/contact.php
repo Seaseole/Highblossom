@@ -10,13 +10,10 @@ return [
     'whatsapp' => 'WhatsApp',
     'chat_on_whatsapp' => 'Chat on WhatsApp',
     'call_now' => 'Call Now',
-    'phone' => 'Phone',
     'email' => 'Email',
     'reply_within_24h' => 'Reply within 24 hours',
     'send_email' => 'Send Email',
     'location' => 'Location',
-    'location_address' => 'Gaborone, Botswana',
-    'location_details' => 'Plot 123, Broadhurst',
     'get_directions' => 'Get Directions',
     'line_label' => 'Line',
     'available_24_7' => 'Available 24/7',
@@ -55,9 +52,6 @@ return [
     'wednesday' => 'Wednesday',
     'thursday' => 'Thursday',
     'friday' => 'Friday',
-    'saturday' => 'Saturday',
-    'sunday' => 'Sunday',
-    'monday_friday' => 'Monday - Friday',
     'closed' => 'Closed',
 
     // Quick actions
@@ -65,5 +59,9 @@ return [
     'quick_actions' => 'Quick Actions',
     'get_quote' => 'Get Quote',
     'get_quote_description' => 'Request detailed pricing for your glass needs',
+    'view_services' => 'View Services',
+    'view_services_description' => 'Explore our range of glass services',
+    'view_gallery' => 'View Gallery',
+    'view_gallery_description' => 'See our completed projects',
     'go' => 'Go',
 ];

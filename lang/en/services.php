@@ -7,10 +7,7 @@ return [
     'description' => 'From luxury vehicles to heavy industrial machinery, we deliver expert glass solutions with unmatched quality and precision.',
 
     // Stats
-    'service_types' => 'Service Types',
-    'emergency_response' => 'Emergency Response',
-    'day_service' => 'Day Service',
-    'quality_parts' => 'Quality Parts',
+    'services_offered' => 'Services Offered',
 
     // Service cards
     'service_label' => 'Service',
@@ -18,6 +15,8 @@ return [
     'no_services' => 'No Services Available',
     'no_services_desc' => 'Check back soon to see our latest services',
     'load_more' => 'Load More Services',
+    'read_more' => 'Read more',
+    'show_less' => 'Show less',
 
     // Process section
     'how_it_works' => 'How It Works',

@@ -1,4 +1,13 @@
 <x-layouts::site title="Contact Us">
+    @php
+        // Directions fall back to a map search on the configured street address
+        // rather than a generic link that drops the driver nowhere in particular.
+        $directionsLink = filled($mapDirectionsLink ?? null)
+            ? $mapDirectionsLink
+            : (filled($contact->address)
+                ? 'https://www.google.com/maps/search/?api=1&query='.urlencode($contact->address)
+                : null);
+    @endphp
     <!-- Hero Section -->
     <section class="relative bg-[#0A0A0F] pt-32 pb-20">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
@@ -39,81 +48,7 @@
                         </div>
                         <p class="mb-6 text-sm text-[#71717A]">
                             @if ($number->is_primary)
-                                @php
-                                    try {
-                                        $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
-                                        $openDays = [];
-                                        $closedDays = [];
-
-                                        if (isset($workingHours) && is_array($workingHours)) {
-                                            foreach ($dayOrder as $key => $abbr) {
-                                                if (isset($workingHours[$key]) && ! ($workingHours[$key]['is_closed'] ?? false)) {
-                                                    $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
-                                                    $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')).' – '.date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
-                                                    $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
-                                                } else {
-                                                    $closedDays[] = $abbr;
-                                                }
-                                            }
-
-                                            // Group consecutive days with same hours
-                                            $groupedDays = [];
-                                            $currentGroup = [];
-                                            $currentTime = null;
-                                            $prevKey = null;
-                                            $dayKeys = array_keys($dayOrder);
-
-                                            foreach ($dayKeys as $key) {
-                                                if (! isset($openDays[$key])) {
-                                                    continue;
-                                                }
-
-                                                $dayData = $openDays[$key];
-                                                $time = $dayData['time'];
-
-                                                // Check if consecutive and same time
-                                                $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-
-                                                if ($time === $currentTime && $isConsecutive) {
-                                                    $currentGroup[] = $dayData['abbr'];
-                                                } else {
-                                                    if (! empty($currentGroup)) {
-                                                        $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                                    }
-                                                    $currentGroup = [$dayData['abbr']];
-                                                    $currentTime = $time;
-                                                }
-                                                $prevKey = $key;
-                                            }
-
-                                            if (! empty($currentGroup)) {
-                                                $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                            }
-
-                                            // Modern professional format
-                                            $formatted = [];
-                                            foreach ($groupedDays as $group) {
-                                                $dayLabel = count($group['days']) > 2
-                                                    ? $group['days'][0].'–'.end($group['days'])
-                                                    : implode(' & ', $group['days']);
-                                                $formatted[] = $dayLabel.' · '.$group['time'];
-                                            }
-
-                                            if (! empty($closedDays)) {
-                                                $closedLabel = count($closedDays) > 2
-                                                    ? $closedDays[0].'–'.end($closedDays)
-                                                    : implode(' & ', $closedDays);
-                                                $formatted[] = $closedLabel.' · Closed';
-                                            }
-
-                                            echo implode(' | ', $formatted);
-                                        } else {
-                                            echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                                        }
-                                    } catch (\Exception $e) {
-                                        echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                                    }
-                                @endphp
+                                {{ $contact->openingHours()->implode(' | ') }}
                             @elseif ($number->is_whatsapp)
                                 {{ __('contact.available_24_7') }}
                             @else
@@ -121,8 +56,8 @@
                             @endif
                         </p>
                         <a
-                            href="{{ $number->is_whatsapp ? 'https://wa.me/' . str_replace(['+', ' '], '', $number->phone_number) : 'tel:' . str_replace([' ', '-', '(', ')'], '', $number->phone_number) }}"
-                            target="{{ $number->is_whatsapp ? '_blank' : '_self' }}"
+                            href="{{ $number->is_whatsapp ? $contact->whatsappHrefBare() : $contact->telHref($number->phone_number) }}"
+                            @if ($number->is_whatsapp) target="_blank" rel="noopener noreferrer" @endif
                             class="btn-premium"
                         >
                             <span>{{ $number->is_whatsapp ? __('contact.chat_on_whatsapp') : __('contact.call_now') }}</span>
@@ -132,149 +67,56 @@
                         </a>
                     </div>
                 @empty
-                    <!-- Fallback Cards -->
-                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
-                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
+                    {{-- Nothing configured as a contact number still shows the real
+                         email and address; there is no invented telephone to display. --}}
+                    @if ($contact->emailHref())
+                        <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                                <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                                {{ __('contact.email') }}
+                            </div>
+                            <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                                {{ $contact->email }}
+                            </div>
+                            <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.reply_within_24h') }}</p>
+                            <a href="{{ $contact->emailHref() }}" class="btn-premium">
+                                <span>{{ __('contact.send_email') }}</span>
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
                         </div>
-                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
-                            {{ __('contact.phone') }}
+                    @endif
+
+                    @if (filled($contact->address))
+                        <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
+                            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
+                                <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                                {{ __('contact.location') }}
+                            </div>
+                            <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                                {{ $contact->address }}
+                            </div>
+                            <p class="mb-6 text-sm text-[#71717A]">{{ $contact->openingHours()->implode(' | ') }}</p>
+                            @if ($directionsLink)
+                                <a href="{{ $directionsLink }}" target="_blank" rel="noopener noreferrer" class="btn-premium">
+                                    <span>{{ __('contact.get_directions') }}</span>
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            @endif
                         </div>
-                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
-                            {{ $primaryPhone ?? '+267 123 456 78' }}
-                        </div>
-                        <p class="mb-6 text-sm text-[#71717A]">
-                            @php
-                                try {
-                                    $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
-                                    $openDays = [];
-                                    $closedDays = [];
-
-                                    if (isset($workingHours) && is_array($workingHours)) {
-                                        foreach ($dayOrder as $key => $abbr) {
-                                            if (isset($workingHours[$key]) && ! ($workingHours[$key]['is_closed'] ?? false)) {
-                                                $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
-                                                $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')).' – '.date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
-                                                $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
-                                            } else {
-                                                $closedDays[] = $abbr;
-                                            }
-                                        }
-
-                                        // Group consecutive days with same hours
-                                        $groupedDays = [];
-                                        $currentGroup = [];
-                                        $currentTime = null;
-                                        $prevKey = null;
-                                        $dayKeys = array_keys($dayOrder);
-
-                                        foreach ($dayKeys as $key) {
-                                            if (! isset($openDays[$key])) {
-                                                continue;
-                                            }
-
-                                            $dayData = $openDays[$key];
-                                            $time = $dayData['time'];
-
-                                            // Check if consecutive and same time
-                                            $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-
-                                            if ($time === $currentTime && $isConsecutive) {
-                                                $currentGroup[] = $dayData['abbr'];
-                                            } else {
-                                                if (! empty($currentGroup)) {
-                                                    $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                                }
-                                                $currentGroup = [$dayData['abbr']];
-                                                $currentTime = $time;
-                                            }
-                                            $prevKey = $key;
-                                        }
-
-                                        if (! empty($currentGroup)) {
-                                            $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                        }
-
-                                        // Modern professional format
-                                        $formatted = [];
-                                        foreach ($groupedDays as $group) {
-                                            $dayLabel = count($group['days']) > 2
-                                                ? $group['days'][0].'–'.end($group['days'])
-                                                : implode(' & ', $group['days']);
-                                            $formatted[] = $dayLabel.' · '.$group['time'];
-                                        }
-
-                                        if (! empty($closedDays)) {
-                                            $closedLabel = count($closedDays) > 2
-                                                ? $closedDays[0].'–'.end($closedDays)
-                                                : implode(' & ', $closedDays);
-                                            $formatted[] = $closedLabel.' · Closed';
-                                        }
-
-                                        echo implode(' | ', $formatted);
-                                    } else {
-                                        echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                                    }
-                                } catch (\Exception $e) {
-                                    echo 'Mon–Fri · 7:30 AM – 5:00 PM | Sat · 8:00 AM – 1:00 PM | Sun · Closed';
-                                }
-                            @endphp
-                        </p>
-                        <a
-                            href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone ?? '+26712345678') }}"
-                            class="btn-premium"
-                        >
-                            <span>{{ __('contact.call_now') }}</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
-                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
-                            {{ __('contact.email') }}
-                        </div>
-                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
-                            {{ $primaryEmail ?? 'jseaseole@highblossom.net' }}
-                        </div>
-                        <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.reply_within_24h') }}</p>
-                        <a href="mailto:{{ $primaryEmail }}" class="btn-premium">
-                            <span>{{ __('contact.send_email') }}</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div class="glass-card group rounded-2xl p-8 text-center transition-all hover:bg-white/[0.06]">
-                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20">
-                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
-                            {{ __('contact.location') }}
-                        </div>
-                        <div class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
-                            {{ __('contact.location_address') }}
-                        </div>
-                        <p class="mb-6 text-sm text-[#71717A]">{{ __('contact.location_details') }}</p>
-                        <a href="https://maps.google.com" target="_blank" class="btn-premium">
-                            <span>{{ __('contact.get_directions') }}</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
+                    @endif
                 @endforelse
             </div>
         </div>
@@ -286,19 +128,21 @@
             <div class="grid gap-12 lg:grid-cols-2">
                 <!-- Map -->
                 <div class="relative">
-                    <div class="relative h-[600px] overflow-hidden rounded-2xl">
-                        <iframe
-                            src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($companyName) }}"
-                            width="100%"
-                            height="100%"
-                            style="border: 0"
-                            allowfullscreen=""
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            class="contrast-125 grayscale"
-                        >
-                        </iframe>
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent"></div>
+                    <div class="relative h-[600px] overflow-hidden rounded-2xl bg-[#121218]">
+                        @if (filled($googleMapsApiKey))
+                            <iframe
+                                src="https://www.google.com/maps/embed/v1/place?key={{ $googleMapsApiKey }}&q={{ urlencode($contact->companyName . ' ' . ($contact->address !== '' ? $contact->address : '')) }}"
+                                width="100%"
+                                height="100%"
+                                style="border: 0"
+                                allowfullscreen=""
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                class="contrast-125 grayscale"
+                            >
+                            </iframe>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent"></div>
+                        @endif
                     </div>
                     <div class="glass-card absolute right-6 bottom-6 left-6 rounded-2xl p-6">
                         <div class="flex items-start gap-4">
@@ -311,16 +155,19 @@
                             <div class="flex-1">
                                 <h3 class="font-headline mb-1 text-lg font-bold text-[#FAFAFA]">{{ $companyName }}</h3>
                                 <p class="mb-3 text-sm text-[#A1A1AA]">{{ $companyAddress }}</p>
-                                <a
-                                    href="{{ $mapDirectionsLink }}"
-                                    target="_blank"
-                                    class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-colors hover:text-[#FAFAFA]"
-                                >
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
-                                    </svg>
-                                    {{ __('contact.get_directions') }}
-                                </a>
+                                @if ($directionsLink)
+                                    <a
+                                        href="{{ $directionsLink }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-colors hover:text-[#FAFAFA]"
+                                    >
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
+                                        </svg>
+                                        {{ __('contact.get_directions') }}
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -503,47 +350,34 @@
             </div>
 
             <div class="grid gap-6 md:grid-cols-2">
-                <div class="glass-card rounded-2xl p-8">
-                    <div class="mb-6 flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/10">
-                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                @if ($hasWorkingHours)
+                    <div class="glass-card rounded-2xl p-8">
+                        <div class="mb-6 flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DC2626]/10">
+                                <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-headline text-xl font-bold text-[#FAFAFA]">
+                                {{ __('contact.workshop_hours') }}
+                            </h3>
                         </div>
-                        <h3 class="font-headline text-xl font-bold text-[#FAFAFA]">
-                            {{ __('contact.workshop_hours') }}
-                        </h3>
-                    </div>
-                    <ul class="space-y-4">
-                        @if ($hasWorkingHours)
+                        <ul class="space-y-4">
                             @foreach ($dayOrder as $key => $label)
                                 @php($isClosed = $workingHours[$key]['is_closed'] ?? false)
                                 @php($openTime = $workingHours[$key]['open'] ?? null)
                                 @php($closeTime = $workingHours[$key]['close'] ?? null)
                                 @php($format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A')
-                                @php($timeDisplay = $isClosed ? 'Closed' : (date($format, strtotime($openTime)) . ' – ' . date($format, strtotime($closeTime))))
+                                @php($timeDisplay = $isClosed ? __('contact.closed') : (date($format, strtotime((string) $openTime)) . ' – ' . date($format, strtotime((string) $closeTime))))
                                 @php($textClass = $isClosed ? 'text-[#DC2626]' : 'text-[#FAFAFA]')
                                 <li class="flex items-center justify-between border-b border-white/5 py-3">
                                     <span class="text-[#A1A1AA]">{{ $label }}</span>
                                     <span class="{{ $textClass }} font-semibold">{{ $timeDisplay }}</span>
                                 </li>
                             @endforeach
-                        @else
-                            <li class="flex items-center justify-between border-b border-white/5 py-3">
-                                <span class="text-[#A1A1AA]">{{ __('contact.monday_friday') }}</span>
-                                <span class="font-semibold text-[#FAFAFA]">7:30 AM – 5:00 PM</span>
-                            </li>
-                            <li class="flex items-center justify-between border-b border-white/5 py-3">
-                                <span class="text-[#A1A1AA]">{{ __('contact.saturday') }}</span>
-                                <span class="font-semibold text-[#FAFAFA]">8:00 AM – 1:00 PM</span>
-                            </li>
-                            <li class="flex items-center justify-between py-3">
-                                <span class="text-[#A1A1AA]">{{ __('contact.sunday') }}</span>
-                                <span class="font-semibold text-[#DC2626]">{{ __('contact.closed') }}</span>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
+                        </ul>
+                    </div>
+                @endif
 
                 <div class="glass-card relative self-start overflow-hidden rounded-2xl p-6">
                     <div class="absolute top-0 right-0 h-32 w-32 rounded-full bg-[#DC2626]/10 blur-3xl"></div>
@@ -558,15 +392,15 @@
                         </h3>
                     </div>
                     <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('contact.emergency_description') }}</p>
-                    @if ($primaryPhone)
+                    @if ($contact->telHref($contact->primaryPhone))
                         <a
-                            href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
+                            href="{{ $contact->telHref($contact->primaryPhone) }}"
                             class="btn-premium px-4 py-2 text-sm"
                         >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                            <span>{{ __('contact.hotline') }}: {{ $primaryPhone }}</span>
+                            <span>{{ __('contact.hotline') }} {{ $contact->primaryPhone }}</span>
                         </a>
                     @endif
                 </div>
@@ -615,8 +449,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">View Services</h3>
-                    <p class="mb-4 text-sm text-[#A1A1AA]">Explore our range of glass services</p>
+                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">{{ __('contact.view_services') }}</h3>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('contact.view_services_description') }}</p>
                     <div class="flex items-center gap-2 font-semibold text-[#DC2626]">
                         <span>{{ __('contact.go') }}</span>
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -634,8 +468,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">View Gallery</h3>
-                    <p class="mb-4 text-sm text-[#A1A1AA]">See our completed projects</p>
+                    <h3 class="font-headline mb-2 text-xl font-bold text-[#FAFAFA]">{{ __('contact.view_gallery') }}</h3>
+                    <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('contact.view_gallery_description') }}</p>
                     <div class="flex items-center gap-2 font-semibold text-[#DC2626]">
                         <span>{{ __('contact.go') }}</span>
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

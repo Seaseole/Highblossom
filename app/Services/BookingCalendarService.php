@@ -8,85 +8,94 @@ use App\Services\Contracts\AvailabilityServiceInterface;
 use Carbon\Carbon;
 
 /**
- * Service for building a server-rendered booking calendar grid.
+ * Service for building the booking calendar.
  *
- * Generates month matrices of selectable days using Carbon, disabling closed days
- * and past dates so the public booking form can be rendered without relying on a
- * client-side date-picker package.
+ * Produces a flat list of days per month so the public booking form can be
+ * rendered without relying on a client-side date-picker package, and so the exact
+ * same shape can come back over the API when the picker turns the month.
  *
- * Closed days come from the availability service, which derives them from the
- * configured working hours. Hardcoding the weekend here used to contradict the
- * date strip, which offered Saturdays whenever the setting opened them.
+ * Days are laid out Monday-first: the shop trades Monday to Saturday, and the
+ * grid reads as a working week rather than one that opens on a closed day.
+ *
+ * A day is only selectable when it still has a bookable slot. It used to be
+ * selectable whenever the shop was simply open that day, which meant a fully
+ * booked Saturday looked identical to a free one and only failed after the
+ * customer had committed to tapping it.
  */
 final class BookingCalendarService
 {
     public function __construct(private readonly AvailabilityServiceInterface $availability) {}
 
     /**
-     * Build a list of month grids starting from the current month.
+     * Build consecutive months of the calendar, starting from the current one.
      *
-     * @param int $count Number of consecutive months to render
+     * @param int         $count       Number of consecutive months to render
+     * @param string|null $serviceType The job being booked, which sets its duration
+     * @param string|null $location    mobile|workshop, which selects the capacity pool
      *
-     * @return array<int, array{label: string, weeks: array<int, array<int, array{day: int, date: string, isClosed: bool, isPast: bool, selectable: bool}|null>>}>
+     * @return list<array<string, mixed>>
      */
-    public function getMonths(int $count = 3): array
+    public function getMonths(int $count = 3, ?string $serviceType = null, ?string $location = null): array
     {
         $today = Carbon::today();
         $months = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $months[] = $this->buildMonth($today->copy()->addMonths($i), $today);
+            $months[] = $this->monthPayload($today->copy()->addMonths($i), $serviceType, $location);
         }
 
         return $months;
     }
 
     /**
-     * Build a single month matrix laid out in Sunday-first weeks.
+     * Build one month as the payload the picker draws and the API returns.
      *
-     * @param Carbon $month The month to render
-     * @param Carbon $today Reference "today" used to disable past days
+     * Availability is decided here rather than in JavaScript: the grid the customer
+     * sees must not be able to disagree with what the server will accept.
      *
-     * @return array{label: string, weeks: array<int, array<int, array{day: int, date: string, isClosed: bool, isPast: bool, selectable: bool}|null>>}
+     * @param string|null $serviceType The job being booked
+     * @param string|null $location    mobile|workshop
+     *
+     * @return array{month: string, label: string, leading_blanks: int, available_count: int, open_count: int, days: list<array{date: string, day: int, selectable: bool, reason: string|null, is_today: bool}>}
      */
-    private function buildMonth(Carbon $month, Carbon $today): array
+    public function monthPayload(Carbon $month, ?string $serviceType = null, ?string $location = null): array
     {
         $startOfMonth = $month->copy()->startOfMonth();
-        $daysInMonth = $month->daysInMonth;
-        $leadingBlanks = (int) $startOfMonth->dayOfWeek;
+        $today = Carbon::today();
+        $survey = $this->availability->monthAvailability($startOfMonth, $serviceType, $location);
+        $available = array_flip($survey['available_dates']);
+        $open = array_flip($survey['open_dates']);
 
-        $weeks = [];
-        $week = array_fill(0, $leadingBlanks, null);
+        $days = [];
 
-        for ($day = 1; $day <= $daysInMonth; $day++) {
+        for ($day = 1; $day <= $startOfMonth->daysInMonth; $day++) {
             $date = $startOfMonth->copy()->addDays($day - 1);
+            $key = $date->toDateString();
             $isPast = $date->isBefore($today);
-            $isClosed = ! $this->availability->isOpenDay($date);
+            $isOpen = isset($open[$key]);
+            $selectable = isset($available[$key]);
 
-            $week[] = [
+            $days[] = [
+                'date' => $key,
                 'day' => $day,
-                'date' => $date->toDateString(),
-                'isClosed' => $isClosed,
-                'isPast' => $isPast,
-                'selectable' => ! $isClosed && ! $isPast,
+                'selectable' => $selectable,
+                'reason' => match (true) {
+                    $isPast => 'past',
+                    ! $isOpen => 'closed',
+                    ! $selectable => 'full',
+                    default => null,
+                },
+                'is_today' => $date->isSameDay($today),
             ];
-
-            if (count($week) === 7) {
-                $weeks[] = $week;
-                $week = [];
-            }
-        }
-
-        if ($week !== []) {
-            while (count($week) < 7) {
-                $week[] = null;
-            }
-            $weeks[] = $week;
         }
 
         return [
-            'label' => $month->format('F Y'),
-            'weeks' => $weeks,
+            'month' => $startOfMonth->format('Y-m'),
+            'label' => $startOfMonth->format('F Y'),
+            'leading_blanks' => ((int) $startOfMonth->dayOfWeek + 6) % 7,
+            'available_count' => $survey['available_count'],
+            'open_count' => $survey['open_count'],
+            'days' => $days,
         ];
     }
 }

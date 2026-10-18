@@ -12,6 +12,14 @@ use Illuminate\Foundation\Http\FormRequest;
 class QuoteFormRequest extends FormRequest
 {
     /**
+     * Character ceiling shared by every text column on the `quotes` table.
+     *
+     * The columns are varchar(191), so a looser ceiling lets an over-long value
+     * reach MySQL and lose the submission.
+     */
+    private const MAX_TEXT_LENGTH = 191;
+
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -27,11 +35,11 @@ class QuoteFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:'.self::MAX_TEXT_LENGTH,
             'phone' => 'required|string|max:20',
-            'email' => 'required|nullable|email|max:255',
+            'email' => 'required|nullable|email|max:'.self::MAX_TEXT_LENGTH,
             'vehicle_type' => 'required|string|in:sedan,suv,truck,van,heavy,fleet,other',
-            'make_model' => 'nullable|string|max:255',
+            'make_model' => 'nullable|string|max:'.self::MAX_TEXT_LENGTH,
             'reg_number' => 'nullable|string|max:20',
             'year' => 'nullable|integer|min:1980|max:'.(date('Y') + 1),
             'glass_type_id' => 'required|exists:glass_types,id',

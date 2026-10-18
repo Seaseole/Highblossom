@@ -72,6 +72,9 @@
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">
                                     {{ $booking->client_name }}
                                 </div>
+                                <div class="font-mono text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $booking->displayReference() }}
+                                </div>
                                 @if ($booking->user)
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $booking->user->email }}
@@ -89,9 +92,18 @@
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                 {{ $booking->client_phone ?? '-' }}<br />
                                 {{ $booking->client_email ?? '-' }}
+                                @if ($booking->prefers_whatsapp)
+                                    <span class="mt-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">WhatsApp</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                {{ $booking->vehicle_details }}
+                                <div class="font-medium text-gray-900 dark:text-white">
+                                    {{ $booking->service_type?->label() ?? '—' }}
+                                </div>
+                                <div>{{ $booking->vehicleSummary() ?: '—' }}</div>
+                                @if ($booking->damage_type)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $booking->damage_type->label() }}</div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
                                 {{ number_format($booking->total_price, 2) }}

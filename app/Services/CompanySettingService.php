@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\BookingServiceType;
 use App\Models\CompanySetting;
 use App\Services\Settings\SettingsManager;
 use Illuminate\Container\Attributes\Singleton;
@@ -22,13 +23,27 @@ use Illuminate\Support\Facades\Storage;
 #[Singleton(name: 'company_settings')]
 final class CompanySettingService
 {
+    /** @var list<string> Scalar homepage copy fields saved straight to the settings store */
+    private const HOME_SIMPLE_FIELDS = [
+        'home_tagline', 'home_years_experience', 'home_warranty_heading', 'home_warranty_text',
+        'home_urgency_text', 'home_cta_heading', 'home_cta_text', 'home_service_area',
+        'home_mobile_coverage', 'home_whatsapp_message', 'home_final_cta_heading', 'home_final_cta_text',
+    ];
+
+    /** @var list<string> Homepage repeater fields stored as JSON arrays */
+    private const HOME_JSON_FIELDS = [
+        'home_fact_tiles', 'home_warranty_highlights', 'home_process_steps', 'home_faqs',
+    ];
+
     /** @var list<string> Fields that are saved as simple key-value pairs */
     private const SIMPLE_FIELDS = [
         'company_name', 'logo_text', 'primary_email', 'address', 'primary_phone', 'secondary_phone',
         'whatsapp_number_default', 'timezone', 'locale', 'date_format', 'time_format',
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
-        'booking_lead_time_hours', 'require_email_verification', 'session_idle_timeout_minutes',
+        'booking_lead_time_hours', 'booking_slot_interval_minutes', 'booking_capacity_workshop',
+        'booking_capacity_mobile', 'require_email_verification', 'session_idle_timeout_minutes',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
+        ...self::HOME_SIMPLE_FIELDS,
     ];
 
     /** @var list<string> Day keys used for working hours configuration */
@@ -40,10 +55,16 @@ final class CompanySettingService
     /** Favicon cover dimensions (square). */
     private const FAVICON_DIMENSIONS = [256, 256];
 
+    /** Hero banner cover dimensions. Cropped to fill the full-bleed desktop hero. */
+    private const HERO_MAX_DIMENSIONS = [1920, 1080];
+
     /** Output quality for processed images (1-100). */
     private const IMAGE_QUALITY = 82;
 
-    public function __construct(private readonly EnvEditor $envEditor) {}
+    public function __construct(
+        private readonly EnvEditor $envEditor,
+        private readonly SettingsManager $settingsManager,
+    ) {}
 
     /**
      * Update company settings from form data and request.
@@ -52,11 +73,13 @@ final class CompanySettingService
     {
         $this->handleLogoUpload($request);
         $this->handleFaviconUpload($request);
+        $this->handleHeroImageUpload($request);
         $this->saveSimpleFields($data);
         $this->saveJsonFields($data);
         $this->handleEnvUpdate($data);
         CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
         CompanySetting::set('enable_registration', $request->boolean('enable_registration') ? '1' : '0', 'boolean');
+        CompanySetting::set('home_urgency_enabled', $request->boolean('home_urgency_enabled') ? '1' : '0', 'boolean');
     }
 
     /**
@@ -147,6 +170,52 @@ final class CompanySettingService
     }
 
     /**
+     * Handle business hero banner upload, replacement, or removal.
+     *
+     * Mirrors the logo branches: explicit removal, adoption of a pre-uploaded
+     * media-library path, or a direct upload normalised to WebP on the public disk.
+     */
+    private function handleHeroImageUpload(Request $request): void
+    {
+        $oldImage = (string) CompanySetting::get('hero_image', '');
+
+        if ($request->boolean('remove_hero_image')) {
+            $this->deleteStoredImage($oldImage);
+            CompanySetting::set('hero_image', '');
+
+            return;
+        }
+
+        $imagePath = $request->input('hero_image_path');
+
+        if (filled($imagePath)) {
+            if ($oldImage !== '' && $oldImage !== $imagePath) {
+                $this->deleteStoredImage($oldImage);
+            }
+            CompanySetting::set('hero_image', $imagePath);
+
+            return;
+        }
+
+        if ($request->hasFile('hero_image') && $request->file('hero_image')->isValid()) {
+            try {
+                $this->deleteStoredImage($oldImage);
+                $path = Image::fromUpload($request->file('hero_image'))
+                    ->cover(self::HERO_MAX_DIMENSIONS[0], self::HERO_MAX_DIMENSIONS[1])
+                    ->toWebp()
+                    ->quality(self::IMAGE_QUALITY)
+                    ->store('settings', 'public');
+
+                if ($path !== false) {
+                    CompanySetting::set('hero_image', $path);
+                }
+            } catch (ImageException $e) {
+                Log::error('Failed to process hero image upload: '.$e->getMessage());
+            }
+        }
+    }
+
+    /**
      * Delete a stored image from the public disk if it exists.
      */
     private function deleteStoredImage(?string $path): void
@@ -231,8 +300,30 @@ final class CompanySettingService
     {
         CompanySetting::set('whatsapp_additional_numbers', $data['whatsapp_additional_numbers'] ?? [], 'json');
         CompanySetting::set('working_hours', $this->prepareWorkingHours($data['working_hours'] ?? []), 'json');
+        CompanySetting::set('booking_service_durations', $this->prepareDurations($data['booking_service_durations'] ?? []), 'json');
         CompanySetting::set('gallery_metrics', $data['gallery_metrics'] ?? [], 'json');
         CompanySetting::set('announcements', $data['announcements'] ?? [], 'json');
+
+        foreach (self::HOME_JSON_FIELDS as $field) {
+            CompanySetting::set($field, $this->pruneRows($data[$field] ?? []), 'json');
+        }
+    }
+
+    /**
+     * Drop empty repeater rows so an unsaved admin tab cannot blank a section's
+     * fallback copy, and so nothing renders a tile or accordion with no content.
+     *
+     * @param array<array<string, string>> $rows
+     *
+     * @return list<array<string, string>>
+     */
+    private function pruneRows(array $rows): array
+    {
+        return collect($rows)
+            ->filter(fn ($row) => is_array($row) && collect($row)->filter(fn ($value) => filled($value))->isNotEmpty())
+            ->map(fn ($row) => array_map(fn ($value) => is_array($value) ? $value : trim((string) $value), $row))
+            ->values()
+            ->all();
     }
 
     /**
@@ -249,6 +340,42 @@ final class CompanySettingService
         }
 
         return $workingHours;
+    }
+
+    /**
+     * Normalise the per-service durations, keyed by every bookable service.
+     *
+     * A service missing from the form keeps its enum default rather than collapsing
+     * to zero, because a zero-minute job would make every slot on the calendar
+     * overlap into the next one.
+     *
+     * @param array<string, mixed> $durations
+     *
+     * @return array<string, int>
+     */
+    private function prepareDurations(array $durations): array
+    {
+        $prepared = [];
+
+        foreach (BookingServiceType::selectable() as $type) {
+            $value = (int) ($durations[$type->value] ?? $type->defaultDurationMinutes());
+
+            $prepared[$type->value] = min(480, max(15, $value ?: $type->defaultDurationMinutes()));
+        }
+
+        return $prepared;
+    }
+
+    /**
+     * The durations used before an admin has saved the tab.
+     *
+     * @return array<string, int>
+     */
+    private function getDefaultDurations(): array
+    {
+        return collect(BookingServiceType::selectable())
+            ->mapWithKeys(fn (BookingServiceType $type): array => [$type->value => $type->defaultDurationMinutes()])
+            ->all();
     }
 
     /**
@@ -272,6 +399,10 @@ final class CompanySettingService
             'time_format' => CompanySetting::get('time_format', 'H:i'),
             'time_format_display' => CompanySetting::get('time_format_display', '12'),
             'booking_lead_time_hours' => CompanySetting::get('booking_lead_time_hours', 2),
+            'booking_slot_interval_minutes' => CompanySetting::get('booking_slot_interval_minutes', 30),
+            'booking_capacity_workshop' => CompanySetting::get('booking_capacity_workshop', 1),
+            'booking_capacity_mobile' => CompanySetting::get('booking_capacity_mobile', 1),
+            'booking_service_durations' => CompanySetting::get('booking_service_durations', $this->getDefaultDurations()),
             'currency_symbol' => CompanySetting::get('currency_symbol', 'P'),
             'business_logo' => CompanySetting::get('business_logo', ''),
             'favicon' => CompanySetting::get('favicon', ''),
@@ -291,7 +422,35 @@ final class CompanySettingService
                 ['label' => 'Heavy Machines', 'value' => '150', 'suffix' => '+'],
                 ['label' => 'Fleet Accounts', 'value' => '45', 'suffix' => '+'],
             ]),
+            ...$this->homepageSettings(),
         ];
+    }
+
+    /**
+     * Read every homepage content setting for the admin form.
+     *
+     * Defaults come from SettingsManager so the admin screen and the public
+     * view can never drift onto two separate copies of the same copy.
+     *
+     * @return array<string, mixed>
+     */
+    private function homepageSettings(): array
+    {
+        $sharedDefaults = $this->settingsManager->getDefaults();
+        $keys = [...self::HOME_SIMPLE_FIELDS, ...self::HOME_JSON_FIELDS, 'hero_image'];
+
+        $settings = [];
+
+        foreach ($keys as $key) {
+            $settings[$key] = CompanySetting::get($key, $sharedDefaults[$key] ?? null);
+        }
+
+        $settings['home_urgency_enabled'] = filter_var(
+            CompanySetting::get('home_urgency_enabled', $sharedDefaults['home_urgency_enabled'] ?? true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        return $settings;
     }
 
     /**
@@ -302,6 +461,6 @@ final class CompanySettingService
      */
     private function getDefaultWorkingHours(): array
     {
-        return app(SettingsManager::class)->getDefaults()['working_hours'];
+        return $this->settingsManager->getDefaults()['working_hours'];
     }
 }

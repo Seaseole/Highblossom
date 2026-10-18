@@ -17,24 +17,37 @@
                     commercial fleets.
                 </p>
                 <div class="mt-6 flex items-center gap-4">
-                    @if ($primaryPhone)
+                    @if ($contact->hasPhone())
                         <a
-                            href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
-                            class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
-                            aria-label="Call us"
+                            href="{{ $contact->telHref($contact->primaryPhone) }}"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            aria-label="{{ __('site.home.cta_band_call') }}"
                         >
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                             </svg>
                         </a>
                     @endif
-                    @if ($primaryEmail)
+                    @if ($contact->hasWhatsapp())
                         <a
-                            href="mailto:{{ $primaryEmail }}"
-                            class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
-                            aria-label="Email us"
+                            href="{{ $contact->whatsappHrefBare() }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            aria-label="{{ __('site.home.cta_band_whatsapp') }}"
                         >
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                        </a>
+                    @endif
+                    @if ($contact->emailHref())
+                        <a
+                            href="{{ $contact->emailHref() }}"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            aria-label="{{ __('site.home.cta_band_email') }}"
+                        >
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                             </svg>
                         </a>
@@ -83,53 +96,33 @@
                 </div>
             </div>
 
-            {{-- Services Column --}}
+            {{-- Services Column: links point at each service's own block on the
+                 services page instead of the top of /services for all five. --}}
             <div>
                 <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-[#FAFAFA] uppercase">
                     Services
                 </h4>
-                <ul class="space-y-3">
-                    <li>
-                        <a
-                            href="{{ route('services') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-                        >
-                            Windscreen Replacement
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="{{ route('services') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-                        >
-                            Side & Rear Windows
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="{{ route('services') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-                        >
-                            Heavy Machinery
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="{{ route('services') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-                        >
-                            Fleet Services
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="{{ route('services') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-                        >
-                            Mobile Service
-                        </a>
-                    </li>
-                </ul>
+                @if ($footerServices->isNotEmpty())
+                    <ul class="space-y-3">
+                        @foreach ($footerServices as $footerService)
+                            <li>
+                                <a
+                                    href="{{ route('services') }}#service-{{ $footerService->slug }}"
+                                    class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                >
+                                    {{ $footerService->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <a
+                        href="{{ route('services') }}"
+                        class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                    >
+                        {{ __('site.services') }}
+                    </a>
+                @endif
             </div>
 
             {{-- Company Column --}}
@@ -139,38 +132,49 @@
                     <li>
                         <a
                             href="{{ route('home') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
-                            Home
+                            {{ __('site.nav_home') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="{{ route('about-us') }}"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                        >
+                            {{ __('site.about') }}
                         </a>
                     </li>
                     <li>
                         <a
                             href="{{ route('gallery') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
                             Our Work
                         </a>
                     </li>
                     <li>
-                        {{-- <a href="{{ route('blog.index') }}" class="text-[#71717A] hover:text-[#FAFAFA] transition-colors text-sm">
-                            Blog
-                        </a> --}}
+                        <a
+                            href="{{ route('blog') }}"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                        >
+                            {{ __('site.blog') }}
+                        </a>
                     </li>
                     <li>
                         <a
                             href="{{ route('quote') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
-                            Get a Quote
+                            {{ __('site.get_quote') }}
                         </a>
                     </li>
                     <li>
                         <a
                             href="{{ route('contact') }}"
-                            class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                         >
-                            Contact Us
+                            {{ __('site.contact') }}
                         </a>
                     </li>
                 </ul>
@@ -180,111 +184,60 @@
             <div>
                 <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-[#FAFAFA] uppercase">Contact</h4>
                 <div class="space-y-4">
-                    @if ($primaryPhone)
+                    @if ($contact->hasPhone())
                         <div class="glass-card rounded-xl p-4">
                             <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Phone</div>
                             <a
-                                href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
-                                class="font-headline font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626]"
+                                href="{{ $contact->telHref($contact->primaryPhone) }}"
+                                class="font-headline inline-flex min-h-[44px] items-center font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                             >
-                                {{ $primaryPhone }}
+                                {{ $contact->primaryPhone }}
                             </a>
-                            @if ($secondaryPhone)
+                            @if (filled($contact->secondaryPhone))
                                 <a
-                                    href="tel:{{ str_replace([' ', '-', '(', ')'], '', $secondaryPhone) }}"
-                                    class="font-headline mt-1 block text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                                    href="{{ $contact->telHref($contact->secondaryPhone) }}"
+                                    class="font-headline mt-1 inline-flex min-h-[44px] items-center text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
                                 >
-                                    {{ $secondaryPhone }}
+                                    {{ $contact->secondaryPhone }}
                                 </a>
                             @endif
                         </div>
                     @endif
 
-                    <div class="glass-card rounded-xl p-4">
-                        <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Location</div>
-                        <p class="text-sm leading-relaxed text-[#FAFAFA]">{{ $companyAddress }}</p>
-                    </div>
+                    @if (filled($contact->address))
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Location</div>
+                            <p class="text-sm leading-relaxed text-[#FAFAFA]">{{ $contact->address }}</p>
+                        </div>
+                    @endif
 
-                    <div class="glass-card rounded-xl p-4">
-                        <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Hours</div>
-                        <p class="text-sm text-[#FAFAFA]">
-                            @php
-                                try {
-                                    $dayOrder = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
-                                    $openDays = [];
-                                    $closedDays = [];
+                    @if ($contact->hasWhatsapp())
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">WhatsApp</div>
+                            <a
+                                href="{{ $contact->whatsappHref() }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-[#FAFAFA] transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            >
+                                <svg class="h-5 w-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
+                                </svg>
+                                <span>{{ __('site.home.cta_band_whatsapp') }}</span>
+                            </a>
+                        </div>
+                    @endif
 
-                                    if (isset($workingHours) && is_array($workingHours)) {
-                                        foreach ($dayOrder as $key => $abbr) {
-                                            if (isset($workingHours[$key]) && ! ($workingHours[$key]['is_closed'] ?? false)) {
-                                                $format = ($timeFormatDisplay ?? '12') === '24' ? 'H:i' : 'g:i A';
-                                                $time = date($format, strtotime($workingHours[$key]['open'] ?? '07:30')).' – '.date($format, strtotime($workingHours[$key]['close'] ?? '17:00'));
-                                                $openDays[$key] = ['abbr' => $abbr, 'time' => $time];
-                                            } else {
-                                                $closedDays[] = $abbr;
-                                            }
-                                        }
-
-                                        // Group consecutive days with same hours
-                                        $groupedDays = [];
-                                        $currentGroup = [];
-                                        $currentTime = null;
-                                        $prevKey = null;
-                                        $dayKeys = array_keys($dayOrder);
-
-                                        foreach ($dayKeys as $key) {
-                                            if (! isset($openDays[$key])) {
-                                                continue;
-                                            }
-
-                                            $dayData = $openDays[$key];
-                                            $time = $dayData['time'];
-
-                                            // Check if consecutive and same time
-                                            $isConsecutive = $prevKey !== null && array_search($key, $dayKeys) === array_search($prevKey, $dayKeys) + 1;
-
-                                            if ($time === $currentTime && $isConsecutive) {
-                                                $currentGroup[] = $dayData['abbr'];
-                                            } else {
-                                                if (! empty($currentGroup)) {
-                                                    $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                                }
-                                                $currentGroup = [$dayData['abbr']];
-                                                $currentTime = $time;
-                                            }
-                                            $prevKey = $key;
-                                        }
-
-                                        if (! empty($currentGroup)) {
-                                            $groupedDays[] = ['days' => $currentGroup, 'time' => $currentTime];
-                                        }
-
-                                        // Modern professional format
-                                        $formatted = [];
-                                        foreach ($groupedDays as $group) {
-                                            $dayLabel = count($group['days']) > 2
-                                                ? $group['days'][0].'–'.end($group['days'])
-                                                : implode(' & ', $group['days']);
-                                            $formatted[] = $dayLabel.' · '.$group['time'];
-                                        }
-
-                                        if (! empty($closedDays)) {
-                                            $closedLabel = count($closedDays) > 2
-                                                ? $closedDays[0].'–'.end($closedDays)
-                                                : implode(' & ', $closedDays);
-                                            $formatted[] = $closedLabel.' · Closed';
-                                        }
-
-                                        echo implode('<br>', $formatted);
-                                    } else {
-                                        echo 'Mon–Fri · 7:30 AM – 5:00 PM<br>Sat · 8:00 AM – 1:00 PM<br>Sun · Closed';
-                                    }
-                                } catch (\Exception $e) {
-                                    echo 'Mon–Fri · 7:30 AM – 5:00 PM<br>Sat · 8:00 AM – 1:00 PM<br>Sun · Closed';
-                                }
-                            @endphp
-                        </p>
-                    </div>
+                    @if ($contact->openingHours()->isNotEmpty())
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Hours</div>
+                            <ul class="space-y-1 text-sm text-[#FAFAFA]">
+                                @foreach ($contact->openingHours() as $line)
+                                    <li>{{ $line }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -317,7 +270,7 @@
                     </svg>
                     Crafted with care by
                     <a
-                        href="https://highblossom.com"
+                        href="{{ route('home') }}"
                         class="font-medium text-[#A1A1AA] transition-colors duration-200 hover:text-[#DC2626]"
                     >Eugene Seaseole</a>
                 </span>

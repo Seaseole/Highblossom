@@ -33,14 +33,28 @@ class IdempotencyService
      * Mark a token as processed.
      *
      * @param string $token The idempotency token to mark as processed.
+     * @param mixed  $value What the token produced, so a retry can be handed the
+     *                      original result rather than only told it was a duplicate.
      */
-    public function markProcessed(string $token): void
+    public function markProcessed(string $token, mixed $value = true): void
     {
         if (empty($token)) {
             return;
         }
 
-        Cache::put($this->getCacheKey($token), true, self::CACHE_TTL_SECONDS);
+        Cache::put($this->getCacheKey($token), $value, self::CACHE_TTL_SECONDS);
+    }
+
+    /**
+     * What the first submission of this token produced, or null when it is unseen.
+     */
+    public function result(string $token): mixed
+    {
+        if (empty($token)) {
+            return null;
+        }
+
+        return Cache::get($this->getCacheKey($token));
     }
 
     /**

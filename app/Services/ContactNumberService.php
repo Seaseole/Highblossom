@@ -11,6 +11,9 @@ final readonly class ContactNumberService
     /**
      * Build contact numbers collection from company settings.
      *
+     * Blank settings produce no card at all: an unset WhatsApp number used to
+     * render a headline card with an empty number and a dead `wa.me/` link.
+     *
      * @param string $whatsappDefault    Default WhatsApp number
      * @param array  $whatsappAdditional Additional WhatsApp numbers
      * @param string $primaryPhone       Primary phone number
@@ -23,22 +26,32 @@ final readonly class ContactNumberService
         $contactNumbers = collect();
 
         // Add primary WhatsApp
-        $contactNumbers->push($this->createNumberObject('WhatsApp', $whatsappDefault, true, true));
+        if ($this->isUsable($whatsappDefault)) {
+            $contactNumbers->push($this->createNumberObject('WhatsApp', $whatsappDefault, true, true));
+        }
 
         // Add additional WhatsApp numbers
         $this->addAdditionalWhatsAppNumbers($contactNumbers, $whatsappAdditional, $whatsappDefault);
 
         // Add primary phone if different
-        if ($primaryPhone !== $whatsappDefault) {
+        if ($this->isUsable($primaryPhone) && $primaryPhone !== $whatsappDefault) {
             $contactNumbers->push($this->createNumberObject('Phone', $primaryPhone, false, false));
         }
 
         // Add the secondary line when set and not a duplicate of the numbers above
-        if ($secondaryPhone !== '' && $secondaryPhone !== $whatsappDefault && $secondaryPhone !== $primaryPhone) {
+        if ($this->isUsable($secondaryPhone) && $secondaryPhone !== $whatsappDefault && $secondaryPhone !== $primaryPhone) {
             $contactNumbers->push($this->createNumberObject('Phone 2', $secondaryPhone, false, false));
         }
 
         return $contactNumbers;
+    }
+
+    /**
+     * Determine whether a configured number is worth rendering a card for.
+     */
+    private function isUsable(string $number): bool
+    {
+        return trim($number) !== '';
     }
 
     /**

@@ -42,9 +42,11 @@
                         @endif
                     @endif
 
-                    <div class="prose prose-invert prose-lg mb-20 max-w-none leading-relaxed text-[#A1A1AA]">
-                        {!! $content->body !!}
-                    </div>
+                    @if (trim((string) $content->body) !== '')
+                        <div class="prose prose-invert prose-lg mb-20 max-w-none leading-relaxed text-[#A1A1AA]">
+                            {!! $content->body !!}
+                        </div>
+                    @endif
 
                     {{-- Team Section --}}
                     @if ($staff->isNotEmpty())

@@ -1,11 +1,43 @@
 * text=auto eol=lf
 
+# Diff/merge drivers
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
 
-CHANGELOG.md export-ignore
-README.md export-ignore
-.github/workflows/browser-tests.yml export-ignore
+# Treat published/binary assets as opaque (no line-ending churn, no diffs)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.otf binary
+*.mp4 binary
+*.pdf binary
+
+# Keep the `git archive` / GitHub source export lean: drop dev-only paths
+/tests export-ignore
+/phpunit.xml export-ignore
+/.github export-ignore
+/.agents export-ignore
+/.devin export-ignore
+/.ai export-ignore
+/.kilo export-ignore
+/.junie export-ignore
+/.cursor export-ignore
+/.windsurf export-ignore
+/PRD.md export-ignore
+/GEMINI.md export-ignore
+/CHANGELOG-*.md export-ignore
+/qodana.yaml export-ignore
+/boost.json export-ignore
+/routes_output.txt export-ignore
+/routes_debug.json export-ignore
+/.editorconfig export-ignore

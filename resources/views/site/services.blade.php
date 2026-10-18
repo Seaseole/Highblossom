@@ -1,8 +1,24 @@
 <x-layouts::site title="Our Services">
+    @php
+        // The count comes from live records and the rest from the same admin-editable
+        // tiles the homepage strip uses, so no unbacked figure leads this card.
+        $heroFacts = collect([[
+            'value' => (string) $services->total(),
+            'label' => __('services.services_offered'),
+            'suffix' => '',
+        ]])->concat(
+            $factTiles->map(fn (array $tile): array => [
+                'value' => (string) $tile['value'],
+                'label' => (string) $tile['label'],
+                'suffix' => (string) ($tile['suffix'] ?? ''),
+            ])
+        )->take(4)->values();
+    @endphp
+
     <!-- Hero Section -->
     <section class="relative bg-[#0A0A0F] pt-32 pb-20">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
-            <div class="grid items-center gap-12 lg:grid-cols-2">
+            <div class="grid items-center gap-12 {{ $heroFacts->isNotEmpty() ? 'lg:grid-cols-2' : '' }}">
                 <div>
                     <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
                         {{ __('services.label') }}
@@ -12,28 +28,22 @@
                     </h1>
                     <p class="max-w-lg text-lg leading-relaxed text-[#A1A1AA]">{{ __('services.description') }}</p>
                 </div>
-                <div class="relative">
-                    <div class="glass-card rounded-2xl p-8">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="text-center">
-                                <div class="font-headline text-3xl font-bold text-[#DC2626]">6+</div>
-                                <div class="mt-1 text-sm text-[#71717A]">{{ __('services.service_types') }}</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-headline text-3xl font-bold text-[#DC2626]">24h</div>
-                                <div class="mt-1 text-sm text-[#71717A]">{{ __('services.emergency_response') }}</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-headline text-3xl font-bold text-[#DC2626]">Same</div>
-                                <div class="mt-1 text-sm text-[#71717A]">{{ __('services.day_service') }}</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-headline text-3xl font-bold text-[#DC2626]">OEM</div>
-                                <div class="mt-1 text-sm text-[#71717A]">{{ __('services.quality_parts') }}</div>
+                @if ($heroFacts->isNotEmpty())
+                    <div class="relative">
+                        <div class="glass-card rounded-2xl p-8">
+                            <div class="grid grid-cols-2 gap-6">
+                                @foreach ($heroFacts as $fact)
+                                    <div class="text-center">
+                                        <div class="font-headline text-3xl font-bold text-[#DC2626]">
+                                            {{ $fact['value'] }}{{ $fact['suffix'] }}
+                                        </div>
+                                        <div class="mt-1 text-sm text-[#71717A]">{{ $fact['label'] }}</div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </section>
@@ -44,7 +54,7 @@
             @forelse ($services as $index => $service)
                 @if ($index % 2 === 0)
                     <!-- Image Left, Content Right -->
-                    <div class="mb-20 grid items-center gap-12 last:mb-0 lg:grid-cols-2 lg:gap-20">
+                    <div id="service-{{ $service->slug }}" class="mb-20 grid scroll-mt-28 items-center gap-12 last:mb-0 lg:grid-cols-2 lg:gap-20">
                         <div class="group relative overflow-hidden rounded-2xl">
                             <img
                                 src="{{ $service->full_image_url ?? asset('placeholder.gif') }}"
@@ -63,7 +73,7 @@
                             <h2 class="font-headline mb-4 text-3xl font-bold text-[#FAFAFA] md:text-4xl">
                                 {{ $service->title }}
                             </h2>
-                            <p class="mb-6 text-lg leading-relaxed text-[#A1A1AA]">{{ $service->short_description }}</p>
+                            @include('partials.service-description', ['service' => $service])
                             @if ($service->features && count($service->features) > 0)
                                 <ul class="mb-8 space-y-3">
                                     @foreach ($service->features as $feature)
@@ -86,12 +96,12 @@
                     </div>
                 @else
                     <!-- Content Left, Image Right -->
-                    <div class="mb-20 grid items-center gap-12 last:mb-0 lg:grid-cols-2 lg:gap-20">
+                    <div id="service-{{ $service->slug }}" class="mb-20 grid scroll-mt-28 items-center gap-12 last:mb-0 lg:grid-cols-2 lg:gap-20">
                         <div class="order-2 lg:order-1">
                             <h2 class="font-headline mb-4 text-3xl font-bold text-[#FAFAFA] md:text-4xl">
                                 {{ $service->title }}
                             </h2>
-                            <p class="mb-6 text-lg leading-relaxed text-[#A1A1AA]">{{ $service->short_description }}</p>
+                            @include('partials.service-description', ['service' => $service])
                             @if ($service->features && count($service->features) > 0)
                                 <ul class="mb-8 space-y-3">
                                     @foreach ($service->features as $feature)
@@ -226,25 +236,10 @@
                     </h2>
                     <p class="mx-auto mb-10 max-w-2xl text-lg text-[#A1A1AA]">{{ __('services.cta_description') }}</p>
 
-                    <div class="flex flex-col justify-center gap-4 sm:flex-row">
-                        <a href="{{ route('quote') }}" class="btn-premium glow-red px-8 py-4 text-lg">
-                            <span>{{ __('services.request_quote') }}</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
-                        </a>
-                        @if ($primaryPhone)
-                            <a
-                                href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
-                                class="btn-glass px-8 py-4 text-lg"
-                            >
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                </svg>
-                                <span>{{ $primaryPhone }}</span>
-                            </a>
-                        @endif
-                    </div>
+                    <x-site.contact-buttons
+                        :quote-label="__('services.request_quote')"
+                        size="lg"
+                    />
                 </div>
             </div>
         </div>

@@ -404,6 +404,230 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
+    // Sub-categories on the Edit Glass Type page. One modal covers both create and edit:
+    // rows post JSON to the same resource routes the standalone pages use, and the affected
+    // row is cloned or repainted in place so the surrounding glass-type form keeps its
+    // unsaved values instead of being discarded by a navigation.
+    window.Alpine.data('subCategories', (base, glassTypeId, initialCount) => ({
+        base: base,
+        glassTypeId: glassTypeId,
+        count: initialCount,
+        mode: null,
+        id: null,
+        row: null,
+        name: '',
+        slug: '',
+        slugEdited: false,
+        sortOrder: 0,
+        isActive: true,
+        errors: [],
+        saving: false,
+
+        get isOpen() {
+            return this.mode !== null;
+        },
+
+        get isCreate() {
+            return this.mode === 'create';
+        },
+
+        get title() {
+            return this.isCreate ? 'New sub-category' : 'Edit sub-category';
+        },
+
+        openCreate() {
+            this.mode = 'create';
+            this.id = null;
+            this.row = null;
+            this.name = '';
+            this.slug = '';
+            this.slugEdited = false;
+            this.sortOrder = this.count;
+            this.isActive = true;
+            this.errors = [];
+
+            this.focusDialog();
+        },
+
+        openEdit(row) {
+            this.mode = 'edit';
+            this.id = Number(row.dataset.id);
+            this.row = row;
+            this.name = row.dataset.name;
+            this.slug = row.dataset.slug ?? '';
+            this.slugEdited = true;
+            this.sortOrder = Number(row.dataset.sortOrder ?? 0);
+            this.isActive = row.dataset.active !== '0';
+            this.errors = [];
+
+            this.focusDialog();
+        },
+
+        focusDialog() {
+            this.$nextTick(() => {
+                document.body.style.overflow = 'hidden';
+
+                if (this.$refs.input) this.$refs.input.focus();
+            });
+        },
+
+        close() {
+            if (! this.isOpen) return;
+
+            this.mode = null;
+            this.row = null;
+            this.errors = [];
+            document.body.style.overflow = '';
+        },
+
+        // @alpinejs/focus is not installed, so x-trap is unavailable and the cycle is
+        // written by hand or focus would escape behind the overlay.
+        trap(event) {
+            if (event.key !== 'Tab' || ! this.$refs.dialog) return;
+
+            const focusables = Array.from(this.$refs.dialog.querySelectorAll('input, button'))
+                .filter((el) => ! el.disabled);
+
+            if (! focusables.length) return;
+
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (! event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        },
+
+        autoSlug() {
+            if (this.slugEdited) return;
+
+            this.slug = this.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        },
+
+        async save() {
+            if (this.saving || ! this.isOpen) return;
+
+            this.saving = true;
+            this.errors = [];
+
+            const creating = this.isCreate;
+            const url = creating ? this.base : this.base + '/' + this.id;
+
+            try {
+                const response = await fetch(url, {
+                    method: creating ? 'POST' : 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    },
+                    body: JSON.stringify({
+                        glass_type_id: this.glassTypeId,
+                        name: this.name,
+                        slug: this.slug,
+                        sort_order: Number(this.sortOrder) || 0,
+                        is_active: this.isActive,
+                    }),
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (! response.ok) {
+                    this.errors = Object.values(data.errors ?? {}).flat();
+
+                    if (! this.errors.length) {
+                        this.errors = [data.message || 'Could not save.'];
+                    }
+
+                    return;
+                }
+
+                if (creating) {
+                    this.appendRow(data);
+                } else {
+                    this.paintRow(this.row, data);
+                }
+
+                this.close();
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'success', message: data.name + (creating ? ' created.' : ' updated.') },
+                }));
+            } catch (error) {
+                this.errors = ['Network error — nothing was saved.'];
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        appendRow(created) {
+            const list = document.getElementById('sub-category-list');
+            const template = document.getElementById('sub-category-row-template');
+
+            if (! list || ! template) return;
+
+            const row = template.content.firstElementChild.cloneNode(true);
+
+            this.paintRow(row, created);
+            list.append(row);
+            this.count += 1;
+        },
+
+        paintRow(row, data) {
+            row.dataset.id = String(data.id);
+            row.dataset.name = data.name;
+            row.dataset.slug = data.slug;
+            row.dataset.sortOrder = String(data.sort_order);
+            row.dataset.active = data.is_active ? '1' : '0';
+
+            row.querySelector('[data-row-name]').textContent = data.name;
+            row.querySelector('[data-row-slug]').textContent = data.slug;
+            row.querySelector('[data-row-inactive]').classList.toggle('hidden', Boolean(data.is_active));
+        },
+
+        async remove(row) {
+            if (! window.confirm('Delete this sub-category? This cannot be undone.')) return;
+
+            try {
+                const response = await fetch(this.base + '/' + row.dataset.id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    },
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (! response.ok) {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { type: 'error', message: data.message || 'Could not delete.' },
+                    }));
+
+                    return;
+                }
+
+                row.remove();
+                this.count -= 1;
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'success', message: 'Sub-category deleted.' },
+                }));
+            } catch (error) {
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'error', message: 'Network error — nothing was deleted.' },
+                }));
+            }
+        },
+    }));
+
     // Status control for the posts index: a menu opened by clicking the status pill
     // or right-clicking a row, plus a multi-select bulk bar. Both paths post JSON and
     // repaint the affected pills in place rather than reloading the table.

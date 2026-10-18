@@ -1,29 +1,19 @@
-@component('mail::message')
-# Booking Confirmed
+<x-emails.layout
+    :title="'Booking Confirmed — '.config('app.name')"
+    :preheader="'Your booking '.$booking->displayReference().' is confirmed.'"
+    :header-label="$booking->displayReference()"
+    kicker="Booking Confirmed"
+    :heading="'You are all set, '.$booking->client_name"
+>
+    <p style="margin: 0 0 24px; font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #4b5563; font-size: 15px; line-height: 1.7;">
+        Great news — your booking is confirmed and on our appointment list. Please arrive a few minutes early so we can get you straight in.
+    </p>
 
-Hi {{ $booking->client_name }},
+    @include('emails.bookings.details')
 
-Great news! Your booking has been confirmed and added to our appointment list.
+    <x-emails.button :url="URL::signedRoute('bookings.confirmation', $booking)">View booking status</x-emails.button>
 
-**Vehicle Details:**
-{{ $booking->vehicle_details }}
-
-**Scheduled Date:**
-{{ $booking->scheduled_at ? $booking->scheduled_at->format('M d, Y H:i') : 'To be confirmed' }}
-
-**Location:**
-{{ $booking->location === 'mobile' ? 'Mobile Service' : 'Workshop' }}
-@if($booking->location === 'mobile' && $booking->client_address)
-**Service Address:**
-{{ $booking->client_address }}
-@endif
-
-Our team looks forward to serving you. If you need to make any changes, please reply to this email or contact our support team.
-
-@component('mail::button', ['url' => URL::signedRoute('bookings.confirmation', $booking)])
-View booking status
-@endcomponent
-
-Thanks,<br>
-{{ config('app.name') }}
-@endcomponent
+    <p style="margin: 20px 0 0; font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #9ca3af; font-size: 13px; line-height: 1.6; text-align: center;">
+        Need to make a change? Reply to this email and we will help.
+    </p>
+</x-emails.layout>

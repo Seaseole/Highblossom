@@ -32,6 +32,6 @@ final class BookingConfirmedClientMail extends Mailable implements ShouldQueue
     public function build(): self
     {
         return $this->subject('Highblossom: Booking Confirmed')
-            ->markdown('emails.bookings.confirmed');
+            ->view('emails.bookings.confirmed');
     }
 }

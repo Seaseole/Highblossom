@@ -38,6 +38,6 @@ final class BookingRescheduledClientMail extends Mailable implements ShouldQueue
     public function build(): self
     {
         return $this->subject('Highblossom: Appointment Rescheduled')
-            ->markdown('emails.bookings.rescheduled');
+            ->view('emails.bookings.rescheduled');
     }
 }

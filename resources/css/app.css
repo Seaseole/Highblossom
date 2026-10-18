@@ -84,6 +84,67 @@
     --z-100: 100;
 }
 
+/*
+ * Booking flow surface.
+ *
+ * Scoped to .booking-flow on purpose: the flow shares the site's dark theme and
+ * its red accent, but keeps its own panel/line/muted values so the wizard and
+ * confirmation cards stay one edit away from any future site-wide token sweep.
+ */
+.booking-flow {
+    --booking-accent: #dc2626;
+    --booking-accent-strong: #b91c1c;
+    --booking-accent-ink: #ffffff;
+    --booking-panel: #14141a;
+    --booking-panel-raised: #1b1b23;
+    --booking-line: rgba(255, 255, 255, 0.08);
+    --booking-muted: #9b9ba6;
+}
+
+.booking-flow .tnum {
+    font-variant-numeric: tabular-nums;
+}
+
+/* White-on-dark inputs: the shared .form-input-premium is built for the light admin theme. */
+.booking-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--booking-line);
+    border-radius: 0.875rem;
+    padding: 0.875rem 1rem;
+    color: #fafafa;
+    font-size: 0.9375rem;
+    min-height: 44px;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-input::placeholder {
+    color: rgba(155, 155, 166, 0.75);
+}
+
+.booking-input:focus-visible {
+    outline: none;
+    border-color: var(--booking-accent);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+}
+
+.booking-input[data-invalid="true"] {
+    border-color: rgba(248, 113, 113, 0.55);
+}
+
+.booking-flow :focus-visible {
+    outline: 2px solid var(--booking-accent);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .booking-flow * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
 @layer theme {
     .dark {
         --color-accent: var(--color-white);

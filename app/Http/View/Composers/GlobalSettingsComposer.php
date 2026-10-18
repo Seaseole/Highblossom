@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\View\Composers;
 
+use App\Services\Contact\ContactDetails;
 use App\Services\Settings\SettingsManager;
 use Illuminate\View\View;
 
@@ -57,6 +58,19 @@ final readonly class GlobalSettingsComposer
             'announcements' => $settings->get('announcements'),
             'galleryMetrics' => $settings->get('gallery_metrics'),
             'googleSiteVerification' => $settings->get('google_site_verification'),
+            'contact' => ContactDetails::fromSettings($this->settings),
+            'homeTagline' => $settings->get('home_tagline'),
+            'homeYearsExperience' => $settings->get('home_years_experience'),
+            'homeWarrantyHeading' => $settings->get('home_warranty_heading'),
+            'homeWarrantyText' => $settings->get('home_warranty_text'),
+            'homeUrgencyEnabled' => filter_var($settings->get('home_urgency_enabled', true), FILTER_VALIDATE_BOOLEAN),
+            'homeUrgencyText' => $settings->get('home_urgency_text'),
+            'homeCtaHeading' => $settings->get('home_cta_heading'),
+            'homeCtaText' => $settings->get('home_cta_text'),
+            'homeFinalCtaHeading' => $settings->get('home_final_cta_heading'),
+            'homeFinalCtaText' => $settings->get('home_final_cta_text'),
+            'homeServiceArea' => $settings->get('home_service_area'),
+            'homeMobileCoverage' => $settings->get('home_mobile_coverage'),
         ]);
     }
 }

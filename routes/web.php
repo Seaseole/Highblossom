@@ -44,9 +44,18 @@ Route::get('/bookings/{booking}/confirmation', [BookingController::class, 'confi
     ->middleware('signed')
     ->name('bookings.confirmation');
 
+// Signed so a diary entry cannot be pulled by guessing the next booking id.
+Route::get('/bookings/{booking}/calendar.ics', [BookingController::class, 'calendar'])
+    ->middleware('signed')
+    ->name('bookings.calendar');
+
 Route::get('/api/bookings/availability', [BookingAvailabilityController::class, 'availability'])
     ->middleware('throttle:30,1')
     ->name('api.bookings.availability');
+
+Route::get('/api/bookings/calendar', [BookingAvailabilityController::class, 'calendar'])
+    ->middleware('throttle:30,1')
+    ->name('api.bookings.calendar');
 
 // Poll API
 Route::post('/api/content-blocks/poll/{poll}', [PollController::class, 'vote'])

@@ -5,7 +5,8 @@ return [
     'title' => 'Highblossom',
 
     // Buttons
-    'get_quote' => 'Get Your Quote',
+    'get_quote' => 'Get a Quote',
+    'book_appointment' => 'Book Appointment',
     'view_work' => 'View Our Work',
     'view_all' => 'View All',
     'learn_more' => 'Learn more',
@@ -16,6 +17,7 @@ return [
     'nav_home' => 'Home',
     'services' => 'Services',
     'gallery' => 'Gallery',
+    'blog' => 'Blog',
     'about' => 'About',
     'contact' => 'Contact',
 
@@ -23,24 +25,19 @@ return [
     'home' => [
         // Hero section
         'hero_trust_badge' => 'Gaborone\'s Trusted Auto Glass Specialists',
-        'hero_headline' => 'Precision<br><span class="gradient-text-accent">Glass</span> Works',
-        'hero_headline_fallback' => 'Precision Glass Works',
+        'hero_headline' => 'Precision<br><span class="gradient-text-accent">Automotive Glass</span>',
+        'hero_headline_fallback' => 'Precision Automotive Glass',
         'hero_headline_animated' => [
             'Expert Automotive Glass Solutions',
-            'Precision Glass Works',
+            'Precision Automotive Glass',
             'Your Trusted Auto Glass Partner',
             'Premium Windshield Specialists',
             'Gaborone\'s Glass Experts',
         ],
         'hero_subheadline' => 'Premium automotive glass repair, restoration, and replacement for Gaborone\'s vehicle owners and commercial fleets.',
-        'hero_get_quote' => 'Get Your Quote',
+        'hero_get_quote' => 'Get a Quote',
         'hero_view_work' => 'View Our Work',
-
-        // Trust bar
-        'years_experience' => 'Years Experience',
-        'vehicles_serviced' => 'Vehicles Serviced',
-        'on_time_rate' => 'On-Time Rate',
-        'same_day_service' => 'Same Day Service',
+        'hero_years_badge' => ':years years of experience',
 
         // Services section
         'services_section_label' => 'What We Do',
@@ -61,7 +58,6 @@ return [
         'gallery_section_label' => 'Portfolio',
         'gallery_title' => 'Recent Work',
         'gallery_view_full' => 'View Full Gallery',
-        'gallery_no_items' => 'No featured portfolio items yet. Check back soon!',
 
         // Why choose us section
         'why_choose_label' => 'Why Highblossom',
@@ -78,16 +74,47 @@ return [
         'mobile_service' => 'Mobile Service',
         'mobile_service_description' => 'We come to you. Mobile units serving Gaborone and surrounding areas.',
 
+        // Partners strip
+        'trusted_by' => 'Proudly Trusted By',
+
         // Testimonials section
         'testimonials_label' => 'Testimonials',
         'testimonials_title' => 'What Our Clients Say',
         'testimonials_featured' => 'Featured',
-        'testimonials_no_testimonials' => 'Be the first to share your experience with us.',
 
-        // Stats
-        'happy_clients' => 'Happy Clients',
+        // Proof row: only rendered when backed by real records or admin settings
         'average_rating' => 'Average Rating',
         'recommend_us' => 'Recommend Us',
-        'response_time' => 'Response Time',
+        'verified_reviews' => 'Verified Reviews',
+
+        // Warranty band
+        'warranty_label' => 'Our Guarantee',
+
+        // Repeated call-to-action band
+        'cta_band_quote' => 'Get Your Free Quote',
+        'cta_band_whatsapp' => 'WhatsApp Us',
+        'cta_band_call' => 'Call Us',
+        'cta_band_email' => 'Email Us',
+
+        // Urgency band
+        'urgency_call' => 'Call Now',
+        'urgency_whatsapp' => 'WhatsApp Us',
+
+        // Quick info strip
+        'quick_info_call_hint' => 'Call for immediate assistance',
+
+        // Mobile sticky bar
+        'sticky_call' => 'Call',
+        'sticky_whatsapp' => 'WhatsApp',
+
+        // Where we fit
+        'service_area_label' => 'Where We Fit',
+        'service_area_mobile' => 'Mobile coverage',
+        'service_area_workshop' => 'Workshop',
+        'service_area_directions' => 'Get directions',
+
+        // Frequently asked questions
+        'faq_label' => 'Questions',
+        'faq_title' => 'Frequently Asked Questions',
     ],
 ];

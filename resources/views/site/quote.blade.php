@@ -28,15 +28,13 @@
                             class="space-y-10"
                             x-data="{
                                 isSubmitting: false,
-                                isUploading: false,
-                                hasImage: false,
                                 showErrors: true,
                                 init() {
                                     setTimeout(() => (this.showErrors = false), 5000);
                                 },
                             }"
                             @submit.prevent="
-                                if (! isSubmitting && ! isUploading) {
+                                if (! isSubmitting) {
                                     isSubmitting = true;
                                     $el.submit();
                                 }
@@ -76,8 +74,7 @@
                                             required
                                             class="form-input-premium @error('name') border-red-500 @enderror"
                                             placeholder="John Doe"
-                                            oninput="this.value=this.value.replace(/[^a-zA-Z"
-                                            ]/g,'')"
+                                            oninput="this.value = this.value.replace(/[^\p{L}\p{M}\p{N}\s'’\-.,]/gu, '')"
                                         />
                                         @error('name')
                                             <p x-show="showErrors" class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -356,10 +353,7 @@
                                     </h3>
                                     <p class="mb-4 text-sm text-[#71717A]">{{ __('quote.upload_description') }}</p>
 
-                                    <input type="hidden" name="image_path" id="quote-image-path" />
-
                                     <div id="quote-image-preview" class="mb-4"></div>
-                                    <div id="quote-image-progress"></div>
 
                                     <div class="mt-4 flex justify-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] px-6 py-10 transition-colors hover:bg-white/[0.04]">
                                         <div class="text-center">
@@ -384,6 +378,9 @@
                                             <p class="text-xs leading-5 text-[#71717A]">
                                                 {{ __('quote.file_requirements') }}
                                             </p>
+                                            @error('image')
+                                                <p x-show="showErrors" class="mt-2 text-xs text-red-500">{{ $message }}</p>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
@@ -400,21 +397,14 @@
                                 <button
                                     type="submit"
                                     class="btn-premium glow-red-subtle w-full px-12 py-4 text-lg md:w-auto"
-                                    :disabled="isSubmitting || isUploading"
-                                    :class="{ 'opacity-75 cursor-not-allowed': isSubmitting || isUploading }"
+                                    :disabled="isSubmitting"
+                                    :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }"
                                 >
                                     <span
-                                        x-show="! isSubmitting && ! isUploading"
+                                        x-show="! isSubmitting"
                                         x-cloak
                                     >{{ __('quote.submit_quote') }}</span>
-                                    <span x-show="isUploading" x-cloak class="flex items-center gap-2">
-                                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Uploading image...
-                                    </span>
-                                    <span x-show="isSubmitting && ! isUploading" x-cloak class="flex items-center gap-2">
+                                    <span x-show="isSubmitting" x-cloak class="flex items-center gap-2">
                                         <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -422,7 +412,7 @@
                                         Submitting...
                                     </span>
                                     <svg
-                                        x-show="! isSubmitting && ! isUploading"
+                                        x-show="! isSubmitting"
                                         x-cloak
                                         class="h-5 w-5"
                                         fill="none"
@@ -432,10 +422,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                     </svg>
                                 </button>
-                                <p class="mt-4 text-sm text-[#71717A]" x-show="isUploading">
-                                    Please wait for the image to finish uploading before submitting.
-                                </p>
-                                <p class="mt-4 text-sm text-[#71717A]" x-show="! isUploading">
+                                <p class="mt-4 text-sm text-[#71717A]">
                                     {{ __('quote.submit_disclaimer') }}
                                 </p>
                             </div>
@@ -480,20 +467,20 @@
                         </div>
 
                         <!-- Contact Card -->
-                        @if ($primaryPhone)
+                        @if ($contact->telHref($contact->primaryPhone))
                             <div class="glass-card rounded-2xl p-6">
                                 <h3 class="font-headline mb-4 text-lg font-bold text-[#FAFAFA]">
                                     {{ __('quote.prefer_to_call') }}
                                 </h3>
                                 <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('quote.call_description') }}</p>
                                 <a
-                                    href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
+                                    href="{{ $contact->telHref($contact->primaryPhone) }}"
                                     class="flex items-center gap-3 font-semibold text-[#DC2626] hover:underline"
                                 >
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                     </svg>
-                                    {{ $primaryPhone }}
+                                    {{ $contact->primaryPhone }}
                                 </a>
                             </div>
                         @endif
@@ -505,9 +492,9 @@
                                 <span class="text-sm font-semibold text-[#DC2626] uppercase">{{ __('quote.emergency_24_7') }}</span>
                             </div>
                             <p class="mb-4 text-sm text-[#A1A1AA]">{{ __('quote.emergency_description') }}</p>
-                            @if ($primaryPhone)
+                            @if ($contact->telHref($contact->primaryPhone))
                                 <a
-                                    href="tel:{{ str_replace([' ', '-', '(', ')'], '', $primaryPhone) }}"
+                                    href="{{ $contact->telHref($contact->primaryPhone) }}"
                                     class="btn-premium w-full py-3 text-sm"
                                 >
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -524,7 +511,6 @@
     </section>
 </x-layouts::site>
 
-<script src="{{ asset('js/image-upload.js') }}"></script>
 <script>
     // Function to load sub-categories via AJAX
     function loadSubCategories(glassTypeId) {
@@ -542,54 +528,38 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof ImageUploader !== 'undefined') {
-            // Get Alpine.js component reference for state synchronization
-            const form = document.querySelector('form[x-data]');
-            let alpineComponent = null;
+        const input = document.getElementById('file-upload');
+        const preview = document.getElementById('quote-image-preview');
 
-            // Find the Alpine.js component
-            if (form && form._x_dataStack) {
-                alpineComponent = form._x_dataStack[0];
+        if (! input || ! preview) {
+            return;
+        }
+
+        // The photo travels with the multipart submit, so the preview only needs
+        // to confirm the selection locally rather than upload it first.
+        input.addEventListener('change', function () {
+            const file = input.files[0];
+            preview.replaceChildren();
+
+            if (! file) {
+                return;
             }
 
-            const uploader = new ImageUploader({
-                fileInput: document.querySelector('input[name="image"]'),
-                previewContainer: document.getElementById('quote-image-preview'),
-                progressContainer: document.getElementById('quote-image-progress'),
-                hiddenInput: document.getElementById('quote-image-path'),
-                uploadUrl: '{{ route("admin.image-upload") }}',
-                csrfToken: '{{ csrf_token() }}',
-                folder: 'quotes',
-                maxSize: 2 * 1024 * 1024, // 2MB
-                acceptedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
-                onUploadStart: function () {
-                    // Sync with Alpine.js
-                    if (alpineComponent && alpineComponent.isUploading !== undefined) {
-                        alpineComponent.isUploading = true;
-                    }
-                    // Dispatch custom event for any other listeners
-                    form?.dispatchEvent(new CustomEvent('upload:start'));
-                },
-                onUploadEnd: function () {
-                    // Sync with Alpine.js
-                    if (alpineComponent && alpineComponent.isUploading !== undefined) {
-                        alpineComponent.isUploading = false;
-                    }
-                    form?.dispatchEvent(new CustomEvent('upload:end'));
-                },
-                onUploadComplete: function (response) {
-                    console.log('Image uploaded successfully:', response);
-                    if (alpineComponent && alpineComponent.hasImage !== undefined) {
-                        alpineComponent.hasImage = true;
-                    }
-                },
-                onUploadError: function (message) {
-                    console.error('Upload error:', message);
-                },
-            });
+            const wrapper = document.createElement('div');
+            wrapper.className = 'relative aspect-video w-full overflow-hidden rounded-xl border border-white/5 shadow-sm';
 
-            // Also expose uploader instance for debugging
-            window.quoteUploader = uploader;
-        }
+            const img = document.createElement('img');
+            img.className = 'h-full w-full object-cover';
+            img.alt = '';
+            img.addEventListener('load', () => URL.revokeObjectURL(img.src), { once: true });
+            img.src = URL.createObjectURL(file);
+
+            const caption = document.createElement('p');
+            caption.className = 'mt-2 text-xs text-[#71717A]';
+            caption.textContent = file.name;
+
+            wrapper.append(img);
+            preview.append(wrapper, caption);
+        });
     });
 </script>

@@ -33,8 +33,8 @@ return [
     'select_service' => 'Select service',
     'visual_assessment' => 'Visual Assessment',
     'upload_description' => 'Upload a photo of the damage for a more accurate quote.',
-    'click_to_upload' => 'Click to upload or drag and drop',
-    'file_requirements' => 'PNG, JPG up to 10MB',
+    'click_to_upload' => 'Click to upload',
+    'file_requirements' => 'PNG, JPG or WebP up to 10MB',
     'mobile_service' => 'Request mobile service (we come to you)',
 
     // Buttons

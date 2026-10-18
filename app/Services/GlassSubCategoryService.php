@@ -35,6 +35,18 @@ final class GlassSubCategoryService
     }
 
     /**
+     * Get every sub-category of a glass type, inactive ones included, for management screens.
+     */
+    public function getAllByGlassType(GlassType|int $glassType): Collection
+    {
+        $glassTypeId = $glassType instanceof GlassType ? $glassType->id : $glassType;
+
+        return GlassSubCategory::where('glass_type_id', $glassTypeId)
+            ->ordered()
+            ->get();
+    }
+
+    /**
      * Get active sub-categories for public quote form.
      */
     public function getActiveForQuote(): Collection

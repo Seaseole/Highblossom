@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\ApplicationVersionController;
+use App\Http\Controllers\Admin\BookingClosureController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CacheController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -39,6 +40,12 @@ use Lubusin\Decomposer\Controllers\DecomposerController;
 // Admin Portal
 Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:access admin panel'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('bookings', [BookingController::class, 'index'])->middleware('can:view bookings')->name('bookings.index');
+
+    // Registered ahead of bookings/{booking} so the literal is not swallowed by the wildcard.
+    Route::get('bookings/closures', [BookingClosureController::class, 'index'])->middleware('can:update bookings')->name('bookings.closures.index');
+    Route::post('bookings/closures', [BookingClosureController::class, 'store'])->middleware('can:update bookings')->name('bookings.closures.store');
+    Route::delete('bookings/closures/{closure}', [BookingClosureController::class, 'destroy'])->middleware('can:update bookings')->name('bookings.closures.destroy');
+
     Route::get('bookings/{booking}', [BookingController::class, 'show'])->middleware('can:view bookings')->name('bookings.show');
     Route::patch('bookings/{booking}', [BookingController::class, 'update'])->middleware('can:update bookings')->name('bookings.update');
     Route::patch('bookings/{booking}/update-status', [BookingController::class, 'updateStatus'])->middleware('can:update bookings')->name('bookings.update-status');

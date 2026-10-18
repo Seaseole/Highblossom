@@ -43,10 +43,16 @@ final class GlassSubCategoryController
 
     /**
      * Store a newly created glass sub-category in storage.
+     *
+     * @return RedirectResponse|JsonResponse
      */
-    public function store(GlassSubCategoryRequest $request): RedirectResponse
+    public function store(GlassSubCategoryRequest $request)
     {
-        $this->glassSubCategoryService->create($request->validated());
+        $subCategory = $this->glassSubCategoryService->create($request->validated());
+
+        if ($request->wantsJson()) {
+            return $this->presented($subCategory, 201);
+        }
 
         return redirect()
             ->route('admin.glass-sub-categories.index')
@@ -65,10 +71,16 @@ final class GlassSubCategoryController
 
     /**
      * Update the specified glass sub-category in storage.
+     *
+     * @return RedirectResponse|JsonResponse
      */
-    public function update(GlassSubCategoryRequest $request, GlassSubCategory $glassSubCategory): RedirectResponse
+    public function update(GlassSubCategoryRequest $request, GlassSubCategory $glassSubCategory)
     {
-        $this->glassSubCategoryService->update($glassSubCategory, $request->validated());
+        $subCategory = $this->glassSubCategoryService->update($glassSubCategory, $request->validated());
+
+        if ($request->wantsJson()) {
+            return $this->presented($subCategory);
+        }
 
         return redirect()
             ->route('admin.glass-sub-categories.index')
@@ -77,20 +89,44 @@ final class GlassSubCategoryController
 
     /**
      * Remove the specified glass sub-category from storage.
+     *
+     * @return RedirectResponse|JsonResponse
      */
-    public function destroy(GlassSubCategory $glassSubCategory): RedirectResponse
+    public function destroy(GlassSubCategory $glassSubCategory)
     {
         try {
             $this->glassSubCategoryService->delete($glassSubCategory);
-
-            return redirect()
-                ->route('admin.glass-sub-categories.index')
-                ->with('success', __('messages.glass_sub_category_deleted'));
         } catch (\Exception $e) {
+            if (request()->wantsJson()) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+
             return redirect()
                 ->route('admin.glass-sub-categories.index')
                 ->with('error', $e->getMessage());
         }
+
+        if (request()->wantsJson()) {
+            return response()->json(['id' => $glassSubCategory->getKey()]);
+        }
+
+        return redirect()
+            ->route('admin.glass-sub-categories.index')
+            ->with('success', __('messages.glass_sub_category_deleted'));
+    }
+
+    /**
+     * Shape a sub-category for the modal on the Edit Glass Type page.
+     */
+    private function presented(GlassSubCategory $subCategory, int $status = 200): JsonResponse
+    {
+        return response()->json([
+            'id' => $subCategory->getKey(),
+            'name' => $subCategory->name,
+            'slug' => $subCategory->slug,
+            'sort_order' => $subCategory->sort_order,
+            'is_active' => $subCategory->is_active,
+        ], $status);
     }
 
     /**

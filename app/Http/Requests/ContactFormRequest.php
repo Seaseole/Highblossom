@@ -22,15 +22,18 @@ class ContactFormRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
+     * The varchar columns on `contact_messages` are 191 characters wide, so the
+     * ceilings match them rather than leaving MySQL to truncate the submission.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'name' => 'required|string|max:191',
+            'email' => 'required|email|max:191',
             'phone' => 'nullable|string|max:20',
-            'subject' => 'required|string|max:255',
+            'subject' => 'required|string|max:191',
             'message' => 'required|string|min:10',
         ];
     }

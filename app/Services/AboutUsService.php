@@ -40,10 +40,15 @@ final class AboutUsService
 
     /**
      * Get existing content or create with defaults if none exists.
+     *
+     * Resolves through the same selector the public page uses so the editor never
+     * writes to a different row than the one visitors read. Falls back to the most
+     * recently edited row when every entry is inactive, rather than piling up blanks.
      */
     public function getOrCreateContent(): AboutUsContent
     {
-        $content = AboutUsContent::first();
+        $content = AboutUsContent::active()
+            ?? AboutUsContent::orderByDesc('updated_at')->orderByDesc('id')->first();
 
         if (! $content) {
             $content = AboutUsContent::create([

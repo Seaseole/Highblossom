@@ -66,6 +66,8 @@
             background-color: #0a0a0f;
         }
     </style>
+
+    @stack('styles')
 </head>
 <body class="font-body bg-[#0A0A0F] text-[#FAFAFA] antialiased selection:bg-[#DC2626] selection:text-white">
     @include('partials.site-nav')

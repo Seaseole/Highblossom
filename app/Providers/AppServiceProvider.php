@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Http\View\Composers\GlobalSettingsComposer;
+use App\Http\View\Composers\SiteFooterComposer;
 use App\Services\AvailabilityService;
 use App\Services\Contracts\AvailabilityServiceInterface;
 use App\Services\Settings\SettingsManager;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Share global settings via View Composer
         View::composer('*', GlobalSettingsComposer::class);
+        View::composer('partials.site-footer', SiteFooterComposer::class);
 
         Model::preventLazyLoading(! app()->isProduction());
 
