@@ -74,3 +74,4 @@ yarn-error.log
 *.bak
 *.log
 /backups
+/public/favicon-version.txt

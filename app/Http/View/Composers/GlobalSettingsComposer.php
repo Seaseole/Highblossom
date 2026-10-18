@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\View\Composers;
 
 use App\Services\Contact\ContactDetails;
+use App\Services\FaviconSetGenerator;
 use App\Services\Settings\SettingsManager;
 use Illuminate\View\View;
 
@@ -19,7 +20,8 @@ final readonly class GlobalSettingsComposer
      * Create a new composer instance.
      */
     public function __construct(
-        private SettingsManager $settings
+        private SettingsManager $settings,
+        private FaviconSetGenerator $favicons,
     ) {}
 
     /**
@@ -29,6 +31,13 @@ final readonly class GlobalSettingsComposer
     {
         $settings = $this->settings->all();
         $view->with('settings', $settings);
+
+        $faviconSet = (array) $settings->get('favicon_set', []);
+
+        // Keeps the public-root icon files in sync with the stored set version
+        // (self-heals after deploys rebuilt public/ from git). Cheap: one
+        // marker read unless the version actually drifted.
+        $this->favicons->ensure($faviconSet, $settings->get('favicon') ?: null);
 
         // Map snake_case settings to camelCase variables expected by views
         $view->with([
@@ -44,6 +53,7 @@ final readonly class GlobalSettingsComposer
             'timeFormatDisplay' => $settings->get('time_format_display'),
             'businessLogo' => $settings->get('business_logo'),
             'favicon' => $settings->get('favicon'),
+            'faviconSet' => $faviconSet,
             'googleMapsApiKey' => $settings->get('google_maps_api_key'),
             'mapDirectionsLink' => $settings->get('map_directions_link'),
             'timezone' => $settings->get('timezone'),

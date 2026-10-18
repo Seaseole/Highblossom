@@ -80,6 +80,7 @@ final class SettingsManager
             'time_format_display' => '24',
             'business_logo' => '',
             'favicon' => '',
+            'favicon_set' => [],
             'google_maps_api_key' => '',
             'map_directions_link' => 'https://maps.app.goo.gl/KJip8MytQrPrULg58',
             'timezone' => 'Africa/Gaborone',

@@ -7,9 +7,7 @@
     <title>
         {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
     </title>
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    @include('partials.favicons')
 
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

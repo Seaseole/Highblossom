@@ -52,8 +52,8 @@ final class CompanySettingService
     /** Logo containment dimensions (max width/height). Preserves aspect ratio. */
     private const LOGO_MAX_DIMENSIONS = [512, 512];
 
-    /** Favicon cover dimensions (square). */
-    private const FAVICON_DIMENSIONS = [256, 256];
+    /** Favicon master cover dimensions (square); sized for the 512px manifest icon. */
+    private const FAVICON_DIMENSIONS = [512, 512];
 
     /** Hero banner cover dimensions. Cropped to fill the full-bleed desktop hero. */
     private const HERO_MAX_DIMENSIONS = [1920, 1080];
@@ -64,6 +64,7 @@ final class CompanySettingService
     public function __construct(
         private readonly EnvEditor $envEditor,
         private readonly SettingsManager $settingsManager,
+        private readonly FaviconSetGenerator $faviconSets,
     ) {}
 
     /**
@@ -239,33 +240,46 @@ final class CompanySettingService
     /**
      * Handle favicon upload, replacement, or removal.
      *
-     * Two branches:
-     *  1. Pre-uploaded path provided -> adopt it, deleting the previous file if changed.
-     *  2. Direct file upload -> process through Laravel 13.20 `Image` facade (cover to
-     *     256x256 square, normalised to WebP at fixed quality) and store on the public
-     *     disk, deleting the previous file if present.
+     * Three branches, mirroring the logo flow: explicit removal, adoption of a
+     * pre-uploaded path, or a direct file upload normalised to WebP. Every
+     * branch regenerates the full browser icon set (ico + PNG sizes +
+     * apple-touch + manifest icons) so replacing the favicon replaces it
+     * everywhere, not just the single custom <link> tag.
      */
     private function handleFaviconUpload(Request $request): void
     {
+        $oldFavicon = (string) CompanySetting::get('favicon', '');
+
+        if ($request->boolean('remove_favicon')) {
+            $this->deleteStoredImage($oldFavicon);
+            $this->faviconSets->restore();
+            CompanySetting::set('favicon', '');
+            CompanySetting::set('favicon_set', [], 'json');
+
+            return;
+        }
+
         $imagePath = $request->input('favicon_path');
 
         if (! empty($imagePath)) {
-            $oldFavicon = CompanySetting::get('favicon', '');
             try {
-                if ($oldFavicon && $oldFavicon !== $imagePath) {
+                if ($oldFavicon !== '' && $oldFavicon !== $imagePath) {
                     $this->deleteStoredImage($oldFavicon);
                 }
+                CompanySetting::set('favicon', $imagePath);
+                $this->regenerateFaviconSet((string) Storage::disk('public')->get($imagePath));
             } catch (\Exception $e) {
-                Log::error('Failed to remove old favicon: '.$e->getMessage());
+                Log::error('Failed to adopt favicon path: '.$e->getMessage());
             }
-            CompanySetting::set('favicon', $imagePath);
-        } elseif ($request->hasFile('favicon')) {
-            $oldFavicon = CompanySetting::get('favicon', '');
+
+            return;
+        }
+
+        if ($request->hasFile('favicon') && $request->file('favicon')->isValid()) {
             try {
-                if ($oldFavicon) {
-                    $this->deleteStoredImage($oldFavicon);
-                }
+                $this->deleteStoredImage($oldFavicon);
                 $file = $request->file('favicon');
+                $sourceBytes = (string) file_get_contents($file->getRealPath());
                 $path = Image::fromUpload($file)
                     ->cover(self::FAVICON_DIMENSIONS[0], self::FAVICON_DIMENSIONS[1])
                     ->toWebp()
@@ -274,11 +288,28 @@ final class CompanySettingService
 
                 if ($path !== false) {
                     CompanySetting::set('favicon', $path);
+                    $this->regenerateFaviconSet($sourceBytes);
                 }
             } catch (ImageException $e) {
                 Log::error('Failed to process favicon upload: '.$e->getMessage());
             }
         }
+    }
+
+    /**
+     * Regenerate the public-root icon set from source bytes and persist its version.
+     *
+     * On failure the stored set is cleared; the generator has already restored
+     * the bundled brand files to the public root, so the site never serves a
+     * half-written custom set.
+     *
+     * @param string $bytes Encoded source image bytes
+     */
+    private function regenerateFaviconSet(string $bytes): void
+    {
+        $version = $this->faviconSets->generate($bytes);
+
+        CompanySetting::set('favicon_set', $version !== null ? ['v' => $version] : [], 'json');
     }
 
     /**
