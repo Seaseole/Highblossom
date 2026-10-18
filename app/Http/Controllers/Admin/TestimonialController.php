@@ -24,7 +24,7 @@ final class TestimonialController
      */
     public function index(): View
     {
-        $testimonials = Testimonial::query()->latest()->paginate(15);
+        $testimonials = Testimonial::query()->ordered()->paginate(15);
 
         return view('admin.testimonials.index', compact('testimonials'));
     }

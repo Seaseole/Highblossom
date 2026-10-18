@@ -26,6 +26,9 @@
                             Role
                         </th>
                         <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                            Order
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
                             Status
                         </th>
                         <th class="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -47,6 +50,9 @@
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                 {{ $testimonial->role ?? '-' }}
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $testimonial->sort_order }}
+                            </td>
                             <td class="flex gap-2 px-6 py-4">
                                 @if ($testimonial->is_featured)
                                     <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Featured</span>
@@ -66,7 +72,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                 No testimonials found.
                             </td>
                         </tr>

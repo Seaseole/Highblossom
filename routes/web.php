@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\GlassTypeController;
+use App\Http\Controllers\Api\BlogSearchController;
 use App\Http\Controllers\Api\BookingAvailabilityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ConsentController;
@@ -37,6 +38,12 @@ Route::middleware('auth')->group(function () {
 // Blog
 Route::get('/blog', [SiteController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [SiteController::class, 'blogShow'])->name('blog.show');
+
+// Type-ahead for the blog command palette. Throttled per visitor because every
+// keystroke that clears the debounce is a request.
+Route::get('/api/blog/search', [BlogSearchController::class, 'search'])
+    ->middleware('throttle:60,1')
+    ->name('api.blog.search');
 
 // Bookings
 Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');

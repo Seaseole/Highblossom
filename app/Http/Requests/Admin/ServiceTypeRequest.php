@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\ServiceType;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -28,7 +30,7 @@ final class ServiceTypeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'sort_order' => SortOrderRules::rules(ServiceType::class, $this->all(), $this->route('serviceType')),
             'is_active' => ['boolean'],
         ];
     }
@@ -41,5 +43,7 @@ final class ServiceTypeRequest extends FormRequest
         $this->merge([
             'is_active' => $this->boolean('is_active'),
         ]);
+
+        SortOrderRules::normalize($this, ServiceType::class, $this->route('serviceType'));
     }
 }

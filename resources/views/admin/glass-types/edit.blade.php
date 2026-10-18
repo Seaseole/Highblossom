@@ -5,7 +5,7 @@
 
     <div
         class="mx-auto max-w-5xl space-y-8 py-6 sm:py-10"
-        x-data="subCategories('{{ url('admin/glass-sub-categories') }}', {{ $glassType->id }}, {{ $glassSubCategories->count() }})"
+        x-data="subCategories('{{ url('admin/glass-sub-categories') }}', {{ $glassType->id }}, {{ $glassSubCategories->count() }}, {{ $nextSortOrder }})"
     >
         <!-- Header -->
         <div class="flex items-center justify-between">
@@ -134,12 +134,10 @@
             <div class="space-y-6">
                 <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
-                        <input
-                            type="number"
-                            name="sort_order"
-                            value="{{ old('sort_order', $glassType->sort_order) }}"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                        <x-admin.sort-order-field
+                            module="glass-types"
+                            :value="$glassType->sort_order"
+                            :current-id="$glassType->id"
                         />
                     </div>
                     <x-ui.checkbox name="is_active" value="1" :checked="old('is_active', $glassType->is_active)" label="Visible" />
@@ -206,10 +204,15 @@
                                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
                                 <input
                                     type="number"
-                                    min="0"
+                                    min="1"
+                                    step="1"
                                     x-model.number="sortOrder"
                                     class="{{ $field }}"
                                 />
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    Next free number for this glass type is
+                                    <span x-text="nextSortOrder"></span>. Leave blank to take it automatically.
+                                </p>
                             </div>
                             <label class="flex min-h-[42px] cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                 <input type="checkbox" x-model="isActive" class="size-4 rounded border-gray-300 dark:border-white/10" />

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class GlassSubCategory extends Model
 {
+    use HasSortOrder;
+
     protected $fillable = [
         'glass_type_id',
         'name',
@@ -26,6 +29,17 @@ final class GlassSubCategory extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    /**
+     * Each glass type keeps its own numbering line, so sub-category 3 of one type
+     * never collides with sub-category 3 of another.
+     *
+     * @return array<int, string>
+     */
+    public function sortOrderScopeColumns(): array
+    {
+        return ['glass_type_id'];
+    }
 
     /**
      * Get the glass type that owns the sub-category.
@@ -52,11 +66,11 @@ final class GlassSubCategory extends Model
     }
 
     /**
-     * Scope for ordered sub-categories.
+     * Scope for sub-categories in display order, id as tie-break.
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('sort_order')->orderByDesc('id');
     }
 
     /**

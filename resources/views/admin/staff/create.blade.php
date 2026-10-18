@@ -56,6 +56,7 @@
                         class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                     ></textarea>
                 </div>
+                <x-admin.sort-order-field module="staff" label="Display Order" />
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo</label>
                     <div

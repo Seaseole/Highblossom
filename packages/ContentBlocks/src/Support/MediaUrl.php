@@ -37,6 +37,16 @@ final class MediaUrl
     private const DISK = 'public';
 
     /**
+     * Bundled files stored in the database as bare filenames that live in the
+     * app's public root (shipped with every deploy via git), not on the
+     * driver-switchable public disk. Resolving them through the disk would
+     * point at object storage, where they were never uploaded.
+     *
+     * @var list<string>
+     */
+    private const ROOT_ASSETS = ['placeholder.gif'];
+
+    /**
      * Resolve any stored media value into a displayable URL.
      *
      * @param string|null $value Path or URL persisted in the database
@@ -55,6 +65,10 @@ final class MediaUrl
         if ($path === null) {
             // A genuinely external URL (CDN, YouTube, another host): pass through.
             return $value;
+        }
+
+        if (in_array($path, self::ROOT_ASSETS, true)) {
+            return asset($path);
         }
 
         return Storage::disk(self::DISK)->url($path);

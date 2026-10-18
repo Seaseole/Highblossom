@@ -28,7 +28,7 @@ final class GalleryController
         $items = GalleryImage::query()
             ->inGallery()
             ->with('category')
-            ->latest()
+            ->ordered()
             ->paginate(15);
 
         return view('admin.gallery.index', compact('items'));

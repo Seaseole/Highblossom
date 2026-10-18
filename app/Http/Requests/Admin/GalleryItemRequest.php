@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\GalleryImage;
 use App\Rules\SafeStoredUploadPath;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -36,7 +38,13 @@ final class GalleryItemRequest extends FormRequest
             'gallery_category_id' => ['required', 'exists:gallery_categories,id'],
             'is_featured' => ['boolean'],
             'is_active' => ['boolean'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
+            // GalleryService forces source=gallery on both save paths, so this form
+            // always numbers inside the gallery's own line.
+            'sort_order' => SortOrderRules::rules(
+                GalleryImage::class,
+                array_merge($this->all(), ['source' => GalleryImage::SOURCE_GALLERY]),
+                $this->route('item'),
+            ),
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'location_address' => ['nullable', 'string', 'max:255'],
@@ -52,5 +60,7 @@ final class GalleryItemRequest extends FormRequest
             'is_featured' => $this->boolean('is_featured'),
             'is_active' => $this->boolean('is_active'),
         ]);
+
+        SortOrderRules::normalize($this, GalleryImage::class, $this->route('item'));
     }
 }

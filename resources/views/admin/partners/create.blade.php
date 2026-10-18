@@ -77,6 +77,8 @@
                         placeholder="https://"
                     />
                 </div>
+
+                <x-admin.sort-order-field module="partners" label="Display Order" />
             </div>
 
             <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-white/5">

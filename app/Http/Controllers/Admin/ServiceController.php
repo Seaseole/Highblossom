@@ -24,7 +24,7 @@ final class ServiceController
      */
     public function index(): View
     {
-        $services = Service::query()->latest()->paginate(15);
+        $services = Service::query()->ordered()->paginate(15);
 
         return view('admin.services.index', compact('services'));
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use Database\Factories\PartnerFactory;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,10 +19,21 @@ class Partner extends Model
     /** @use HasFactory<PartnerFactory> */
     use HasFactory;
 
+    use HasSortOrder;
+
+    /**
+     * This table names its ordering column `order`, not `sort_order`.
+     */
+    public function sortOrderColumn(): string
+    {
+        return 'order';
+    }
+
     protected $fillable = ['name', 'logo_path', 'website_url', 'order', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
     /**

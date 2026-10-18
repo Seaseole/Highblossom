@@ -38,7 +38,8 @@ final class MediaLibraryService
             'source' => GalleryImage::SOURCE_LIBRARY,
             'gallery_category_id' => GalleryCategory::query()->where('slug', $data['category'])->value('id'),
             'is_active' => false,
-            'sort_order' => GalleryImage::max('sort_order') + 1,
+            // sort_order is reserved by HasSortOrder inside the library's own numbering
+            // line, so an upload never consumes a public gallery rank.
         ]);
     }
 
@@ -49,12 +50,8 @@ final class MediaLibraryService
      */
     private function resolveImagePath(Request $request): ?string
     {
-        $imagePath = $request->input('image_path');
-
-        if (! empty($imagePath)) {
-            return $imagePath;
-        }
-
+        // An uploaded file always wins over the hidden image_path field (see
+        // ServiceService::resolveImagePath for the placeholder-shadowing bug).
         if ($request->hasFile('upload')) {
             try {
                 $file = $request->file('upload');
@@ -69,6 +66,12 @@ final class MediaLibraryService
                 Log::error('Failed to process media library image: '.$e->getMessage());
                 throw new \RuntimeException('Failed to upload image.');
             }
+        }
+
+        $imagePath = $request->input('image_path');
+
+        if (! empty($imagePath)) {
+            return $imagePath;
         }
 
         return null;

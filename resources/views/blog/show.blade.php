@@ -133,4 +133,6 @@
 
         <x-blog.image-lightbox />
     </div>
+
+    <x-blog.search-palette />
 </x-layouts::site>

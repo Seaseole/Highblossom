@@ -80,15 +80,7 @@
                 </div>
 
                 <div>
-                    <label for="sort_order" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >Sort Order (Optional)</label>
-                    <input
-                        type="number"
-                        name="sort_order"
-                        id="sort_order"
-                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                        placeholder="Lower numbers appear first"
-                    />
+                    <x-admin.sort-order-field module="testimonials" />
                 </div>
 
                 <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4 dark:border-white/5">

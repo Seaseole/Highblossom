@@ -171,6 +171,24 @@
 
         {{-- Right Side Actions --}}
         <div class="flex items-center gap-4">
+            @if (request()->routeIs('blog', 'blog.show'))
+                {{-- Blog palette trigger, below lg only: on desktop the shortcut and
+                     the in-page search bar cover it, and the header has better things
+                     to spend width on. --}}
+                <button
+                    type="button"
+                    x-data="{}"
+                    x-cloak
+                    @click="$dispatch('blog-search:open', { trigger: $el })"
+                    aria-label="Search the blog"
+                    class="flex min-h-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 p-2.5 text-[#A1A1AA] transition-colors hover:border-[#DC2626]/40 hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60 lg:hidden"
+                >
+                    <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            @endif
+
             {{-- Call / WhatsApp: always one tap away, desktop --}}
             <div class="hidden items-center gap-3 lg:flex">
                 @if ($contact->hasPhone())

@@ -408,17 +408,18 @@ document.addEventListener('alpine:init', () => {
     // rows post JSON to the same resource routes the standalone pages use, and the affected
     // row is cloned or repainted in place so the surrounding glass-type form keeps its
     // unsaved values instead of being discarded by a navigation.
-    window.Alpine.data('subCategories', (base, glassTypeId, initialCount) => ({
+    window.Alpine.data('subCategories', (base, glassTypeId, initialCount, nextSortOrder) => ({
         base: base,
         glassTypeId: glassTypeId,
         count: initialCount,
+        nextSortOrder: Number(nextSortOrder) || 1,
         mode: null,
         id: null,
         row: null,
         name: '',
         slug: '',
         slugEdited: false,
-        sortOrder: 0,
+        sortOrder: Number(nextSortOrder) || 1,
         isActive: true,
         errors: [],
         saving: false,
@@ -442,7 +443,7 @@ document.addEventListener('alpine:init', () => {
             this.name = '';
             this.slug = '';
             this.slugEdited = false;
-            this.sortOrder = this.count;
+            this.sortOrder = this.nextSortOrder;
             this.isActive = true;
             this.errors = [];
 
@@ -456,7 +457,8 @@ document.addEventListener('alpine:init', () => {
             this.name = row.dataset.name;
             this.slug = row.dataset.slug ?? '';
             this.slugEdited = true;
-            this.sortOrder = Number(row.dataset.sortOrder ?? 0);
+            const stored = Number(row.dataset.sortOrder);
+            this.sortOrder = Number.isFinite(stored) && stored > 0 ? stored : '';
             this.isActive = row.dataset.active !== '0';
             this.errors = [];
 
@@ -532,7 +534,7 @@ document.addEventListener('alpine:init', () => {
                         glass_type_id: this.glassTypeId,
                         name: this.name,
                         slug: this.slug,
-                        sort_order: Number(this.sortOrder) || 0,
+                        sort_order: Number(this.sortOrder) > 0 ? Number(this.sortOrder) : null,
                         is_active: this.isActive,
                     }),
                 });
@@ -578,6 +580,7 @@ document.addEventListener('alpine:init', () => {
             this.paintRow(row, created);
             list.append(row);
             this.count += 1;
+            this.nextSortOrder = Math.max(this.nextSortOrder, Number(created.sort_order) + 1);
         },
 
         paintRow(row, data) {
@@ -807,6 +810,10 @@ document.addEventListener('alpine:init', () => {
 
             if (path.startsWith('storage/')) {
                 path = path.slice('storage/'.length);
+            }
+
+            if (path === 'placeholder.gif') {
+                return '/' + path;
             }
 
             return this.mediaBase + '/' + path;
@@ -1482,3 +1489,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Admin sort-order fields ask the server whether a typed number is still free and
+// show the answer inline. The FormRequest repeats the same check on submit, so a
+// stale answer here can never write a duplicate.
+(() => {
+    const latest = new WeakMap();
+
+    const scopePairs = (input, form) =>
+        (input.dataset.sortScopeInputs || '')
+            .split(',')
+            .filter(Boolean)
+            .map((pair) => pair.split(':'))
+            .map(([column, field]) => {
+                const control = form ? form.querySelector(`[name="${field}"]`) : null;
+
+                return control && control.value !== '' ? [column, control.value] : null;
+            })
+            .filter(Boolean);
+
+    document.addEventListener('change', (event) => {
+        if (! (event.target instanceof Element)) {
+            return;
+        }
+
+        const input = event.target.closest('input[data-sort-check-url]');
+        if (! input) {
+            return;
+        }
+
+        const wrapper = input.closest('[data-sort-order-field]');
+        const slot = wrapper ? wrapper.querySelector('[data-sort-error]') : null;
+        if (! slot) {
+            return;
+        }
+
+        const value = Number(input.value);
+
+        // Blank or unusable: the model assigns the next number, so there is nothing
+        // to complain about yet.
+        if (! Number.isInteger(value) || value < 1) {
+            slot.textContent = '';
+            slot.hidden = true;
+
+            return;
+        }
+
+        const url = new URL(input.dataset.sortCheckUrl, document.baseURI);
+        url.searchParams.set('value', String(value));
+
+        if (input.dataset.sortCurrent) {
+            url.searchParams.set('current', input.dataset.sortCurrent);
+        }
+
+        scopePairs(input, input.closest('form')).forEach(([column, scopeValue]) => {
+            url.searchParams.set(`scope[${column}]`, scopeValue);
+        });
+
+        const token = (latest.get(input) || 0) + 1;
+        latest.set(input, token);
+
+        fetch(url.toString(), {
+            headers: { Accept: 'application/json' },
+            credentials: 'same-origin',
+        })
+            .then((response) => (response.ok ? response.json() : null))
+            .then((data) => {
+                if (! data || latest.get(input) !== token) {
+                    return;
+                }
+
+                slot.textContent = data.available ? '' : data.message;
+                slot.hidden = Boolean(data.available);
+            })
+            .catch(() => {
+                // Offline or aborted: submit-time validation still has the last word.
+            });
+    });
+})();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\GlassType;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -28,7 +30,7 @@ final class GlassTypeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'sort_order' => SortOrderRules::rules(GlassType::class, $this->all(), $this->route('glassType')),
             'is_active' => ['boolean'],
         ];
     }
@@ -41,5 +43,7 @@ final class GlassTypeRequest extends FormRequest
         $this->merge([
             'is_active' => $this->boolean('is_active'),
         ]);
+
+        SortOrderRules::normalize($this, GlassType::class, $this->route('glassType'));
     }
 }

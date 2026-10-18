@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class GlassType extends Model
 {
+    use HasSortOrder;
+
     protected $fillable = [
         'name',
         'slug',
@@ -39,7 +42,8 @@ final class GlassType extends Model
     }
 
     /**
-     * Scope query to order by sort_order then creation date.
+     * Scope query to order by sort order, with an id tie-break for rows outside the
+     * same uniqueness scope.
      *
      * @param Builder $query
      *
@@ -47,15 +51,15 @@ final class GlassType extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('sort_order')->orderByDesc('id');
     }
 
     /**
-     * Get the sub-categories for this glass type.
+     * Get the sub-categories for this glass type, in display order.
      */
     public function subCategories(): HasMany
     {
-        return $this->hasMany(GlassSubCategory::class);
+        return $this->hasMany(GlassSubCategory::class)->orderBy('sort_order')->orderByDesc('id');
     }
 
     /**

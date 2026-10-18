@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Testimonial;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -33,7 +35,7 @@ final class TestimonialRequest extends FormRequest
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'is_featured' => ['boolean'],
             'is_published' => ['boolean'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'sort_order' => SortOrderRules::rules(Testimonial::class, $this->all(), $this->route('testimonial')),
         ];
     }
 
@@ -46,5 +48,7 @@ final class TestimonialRequest extends FormRequest
             'is_featured' => $this->boolean('is_featured'),
             'is_published' => $this->boolean('is_published'),
         ]);
+
+        SortOrderRules::normalize($this, Testimonial::class, $this->route('testimonial'));
     }
 }

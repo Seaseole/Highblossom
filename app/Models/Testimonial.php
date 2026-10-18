@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class Testimonial extends Model
 {
+    use HasSortOrder;
+
     protected $fillable = [
         'name',
         'role',
@@ -43,7 +46,8 @@ final class Testimonial extends Model
     }
 
     /**
-     * Scope query to order by sort_order then creation date.
+     * Scope query to order by sort order, with an id tie-break for rows outside the
+     * same uniqueness scope.
      *
      * @param Builder $query
      *
@@ -51,6 +55,6 @@ final class Testimonial extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('sort_order')->orderByDesc('id');
     }
 }

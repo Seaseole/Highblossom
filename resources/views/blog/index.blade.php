@@ -24,4 +24,6 @@
             </div>
         </div>
     </section>
+
+    <x-blog.search-palette />
 </x-layouts::site>

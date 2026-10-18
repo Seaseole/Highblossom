@@ -43,6 +43,9 @@
                             Location
                         </th>
                         <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                            Order
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase">
                             Status
                         </th>
                         <th class="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -82,6 +85,9 @@
                             <td class="px-6 py-4">
                                 <span class="text-sm text-gray-600 dark:text-gray-300">{{ $item->location_address ?? '-' }}</span>
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $item->sort_order }}
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex gap-2">
                                     @if ($item->is_featured)
@@ -114,7 +120,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                 No gallery items found.
                             </td>
                         </tr>

@@ -63,12 +63,12 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
-                <input
-                    type="number"
-                    name="sort_order"
-                    value="{{ old('sort_order', $glassSubCategory->sort_order) }}"
-                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                <x-admin.sort-order-field
+                    module="glass-sub-categories"
+                    :scope="['glass_type_id' => $glassSubCategory->glass_type_id]"
+                    :scope-inputs="['glass_type_id' => 'glass_type_id']"
+                    :value="$glassSubCategory->sort_order"
+                    :current-id="$glassSubCategory->id"
                 />
             </div>
 

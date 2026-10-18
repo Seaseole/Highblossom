@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Service;
 use App\Rules\SafeStoredUploadPath;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -38,7 +40,7 @@ final class ServiceRequest extends FormRequest
             'image_path' => ['nullable', 'string', new SafeStoredUploadPath(['services', 'uploads', 'uploads/blog', 'uploads/images', 'uploads/videos', 'uploads/videos/thumbnails'], 'placeholder.gif')],
             'remove_image' => ['nullable', 'boolean'],
             'is_active' => ['boolean'],
-            'sort_order' => ['nullable', 'integer'],
+            'sort_order' => SortOrderRules::rules(Service::class, $this->all(), $this->route('service')),
         ];
     }
 
@@ -49,8 +51,9 @@ final class ServiceRequest extends FormRequest
     {
         $this->merge([
             'is_active' => $this->boolean('is_active'),
-            'sort_order' => $this->input('sort_order', 0),
         ]);
+
+        SortOrderRules::normalize($this, Service::class, $this->route('service'));
     }
 
     /**
@@ -63,7 +66,7 @@ final class ServiceRequest extends FormRequest
         $validated = $this->validated();
 
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['features'] = $validated['features']
+        $validated['features'] = filled($validated['features'] ?? null)
             ? array_map('trim', explode("\n", $validated['features']))
             : [];
 

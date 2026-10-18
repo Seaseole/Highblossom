@@ -42,12 +42,10 @@
             <div class="space-y-6">
                 <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
-                        <input
-                            type="number"
-                            name="sort_order"
-                            value="{{ old('sort_order', $serviceType->sort_order) }}"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                        <x-admin.sort-order-field
+                            module="service-types"
+                            :value="$serviceType->sort_order"
+                            :current-id="$serviceType->id"
                         />
                     </div>
                     <x-ui.checkbox name="is_active" value="1" :checked="old('is_active', $serviceType->is_active)" label="Visible" />

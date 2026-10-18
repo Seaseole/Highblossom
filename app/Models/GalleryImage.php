@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use App\Observers\SitemapObserver;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -23,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[ObservedBy(SitemapObserver::class)]
 final class GalleryImage extends Model
 {
+    use HasSortOrder;
+
     /**
      * Row curated on the public gallery by the admin Gallery form.
      */
@@ -50,6 +53,35 @@ final class GalleryImage extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    /**
+     * Mirrors the column default so an unsaved row knows which numbering line it
+     * belongs to instead of reading its scope as null.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'source' => self::SOURCE_GALLERY,
+    ];
+
+    /**
+     * Gallery and library rows keep their own numbering line, so a library upload
+     * can never consume or clash with a public gallery rank.
+     *
+     * @return array<int, string>
+     */
+    public function sortOrderScopeColumns(): array
+    {
+        return ['source'];
+    }
+
+    /**
+     * Gallery images are named by their title in a sort-order clash message.
+     */
+    public function sortOrderLabelColumn(): string
+    {
+        return 'title';
+    }
 
     /**
      * Scope query to only include active images.
@@ -88,7 +120,8 @@ final class GalleryImage extends Model
     }
 
     /**
-     * Scope query to order by sort_order then creation date.
+     * Scope query to order by sort order, with an id tie-break for rows outside the
+     * same uniqueness scope.
      *
      * @param Builder $query
      *
@@ -96,7 +129,7 @@ final class GalleryImage extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('sort_order')->orderByDesc('id');
     }
 
     /**

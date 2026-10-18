@@ -153,18 +153,4 @@ final class GlassSubCategoryController
             'sub_categories' => $subCategories,
         ]);
     }
-
-    /**
-     * Reorder glass sub-categories.
-     */
-    public function reorder(): JsonResponse
-    {
-        $subCategoryIds = request()->input('sub_category_ids', []);
-
-        $this->glassSubCategoryService->reorder($subCategoryIds);
-
-        return response()->json([
-            'success' => true,
-        ]);
-    }
 }

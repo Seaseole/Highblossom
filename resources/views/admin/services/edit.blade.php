@@ -22,8 +22,6 @@
         >
             @csrf
             @method('PUT')
-            <input type="hidden" name="image_path" value="{{ $service->image_path ?? '' }}" />
-            <input type="hidden" name="remove_image" value="0" />
 
             <div class="space-y-8 lg:col-span-2">
                 <!-- Details Card -->
@@ -72,31 +70,28 @@
             <div class="space-y-8">
                 <!-- Visuals Card -->
                 <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Image</label>
-                    <div
-                        class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
-                        @click="$refs.imageInput.click()"
-                    >
-                        @if ($service->image)
-                            <img src="{{ $service->image }}" class="h-full w-full rounded-2xl object-cover" />
-                        @else
-                            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-                                <span class="text-xs font-semibold">Click to upload image</span>
-                            </div>
-                        @endif
-                        <input type="file" name="image" x-ref="imageInput" class="hidden" accept="image/*" />
-                    </div>
+                    @php
+                        $currentImagePath = $service->image_path !== 'placeholder.gif' ? $service->image_path : null;
+                    @endphp
+
+                    <x-ui.image-field
+                        name="image_path"
+                        remove-name="remove_image"
+                        label="Project Image"
+                        folder="services"
+                        :existing-path="$currentImagePath"
+                        :deleteable="true"
+                        hint="Recommended: 800x600 (4:3), max 2MB"
+                    />
                 </div>
 
                 <!-- Config Card -->
                 <div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
-                        <input
-                            type="number"
-                            name="sort_order"
-                            value="{{ old('sort_order', $service->sort_order) }}"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                        <x-admin.sort-order-field
+                            module="services"
+                            :value="$service->sort_order"
+                            :current-id="$service->id"
                         />
                     </div>
                     <x-ui.checkbox name="is_active" value="1" :checked="old('is_active', $service->is_active)" label="Visible" />

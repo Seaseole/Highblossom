@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
+use App\Support\SortOrderRules;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
@@ -46,6 +47,7 @@ final class PartnerController extends Controller
             'name' => 'required|string|max:255',
             'logo' => 'required|image|max:2048',
             'website_url' => 'nullable|url',
+            'order' => SortOrderRules::rules(Partner::class, $request->all()),
         ]);
 
         try {
@@ -63,6 +65,7 @@ final class PartnerController extends Controller
             'name' => $validated['name'],
             'logo_path' => $path,
             'website_url' => $validated['website_url'] ?? null,
+            'order' => $validated['order'] ?? null,
         ]);
 
         return redirect()->route('admin.partners.index')->with('success', 'Partner added successfully.');
@@ -81,10 +84,13 @@ final class PartnerController extends Controller
      */
     public function update(Request $request, Partner $partner): RedirectResponse
     {
+        SortOrderRules::normalize($request, Partner::class, $partner);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'logo' => 'nullable|image|max:2048',
             'website_url' => 'nullable|url',
+            'order' => SortOrderRules::rules(Partner::class, $request->all(), $partner),
         ]);
 
         if ($request->hasFile('logo')) {
@@ -105,6 +111,7 @@ final class PartnerController extends Controller
         $partner->update([
             'name' => $validated['name'],
             'website_url' => $validated['website_url'] ?? null,
+            'order' => $validated['order'],
         ]);
 
         return redirect()->route('admin.partners.index')->with('success', 'Partner updated successfully.');

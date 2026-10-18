@@ -132,18 +132,6 @@ final class GlassSubCategoryService
     }
 
     /**
-     * Reorder sub-categories within a glass type.
-     */
-    public function reorder(array $subCategoryIds): bool
-    {
-        foreach ($subCategoryIds as $index => $id) {
-            GlassSubCategory::where('id', $id)->update(['sort_order' => $index]);
-        }
-
-        return true;
-    }
-
-    /**
      * Get sub-categories grouped by glass type for dropdowns.
      */
     public function getGroupedByGlassType(): array

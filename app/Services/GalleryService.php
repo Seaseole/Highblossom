@@ -110,12 +110,8 @@ final class GalleryService
             return null;
         }
 
-        $imagePath = $request->input('image_path');
-
-        if (! empty($imagePath)) {
-            return $imagePath;
-        }
-
+        // An uploaded file always wins over the hidden image_path field (see
+        // ServiceService::resolveImagePath for the placeholder-shadowing bug).
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');
@@ -129,6 +125,12 @@ final class GalleryService
             } catch (ImageException $e) {
                 Log::error('Failed to process gallery image: '.$e->getMessage());
             }
+        }
+
+        $imagePath = $request->input('image_path');
+
+        if (! empty($imagePath)) {
+            return $imagePath;
         }
 
         // For create, use placeholder; for update, keep existing

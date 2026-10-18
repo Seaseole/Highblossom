@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSortOrder;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class Service extends Model
 {
+    use HasSortOrder;
+
     protected $fillable = [
         'title',
         'slug',
@@ -32,6 +35,14 @@ final class Service extends Model
     ];
 
     /**
+     * Services are named by their title in a sort-order clash message.
+     */
+    public function sortOrderLabelColumn(): string
+    {
+        return 'title';
+    }
+
+    /**
      * Scope query to only include active services.
      *
      * @param Builder $query
@@ -44,7 +55,8 @@ final class Service extends Model
     }
 
     /**
-     * Scope query to order by sort_order then creation date.
+     * Scope query to order by sort order, with an id tie-break for rows outside the
+     * same uniqueness scope.
      *
      * @param Builder $query
      *
@@ -52,7 +64,7 @@ final class Service extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('sort_order')->orderByDesc('id');
     }
 
     /**

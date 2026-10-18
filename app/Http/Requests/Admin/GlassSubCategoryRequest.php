@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\GlassSubCategory;
+use App\Support\SortOrderRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +29,7 @@ final class GlassSubCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $glassSubCategoryId = $this->route('glass_sub_category')?->id;
+        $subCategory = $this->route('glassSubCategory');
 
         return [
             'glass_type_id' => [
@@ -43,15 +45,12 @@ final class GlassSubCategoryRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('glass_sub_categories')->ignore($glassSubCategoryId),
+                Rule::unique('glass_sub_categories')->ignore($subCategory),
             ],
             'is_active' => [
                 'boolean',
             ],
-            'sort_order' => [
-                'integer',
-                'min:0',
-            ],
+            'sort_order' => SortOrderRules::rules(GlassSubCategory::class, $this->all(), $subCategory),
         ];
     }
 
@@ -68,7 +67,7 @@ final class GlassSubCategoryRequest extends FormRequest
             'name.required' => 'The sub-category name is required.',
             'name.max' => 'The sub-category name may not be greater than 255 characters.',
             'slug.unique' => 'The slug must be unique.',
-            'sort_order.min' => 'The sort order must be at least 0.',
+            'sort_order.min' => 'The sort order must be at least 1.',
         ];
     }
 
@@ -90,5 +89,7 @@ final class GlassSubCategoryRequest extends FormRequest
                 'slug' => str($this->name)->slug()->toString(),
             ]);
         }
+
+        SortOrderRules::normalize($this, GlassSubCategory::class, $this->route('glassSubCategory'));
     }
 }

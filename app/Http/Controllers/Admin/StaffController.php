@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use App\Support\SortOrderRules;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -44,6 +45,7 @@ final class StaffController extends Controller
             'role' => 'required|string|max:255',
             'bio' => 'nullable|string',
             'photo' => 'required|image|max:2048',
+            'order' => SortOrderRules::rules(Staff::class, $request->all()),
         ]);
 
         $path = $request->file('photo')->store('staff', 'public');
@@ -53,6 +55,7 @@ final class StaffController extends Controller
             'role' => $validated['role'],
             'bio' => $validated['bio'],
             'photo_path' => $path,
+            'order' => $validated['order'] ?? null,
         ]);
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff member added.');
@@ -71,11 +74,14 @@ final class StaffController extends Controller
      */
     public function update(Request $request, Staff $staff): RedirectResponse
     {
+        SortOrderRules::normalize($request, Staff::class, $staff);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'role' => 'required|string|max:255',
             'bio' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
+            'order' => SortOrderRules::rules(Staff::class, $request->all(), $staff),
         ]);
 
         if ($request->hasFile('photo')) {
@@ -89,6 +95,7 @@ final class StaffController extends Controller
             'name' => $validated['name'],
             'role' => $validated['role'],
             'bio' => $validated['bio'],
+            'order' => $validated['order'],
         ]);
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff member updated.');

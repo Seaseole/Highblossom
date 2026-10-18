@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\GlassTypeRequest;
+use App\Models\GlassSubCategory;
 use App\Models\GlassType;
 use App\Services\GlassSubCategoryService;
 use App\Services\GlassTypeService;
@@ -58,8 +59,9 @@ final readonly class GlassTypeController
     public function edit(GlassType $glassType): View
     {
         $glassSubCategories = $this->glassSubCategoryService->getAllByGlassType($glassType);
+        $nextSortOrder = GlassSubCategory::nextSortOrder(['glass_type_id' => $glassType->id]);
 
-        return view('admin.glass-types.edit', compact('glassType', 'glassSubCategories'));
+        return view('admin.glass-types.edit', compact('glassType', 'glassSubCategories', 'nextSortOrder'));
     }
 
     /**

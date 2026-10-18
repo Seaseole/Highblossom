@@ -53,7 +53,7 @@ final readonly class SiteService
      */
     public function getHomeData(): array
     {
-        $featuredTestimonial = Testimonial::where('is_featured', true)->active()->first();
+        $featuredTestimonial = Testimonial::where('is_featured', true)->active()->ordered()->first();
         $otherTestimonials = Testimonial::active()->where('is_featured', false)->ordered()->get();
 
         // collect() + concat() so $otherTestimonials is never mutated by the count.

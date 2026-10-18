@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
+use App\Http\Controllers\Admin\SortOrderController;
 use App\Http\Controllers\Admin\StaffAbsenceController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SystemOverviewController;
@@ -76,6 +77,10 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     // About Us
     Route::get('about-us', [AboutUsController::class, 'edit'])->middleware('can:manage pages')->name('about-us.edit');
     Route::put('about-us', [AboutUsController::class, 'update'])->middleware('can:manage pages')->name('about-us.update');
+
+    // Shared by every admin sort-order field. Reports only - the module's own
+    // ability is checked in the controller and nothing here writes a row.
+    Route::get('sort-order/availability', [SortOrderController::class, 'availability'])->name('sort-order.availability');
 
     // Content Management
     Route::get('testimonials', [TestimonialController::class, 'index'])->middleware('can:manage testimonials')->name('testimonials.index');
@@ -163,7 +168,6 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::delete('glass-sub-categories/{glassSubCategory}', [GlassSubCategoryController::class, 'destroy'])->middleware('can:manage services')->name('glass-sub-categories.destroy');
     Route::patch('glass-sub-categories/{glassSubCategory}/toggle-status', [GlassSubCategoryController::class, 'toggleStatus'])->name('glass-sub-categories.toggle-status');
     Route::get('glass-sub-categories/by-glass-type/{glassTypeId}', [GlassSubCategoryController::class, 'getByGlassType'])->name('glass-sub-categories.by-glass-type');
-    Route::put('glass-sub-categories/reorder', [GlassSubCategoryController::class, 'reorder'])->name('glass-sub-categories.reorder');
 
     Route::get('service-types', [ServiceTypeController::class, 'index'])->middleware('can:view services')->name('service-types.index');
     Route::get('service-types/create', [ServiceTypeController::class, 'create'])->middleware('can:manage services')->name('service-types.create');
