@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\StaffAbsenceFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['staff_id', 'starts_at', 'ends_at', 'reason'])]
 /**
  * Staff absence records with date ranges.
  * Maps to the `staff_absences` database table.
@@ -21,8 +23,6 @@ final class StaffAbsence extends Model
     {
         return StaffAbsenceFactory::new();
     }
-
-    protected $fillable = ['staff_id', 'starts_at', 'ends_at', 'reason'];
 
     protected $casts = [
         'starts_at' => 'datetime',

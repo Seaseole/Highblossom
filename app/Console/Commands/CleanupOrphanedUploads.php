@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\Content\ContentBlockCleanupService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Clean up orphaned temp upload files not referenced in any post content')]
+#[Signature('content-blocks:cleanup-orphaned-uploads')]
 /**
  * Console command to clean up orphaned temporary upload files.
  *
@@ -14,20 +18,6 @@ use Illuminate\Console\Command;
  */
 final class CleanupOrphanedUploads extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'content-blocks:cleanup-orphaned-uploads';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Clean up orphaned temp upload files not referenced in any post content';
-
     /**
      * Create a new command instance.
      */

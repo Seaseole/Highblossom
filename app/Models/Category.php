@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
+#[Fillable(['name', 'slug', 'description'])]
 /**
  * Blog post categories with auto-slugging.
  * Maps to the `categories` database table.
  */
 final class Category extends Model
 {
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-    ];
-
     /**
      * Get the posts in this category.
      */

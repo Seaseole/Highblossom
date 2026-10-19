@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\InspectionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['booking_id', 'staff_id', 'scheduled_at', 'started_at', 'ended_at', 'location', 'type'])]
 /**
  * On-site inspection records linked to bookings.
  * Maps to the `inspections` database table.
@@ -29,11 +31,6 @@ final class Inspection extends Model
     {
         return InspectionFactory::new();
     }
-
-    protected $fillable = [
-        'booking_id', 'staff_id', 'scheduled_at', 'started_at', 'ended_at',
-        'location', 'type',
-    ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',

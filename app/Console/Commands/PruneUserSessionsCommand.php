@@ -5,8 +5,14 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\SessionManager;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Delete expired sessions, close the sign-ins that lapsed, and trim history past the retention window')]
+#[Signature('sessions:prune
+        {--days= : Override how many days of closed sessions to keep}
+        {--dry-run : Report what would be closed and deleted without changing anything}')]
 /**
  * Reconciles both session stores with reality on a schedule.
  *
@@ -16,22 +22,6 @@ use Illuminate\Console\Command;
  */
 final class PruneUserSessionsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'sessions:prune
-        {--days= : Override how many days of closed sessions to keep}
-        {--dry-run : Report what would be closed and deleted without changing anything}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Delete expired sessions, close the sign-ins that lapsed, and trim history past the retention window';
-
     /**
      * Create a new command instance.
      */

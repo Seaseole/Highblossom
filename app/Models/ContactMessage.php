@@ -4,24 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'email', 'phone', 'subject', 'message', 'is_read'])]
 /**
  * Contact form submissions from visitors.
  * Maps to the `contact_messages` database table.
  */
 final class ContactMessage extends Model
 {
-    protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'subject',
-        'message',
-        'is_read',
-    ];
-
     protected $casts = [
         'is_read' => 'boolean',
     ];

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\HasSortOrder;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'slug', 'is_active', 'sort_order'])]
 /**
  * Service type categories for quotes and services.
  * Maps to the `service_types` database table.
@@ -15,13 +17,6 @@ use Illuminate\Database\Eloquent\Model;
 final class ServiceType extends Model
 {
     use HasSortOrder;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'is_active',
-        'sort_order',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

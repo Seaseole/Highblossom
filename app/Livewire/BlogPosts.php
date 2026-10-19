@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -33,6 +34,7 @@ final class BlogPosts extends Component
     #[Url]
     public ?string $tagSlug = null;
 
+    #[Locked]
     public int $perPage = 9;
 
     /**

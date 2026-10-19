@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\HasSortOrder;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'role', 'rating', 'content', 'is_featured', 'is_published', 'sort_order'])]
 /**
  * Customer testimonials with ratings and featured flag.
  * Maps to the `testimonials` database table.
@@ -15,16 +17,6 @@ use Illuminate\Database\Eloquent\Model;
 final class Testimonial extends Model
 {
     use HasSortOrder;
-
-    protected $fillable = [
-        'name',
-        'role',
-        'rating',
-        'content',
-        'is_featured',
-        'is_published',
-        'sort_order',
-    ];
 
     protected $casts = [
         'rating' => 'integer',

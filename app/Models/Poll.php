@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
+#[Fillable(['question', 'options', 'allow_multiple', 'show_results', 'is_active'])]
 /**
  * Polls with multiple choice options and voting.
  * Maps to the `polls` database table.
  */
 class Poll extends Model
 {
-    protected $fillable = [
-        'question',
-        'options',
-        'allow_multiple',
-        'show_results',
-        'is_active',
-    ];
-
     protected $casts = [
         'options' => 'array',
         'allow_multiple' => 'boolean',

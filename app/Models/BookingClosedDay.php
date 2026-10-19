@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\BookingClosedDayFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['date', 'reason'])]
 /**
  * A single day the shop takes no bookings at all.
  *
@@ -26,8 +28,6 @@ final class BookingClosedDay extends Model
     {
         return BookingClosedDayFactory::new();
     }
-
-    protected $fillable = ['date', 'reason'];
 
     protected $casts = [
         'date' => 'date',

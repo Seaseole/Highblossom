@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Actions\Auth\ResolvePasskeyLoginFailure;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 /**
@@ -16,6 +17,7 @@ class PasskeyRecoveryBanner extends Component
     /**
      * Whether the re-enrolment prompt is on screen.
      */
+    #[Locked]
     public bool $visible = false;
 
     /**

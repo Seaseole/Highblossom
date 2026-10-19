@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
+#[Description('Upload the local public media folder to the object-storage bucket')]
+#[Signature('media:migrate-to-s3
+                            {--source= : Absolute path of the local media root to read from}
+                            {--prefix= : Only migrate keys under this folder, e.g. gallery}
+                            {--dry-run : List what would be uploaded without writing}
+                            {--force : Re-upload and overwrite keys that already exist}')]
 /**
  * Copies the local public media folder into the object-storage bucket.
  *
@@ -20,24 +28,6 @@ use Throwable;
  */
 final class MediaMigrateToS3 extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'media:migrate-to-s3
-                            {--source= : Absolute path of the local media root to read from}
-                            {--prefix= : Only migrate keys under this folder, e.g. gallery}
-                            {--dry-run : List what would be uploaded without writing}
-                            {--force : Re-upload and overwrite keys that already exist}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Upload the local public media folder to the object-storage bucket';
-
     /**
      * Key used to prove the bucket accepts writes before the real run starts.
      *

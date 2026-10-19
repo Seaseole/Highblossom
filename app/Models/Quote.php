@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'phone', 'email', 'vehicle_type', 'make_model', 'reg_number', 'year', 'glass_type_id', 'glass_sub_category_id', 'service_type_id', 'message', 'image_path', 'mobile_service', 'status'])]
 /**
  * Customer quote requests for glass services with status tracking.
  * Maps to the `quotes` database table.
@@ -14,23 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 class Quote extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'phone',
-        'email',
-        'vehicle_type',
-        'make_model',
-        'reg_number',
-        'year',
-        'glass_type_id',
-        'glass_sub_category_id',
-        'service_type_id',
-        'message',
-        'image_path',
-        'mobile_service',
-        'status',
-    ];
 
     protected $casts = [
         'mobile_service' => 'boolean',

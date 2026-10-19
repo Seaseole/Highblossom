@@ -6,9 +6,11 @@ namespace App\Models;
 
 use App\Models\Concerns\HasSortOrder;
 use Highblossom\ContentBlocks\Support\MediaUrl;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['title', 'slug', 'short_description', 'full_description', 'features', 'is_active', 'sort_order', 'image_path'])]
 /**
  * Individual services offered with descriptions, features, and images.
  * Maps to the `services` database table.
@@ -16,17 +18,6 @@ use Illuminate\Database\Eloquent\Model;
 final class Service extends Model
 {
     use HasSortOrder;
-
-    protected $fillable = [
-        'title',
-        'slug',
-        'short_description',
-        'full_description',
-        'features',
-        'is_active',
-        'sort_order',
-        'image_path',
-    ];
 
     protected $casts = [
         'features' => 'array',

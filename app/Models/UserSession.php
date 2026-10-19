@@ -10,12 +10,14 @@ use App\Enums\SessionEndReason;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 
+#[Fillable(['user_id', 'session_id', 'ip_address', 'last_ip_address', 'user_agent', 'device_type', 'platform', 'browser', 'browser_version', 'login_method', 'remembered', 'login_at', 'last_seen_at', 'ended_at', 'end_reason', 'revoked_by'])]
 /**
  * One row per session lifecycle for a user: signed in, last seen, and closed.
  * Maps to the `user_sessions` database table.
@@ -25,13 +27,6 @@ use Illuminate\Support\Facades\DB;
  */
 final class UserSession extends Model
 {
-    protected $fillable = [
-        'user_id', 'session_id', 'ip_address', 'last_ip_address', 'user_agent',
-        'device_type', 'platform', 'browser', 'browser_version',
-        'login_method', 'remembered', 'login_at', 'last_seen_at',
-        'ended_at', 'end_reason', 'revoked_by',
-    ];
-
     /**
      * Get the attributes that should be cast.
      *

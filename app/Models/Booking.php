@@ -8,6 +8,7 @@ use App\Enums\BookingDamageType;
 use App\Enums\BookingServiceType;
 use Carbon\CarbonInterface;
 use Database\Factories\BookingFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[Fillable(['user_id', 'client_name', 'client_email', 'client_phone', 'prefers_whatsapp', 'vehicle_details', 'service_type', 'damage_type', 'vehicle_make', 'vehicle_model', 'vehicle_year', 'damage_photo_path', 'scheduled_at', 'duration_minutes', 'location', 'client_address', 'status', 'total_price', 'reference'])]
 /**
  * Customer bookings for services with pricing and status.
  * Maps to the `bookings` database table.
@@ -32,13 +34,6 @@ final class Booking extends Model
     {
         return BookingFactory::new();
     }
-
-    protected $fillable = [
-        'user_id', 'client_name', 'client_email', 'client_phone', 'prefers_whatsapp',
-        'vehicle_details', 'service_type', 'damage_type', 'vehicle_make', 'vehicle_model',
-        'vehicle_year', 'damage_photo_path', 'scheduled_at', 'duration_minutes', 'location',
-        'client_address', 'status', 'total_price', 'reference',
-    ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',

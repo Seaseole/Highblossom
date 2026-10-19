@@ -9,6 +9,7 @@ use App\Models\User;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -21,10 +22,13 @@ final class AdminSidebar extends Component
 
     public bool $mobileMenuOpen = false;
 
+    #[Locked]
     public int $userCount = 0;
 
+    #[Locked]
     public ?string $logoUrl = null;
 
+    #[Locked]
     public ?string $companyName = null;
 
     /**

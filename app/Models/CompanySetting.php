@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+#[Fillable(['key', 'value', 'type'])]
 /**
  * Key-value company settings with caching and type casting.
  * Maps to the `company_settings` database table.
  */
 final class CompanySetting extends Model
 {
-    protected $fillable = [
-        'key',
-        'value',
-        'type',
-    ];
-
     protected $casts = [
         'type' => 'string',
     ];

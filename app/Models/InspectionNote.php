@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['inspection_id', 'user_id', 'body', 'is_action', 'done_at'])]
 /**
  * Internal, timestamped admin note on an inspection.
  * Maps to the `inspection_notes` database table.
@@ -18,10 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class InspectionNote extends Model
 {
-    protected $fillable = [
-        'inspection_id', 'user_id', 'body', 'is_action', 'done_at',
-    ];
-
     protected $casts = [
         'is_action' => 'boolean',
         'done_at' => 'datetime',

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\HasSortOrder;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['name', 'slug', 'is_active', 'sort_order'])]
 /**
  * Gallery image categories.
  * Maps to the `gallery_categories` database table.
@@ -16,13 +18,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class GalleryCategory extends Model
 {
     use HasSortOrder;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'is_active',
-        'sort_order',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

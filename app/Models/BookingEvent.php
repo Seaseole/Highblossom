@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['booking_id', 'type', 'summary', 'previous_scheduled_at', 'user_id', 'happened_at'])]
 /**
  * A customer-visible milestone in a booking's history.
  * Maps to the `booking_events` database table.
@@ -46,10 +48,6 @@ final class BookingEvent extends Model
         self::TYPE_RESCHEDULED,
         self::TYPE_COMPLETED,
         self::TYPE_CANCELLED,
-    ];
-
-    protected $fillable = [
-        'booking_id', 'type', 'summary', 'previous_scheduled_at', 'user_id', 'happened_at',
     ];
 
     protected $casts = [

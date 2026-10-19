@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
+#[Fillable(['name', 'slug'])]
 /**
  * Blog post tags with auto-slugging.
  * Maps to the `tags` database table.
  */
 final class Tag extends Model
 {
-    protected $fillable = [
-        'name',
-        'slug',
-    ];
-
     /**
      * Get the posts assigned to this tag.
      */

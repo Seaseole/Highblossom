@@ -7,9 +7,11 @@ namespace App\Models;
 use App\Models\Concerns\HasSortOrder;
 use Database\Factories\StaffFactory;
 use Highblossom\ContentBlocks\Support\MediaUrl;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'role', 'bio', 'photo_path', 'order', 'is_active'])]
 class Staff extends Model
 {
     /** @use HasFactory<StaffFactory> */
@@ -24,8 +26,6 @@ class Staff extends Model
     {
         return 'order';
     }
-
-    protected $fillable = ['name', 'role', 'bio', 'photo_path', 'order', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',

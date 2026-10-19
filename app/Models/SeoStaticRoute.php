@@ -5,36 +5,17 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Services\DataTransferObjects\SeoMetadata;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['route_name', 'meta_title', 'meta_description', 'meta_keywords', 'og_title', 'og_description', 'og_image', 'og_type', 'twitter_card', 'twitter_title', 'twitter_description', 'twitter_image', 'canonical_url', 'robots', 'no_index', 'priority', 'changefreq', 'schema_json_ld'])]
 /**
  * SEO metadata for static routes with schema.org support.
  * Maps to the `seo_static_routes` database table.
  */
 final class SeoStaticRoute extends Model
 {
-    protected $fillable = [
-        'route_name',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
-        'og_title',
-        'og_description',
-        'og_image',
-        'og_type',
-        'twitter_card',
-        'twitter_title',
-        'twitter_description',
-        'twitter_image',
-        'canonical_url',
-        'robots',
-        'no_index',
-        'priority',
-        'changefreq',
-        'schema_json_ld',
-    ];
-
     protected $casts = [
         'no_index' => 'boolean',
         'priority' => 'decimal:2',

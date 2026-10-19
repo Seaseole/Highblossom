@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\Content\ContentBlockCleanupService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Clean up temporary uploaded files older than the specified hours (default: 24)')]
+#[Signature('content-blocks:cleanup-temp-uploads
+                            {--hours=24 : The age in hours after which temp files should be deleted}')]
 /**
  * Console command to clean up temporary uploaded files older than a specified age.
  *
@@ -14,21 +19,6 @@ use Illuminate\Console\Command;
  */
 final class CleanupTempUploadsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'content-blocks:cleanup-temp-uploads
-                            {--hours=24 : The age in hours after which temp files should be deleted}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Clean up temporary uploaded files older than the specified hours (default: 24)';
-
     /**
      * Create a new command instance.
      */

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Concerns\HasSortOrder;
 use App\Observers\SitemapObserver;
 use Highblossom\ContentBlocks\Support\MediaUrl;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * gallery (see self::SOURCE_GALLERY) and the media library content blocks pick
  * assets from (see self::SOURCE_LIBRARY). Only gallery rows may render publicly.
  */
+#[Fillable(['title', 'description', 'image_path', 'source', 'gallery_category_id', 'category', 'is_featured', 'is_active', 'sort_order'])]
 #[ObservedBy(SitemapObserver::class)]
 final class GalleryImage extends Model
 {
@@ -35,18 +37,6 @@ final class GalleryImage extends Model
      * Row stored for content blocks by the media library.
      */
     public const SOURCE_LIBRARY = 'library';
-
-    protected $fillable = [
-        'title',
-        'description',
-        'image_path',
-        'source',
-        'gallery_category_id',
-        'category',
-        'is_featured',
-        'is_active',
-        'sort_order',
-    ];
 
     protected $casts = [
         'is_featured' => 'boolean',

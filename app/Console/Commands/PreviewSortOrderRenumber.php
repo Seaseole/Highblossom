@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Support\SortOrderRenumberPlan;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 use function Laravel\Prompts\table;
 
+#[Description('Preview the admin sort-order renumbering without changing any row')]
+#[Signature('sort-orders:preview')]
 /**
  * Reports what the sort-order renumber migration would change, without writing.
  *
@@ -17,20 +21,6 @@ use function Laravel\Prompts\table;
  */
 final class PreviewSortOrderRenumber extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'sort-orders:preview';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Preview the admin sort-order renumbering without changing any row';
-
     /**
      * Print the plan, table by scope.
      */
