@@ -1,300 +1,174 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    @include('partials.favicons')
-    <title>Two-Factor Authentication - {{ config('app.name') }}</title>
+{{--
+    Two-factor challenge.
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap"
-        rel="stylesheet"
-    />
+    Alpine drives the six-box code entry, the auto-submit at six digits and the
+    switch to recovery codes, so this is the one auth screen that boots it — from
+    the bundled auth-alpine entry rather than a CDN build.
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @keyframes caret-blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.8s var(--ease-out-expo) forwards;
-            opacity: 0;
-        }
-        .caret-blink {
-            animation: caret-blink 1s step-end infinite;
-        }
-        .delay-100 {
-            animation-delay: 100ms;
-        }
-        .delay-200 {
-            animation-delay: 200ms;
-        }
-        .delay-300 {
-            animation-delay: 300ms;
-        }
-        .delay-400 {
-            animation-delay: 400ms;
-        }
-        .delay-500 {
-            animation-delay: 500ms;
-        }
-
-        .glass-vivid {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
-        }
-    </style>
-</head>
-<body class="font-body min-h-[100dvh] bg-[#F9FAFB] text-[#18181B] antialiased selection:bg-[#DC2626] selection:text-white">
-    <div class="grid min-h-[100dvh] grid-cols-1 overflow-hidden lg:grid-cols-2">
-        <!-- Left Column - Branding -->
-        <div class="relative hidden flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#F43F5E] p-12 lg:flex">
-            <!-- Background Decoration -->
-            <div class="absolute inset-0 opacity-20">
-                <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <defs>
-                        <pattern id="grid-light" width="8" height="8" patternUnits="userSpaceOnUse">
-                            <path d="M 8 0 L 0 0 0 8" fill="none" stroke="white" stroke-width="0.2" />
-                        </pattern>
-                    </defs>
-                    <rect width="100" height="100" fill="url(#grid-light)" />
-                </svg>
-            </div>
-
-            <!-- Floating Orbs -->
-            <div class="absolute top-[-10%] left-[-10%] h-80 w-80 animate-pulse rounded-full bg-white/20 blur-[100px]"></div>
-            <div class="absolute right-[-10%] bottom-[-10%] h-80 w-80 rounded-full bg-black/10 blur-[100px]"></div>
-
-            <div class="relative z-10 max-w-lg text-center">
-                <div class="animate-fade-in-up">
-                    <div class="group relative mx-auto mb-10 flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-md">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-                        <span class="transform text-5xl font-bold text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-110">H</span>
-                    </div>
-                </div>
-
-                <h1 class="font-headline animate-fade-in-up mb-6 text-6xl leading-none font-bold tracking-tighter text-white delay-100">
-                    {{ $companyName ?? config('app.name') }}
-                </h1>
-
-                <p class="animate-fade-in-up text-xl leading-relaxed font-medium text-white/80 delay-200">
-                    Two-factor authentication adds an extra layer of security to your account.
-                </p>
-
-                <div class="animate-fade-in-up mt-12 flex justify-center gap-4 delay-300">
-                    <div class="h-1 w-12 rounded-full bg-white/30"></div>
-                    <div class="h-1 w-4 rounded-full bg-white/30"></div>
-                    <div class="h-1 w-4 rounded-full bg-white/30"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column - Two-Factor Form -->
-        <div class="relative flex items-center justify-center p-6 lg:p-12">
-            <!-- Mobile Background Accent -->
-            <div class="absolute top-0 right-0 left-0 h-1/3 bg-gradient-to-b from-[#DC2626]/10 to-transparent lg:hidden"></div>
-
-            <div class="relative z-10 w-full max-w-md">
-                <!-- Mobile Logo -->
-                <div class="animate-fade-in-up mb-10 text-center lg:hidden">
-                    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#DC2626] to-[#B91C1C] shadow-xl">
-                        <span class="text-2xl font-bold text-white">H</span>
-                    </div>
-                    <h1 class="font-headline text-3xl font-bold tracking-tight text-[#18181B]">
-                        {{ $companyName ?? config('app.name') }}
-                    </h1>
-                </div>
-
-                <div class="glass-vivid animate-fade-in-up rounded-[2rem] p-8 delay-100 lg:p-10">
-                    <div class="mb-10 text-center">
-                        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#DC2626]/10">
-                            <svg class="h-8 w-8 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                        </div>
-                        <h2 class="font-headline mb-2 text-3xl font-bold tracking-tight text-[#18181B]">
-                            Two-Factor Auth
-                        </h2>
-                        <p class="text-[#71717A]">Enter the 6-digit code from your app</p>
-                    </div>
-
-                    <x-ui.alert-banner />
-
-                    <form
-                        method="POST"
-                        action="{{ route('two-factor.login') }}"
-                        id="two-factor-form"
-                        class="space-y-8"
-                        x-data="{ code: '', recoveryCode: '', submitting: false, mode: 'code' }"
-                        x-init="
-                            $nextTick(() => {
-                                $refs.codeInput.focus();
-                            });
-                            $watch('code', (value) => {
-                                if (mode === 'code' && value.length === 6 && ! submitting) {
-                                    submitting = true;
-                                    $nextTick(() => {
-                                        $el.submit();
-                                    });
-                                }
-                            });
-                        "
-                        @submit="submitting = true"
-                        x-cloak
-                    >
-                        @csrf
-
-                        <div class="animate-fade-in-up relative delay-200">
-                            <label
-                                for="code"
-                                class="mb-6 block px-1 text-center text-xs font-bold tracking-widest text-[#71717A] uppercase"
-                                x-text="mode === 'code' ? 'Authentication Code' : 'Recovery Code'"
-                            >Authentication Code</label>
-
-                            <!-- Real Hidden Input -->
-                            <input
-                                id="code"
-                                x-show="mode === 'code'"
-                                type="text"
-                                name="code"
-                                x-model="code"
-                                x-ref="codeInput"
-                                maxlength="6"
-                                :disabled="mode !== 'code'"
-                                inputmode="numeric"
-                                pattern="[0-9]*"
-                                class="absolute inset-0 z-10 h-full w-full cursor-text opacity-0"
-                                autocomplete="one-time-code"
-                                @input="code = code.replace(/\D/g, '').slice(0, 6)"
-                                :readonly="submitting"
-                            />
-
-                            <!-- Recovery Code Input -->
-                            <div x-show="mode === 'recovery'" x-cloak>
-                                <input
-                                    type="text"
-                                    name="recovery_code"
-                                    x-model="recoveryCode"
-                                    x-ref="recoveryInput"
-                                    :disabled="mode !== 'recovery'"
-                                    class="w-full rounded-2xl border border-[#E4E4E7] bg-white/50 px-4 py-4 text-center font-mono text-lg tracking-widest text-[#18181B] shadow-sm outline-none transition-all focus:border-[#DC2626] focus:ring-4 focus:ring-[#DC2626]/10"
-                                    placeholder="XXXXX-XXXXXXXX"
-                                    autocomplete="one-time-code"
-                                    spellcheck="false"
-                                />
-                            </div>
-
-                            <!-- Visual Representation -->
-                            <div
-                                x-show="mode === 'code'"
-                                class="relative z-0 flex justify-between gap-2 sm:gap-3"
-                                :class="{
-                                    'opacity-50 pointer-events-none transition-opacity duration-300': submitting,
-                                }"
-                            >
-                                <template x-for="i in [0, 1, 2, 3, 4, 5]" :key="i">
-                                    <div
-                                        class="flex h-16 w-12 items-center justify-center rounded-2xl border bg-white/50 text-3xl font-bold shadow-sm transition-all duration-300"
-                                        :class="{
-                                            'border-[#DC2626] ring-4 ring-[#DC2626]/10': code.length === i && ! submitting,
-                                            'border-[#E4E4E7]': code.length !== i && ! @json($errors->has('code')) || submitting,
-                                            'border-red-500 ring-4 ring-red-500/10': @json($errors->has('code')) && ! submitting,
-                                            'text-[#18181B]': code[i],
-                                            'text-transparent': ! code[i]
-                                        }"
-                                    >
-                                        <span x-text="code[i] || ''" class="relative z-10"></span>
-
-                                        <!-- Blinking Caret -->
-                                        <div
-                                            x-show="code.length === i && ! submitting"
-                                            class="caret-blink absolute h-8 w-[2px] bg-[#DC2626]"
-                                        ></div>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <!-- Loading Indicator -->
-                            <div
-                                x-show="submitting && mode === 'code'"
-                                x-transition
-                                class="animate-fade-in-up mt-8 flex flex-col items-center justify-center gap-3"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <svg class="h-5 w-5 animate-spin text-[#DC2626]" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm font-bold tracking-[0.2em] text-[#DC2626] uppercase">Verifying Code...</span>
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                x-show="mode === 'recovery'"
-                                x-cloak
-                                :disabled="submitting"
-                                class="mt-2 w-full rounded-2xl bg-[#18181B] px-4 py-4 text-sm font-bold tracking-widest text-white uppercase transition-all hover:bg-black disabled:opacity-50"
-                            >
-                                Verify Recovery Code
-                            </button>
-
-                            <x-ui.field-errors field="code" />
-                            <x-ui.field-errors field="recovery_code" />
-                        </div>
-
-                        <div class="text-center">
-                            <button
-                                type="button"
-                                @click="
-                                    mode = mode === 'code' ? 'recovery' : 'code';
-                                    $nextTick(() => {
-                                        (mode === 'code' ? $refs.codeInput : $refs.recoveryInput).focus();
-                                    });
-                                "
-                                class="text-sm font-medium text-[#71717A] underline-offset-4 transition-colors hover:text-[#18181B] hover:underline"
-                                x-text="mode === 'code' ? 'Lost your device? Use a recovery code' : 'Use an authentication code instead'"
-                            ></button>
-                        </div>
-                    </form>
-
-                    @if (session('link'))
-                        <div class="animate-fade-in-up mt-6 text-center delay-400">{{ session('link') }}</div>
-                    @endif
-                </div>
-
-                <!-- Footer Info -->
-                <p class="animate-fade-in-up mt-8 text-center text-xs font-medium tracking-[0.2em] text-[#A1A1AA] uppercase delay-500">
-                    &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-                </p>
-            </div>
-        </div>
+    Field names (`code`, `recovery_code`), the form action and the auto-submit are
+    Fortify's contract. Only the presentation changed.
+--}}
+<x-layouts::auth
+    :title="__('auth.two_factor.title')"
+    :heading="__('auth.two_factor.heading')"
+    :subheading="__('auth.two_factor.subheading')"
+    :brandLine="__('auth.two_factor.brand_line')"
+    :alpine="true"
+>
+    <div class="mb-6 flex size-11 items-center justify-center rounded-ui-md bg-ui-accent-soft text-ui-link">
+        <x-ui.icon name="lock-closed" size="sm" />
     </div>
-</body>
-</html>
+
+    <x-ui.alert-banner />
+
+    <form
+        method="POST"
+        action="{{ route('two-factor.login') }}"
+        id="two-factor-form"
+        class="space-y-6"
+        novalidate
+        x-data="{ code: '', recoveryCode: '', submitting: false, mode: 'code' }"
+        x-init="
+            $nextTick(() => {
+                $refs.codeInput.focus();
+            });
+            $watch('code', (value) => {
+                if (mode === 'code' && value.length === 6 && ! submitting) {
+                    submitting = true;
+                    $nextTick(() => {
+                        $el.submit();
+                    });
+                }
+            });
+        "
+        @submit="submitting = true"
+        x-cloak
+    >
+        @csrf
+
+        <div>
+            {{-- Labels swap with the mode. The strings ride in data-* attributes
+                 rather than inside the x-text expression: escaping a quoted
+                 literal into a double-quoted attribute is fragile, and this
+                 version cannot break on an apostrophe. --}}
+            <x-ui.label for="code" class="text-center">
+                <span
+                    data-code-label="{{ __('auth.two_factor.authentication_code') }}"
+                    data-recovery-label="{{ __('auth.two_factor.recovery_code') }}"
+                    x-text="mode === 'code' ? $el.dataset.codeLabel : $el.dataset.recoveryLabel"
+                >{{ __('auth.two_factor.authentication_code') }}</span>
+            </x-ui.label>
+
+            {{-- The field that actually posts is the transparent overlay, so the
+                 browser still offers one-time-code autofill on it. The boxes below
+                 are drawn from its value. --}}
+            <div class="relative mt-4" x-show="mode === 'code'">
+                <input
+                    id="code"
+                    name="code"
+                    type="text"
+                    class="absolute inset-0 z-10 h-full w-full cursor-text opacity-0"
+                    x-model="code"
+                    x-ref="codeInput"
+                    maxlength="6"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    autocomplete="one-time-code"
+                    spellcheck="false"
+                    :disabled="mode !== 'code'"
+                    :readonly="submitting"
+                    @input="code = code.replace(/\D/g, '').slice(0, 6)"
+                />
+
+                <div
+                    class="flex justify-between gap-2"
+                    :class="{ 'pointer-events-none opacity-50': submitting }"
+                    aria-hidden="true"
+                >
+                    <template x-for="i in [0, 1, 2, 3, 4, 5]" :key="i">
+                        <div
+                            class="relative flex h-14 w-11 items-center justify-center rounded-ui-md border bg-ui-surface text-ui-xl font-semibold shadow-ui-xs transition-colors duration-120"
+                            :class="{
+                                'border-ui-line-strong': code.length !== i && ! submitting,
+                                'border-ui-accent': code.length === i && ! submitting,
+                                'border-ui-danger': {{ $errors->has('code') ? 'true' : 'false' }} && ! submitting,
+                            }"
+                        >
+                            <span class="ui-num relative z-10" x-text="code[i] || ''"></span>
+
+                            <span
+                                class="ui-caret absolute h-6 w-px bg-ui-accent"
+                                x-show="code.length === i && ! submitting"
+                            ></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            {{-- Both fields stay in the DOM when the mode switches, and a hidden
+                 field still submits — so the disabled binding is what keeps a
+                 half-typed code out of the recovery request. This control is a
+                 plain element for exactly that reason: `:disabled="expr"` on a
+                 Blade tag compiles as PHP, and the look comes from the same
+                 .ui-field class the component emits. --}}
+            <div x-show="mode === 'recovery'" x-cloak>
+                <input
+                    type="text"
+                    name="recovery_code"
+                    id="recovery_code"
+                    class="ui-field ui-field-code"
+                    placeholder="XXXXX-XXXXXXXX"
+                    autocomplete="one-time-code"
+                    spellcheck="false"
+                    x-model="recoveryCode"
+                    x-ref="recoveryInput"
+                    :disabled="mode !== 'recovery'"
+                />
+            </div>
+
+            <p
+                class="mt-4 flex items-center justify-center gap-2 text-ui-xs font-medium text-ui-link"
+                x-show="submitting && mode === 'code'"
+                x-transition
+                role="status"
+            >
+                <svg class="size-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ __('auth.two_factor.verifying') }}
+            </p>
+
+            <button
+                type="submit"
+                class="ui-btn ui-btn-primary ui-btn-block mt-5"
+                x-show="mode === 'recovery'"
+                x-cloak
+                :disabled="submitting"
+            >{{ __('auth.two_factor.verify_recovery_code') }}</button>
+
+            <x-ui.field-errors field="code" />
+            <x-ui.field-errors field="recovery_code" />
+        </div>
+
+        <div class="text-center">
+            <button
+                type="button"
+                class="rounded-ui-xs text-ui-sm text-ui-muted underline-offset-4 transition-colors hover:text-ui-text hover:underline focus:outline-none"
+                @click="
+                    mode = mode === 'code' ? 'recovery' : 'code';
+                    $nextTick(() => {
+                        (mode === 'code' ? $refs.codeInput : $refs.recoveryInput).focus();
+                    });
+                "
+                data-recovery-cta="{{ __('auth.two_factor.use_recovery') }}"
+                data-code-cta="{{ __('auth.two_factor.use_code') }}"
+                x-text="mode === 'code' ? $el.dataset.recoveryCta : $el.dataset.codeCta"
+            ></button>
+        </div>
+    </form>
+
+    @if (session('link'))
+        <p class="mt-5 text-ui-sm text-ui-muted">{{ session('link') }}</p>
+    @endif
+</x-layouts::auth>

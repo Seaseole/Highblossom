@@ -1,19 +1,28 @@
-{{-- Guided recovery state for a rejected passkey sign-in. --}}
+{{--
+    Guided recovery state for a rejected passkey sign-in.
+
+    Visibility is driven by resources/js/passkey-signin.js, which toggles the
+    `hidden` class on [data-passkey-recovery="<reason>"]. Keep the class-based
+    contract: the reason keys and this attribute are how a WebAuthn failure maps
+    to copy the user can act on.
+--}}
 @props(['reason', 'title', 'message', 'cta' => null])
 
 <div
     data-passkey-recovery="{{ $reason }}"
     role="alert"
-    {{ $attributes->class('hidden rounded-2xl border border-[#E4E4E7] bg-[#F9FAFB] px-5 py-4') }}
+    {{ $attributes->class('hidden rounded-ui-md border border-ui-line bg-ui-surface-raised px-4 py-3.5') }}
 >
-    <p class="mb-1 text-sm font-bold text-[#18181B]">{{ $title }}</p>
-    <p class="text-sm text-[#71717A]">{{ $message }}</p>
+    <p class="mb-1 text-ui-sm font-semibold text-ui-text">{{ $title }}</p>
+    <p class="text-ui-sm text-ui-muted">{{ $message }}</p>
 
     @if ($cta)
-        <button
+        <x-ui.button
             type="button"
+            variant="secondary"
+            size="sm"
+            class="mt-3"
             data-passkey-signin
-            class="mt-3 rounded-xl border-2 border-[#E4E4E7] bg-white px-4 py-2 text-sm font-bold text-[#18181B] transition-colors hover:border-[#DC2626]/30 focus:ring-4 focus:ring-[#DC2626]/10 focus:outline-none"
-        >{{ $cta }}</button>
+        >{{ $cta }}</x-ui.button>
     @endif
 </div>

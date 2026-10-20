@@ -18,13 +18,13 @@
 
     <div class="booking-flow">
         <!-- Hero -->
-        <section class="relative bg-[#0A0A0F] pt-28 pb-12 md:pt-32">
+        <section class="relative bg-site pt-28 pb-12 md:pt-32">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center">
                     <p class="mb-4 text-xs font-semibold tracking-[0.22em] text-[var(--booking-accent)] uppercase">
                         {{ __('booking.label') }}
                     </p>
-                    <h1 class="mb-5 font-headline text-4xl font-bold tracking-tight leading-[1.08] text-[#FAFAFA] md:text-5xl lg:text-[3.5rem]">
+                    <h1 class="mb-5 font-headline text-4xl font-bold tracking-tight leading-[1.08] text-site-text md:text-5xl lg:text-[3.5rem]">
                         {{ __('booking.title') }}
                     </h1>
                     <p class="text-base leading-relaxed text-[var(--booking-muted)] md:text-lg">
@@ -38,7 +38,7 @@
         </section>
 
         <!-- Wizard -->
-        <section class="bg-[#0A0A0F] pb-24">
+        <section class="bg-site pb-24">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div
                     class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]"
@@ -101,7 +101,7 @@
                         @if (session('error'))
                             <div
                                 role="alert"
-                                class="mb-6 flex items-start gap-3 rounded-2xl border border-[var(--booking-accent)]/35 bg-[var(--booking-accent)]/10 p-4 text-sm text-[#FAFAFA]"
+                                class="mb-6 flex items-start gap-3 rounded-2xl border border-[var(--booking-accent)]/35 bg-[var(--booking-accent)]/10 p-4 text-sm text-site-text"
                             >
                                 <svg class="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--booking-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v4m0 3h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
@@ -122,14 +122,14 @@
                                             :aria-current="currentStep === step ? 'step' : null"
                                             :class="{
                                                 'bg-[var(--booking-accent)] text-[var(--booking-accent-ink)]': currentStep === step,
-                                                'bg-white/[0.05] text-[#FAFAFA] hover:bg-white/[0.1]': currentStep !== step && step < currentStep,
+                                                'bg-[var(--booking-fill)] text-site-text hover:bg-[var(--booking-fill-hover)]': currentStep !== step && step < currentStep,
                                                 'bg-transparent text-[var(--booking-muted)]/60 cursor-not-allowed': currentStep !== step && step > currentStep,
                                             }"
                                             class="flex h-11 items-center gap-2 rounded-full border border-[var(--booking-line)] px-4 text-sm font-semibold transition-colors duration-200"
                                         >
                                             <span
                                                 class="grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold tnum"
-                                                :class="currentStep === step ? 'bg-black/15' : 'bg-white/10'"
+                                                :class="currentStep === step ? 'bg-black/15' : 'bg-site-fill-hover'"
                                                 x-text="step"
                                             ></span>
                                             <span x-text="stepLabels[step - 1]"></span>
@@ -181,12 +181,12 @@
                                                 :aria-pressed="serviceType === '{{ $value }}'"
                                                 class="flex min-h-[44px] items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200"
                                                 :class="serviceType === '{{ $value }}'
-                                                    ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)]/12 text-[#FAFAFA]'
-                                                    : 'border-[var(--booking-line)] bg-white/[0.03] text-[var(--booking-muted)] hover:bg-white/[0.06] hover:text-[#FAFAFA]'"
+                                                    ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)]/12 text-site-text'
+                                                    : 'border-[var(--booking-line)] bg-[var(--booking-fill)] text-[var(--booking-muted)] hover:bg-site-fill hover:text-site-text'"
                                             >
                                                 <span
                                                     class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border"
-                                                    :class="serviceType === '{{ $value }}' ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)]' : 'border-white/25'"
+                                                    :class="serviceType === '{{ $value }}' ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)]' : 'border-site-text/25'"
                                                 >
                                                     <svg x-show="serviceType === '{{ $value }}'" class="h-3 w-3 text-[var(--booking-accent-ink)]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
@@ -212,7 +212,7 @@
                                                 class="min-h-[44px] rounded-full border px-4 text-sm font-medium transition-all duration-200"
                                                 :class="damageType === '{{ $value }}'
                                                     ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)] text-[var(--booking-accent-ink)]'
-                                                    : 'border-[var(--booking-line)] bg-white/[0.03] text-[var(--booking-muted)] hover:bg-white/[0.07] hover:text-[#FAFAFA]'"
+                                                    : 'border-[var(--booking-line)] bg-[var(--booking-fill)] text-[var(--booking-muted)] hover:bg-[var(--booking-fill-hover)] hover:text-site-text'"
                                             >
                                                 {{ $label }}
                                             </button>
@@ -227,7 +227,7 @@
                                 <x-booking.panel :title="__('booking.vehicle_heading')" class="mt-5">
                                     <div class="grid gap-4 sm:grid-cols-3">
                                         <div class="sm:col-span-1">
-                                            <label for="vehicle_make" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.vehicle_make_label') }}</label>
+                                            <label for="vehicle_make" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.vehicle_make_label') }}</label>
                                             <input
                                                 type="text"
                                                 id="vehicle_make"
@@ -245,7 +245,7 @@
                                         </div>
 
                                         <div class="sm:col-span-1">
-                                            <label for="vehicle_model" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.vehicle_model_label') }}</label>
+                                            <label for="vehicle_model" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.vehicle_model_label') }}</label>
                                             <input
                                                 type="text"
                                                 id="vehicle_model"
@@ -263,7 +263,7 @@
                                         </div>
 
                                         <div class="sm:col-span-1">
-                                            <label for="vehicle_year" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.vehicle_year_label') }}</label>
+                                            <label for="vehicle_year" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.vehicle_year_label') }}</label>
                                             <input
                                                 type="text"
                                                 id="vehicle_year"
@@ -293,9 +293,9 @@
                                                 class="min-h-[44px] rounded-2xl border p-4 text-left transition-all duration-200"
                                                 :class="location === '{{ $value }}'
                                                     ? 'border-[var(--booking-accent)] bg-[var(--booking-accent)]/12'
-                                                    : 'border-[var(--booking-line)] bg-white/[0.03] hover:bg-white/[0.06]'"
+                                                    : 'border-[var(--booking-line)] bg-[var(--booking-fill)] hover:bg-site-fill'"
                                             >
-                                                <span class="block text-sm font-semibold text-[#FAFAFA]">{{ $label }}</span>
+                                                <span class="block text-sm font-semibold text-site-text">{{ $label }}</span>
                                                 <span class="mt-1 block text-xs text-[var(--booking-muted)]">
                                                     {{ $value === 'mobile' ? __('booking.location_mobile_hint') : __('booking.location_workshop_hint') }}
                                                 </span>
@@ -308,7 +308,7 @@
                                     @enderror
 
                                     <div x-show="location === 'mobile'" x-transition class="mt-5">
-                                        <label for="client_address" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.address_label') }}</label>
+                                        <label for="client_address" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.address_label') }}</label>
                                         <input
                                             type="text"
                                             id="client_address"
@@ -340,9 +340,9 @@
                             >
                                 <div class="mb-5 flex flex-wrap items-center gap-2">
                                     <span class="mr-1 text-xs font-semibold tracking-[0.16em] text-[var(--booking-muted)] uppercase">{{ __('booking.quick_pick') }}</span>
-                                    <button type="button" @click="quickPick(0)" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-white/[0.03] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-white/[0.08]">{{ __('booking.quick_today') }}</button>
-                                    <button type="button" @click="quickPick(1)" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-white/[0.03] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-white/[0.08]">{{ __('booking.quick_tomorrow') }}</button>
-                                    <button type="button" @click="bookThisWeek()" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-white/[0.03] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-white/[0.08]">{{ __('booking.quick_this_week') }}</button>
+                                    <button type="button" @click="quickPick(0)" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] px-4 text-sm font-medium text-site-text transition-colors hover:bg-[var(--booking-fill-hover)]">{{ __('booking.quick_today') }}</button>
+                                    <button type="button" @click="quickPick(1)" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] px-4 text-sm font-medium text-site-text transition-colors hover:bg-[var(--booking-fill-hover)]">{{ __('booking.quick_tomorrow') }}</button>
+                                    <button type="button" @click="bookThisWeek()" class="min-h-[44px] rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] px-4 text-sm font-medium text-site-text transition-colors hover:bg-[var(--booking-fill-hover)]">{{ __('booking.quick_this_week') }}</button>
                                     <button type="button" @click="jumpToEarliest()" class="min-h-[44px] rounded-full border border-[var(--booking-accent)]/45 bg-[var(--booking-accent)]/12 px-4 text-sm font-semibold text-[var(--booking-accent)] transition-colors hover:bg-[var(--booking-accent)]/20">{{ __('booking.quick_earliest') }}</button>
                                 </div>
 
@@ -359,17 +359,17 @@
                                                 @click="prevMonth()"
                                                 :disabled="activeMonthIndex === 0"
                                                 :aria-label="availabilityLabels.previous"
-                                                class="grid h-11 w-11 place-items-center rounded-full border border-[var(--booking-line)] bg-white/[0.03] text-[#FAFAFA] transition-colors hover:bg-white/[0.09] disabled:cursor-not-allowed disabled:opacity-25"
+                                                class="grid h-11 w-11 place-items-center rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] text-site-text transition-colors hover:bg-[var(--booking-fill-hover)] disabled:cursor-not-allowed disabled:opacity-25"
                                             >
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                                             </button>
-                                            <p class="font-headline text-lg font-bold tracking-tight text-[#FAFAFA]" x-text="monthLabel"></p>
+                                            <p class="font-headline text-lg font-bold tracking-tight text-site-text" x-text="monthLabel"></p>
                                             <button
                                                 type="button"
                                                 @click="nextMonth()"
                                                 :disabled="activeMonthIndex >= maxMonthIndex"
                                                 :aria-label="availabilityLabels.next"
-                                                class="grid h-11 w-11 place-items-center rounded-full border border-[var(--booking-line)] bg-white/[0.03] text-[#FAFAFA] transition-colors hover:bg-white/[0.09] disabled:cursor-not-allowed disabled:opacity-25"
+                                                class="grid h-11 w-11 place-items-center rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] text-site-text transition-colors hover:bg-[var(--booking-fill-hover)] disabled:cursor-not-allowed disabled:opacity-25"
                                             >
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                                             </button>
@@ -377,7 +377,7 @@
 
                                         <div class="mb-2 grid grid-cols-7 gap-1">
                                             @foreach (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as $weekday)
-                                                <div class="py-1 text-center text-[10px] font-semibold tracking-[0.12em] text-white/30 uppercase">
+                                                <div class="py-1 text-center text-[10px] font-semibold tracking-[0.12em] text-site-text/30 uppercase">
                                                     {{ __('booking.weekday_'.$weekday) }}
                                                 </div>
                                             @endforeach
@@ -409,8 +409,8 @@
                                                     :title="day.selectable ? '' : (availabilityLabels[day.reason] || '')"
                                                     :class="{
                                                         'bg-[var(--booking-accent)] text-[var(--booking-accent-ink)] font-bold shadow-[0_0_24px_-6px_rgba(220,38,38,0.6)]': selectedDate === day.date,
-                                                        'border border-[var(--booking-accent)]/40 text-[#FAFAFA] hover:bg-white/[0.08]': selectedDate !== day.date && day.selectable,
-                                                        'text-white/20 cursor-not-allowed line-through decoration-white/20': ! day.selectable,
+                                                        'border border-[var(--booking-accent)]/40 text-site-text hover:bg-[var(--booking-fill-hover)]': selectedDate !== day.date && day.selectable,
+                                                        'text-site-text/20 cursor-not-allowed line-through decoration-site-text/20': ! day.selectable,
                                                     }"
                                                     class="relative grid aspect-square min-h-[44px] place-items-center rounded-full text-sm tnum transition-all duration-200"
                                                 >
@@ -426,8 +426,8 @@
 
                                         <p class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--booking-muted)]">
                                             <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[var(--booking-accent)]"></span>{{ __('booking.quick_today') }}</span>
-                                            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-white/20"></span>{{ __('booking.day_reason_closed') }}</span>
-                                            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-white/20"></span>{{ __('booking.day_reason_full') }}</span>
+                                            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-site-text/20"></span>{{ __('booking.day_reason_closed') }}</span>
+                                            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-site-text/20"></span>{{ __('booking.day_reason_full') }}</span>
                                         </p>
                                     </x-booking.panel>
 
@@ -435,7 +435,7 @@
                                     <x-booking.panel :eyebrow="__('booking.select_time')" :title="__('booking.step_date_time')">
                                         <div x-show="! selectedDate" class="grid min-h-[16rem] place-items-center text-center">
                                             <div>
-                                                <svg class="mx-auto mb-3 h-10 w-10 text-white/15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <svg class="mx-auto mb-3 h-10 w-10 text-site-text/15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <rect x="3" y="4.5" width="18" height="16" rx="3" />
                                                     <path stroke-linecap="round" d="M8 2.5v4M16 2.5v4M3 10h18" />
                                                 </svg>
@@ -446,13 +446,13 @@
                                         {{-- Skeleton --}}
                                         <div x-show="selectedDate && slotsState === 'loading'" class="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                                             <template x-for="i in 8" :key="i">
-                                                <div class="h-11 animate-pulse rounded-xl bg-white/[0.06]"></div>
+                                                <div class="h-11 animate-pulse rounded-xl bg-[var(--booking-fill)]"></div>
                                             </template>
                                         </div>
 
                                         {{-- Error --}}
                                         <div x-show="selectedDate && slotsState === 'error'" x-cloak class="rounded-2xl border border-red-500/25 bg-red-500/[0.07] p-4">
-                                            <p class="text-sm text-[#FAFAFA]/85">{{ __('booking.slots_load_failed') }}</p>
+                                            <p class="text-sm text-site-text/85">{{ __('booking.slots_load_failed') }}</p>
                                             <button type="button" @click="fetchSlots(selectedDate)" class="mt-2 min-h-[44px] text-sm font-semibold text-[var(--booking-accent)] underline-offset-4 hover:underline">{{ __('booking.retry') }}</button>
                                         </div>
 
@@ -473,7 +473,7 @@
 
                                             <template x-for="group in slotGroups" :key="group.key">
                                                 <div>
-                                                    <p class="mb-2 text-[10px] font-semibold tracking-[0.18em] text-white/35 uppercase" x-text="periodLabels[group.key]"></p>
+                                                    <p class="mb-2 text-[10px] font-semibold tracking-[0.18em] text-site-text/35 uppercase" x-text="periodLabels[group.key]"></p>
                                                     <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                                                         <template x-for="slot in group.slots" :key="slot.time">
                                                             <button
@@ -485,8 +485,8 @@
                                                                 class="relative h-11 rounded-xl border text-sm font-semibold transition-all duration-200"
                                                                 :class="{
                                                                     'border-[var(--booking-accent)] bg-[var(--booking-accent)] text-[var(--booking-accent-ink)] shadow-[0_6px_22px_-10px_rgba(220,38,38,0.8)]': selectedTime === slot.time && slot.available,
-                                                                    'border-[var(--booking-line)] bg-white/[0.04] text-[#FAFAFA] hover:border-white/20 hover:bg-white/[0.09]': slot.available && selectedTime !== slot.time,
-                                                                    'border-transparent bg-white/[0.02] text-white/25 cursor-not-allowed': ! slot.available,
+                                                                    'border-[var(--booking-line)] bg-[var(--booking-fill)] text-site-text hover:border-site-line-strong hover:bg-[var(--booking-fill-hover)]': slot.available && selectedTime !== slot.time,
+                                                                    'border-transparent bg-[var(--booking-fill)] text-site-text/25 cursor-not-allowed': ! slot.available,
                                                                 }"
                                                             >
                                                                 <span class="tnum" x-text="slot.label"></span>
@@ -502,8 +502,8 @@
 
                                             <div x-show="scheduledAt" x-cloak class="flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--booking-accent)]/30 bg-[var(--booking-accent)]/[0.08] px-4 py-3">
                                                 <svg class="h-4 w-4 flex-shrink-0 text-[var(--booking-accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" /></svg>
-                                                <span class="text-[10px] font-semibold tracking-[0.16em] text-white/45 uppercase">{{ __('booking.selected') }}</span>
-                                                <span class="text-sm font-semibold text-[#FAFAFA]">
+                                                <span class="text-[10px] font-semibold tracking-[0.16em] text-site-text/45 uppercase">{{ __('booking.selected') }}</span>
+                                                <span class="text-sm font-semibold text-site-text">
                                                     <span x-text="selectedDateLabel"></span> · <span class="tnum" x-text="timeLabel"></span>
                                                     <span class="text-[var(--booking-muted)]">– <span class="tnum" x-text="endsLabel"></span></span>
                                                 </span>
@@ -531,7 +531,7 @@
                                 <x-booking.panel :eyebrow="__('booking.step_details')" :title="__('booking.your_information')" :description="__('booking.your_info_description')">
                                     <div class="grid gap-4 sm:grid-cols-2">
                                         <div>
-                                            <label for="client_name" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.full_name_label') }}</label>
+                                            <label for="client_name" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.full_name_label') }}</label>
                                             <input type="text" id="client_name" name="client_name" x-model="clientName" @input="saveDraft()" :data-invalid="showErrors && clientName.trim() === ''" class="booking-input" placeholder="{{ __('booking.full_name_placeholder') }}" autocomplete="name" />
                                             @error('client_name')
                                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
@@ -539,7 +539,7 @@
                                         </div>
 
                                         <div>
-                                            <label for="client_phone" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.phone_number_label') }}</label>
+                                            <label for="client_phone" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.phone_number_label') }}</label>
                                             <input type="tel" id="client_phone" name="client_phone" x-model="clientPhone" @input="clientPhone = clientPhone.replace(/[^0-9]/g, '').slice(0, 20); saveDraft()" :data-invalid="showErrors && clientPhone.trim() === ''" class="booking-input tnum" placeholder="{{ __('booking.phone_placeholder') }}" autocomplete="tel" />
                                             @error('client_phone')
                                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
@@ -547,23 +547,23 @@
                                         </div>
 
                                         <div class="sm:col-span-2">
-                                            <label for="client_email" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.email_address_label') }}</label>
+                                            <label for="client_email" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.email_address_label') }}</label>
                                             <input type="email" id="client_email" name="client_email" x-model="clientEmail" @input="saveDraft()" :data-invalid="showErrors && clientEmail.trim() === ''" class="booking-input" placeholder="{{ __('booking.email_placeholder') }}" autocomplete="email" />
                                             @error('client_email')
                                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
                                             @enderror
                                         </div>
 
-                                        <label class="sm:col-span-2 flex min-h-[44px] cursor-pointer items-start gap-3 rounded-2xl border border-[var(--booking-line)] bg-white/[0.03] p-4 transition-colors hover:bg-white/[0.06]" :class="prefersWhatsapp ? 'border-[var(--booking-accent)]/45 bg-[var(--booking-accent)]/[0.08]' : ''">
+                                        <label class="sm:col-span-2 flex min-h-[44px] cursor-pointer items-start gap-3 rounded-2xl border border-[var(--booking-line)] bg-[var(--booking-fill)] p-4 transition-colors hover:bg-site-fill" :class="prefersWhatsapp ? 'border-[var(--booking-accent)]/45 bg-[var(--booking-accent)]/[0.08]' : ''">
                                             <input type="checkbox" value="1" x-model="prefersWhatsapp" @change="saveDraft()" class="mt-0.5 h-5 w-5 shrink-0 accent-[var(--booking-accent)]" />
                                             <span>
-                                                <span class="block text-sm font-semibold text-[#FAFAFA]">{{ __('booking.prefers_whatsapp') }}</span>
+                                                <span class="block text-sm font-semibold text-site-text">{{ __('booking.prefers_whatsapp') }}</span>
                                                 <span class="mt-0.5 block text-xs text-[var(--booking-muted)]">{{ __('booking.prefers_whatsapp_hint') }}</span>
                                             </span>
                                         </label>
 
                                         <div class="sm:col-span-2">
-                                            <label for="vehicle_details" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.notes_label') }}</label>
+                                            <label for="vehicle_details" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.notes_label') }}</label>
                                             <textarea id="vehicle_details" name="vehicle_details" x-model="vehicleDetails" @input="saveDraft()" rows="3" class="booking-input" placeholder="{{ __('booking.notes_placeholder') }}"></textarea>
                                             @error('vehicle_details')
                                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
@@ -571,7 +571,7 @@
                                         </div>
 
                                         <div class="sm:col-span-2">
-                                            <label for="damage_photo" class="mb-2 block text-sm font-medium text-[#FAFAFA]/75">{{ __('booking.photo_label') }}</label>
+                                            <label for="damage_photo" class="mb-2 block text-sm font-medium text-site-text/75">{{ __('booking.photo_label') }}</label>
                                             <input
                                                 type="file"
                                                 id="damage_photo"
@@ -638,7 +638,7 @@
                                     @click="prevStep()"
                                     x-show="currentStep > 1"
                                     x-cloak
-                                    class="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--booking-line)] bg-white/[0.03] px-5 text-sm font-semibold text-[#FAFAFA] transition-colors hover:bg-white/[0.08]"
+                                    class="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] px-5 text-sm font-semibold text-site-text transition-colors hover:bg-[var(--booking-fill-hover)]"
                                 >
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                                     {{ __('booking.back') }}
@@ -685,29 +685,29 @@
 
                             <dl class="space-y-4 text-sm">
                                 <div>
-                                    <dt class="text-[11px] tracking-[0.12em] text-white/35 uppercase">{{ __('booking.service_heading') }}</dt>
-                                    <dd class="mt-1 font-medium text-[#FAFAFA]">
+                                    <dt class="text-[11px] tracking-[0.12em] text-site-text/35 uppercase">{{ __('booking.service_heading') }}</dt>
+                                    <dd class="mt-1 font-medium text-site-text">
                                         <span x-show="serviceType" x-cloak x-text="serviceLabel"></span>
                                         <span x-show="! serviceType" class="text-[var(--booking-muted)]">{{ __('booking.summary_not_set') }}</span>
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-[11px] tracking-[0.12em] text-white/35 uppercase">{{ __('booking.vehicle_heading') }}</dt>
-                                    <dd class="mt-1 font-medium text-[#FAFAFA]">
+                                    <dt class="text-[11px] tracking-[0.12em] text-site-text/35 uppercase">{{ __('booking.vehicle_heading') }}</dt>
+                                    <dd class="mt-1 font-medium text-site-text">
                                         <span x-show="vehicleMake" x-cloak x-text="vehicleLabel"></span>
                                         <span x-show="! vehicleMake" class="text-[var(--booking-muted)]">{{ __('booking.summary_not_set') }}</span>
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-[11px] tracking-[0.12em] text-white/35 uppercase">{{ __('booking.select_date') }}</dt>
-                                    <dd class="mt-1 font-medium text-[#FAFAFA]">
+                                    <dt class="text-[11px] tracking-[0.12em] text-site-text/35 uppercase">{{ __('booking.select_date') }}</dt>
+                                    <dd class="mt-1 font-medium text-site-text">
                                         <span x-show="scheduledAt" x-cloak><span x-text="selectedDateLabel"></span> · <span class="tnum" x-text="timeLabel"></span></span>
                                         <span x-show="! scheduledAt" class="text-[var(--booking-muted)]">{{ __('booking.summary_not_set') }}</span>
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-[11px] tracking-[0.12em] text-white/35 uppercase">{{ __('booking.location_heading') }}</dt>
-                                    <dd class="mt-1 font-medium text-[#FAFAFA]">
+                                    <dt class="text-[11px] tracking-[0.12em] text-site-text/35 uppercase">{{ __('booking.location_heading') }}</dt>
+                                    <dd class="mt-1 font-medium text-site-text">
                                         <span x-show="location" x-cloak x-text="locationLabel"></span>
                                         <span x-show="! location" class="text-[var(--booking-muted)]">{{ __('booking.summary_not_set') }}</span>
                                     </dd>

@@ -202,6 +202,22 @@
                                     />
                                 </div>
                                 <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value="{{ old('username', $user->username) }}"
+                                        autocomplete="username"
+                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                    />
+                                    @error('username')
+                                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ \App\Support\Username::formatHint() }}. You can sign in with this or your email address.
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                                     <input
                                         type="email"
@@ -404,14 +420,6 @@
                                 },
                                 showPassword: false,
                                 showConfirmPassword: false,
-                                minLen: 8,
-                                init() {
-                                    const passInput = $refs.passwordInput;
-                                    if (passInput && passInput.dataset.rules) {
-                                        const minMatch = passInput.dataset.rules.match(/min:(\d+)/);
-                                        if (minMatch) this.minLen = parseInt(minMatch[1]);
-                                    }
-                                },
                             }"
                         >
                             @csrf
@@ -445,7 +453,7 @@
                                             name="password"
                                             x-ref="passwordInput"
                                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                                            passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
                                         />
                                         <button
                                             type="button"
@@ -464,7 +472,7 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    <p class="text-xs text-gray-500" x-text="`Min ${minLen} characters`"></p>
+                                    <x-ui.password-rules input="password" />
                                 </div>
                                 <div class="space-y-2">
                                     <label for="password_confirmation" class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
@@ -475,7 +483,7 @@
                                             name="password_confirmation"
                                             x-ref="passwordConfirmInput"
                                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                                            passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
                                         />
                                         <button
                                             type="button"

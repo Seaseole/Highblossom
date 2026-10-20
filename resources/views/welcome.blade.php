@@ -1,6 +1,6 @@
 <x-layouts::site title="Highblossom | Precision Automotive Glass">
     <!-- Hero Section - Cinematic Dark -->
-    <header id="page-hero" class="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[#0A0A0F]">
+    <header id="page-hero" class="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-site">
         <style>
             @media (prefers-reduced-motion: reduce) {
                 .animate-fade-up,
@@ -24,8 +24,8 @@
                     decoding="async"
                 />
             @endif
-            <div class="absolute inset-0 bg-gradient-to-b from-[#0A0A0F] via-[#0A0A0F]/80 to-[#0A0A0F]"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-[#0A0A0F] via-transparent to-[#0A0A0F]/50"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-site via-site/80 to-site"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-site via-transparent to-site/50"></div>
             <div class="grain-overlay pointer-events-none absolute inset-0" aria-hidden="true"></div>
         </div>
 
@@ -34,13 +34,13 @@
             <div class="mx-auto max-w-4xl">
                 {{-- Trust Badge --}}
                 <div class="animate-fade-up mb-6 flex flex-wrap items-center justify-center gap-2 sm:mb-8">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                        <span class="h-2 w-2 animate-pulse rounded-full bg-[#DC2626]" aria-hidden="true"></span>
-                        <span class="text-xs font-medium text-[#FAFAFA] sm:text-sm">{{ __('site.home.hero_trust_badge') }}</span>
+                    <span class="inline-flex items-center gap-2 rounded-full border border-site-line-strong bg-site-fill px-4 py-2">
+                        <span class="h-2 w-2 animate-pulse rounded-full bg-site-accent" aria-hidden="true"></span>
+                        <span class="text-xs font-medium text-site-text sm:text-sm">{{ __('site.home.hero_trust_badge') }}</span>
                     </span>
                     @if (filled($homeYearsExperience))
-                        <span class="inline-flex items-center gap-2 rounded-full border border-[#DC2626]/25 bg-[#DC2626]/10 px-4 py-2">
-                            <span class="text-xs font-bold text-[#FAFAFA] sm:text-sm">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-site-accent/25 bg-site-accent-soft px-4 py-2">
+                            <span class="text-xs font-bold text-site-text sm:text-sm">
                                 {{ __('site.home.hero_years_badge', ['years' => $homeYearsExperience]) }}
                             </span>
                         </span>
@@ -52,13 +52,13 @@
                 <div
                     id="hero-headline-container"
                     aria-labelledby="hero-heading"
-                    class="font-headline mx-auto mb-4 text-2xl leading-[1.2] font-bold tracking-tight break-words hyphens-auto text-[#FAFAFA] sm:mb-6 sm:text-4xl sm:leading-[1.1] md:text-5xl lg:text-6xl"
+                    class="font-headline mx-auto mb-4 text-2xl leading-[1.2] font-bold tracking-tight break-words hyphens-auto text-site-text sm:mb-6 sm:text-4xl sm:leading-[1.1] md:text-5xl lg:text-6xl"
                     style="perspective: 900px; min-height: 2.4em"
                 ><span data-hero-seed>{{ $homeTagline ?: __('site.home.hero_headline_animated')[0] }}</span></div>
 
                 {{-- Subhead --}}
                 <p
-                    class="animate-fade-up mx-auto mb-8 max-w-2xl text-base leading-relaxed text-[#FAFAFA] sm:mb-10 sm:text-lg md:text-xl"
+                    class="animate-fade-up mx-auto mb-8 max-w-2xl text-base leading-relaxed text-site-text sm:mb-10 sm:text-lg md:text-xl"
                     style="animation-delay: 200ms"
                 >
                     {{ __('site.home.hero_subheadline') }}
@@ -100,32 +100,32 @@
                         description: 'Request instant quote online or call',
                         details:
                             'Get a free, no-obligation quote within minutes. Simply provide your vehicle details and glass type, or call our team directly for immediate assistance.',
-                        icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\'></path></svg>`,
+                        icon: `<svg class=\'w-5 h-5 text-site-link\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\'></path></svg>`,
                     },
                     {
                         title: 'Schedule',
                         description: 'Choose convenient appointment time',
                         details:
                             'Select a time that works for you. We offer flexible scheduling including same-day service for urgent repairs to get you back on the road.',
-                        icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\'></path></svg>`,
+                        icon: `<svg class=\'w-5 h-5 text-site-link\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\'></path></svg>`,
                     },
                     {
                         title: 'Mobile Service',
                         description: 'We come to your location',
                         details:
                             'Our mobile technicians come to your home or office. Fully equipped vehicles for on-site glass replacement and high-precision calibration.',
-                        icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z\'></path><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M15 11a3 3 0 11-6 0 3 3 0 016 0z\'></path></svg>`,
+                        icon: `<svg class=\'w-5 h-5 text-site-link\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z\'></path><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M15 11a3 3 0 11-6 0 3 3 0 016 0z\'></path></svg>`,
                     },
                     {
                         title: 'Quality Check',
                         description: 'Final inspection and warranty',
                         details:
                             'Every installation passes rigorous safety and quality inspections. Backed by our lifetime workmanship warranty for complete peace of mind.',
-                        icon: `<svg class=\'w-5 h-5 text-[#DC2626]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\'></path></svg>`,
+                        icon: `<svg class=\'w-5 h-5 text-site-link\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\'></path></svg>`,
                     },
                 ],
             }"
-            class="relative z-10 w-full border-t border-white/5 bg-[#0A0A0F]/50 py-6 backdrop-blur-sm md:py-6"
+            class="relative z-10 w-full border-t border-site-line bg-site/50 py-6 backdrop-blur-sm md:py-6"
         >
             <div class="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
@@ -133,21 +133,21 @@
                         <button
                             type="button"
                             @click="activeCard = index"
-                            class="glass-card group animate-fade-up cursor-pointer rounded-xl p-4 transition-all duration-300 hover:scale-[1.03] hover:shadow-[#DC2626]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60 active:scale-[0.97] md:p-6"
+                            class="glass-card group animate-fade-up cursor-pointer rounded-xl p-4 transition-all duration-300 hover:scale-[1.03] hover:shadow-[#DC2626]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60 active:scale-[0.97] md:p-6"
                             :style="`animation-delay: ${index * 100}ms`"
                         >
                             <div class="flex items-start justify-between">
                                 <div
-                                    class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#DC2626]/10 transition-colors group-hover:bg-[#DC2626]/20"
+                                    class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-site-accent-soft transition-colors group-hover:bg-site-accent/20"
                                     x-html="step.icon"
                                 ></div>
-                                <svg class="h-4 w-4 text-[#A1A1AA] opacity-50 transition-opacity group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-site-muted opacity-50 transition-opacity group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
                             </div>
-                            <h3 class="mb-1 text-sm font-semibold text-[#FAFAFA] md:text-base" x-text="step.title"></h3>
+                            <h3 class="mb-1 text-sm font-semibold text-site-text md:text-base" x-text="step.title"></h3>
                             <p
-                                class="line-clamp-1 text-xs leading-relaxed text-[#A1A1AA] md:text-sm"
+                                class="line-clamp-1 text-xs leading-relaxed text-site-muted md:text-sm"
                                 x-text="step.description"
                             ></p>
                         </button>
@@ -184,12 +184,12 @@
                         x-ref="dialog"
                         tabindex="-1"
                         x-effect="activeCard !== null && $nextTick(() =&gt; $refs.dialog.focus())"
-                        class="glass-card w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50"
+                        class="glass-card w-full max-w-lg overflow-hidden rounded-2xl border border-site-line-strong shadow-2xl shadow-black/50"
                     >
                         <div class="p-8">
                             <div class="mb-6 flex items-start justify-between">
                                 <div
-                                    class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#DC2626]/10"
+                                    class="flex h-14 w-14 items-center justify-center rounded-2xl bg-site-accent-soft"
                                     x-html="
                                         activeCard !== null ? steps[activeCard].icon.replace('w-5 h-5', 'w-7 h-7') : ''
                                     "
@@ -198,7 +198,7 @@
                                     @click="activeCard = null"
                                     aria-label="Close"
                                     type="button"
-                                    class="rounded-full p-2 text-[#A1A1AA] transition-colors hover:bg-white/5 hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                    class="rounded-full p-2 text-site-muted transition-colors hover:bg-site-fill hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                                 >
                                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -208,18 +208,18 @@
 
                             <h2
                                 id="modal-title"
-                                class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]"
+                                class="font-headline mb-2 text-2xl font-bold text-site-text"
                                 x-text="activeCard !== null ? steps[activeCard].title : ''"
                             ></h2>
                             <p
                                 id="modal-desc"
-                                class="mb-6 font-medium text-[#DC2626]"
+                                class="mb-6 font-medium text-site-link"
                                 x-text="activeCard !== null ? steps[activeCard].description : ''"
                             ></p>
 
                             <div class="space-y-4">
                                 <p
-                                    class="text-lg leading-relaxed text-[#A1A1AA]"
+                                    class="text-lg leading-relaxed text-site-muted"
                                     x-text="activeCard !== null ? steps[activeCard].details : ''"
                                 ></p>
                             </div>
@@ -227,7 +227,7 @@
                             <div class="mt-8 flex gap-4">
                                 <button
                                     @click="activeCard = null"
-                                    class="flex-1 rounded-xl bg-[#DC2626] py-4 font-bold text-[#FAFAFA] transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
+                                    class="flex-1 rounded-xl bg-site-accent py-4 font-bold text-site-accent-ink transition-all hover:bg-site-accent-hover active:scale-[0.98]"
                                 >
                                     Got it
                                 </button>
@@ -243,15 +243,15 @@
     <x-site.fact-tiles :stats="$homeStats" :tiles="$factTiles" />
 
     <!-- Services Preview Section -->
-    <section id="services" class="bg-[#0A0A0F] py-24 lg:py-32">
+    <section id="services" class="bg-site py-24 lg:py-32">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
             {{-- Section Header --}}
             <div class="mb-16 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
                 <div>
-                    <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    <div class="mb-3 text-sm font-semibold tracking-wider text-site-link uppercase">
                         {{ __('site.home.services_section_label') }}
                     </div>
-                    <h2 class="font-headline text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl">
+                    <h2 class="font-headline text-4xl font-bold tracking-tight text-site-text md:text-5xl">
                         {{ __('site.home.services_title') }}
                     </h2>
                 </div>
@@ -294,15 +294,15 @@
 
     {{-- Recent Work: the whole section, header included, hides with no featured shots. --}}
     @if ($featuredGalleryImages->isNotEmpty())
-        <section id="gallery" class="bg-[#121218] py-24 lg:py-32">
+        <section id="gallery" class="bg-site-surface py-24 lg:py-32">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 {{-- Section Header --}}
                 <div class="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
                     <div>
-                        <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                        <div class="mb-3 text-sm font-semibold tracking-wider text-site-link uppercase">
                             {{ __('site.home.gallery_section_label') }}
                         </div>
-                        <h2 class="font-headline text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl">
+                        <h2 class="font-headline text-4xl font-bold tracking-tight text-site-text md:text-5xl">
                             {{ __('site.home.gallery_title') }}
                         </h2>
                     </div>
@@ -330,7 +330,7 @@
                         <a
                             href="{{ route('gallery') }}"
                             wire:navigate
-                            class="group relative block overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121218]"
+                            class="group relative block overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent focus-visible:ring-offset-2 focus-visible:ring-offset-site-surface"
                             aria-label="{{ __('site.home.gallery_view_full') }} — {{ $image->title }}"
                         >
                             <img
@@ -342,14 +342,14 @@
                                 loading="lazy"
                                 decoding="async"
                             />
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/25 to-transparent"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-site via-site/25 to-transparent"></div>
                             <div class="absolute right-0 bottom-0 left-0 p-6">
                                 @if (filled($image->category?->name))
-                                    <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1">
-                                        <span class="text-xs font-semibold text-[#FAFAFA] uppercase">{{ str_replace('_', ' ', $image->category->name) }}</span>
+                                    <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-site-line-strong bg-site-fill-hover px-3 py-1">
+                                        <span class="text-xs font-semibold text-site-text uppercase">{{ str_replace('_', ' ', $image->category->name) }}</span>
                                     </div>
                                 @endif
-                                <h3 class="font-headline text-lg font-bold text-[#FAFAFA]">{{ $image->title }}</h3>
+                                <h3 class="font-headline text-lg font-bold text-site-text">{{ $image->title }}</h3>
                             </div>
                         </a>
                     @endforeach
@@ -367,13 +367,13 @@
 
     <!-- Process / Why Choose Us Section -->
     @if ($processSteps->isNotEmpty())
-        <section id="process" class="bg-[#0A0A0F] py-24 lg:py-32">
+        <section id="process" class="bg-site py-24 lg:py-32">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div class="mx-auto mb-16 max-w-2xl text-center">
-                    <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    <div class="mb-3 text-sm font-semibold tracking-wider text-site-link uppercase">
                         {{ __('site.home.why_choose_label') }}
                     </div>
-                    <h2 class="font-headline text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl">
+                    <h2 class="font-headline text-4xl font-bold tracking-tight text-site-text md:text-5xl">
                         {{ __('site.home.why_choose_title') }}
                     </h2>
                 </div>
@@ -381,11 +381,11 @@
                 <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
                     @foreach ($processSteps as $index => $step)
                         <div class="glass-card rounded-2xl p-8 text-center">
-                            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#DC2626]/10 text-2xl font-bold text-[#DC2626]">
+                            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-site-accent-soft text-2xl font-bold text-site-link">
                                 {{ $index + 1 }}
                             </div>
-                            <h3 class="font-headline mb-3 text-xl font-bold text-[#FAFAFA]">{{ $step['title'] }}</h3>
-                            <p class="text-sm leading-relaxed text-[#A1A1AA]">{{ $step['text'] }}</p>
+                            <h3 class="font-headline mb-3 text-xl font-bold text-site-text">{{ $step['title'] }}</h3>
+                            <p class="text-sm leading-relaxed text-site-muted">{{ $step['text'] }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -401,14 +401,14 @@
 
     {{-- Testimonials: hidden in full until a published review exists. --}}
     @if ($hasTestimonials)
-        <section class="bg-[#121218] py-24 lg:py-32">
+        <section class="bg-site-surface py-24 lg:py-32">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 {{-- Section Header --}}
                 <div class="mb-12">
-                    <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    <div class="mb-3 text-sm font-semibold tracking-wider text-site-link uppercase">
                         {{ __('site.home.testimonials_label') }}
                     </div>
-                    <h2 class="font-headline text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl">
+                    <h2 class="font-headline text-4xl font-bold tracking-tight text-site-text md:text-5xl">
                         {{ __('site.home.testimonials_title') }}
                     </h2>
                 </div>
@@ -446,21 +446,21 @@
 
 
     <!-- Final CTA Section -->
-    <section class="bg-gradient-to-b from-[#121218] to-[#0A0A0F] py-24 lg:py-32">
+    <section class="bg-gradient-to-b from-site-surface to-site py-24 lg:py-32">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
             <div class="glass-card relative overflow-hidden rounded-3xl p-8 text-center sm:p-12 lg:p-16">
                 {{-- Background Glow --}}
-                <div class="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#DC2626]/10 blur-[100px]" aria-hidden="true"></div>
+                <div class="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-site-accent-soft blur-[100px]" aria-hidden="true"></div>
 
                 <div class="relative z-10">
                     @if (filled($homeFinalCtaHeading))
-                        <h2 class="font-headline mb-6 text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl lg:text-6xl">
+                        <h2 class="font-headline mb-6 text-4xl font-bold tracking-tight text-site-text md:text-5xl lg:text-6xl">
                             {{ $homeFinalCtaHeading }}
                         </h2>
                     @endif
 
                     @if (filled($homeFinalCtaText))
-                        <p class="mx-auto mb-10 max-w-2xl text-lg text-[#A1A1AA]">
+                        <p class="mx-auto mb-10 max-w-2xl text-lg text-site-muted">
                             {{ $homeFinalCtaText }}
                         </p>
                     @endif
@@ -492,12 +492,12 @@
     </section>
 
     <!-- Quick Info Section -->
-    <section class="border-t border-white/5 bg-[#0A0A0F] py-12">
+    <section class="border-t border-site-line bg-site py-12">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
             <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
                 <div class="flex items-center gap-4">
-                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#DC2626]/10">
-                        <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-site-accent-soft">
+                        <svg class="h-5 w-5 text-site-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -514,11 +514,11 @@
                     </div>
                     <div>
                         @if (filled($contact->address))
-                            <div class="text-sm font-semibold text-[#FAFAFA]">{{ $contact->address }}</div>
+                            <div class="text-sm font-semibold text-site-text">{{ $contact->address }}</div>
                         @endif
 
                         @if ($contact->openingHours()->isNotEmpty())
-                            <div class="text-xs text-[#A1A1AA]">
+                            <div class="text-xs text-site-muted">
                                 {{ $contact->openingHours()->implode(' | ') }}
                             </div>
                         @endif
@@ -527,8 +527,8 @@
 
                 @if ($contact->hasPhone())
                     <div class="flex items-center gap-4">
-                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#DC2626]/10">
-                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-site-accent-soft">
+                            <svg class="h-5 w-5 text-site-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
@@ -540,9 +540,9 @@
                         <div>
                             <a
                                 href="{{ $contact->telHref($contact->primaryPhone) }}"
-                                class="text-sm font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                class="text-sm font-semibold text-site-text transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             >{{ $contact->primaryPhone }}</a>
-                            <div class="text-xs text-[#A1A1AA]">{{ __('site.home.quick_info_call_hint') }}</div>
+                            <div class="text-xs text-site-muted">{{ __('site.home.quick_info_call_hint') }}</div>
                         </div>
                     </div>
                 @endif
@@ -784,12 +784,12 @@
         >
             <div
                 id="mobile-sticky-inner"
-                class="flex translate-y-3 items-center gap-2 rounded-full border border-white/10 bg-[#0A0A0F]/85 p-1.5 opacity-0 shadow-2xl shadow-black/50 backdrop-blur-xl transition-all duration-300 ease-out"
+                class="flex translate-y-3 items-center gap-2 rounded-full border border-site-line-strong bg-site-glass p-1.5 opacity-0 shadow-2xl shadow-black/50 backdrop-blur-xl transition-all duration-300 ease-out"
             >
                 @if ($contact->hasPhone())
                     <a
                         href="{{ $contact->telHref($contact->primaryPhone) }}"
-                        class="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-[#DC2626] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-[#DC2626]/30 transition-all hover:bg-[#B91C1C] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                        class="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-site-accent px-4 py-3 text-sm font-bold text-white shadow-lg shadow-[#DC2626]/30 transition-all hover:bg-site-accent-hover active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                     >
                         <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
@@ -803,7 +803,7 @@
                         href="{{ $contact->whatsappHref() }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-white/5 px-4 py-3 text-sm font-bold text-[#FAFAFA] transition-all hover:border-emerald-400/50 hover:bg-emerald-400/10 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
+                        class="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-site-fill px-4 py-3 text-sm font-bold text-site-text transition-all hover:border-emerald-400/50 hover:bg-emerald-400/10 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
                     >
                         <svg class="h-5 w-5 flex-shrink-0 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>

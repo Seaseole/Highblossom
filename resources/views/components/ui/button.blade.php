@@ -1,39 +1,70 @@
+{{--
+    Button. `variant` and `size` are the only two axes; something that looks like a
+    button but navigates passes `href` and renders an <a>.
+
+    Look and feel live in `.ui-btn` (resources/css/auth.css) so the Alpine-driven
+    screens can reuse the same styling on a plain element.
+
+    Pass a `loading` label and the button wires itself to the vanilla pending
+    mechanism in resources/js/submit-pending.js: it opts into
+    data-submit-pending-button, marks its own idle content, and swaps to the
+    spinner + label while the browser navigates. That script — not wire:loading —
+    is what the auth forms use, because they are plain POST forms with no Livewire
+    component behind them.
+--}}
 @props([
     'variant' => 'primary',
     'size' => 'md',
+    'block' => false,
+    'href' => null,
     'type' => 'button',
-    'icon' => null,
     'disabled' => false,
+    'loading' => null,
+    'icon' => null,
 ])
 
 @php
-    $variantClasses = match ($variant) {
-        'primary' => 'bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-lg shadow-[#DC2626]/20 hover:shadow-xl hover:shadow-[#DC2626]/30',
-        'secondary' => 'bg-[#16161D] hover:bg-[#1a1a24] text-[#FAFAFA] border border-white/10',
-        'danger' => 'bg-red-600 hover:bg-red-700 text-white',
-        'ghost' => 'bg-transparent hover:bg-white/5 text-[#FAFAFA] border border-white/10',
-        default => 'bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-lg shadow-[#DC2626]/20 hover:shadow-xl hover:shadow-[#DC2626]/30',
-    };
+    $variants = ['primary', 'secondary', 'ghost'];
+    $variant = in_array($variant, $variants, true) ? $variant : 'primary';
 
-    $sizeClasses = match ($size) {
-        'sm' => 'px-3 py-1.5 text-xs',
-        'md' => 'px-6 py-2.5 text-sm',
-        'lg' => 'px-8 py-3.5 text-base',
-        default => 'px-6 py-2.5 text-sm',
-    };
+    $classes = 'ui-btn ui-btn-'.$variant
+       .(in_array($size, ['sm', 'lg'], true) ? ' ui-btn-'.$size : '')
+       .($block ? ' ui-btn-block' : '');
 
-    $baseClasses = 'inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 ease-out-expo hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:active:scale-100';
+    $spinner = '<svg class="size-[1.05em] shrink-0 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">'
+        .'<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>'
+        .'<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>'
+        .'</svg>';
 @endphp
 
-<button {{
-    $attributes->merge([
-        'type' => $type,
-        'disabled' => $disabled,
-        'class' => "$baseClasses $variantClasses $sizeClasses",
-    ])
-}}>
-    @if ($icon)
-        <x-ui.icon :name="$icon" class="mr-2 h-4 w-4" />
-    @endif
-    {{ $slot }}
-</button>
+@if ($href)
+    <a href="{{ $href }}" {{ $attributes->class($classes) }}>
+        @if ($icon)
+            <x-ui.icon :name="$icon" size="sm" class="shrink-0" />
+        @endif
+        {{ $slot }}
+    </a>
+@else
+    <button
+        type="{{ $type }}"
+        {{ $attributes->class($classes) }}
+        @if ($disabled) disabled @endif
+        @if ($loading) data-submit-pending-button @endif
+    >
+        <span data-idle-state class="contents">
+            @if ($icon)
+                <x-ui.icon :name="$icon" size="sm" class="shrink-0" />
+            @endif
+            {{ $slot }}
+        </span>
+
+        @if ($loading)
+            <span data-pending-state class="hidden">
+                <span class="inline-flex items-center gap-2">
+                    {!! $spinner !!}
+                    {{ $loading }}
+                </span>
+            </span>
+        @endif
+    </button>
+@endif

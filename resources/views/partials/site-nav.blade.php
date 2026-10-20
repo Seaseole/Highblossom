@@ -1,6 +1,6 @@
 <nav
     id="public-main-nav"
-    class="sticky top-0 z-40 flex w-full flex-col border-b border-white/5 bg-[#0A0A0F]/90 backdrop-blur-xl"
+    class="sticky top-0 z-40 flex w-full flex-col border-b border-site-line bg-site-glass backdrop-blur-xl"
 >
     @php
         $isAnnounceActive = $announcementActive ?? $settings->get('announcement_active', false);
@@ -173,6 +173,8 @@
 
         {{-- Right Side Actions --}}
         <div class="flex items-center gap-4">
+            <x-site.theme-toggle />
+
             @if (request()->routeIs('blog', 'blog.show'))
                 {{-- Blog palette trigger, below lg only: on desktop the shortcut and
                      the in-page search bar cover it, and the header has better things
@@ -183,9 +185,9 @@
                     x-cloak
                     @click="$dispatch('blog-search:open', { trigger: $el })"
                     aria-label="Search the blog"
-                    class="flex min-h-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 p-2.5 text-[#A1A1AA] transition-colors hover:border-[#DC2626]/40 hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60 lg:hidden"
+                    class="flex min-h-[44px] items-center justify-center rounded-full border border-site-line-strong bg-site-fill p-2.5 text-site-muted transition-colors hover:border-site-accent/40 hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60 lg:hidden"
                 >
-                    <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg class="h-5 w-5 text-site-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </button>
@@ -196,9 +198,9 @@
                 @if ($contact->hasPhone())
                     <a
                         href="{{ $contact->telHref($contact->primaryPhone) }}"
-                        class="flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                        class="flex min-h-[44px] items-center gap-2 text-sm font-semibold text-site-text transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                     >
-                        <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg class="h-5 w-5 text-site-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                         </svg>
                         <span>{{ $contact->primaryPhone }}</span>
@@ -209,7 +211,7 @@
                         href="{{ $contact->whatsappHref() }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="flex min-h-[44px] items-center justify-center rounded-full border border-emerald-400/25 bg-white/5 px-3 text-[#FAFAFA] transition-colors hover:border-emerald-400/50 hover:bg-emerald-400/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                        class="flex min-h-[44px] items-center justify-center rounded-full border border-emerald-400/25 bg-site-fill px-3 text-site-text transition-colors hover:border-emerald-400/50 hover:bg-emerald-400/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
                         title="WhatsApp"
                     >
                         <span class="sr-only">{{ __('site.home.cta_band_whatsapp') }}</span>
@@ -227,7 +229,7 @@
                         href="{{ $facebookUrl }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                        class="text-site-muted transition-colors hover:text-site-link"
                         title="Facebook"
                     >
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -240,7 +242,7 @@
                         href="{{ $instagramUrl }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                        class="text-site-muted transition-colors hover:text-site-link"
                         title="Instagram"
                     >
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -253,7 +255,7 @@
                         href="{{ $linkedinUrl }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                        class="text-site-muted transition-colors hover:text-site-link"
                         title="LinkedIn"
                     >
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -267,14 +269,14 @@
                 @auth
                     <a
                         href="{{ route('dashboard') }}"
-                        class="font-headline hidden text-sm font-semibold text-[#A1A1AA] transition-colors hover:text-[#FAFAFA] lg:block"
+                        class="font-headline hidden text-sm font-semibold text-site-muted transition-colors hover:text-site-text lg:block"
                     >
                         Dashboard
                     </a>
                 @else
                     <a
                         href="{{ route('login') }}"
-                        class="font-headline hidden text-sm font-semibold text-[#A1A1AA] transition-colors hover:text-[#FAFAFA] lg:block"
+                        class="font-headline hidden text-sm font-semibold text-site-muted transition-colors hover:text-site-text lg:block"
                     >
                         Log in
                     </a>
@@ -284,7 +286,7 @@
             {{-- Mobile Menu Button --}}
             <button
                 id="mobile-menu-btn"
-                class="p-2 text-[#FAFAFA] transition-colors hover:text-[#DC2626] md:hidden"
+                class="p-2 text-site-text transition-colors hover:text-site-link md:hidden"
                 aria-label="Toggle menu"
                 aria-expanded="false"
                 aria-controls="mobile-menu"
@@ -300,17 +302,17 @@
 {{-- Mobile Menu --}}
 <div
     id="mobile-menu"
-    class="mobile-menu fixed top-0 right-0 z-[60] h-[100dvh] w-full max-w-sm border-l border-white/10 bg-[#121218]"
+    class="mobile-menu fixed top-0 right-0 z-[60] h-[100dvh] w-full max-w-sm border-l border-site-line-strong bg-site-surface"
     aria-hidden="true"
     aria-label="Mobile navigation menu"
 >
     <div class="flex h-full flex-col">
         {{-- Mobile Header --}}
-        <div class="flex flex-shrink-0 items-center justify-between border-b border-white/10 px-6 py-4">
-            <span class="font-headline text-lg font-bold text-[#FAFAFA]">Menu</span>
+        <div class="flex flex-shrink-0 items-center justify-between border-b border-site-line-strong px-6 py-4">
+            <span class="font-headline text-lg font-bold text-site-text">Menu</span>
             <button
                 id="mobile-menu-close"
-                class="p-2 text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                class="p-2 text-site-muted transition-colors hover:text-site-text"
                 aria-label="Close menu"
             >
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +327,7 @@
                 href="{{ route('home') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('home') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('home') ? 'text-site-link' : '' }}"
             >
                 Home
             </a>
@@ -333,7 +335,7 @@
                 href="{{ route('about-us') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('about-us') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('about-us') ? 'text-site-link' : '' }}"
             >
                 About Us
             </a>
@@ -341,7 +343,7 @@
                 href="{{ route('services') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('services') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('services') ? 'text-site-link' : '' }}"
             >
                 Services
             </a>
@@ -349,7 +351,7 @@
                 href="{{ route('gallery') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('gallery') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('gallery') ? 'text-site-link' : '' }}"
             >
                 Gallery
             </a>
@@ -357,7 +359,7 @@
                 href="{{ route('blog') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('blog') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('blog') ? 'text-site-link' : '' }}"
             >
                 Blog
             </a>
@@ -365,7 +367,7 @@
                 href="{{ route('quote') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="mt-2 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#DC2626] px-6 text-base font-bold text-white transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
+                class="mt-2 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-site-accent px-6 text-base font-bold text-white transition-all hover:bg-site-accent-hover active:scale-[0.98]"
             >
                 {{ __('site.get_quote') }}
             </a>
@@ -373,7 +375,7 @@
                 href="{{ route('bookings.create') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-base font-bold text-[#FAFAFA] transition-all hover:border-[#DC2626]/40 hover:bg-[#DC2626]/10 active:scale-[0.98]"
+                class="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-site-line-strong bg-site-fill px-6 text-base font-bold text-site-text transition-all hover:border-site-accent/40 hover:bg-site-accent-soft active:scale-[0.98]"
             >
                 {{ __('site.book_appointment') }}
             </a>
@@ -383,9 +385,9 @@
                         <a
                             href="{{ $contact->telHref($contact->primaryPhone) }}"
                             onclick="closeMobileMenu()"
-                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 text-sm font-bold text-[#FAFAFA] transition-colors hover:border-[#DC2626]/40"
+                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-site-line-strong bg-site-fill px-4 text-sm font-bold text-site-text transition-colors hover:border-site-accent/40"
                         >
-                            <svg class="h-5 w-5 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg class="h-5 w-5 text-site-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                             </svg>
                             <span>{{ __('site.home.sticky_call') }}</span>
@@ -397,7 +399,7 @@
                             onclick="closeMobileMenu()"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-white/5 px-4 text-sm font-bold text-[#FAFAFA] transition-colors hover:border-emerald-400/50"
+                            class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-site-fill px-4 text-sm font-bold text-site-text transition-colors hover:border-emerald-400/50"
                         >
                             <svg class="h-5 w-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
@@ -411,20 +413,24 @@
                 href="{{ route('contact') }}"
                 onclick="closeMobileMenu()"
                 wire:navigate
-                class="text-2xl font-headline font-bold text-[#FAFAFA] hover:text-[#DC2626] transition-colors {{ request()->routeIs('contact') ? 'text-[#DC2626]' : '' }}"
+                class="text-2xl font-headline font-bold text-site-text hover:text-site-link transition-colors {{ request()->routeIs('contact') ? 'text-site-link' : '' }}"
             >
                 Contact
             </a>
         </div>
 
         {{-- Mobile Footer --}}
-        <div class="flex-shrink-0 border-t border-white/10 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div class="flex-shrink-0 border-t border-site-line-strong px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+            <div class="mb-5 flex items-center justify-between">
+                <span class="font-headline text-sm font-semibold tracking-tight text-site-muted uppercase">Appearance</span>
+                <x-site.theme-toggle />
+            </div>
             @if (Route::has('login'))
                 @auth
                     <a
                         href="{{ route('dashboard') }}"
                         onclick="closeMobileMenu()"
-                        class="flex w-full items-center justify-center gap-3 rounded-full bg-[#DC2626] px-6 py-3.5 text-base font-bold text-white transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
+                        class="flex w-full items-center justify-center gap-3 rounded-full bg-site-accent px-6 py-3.5 text-base font-bold text-white transition-all hover:bg-site-accent-hover active:scale-[0.98]"
                     >
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -435,7 +441,7 @@
                     <a
                         href="{{ route('login') }}"
                         onclick="closeMobileMenu()"
-                        class="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-base font-bold text-[#FAFAFA] transition-all hover:border-[#DC2626]/40 hover:bg-[#DC2626]/10 active:scale-[0.98]"
+                        class="flex w-full items-center justify-center gap-3 rounded-full border border-site-line-strong bg-site-fill px-6 py-3.5 text-base font-bold text-site-text transition-all hover:border-site-accent/40 hover:bg-site-accent-soft active:scale-[0.98]"
                     >
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
@@ -446,7 +452,7 @@
                         <a
                             href="{{ route('register') }}"
                             onclick="closeMobileMenu()"
-                            class="mt-3 block text-center text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                            class="mt-3 block text-center text-sm font-medium text-site-muted transition-colors hover:text-site-text"
                         >
                             Need an account? Register
                         </a>

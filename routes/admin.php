@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\InspectionController;
 use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\PasswordPolicyController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProfileSessionController;
@@ -68,6 +69,10 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     // Settings
     Route::get('settings', [CompanySettingController::class, 'index'])->middleware('can:view settings')->name('settings.index');
     Route::put('settings', [CompanySettingController::class, 'update'])->middleware('can:update settings')->name('settings.update');
+
+    // Security: the password rules every password form is held to
+    Route::get('security', [PasswordPolicyController::class, 'index'])->middleware('can:view settings')->name('password-policy.index');
+    Route::put('security', [PasswordPolicyController::class, 'update'])->middleware('can:update settings')->name('password-policy.update');
 
     // Application versions
     Route::get('versions', [ApplicationVersionController::class, 'index'])->middleware('can:manage versions')->name('versions.index');

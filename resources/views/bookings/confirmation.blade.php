@@ -10,7 +10,7 @@
 
 <x-layouts::site>
     <div class="booking-flow">
-        <section class="relative bg-[#0A0A0F] pt-28 pb-24">
+        <section class="relative bg-site pt-28 pb-24">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl">
                     <div class="mb-8 flex flex-col items-center text-center">
@@ -20,7 +20,7 @@
                             </svg>
                         </div>
 
-                        <h1 class="mb-3 font-headline text-4xl font-bold tracking-tight leading-[1.1] text-[#FAFAFA] md:text-5xl">
+                        <h1 class="mb-3 font-headline text-4xl font-bold tracking-tight leading-[1.1] text-site-text md:text-5xl">
                             {{ __('confirmation.title') }}
                         </h1>
                         <p class="text-base leading-relaxed text-[var(--booking-muted)] md:text-lg">
@@ -37,7 +37,7 @@
                         <dl class="divide-y divide-[var(--booking-line)] text-sm">
                             <div class="flex items-start justify-between gap-6 px-6 py-4">
                                 <dt class="shrink-0 text-[var(--booking-muted)]">{{ __('booking.review_vehicle') }}</dt>
-                                <dd class="text-right font-medium text-[#FAFAFA]">
+                                <dd class="text-right font-medium text-site-text">
                                     {{ $booking->service_type?->label() ?? __('confirmation.tbc') }}
                                     @if ($booking->damage_type)
                                         <span class="block text-xs font-normal text-[var(--booking-muted)]">{{ $booking->damage_type->label() }}</span>
@@ -47,7 +47,7 @@
 
                             <div class="flex items-start justify-between gap-6 px-6 py-4">
                                 <dt class="shrink-0 text-[var(--booking-muted)]">{{ __('booking.vehicle_heading') }}</dt>
-                                <dd class="text-right font-medium text-[#FAFAFA]">
+                                <dd class="text-right font-medium text-site-text">
                                     {{ $booking->vehicleSummary() }}
                                     @if ($booking->vehicle_details)
                                         <span class="block text-xs font-normal text-[var(--booking-muted)]">{{ $booking->vehicle_details }}</span>
@@ -57,7 +57,7 @@
 
                             <div class="flex items-start justify-between gap-6 px-6 py-4">
                                 <dt class="shrink-0 text-[var(--booking-muted)]">{{ __('confirmation.scheduled_date') }}</dt>
-                                <dd class="text-right font-medium text-[#FAFAFA] tnum">
+                                <dd class="text-right font-medium text-site-text tnum">
                                     {{ $booking->scheduled_at ? $booking->scheduled_at->format(($dateFormat ?? 'd/M/Y') . ' ' . ($timeFormat ?? 'H:i')) : __('confirmation.tbc') }}
                                     @if ($booking->ends_at)
                                         <span class="block text-xs font-normal text-[var(--booking-muted)]">
@@ -70,7 +70,7 @@
 
                             <div class="flex items-start justify-between gap-6 px-6 py-4">
                                 <dt class="shrink-0 text-[var(--booking-muted)]">{{ __('confirmation.location') }}</dt>
-                                <dd class="text-right font-medium text-[#FAFAFA]">
+                                <dd class="text-right font-medium text-site-text">
                                     {{ $booking->location === 'mobile' ? __('booking.location_mobile') : __('booking.location_workshop') }}
                                     @if ($booking->location === 'mobile' && $booking->client_address)
                                         <span class="block text-xs font-normal text-[var(--booking-muted)]">{{ $booking->client_address }}</span>
@@ -80,7 +80,7 @@
 
                             <div class="flex items-start justify-between gap-6 px-6 py-4">
                                 <dt class="shrink-0 text-[var(--booking-muted)]">{{ __('confirmation.confirmation_email') }}</dt>
-                                <dd class="text-right font-medium text-[#FAFAFA]">
+                                <dd class="text-right font-medium text-site-text">
                                     {{ $booking->client_email }}
                                     <span class="block text-xs font-normal text-[var(--booking-muted)] tnum">{{ $booking->client_phone }}</span>
                                 </dd>
@@ -105,7 +105,7 @@
                                 href="{{ $contact->whatsappHref($whatsappMessage) }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-[var(--booking-line)] bg-white/[0.04] px-6 text-sm font-semibold text-[#FAFAFA] transition-colors hover:bg-white/[0.09]"
+                                class="inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-[var(--booking-line)] bg-[var(--booking-fill)] px-6 text-sm font-semibold text-site-text transition-colors hover:bg-[var(--booking-fill-hover)]"
                             >
                                 <svg class="h-4 w-4 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z" />
@@ -117,7 +117,7 @@
 
                     @if ($booking->events->isNotEmpty())
                         <div class="mb-10 rounded-3xl border border-[var(--booking-line)] bg-[var(--booking-panel)] p-6 md:p-8">
-                            <h2 class="mb-1 font-headline text-xl font-bold tracking-tight text-[#FAFAFA]">
+                            <h2 class="mb-1 font-headline text-xl font-bold tracking-tight text-site-text">
                                 {{ __('confirmation.progress') }}
                             </h2>
                             <p class="mb-6 text-sm text-[var(--booking-muted)]">{{ __('confirmation.progress_description') }}</p>
@@ -134,7 +134,7 @@
                                             @endunless
                                         </div>
                                         <div class="pb-1">
-                                            <p class="text-sm font-semibold text-[#FAFAFA]">
+                                            <p class="text-sm font-semibold text-site-text">
                                                 {{ __('confirmation.event_'.$event->type) }}
                                             </p>
                                             <p class="text-xs text-[var(--booking-muted)] tnum">

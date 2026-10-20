@@ -1,8 +1,8 @@
 @props(['label', 'step' => null, 'last' => false])
 
 <div {{ $attributes->merge(['class' => 'flex items-start justify-between gap-6 py-4 '.($last ? '' : 'border-b border-[var(--booking-line)]')]) }}>
-    <dt class="shrink-0 text-[11px] font-semibold tracking-[0.12em] text-white/35 uppercase">{{ $label }}</dt>
-    <dd class="min-w-0 flex-1 text-right text-sm font-medium text-[#FAFAFA]">
+    <dt class="shrink-0 text-[11px] font-semibold tracking-[0.12em] text-site-text/35 uppercase">{{ $label }}</dt>
+    <dd class="min-w-0 flex-1 text-right text-sm font-medium text-site-text">
         {{ $slot }}
     </dd>
 

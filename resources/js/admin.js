@@ -1,5 +1,6 @@
 import collapse from '@alpinejs/collapse';
 import { Passkeys } from '@laravel/passkeys';
+import './password-rules';
 
 console.log('Admin JS: Script loaded');
 

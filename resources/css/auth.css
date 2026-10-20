@@ -1,0 +1,277 @@
+/* ============================================================================
+   Design language v1 — scoped rules.
+
+   app.css is one bundle shared by the public site, the admin panel and these
+   pages, and it carries *unlayered* global rules (most importantly
+   `*:focus-visible`). Unlayered CSS beats Tailwind's `@layer utilities`, so a
+   `focus:ring-*` class on a new control would silently lose to it.
+
+   Everything here is therefore (a) unlayered, so it can win, and (b) scoped
+   under `.hb-ui`, so it can never reach a page that has not opted into this
+   language. A page opts in by rendering through layouts/base, which puts that
+   class on <body>. Nothing in this file targets a bare element selector.
+
+   The .ui-field / .ui-btn classes are the authoritative control styling — the
+   Blade components emit them rather than assembling utility strings, because a
+   screen driven by Alpine bindings (the two-factor challenge) has to put those
+   bindings on plain elements: `:disabled="expr"` on a Blade tag compiles as PHP.
+   To change how a control looks, change it here, once. To override an instance,
+   use the component prop — a utility class will not beat these rules.
+   ========================================================================== */
+
+.hb-ui {
+    /* Motion. Durations are raw custom properties rather than @theme entries:
+       transition-duration is not a Tailwind theme namespace, so utilities would
+       only accept these as arbitrary values anyway. */
+    --ui-dur-fast: 120ms;
+    --ui-dur-base: 180ms;
+    --ui-dur-slow: 240ms;
+    --ui-dur-enter: 320ms;
+
+    /* x-ui.checkbox already reads these two hooks. Setting them here replaces the
+       `.light-checkbox … !important` block the old auth layout needed, and leaves
+       the 43 admin usages of that component untouched. */
+    --checkbox-label: var(--color-ui-muted);
+    --checkbox-label-hover: var(--color-ui-text);
+
+    min-height: 100dvh;
+    font-family: var(--font-ui-sans);
+    background-color: var(--color-ui-bg);
+    color: var(--color-ui-text);
+    -webkit-font-smoothing: antialiased;
+    transition:
+        background-color var(--ui-dur-base) var(--ease-ui-out),
+        color var(--ui-dur-base) var(--ease-ui-out);
+}
+
+.hb-ui ::selection {
+    background-color: var(--color-ui-accent);
+    color: var(--color-ui-accent-ink);
+}
+
+/* Focus. The ring is a box-shadow so it sits outside a rounded control without
+   repainting its radius — the global rule this replaces set `border-radius: 6px`
+   on focus, which nudged every control it touched. */
+.hb-ui :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-ui-focus);
+}
+
+/* --------------------------------------------------------------------------
+   Fields
+   -------------------------------------------------------------------------- */
+.hb-ui .ui-field {
+    display: block;
+    width: 100%;
+    padding: 0.6875rem 0.875rem;
+    font-family: inherit;
+    font-size: var(--text-ui-md);
+    line-height: var(--text-ui-md--line-height);
+    color: var(--color-ui-text);
+    background-color: var(--color-ui-surface);
+    border: 1px solid var(--color-ui-line-strong);
+    border-radius: var(--radius-ui-md);
+    box-shadow: var(--shadow-ui-xs);
+    caret-color: var(--color-ui-accent);
+    transition:
+        border-color var(--ui-dur-fast) var(--ease-ui-out),
+        background-color var(--ui-dur-fast) var(--ease-ui-out);
+}
+
+.hb-ui .ui-field::placeholder {
+    color: var(--color-ui-muted);
+}
+
+.hb-ui .ui-field:hover:not(:disabled):not([aria-invalid='true']) {
+    border-color: var(--color-ui-faint);
+}
+
+.hb-ui .ui-field:focus {
+    border-color: var(--color-ui-accent);
+}
+
+/* x-ui.input marks the control from the validation key, so an errored field is
+   red without the view repeating $errors->has(). */
+.hb-ui .ui-field[aria-invalid='true'] {
+    border-color: var(--color-ui-danger);
+}
+
+.hb-ui .ui-field:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Recovery codes read as centred, tracked groups. Tabular figures rather than a
+   mono stack: the language is one family, and digit width is all this needs. */
+.hb-ui .ui-field-code {
+    text-align: center;
+    letter-spacing: 0.22em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.hb-ui .ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.125rem;
+    font-family: inherit;
+    font-size: var(--text-ui-md);
+    line-height: 1.25rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+    border: 1px solid transparent;
+    border-radius: var(--radius-ui-md);
+    cursor: pointer;
+    user-select: none;
+    transition:
+        background-color var(--ui-dur-fast) var(--ease-ui-out),
+        border-color var(--ui-dur-fast) var(--ease-ui-out),
+        color var(--ui-dur-fast) var(--ease-ui-out),
+        transform var(--ui-dur-fast) var(--ease-ui-out);
+}
+
+.hb-ui .ui-btn:active:not(:disabled) {
+    transform: scale(0.99);
+}
+
+.hb-ui .ui-btn:disabled,
+.hb-ui .ui-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* submit-pending.js sets aria-busy while the browser navigates. */
+.hb-ui .ui-btn[aria-busy='true'] {
+    cursor: wait;
+}
+
+.hb-ui .ui-btn-primary {
+    background-color: var(--color-ui-accent);
+    color: var(--color-ui-accent-ink);
+}
+
+.hb-ui .ui-btn-primary:hover:not(:disabled) {
+    background-color: var(--color-ui-accent-hover);
+}
+
+.hb-ui .ui-btn-secondary {
+    background-color: var(--color-ui-surface);
+    border-color: var(--color-ui-line-strong);
+    color: var(--color-ui-text);
+}
+
+.hb-ui .ui-btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-ui-surface-raised);
+    border-color: var(--color-ui-faint);
+}
+
+.hb-ui .ui-btn-ghost {
+    background-color: transparent;
+    color: var(--color-ui-muted);
+}
+
+.hb-ui .ui-btn-ghost:hover:not(:disabled) {
+    background-color: var(--color-ui-accent-soft);
+    color: var(--color-ui-text);
+}
+
+.hb-ui .ui-btn-sm {
+    padding: 0.5rem 0.875rem;
+    font-size: var(--text-ui-sm);
+    line-height: 1.125rem;
+}
+
+.hb-ui .ui-btn-lg {
+    padding: 0.875rem 1.25rem;
+    font-size: var(--text-ui-lg);
+    line-height: 1.5rem;
+}
+
+.hb-ui .ui-btn-block {
+    width: 100%;
+}
+
+/* One entrance for the card, not a five-stage stagger. */
+@keyframes ui-rise {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.ui-rise {
+    animation: ui-rise var(--ui-dur-enter) var(--ease-ui-out) both;
+}
+
+/* The two-factor code boxes blink a caret while the real input stays invisible. */
+@keyframes ui-caret {
+    50% {
+        opacity: 0;
+    }
+}
+
+.ui-caret {
+    animation: ui-caret 1s step-end infinite;
+}
+
+.hb-ui [x-cloak] {
+    display: none !important;
+}
+
+/* Tabular figures so a changing 6-digit code does not reflow its boxes. */
+.ui-num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Brand panel. The grid and tint are separate absolute layers so the copy above
+   them never inherits a blend mode, and both are decoration — the markup that
+   adds them carries aria-hidden. */
+.hb-ui .ui-panel {
+    background-color: var(--color-ui-panel);
+    color: var(--color-ui-on-panel);
+    border-right: 1px solid var(--color-ui-on-panel-line);
+}
+
+.hb-ui .ui-panel-grid {
+    background-image:
+        repeating-linear-gradient(to right, var(--color-ui-on-panel-line) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(to bottom, var(--color-ui-on-panel-line) 0 1px, transparent 1px 72px);
+    opacity: 0.55;
+    -webkit-mask-image: radial-gradient(125% 95% at 15% 100%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(125% 95% at 15% 100%, #000 0%, transparent 72%);
+}
+
+.hb-ui .ui-panel-tint {
+    background: radial-gradient(72% 58% at 12% 98%, var(--color-ui-panel-tint), transparent 66%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hb-ui *,
+    .hb-ui *::before,
+    .hb-ui *::after {
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* `1ms` still lands the entrance on its final frame, but a keyframe that
+       starts transparent needs pinning for anything never animated in at all. */
+    .ui-rise {
+        opacity: 1;
+        transform: none;
+    }
+
+    .ui-caret {
+        animation: none;
+    }
+}

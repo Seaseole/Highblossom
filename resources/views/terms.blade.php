@@ -3,7 +3,7 @@
         <h1 class="mb-8 text-4xl font-bold">Terms and Conditions for Highblossom (Pty) Ltd</h1>
         <p class="mb-8 text-gray-400">Last Updated: June 2, 2026</p>
 
-        <div class="prose prose-invert max-w-none">
+        <div class="prose max-w-none">
             <p>
                 Welcome to Highblossom (Pty) Ltd ("we," "us," or "our"). These Terms and Conditions ("Terms") govern
                 your use of our website located at https://highblossom.net (the "Site") and

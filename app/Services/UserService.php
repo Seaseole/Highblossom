@@ -18,6 +18,7 @@ final class UserService
     {
         $user = User::create([
             'name' => $data['name'],
+            'username' => $data['username'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
@@ -36,6 +37,9 @@ final class UserService
     {
         $user->update([
             'name' => $data['name'],
+            // `validated()` omits a key the form never sent, so an absent username means
+            // "leave it alone" rather than "clear it".
+            'username' => $data['username'] ?? $user->username,
             'email' => $data['email'],
         ]);
 

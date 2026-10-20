@@ -9,9 +9,9 @@
 {{-- Only renders with at least one real logo; the row centres and wraps from
      one to eight marks without leaving gaps. --}}
 @if ($partners->isNotEmpty())
-    <section class="bg-[#0A0A0F] py-14 lg:py-20" aria-label="{{ __('site.home.trusted_by') }}">
+    <section class="bg-site py-14 lg:py-20" aria-label="{{ __('site.home.trusted_by') }}">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
-            <p class="mb-10 text-center text-[10px] font-bold tracking-[0.2em] text-[#A1A1AA] uppercase">
+            <p class="mb-10 text-center text-[10px] font-bold tracking-[0.2em] text-site-muted uppercase">
                 {{ __('site.home.trusted_by') }}
             </p>
 

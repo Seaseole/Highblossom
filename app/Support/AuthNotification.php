@@ -14,8 +14,9 @@ use Illuminate\Support\ViewErrorBag;
  * Fortify reports credential and lockout failures on the email key
  * (AttemptToAuthenticate, LockoutResponse), so a bag key cannot tell a page-level
  * "these credentials do not match" apart from a plain "the email is required".
- * The split is made on the translated message instead, which keeps the banner and
- * the inline hints from showing the same sentence twice.
+ * The split is made on the translated message instead: page-level sentences take the
+ * banner, anything else stays under its own input, and a bag of only field-level
+ * sentences gets a neutral summary so the reload is never silent.
  */
 final class AuthNotification
 {
@@ -80,7 +81,14 @@ final class AuthNotification
 
         $pageLevel = array_values(array_filter($messages, fn (string $message): bool => self::isPageLevel($message)));
 
-        return ['type' => 'error', 'message' => $pageLevel[0] ?? $messages[0]];
+        if ($pageLevel !== []) {
+            return ['type' => 'error', 'message' => $pageLevel[0]];
+        }
+
+        // The bag holds only field-level sentences, so the banner says that something
+        // needs attention and each field keeps its own fix. Promoting one of them here
+        // used to leave its box red with nothing written under it.
+        return ['type' => 'error', 'message' => __('auth.ui.fix_highlighted_fields')];
     }
 
     /**
@@ -90,11 +98,9 @@ final class AuthNotification
      */
     public static function fieldMessages(string $field): array
     {
-        $banner = self::fromSession()['message'] ?? null;
-
         return array_values(array_filter(
             self::bag()->get($field),
-            fn (string $message): bool => $message !== $banner && ! self::isPageLevel($message)
+            fn (string $message): bool => ! self::isPageLevel($message)
         ));
     }
 

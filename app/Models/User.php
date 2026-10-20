@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\Theme;
+use App\Support\Username;
 use Database\Factories\UserFactory;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,7 +22,7 @@ use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'theme', 'avatar_path', 'terms_accepted_at', 'privacy_accepted_at'])]
+#[Fillable(['name', 'username', 'email', 'phone', 'password', 'theme', 'avatar_path', 'terms_accepted_at', 'privacy_accepted_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 /**
  * The authenticatable user model with roles, passkeys, and two-factor authentication.
@@ -45,6 +47,22 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'password' => 'hashed',
             'theme' => Theme::class,
         ];
+    }
+
+    /**
+     * Normalise the username on the way in, so the column only ever holds the lowercase
+     * form of what was typed.
+     *
+     * Done here rather than in each form because there are four ways a username arrives —
+     * registration, the profile page, the two admin user screens and the backfill command —
+     * and a mixed-case value stored by any one of them would be reachable case-insensitively
+     * while the unique index had promised the other spelling was still available.
+     */
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value): ?string => $value === null ? null : Username::normalize($value),
+        );
     }
 
     /**

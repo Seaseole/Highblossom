@@ -13,7 +13,7 @@
     $base = $isLarge
         ? 'min-h-[52px] px-7 py-3.5 text-base'
         : 'min-h-[44px] px-5 py-3 text-sm sm:text-base';
-    $focus = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0F]';
+    $focus = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent focus-visible:ring-offset-2 focus-visible:ring-offset-site';
 @endphp
 
 <div {{ $attributes->merge(['class' => 'flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center']) }}>

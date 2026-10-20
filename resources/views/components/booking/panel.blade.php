@@ -8,7 +8,7 @@
     @endif
 
     @if ($title)
-        <h2 class="font-headline text-xl font-bold tracking-tight text-[#FAFAFA] md:text-2xl">{{ $title }}</h2>
+        <h2 class="font-headline text-xl font-bold tracking-tight text-site-text md:text-2xl">{{ $title }}</h2>
     @endif
 
     @if ($description)

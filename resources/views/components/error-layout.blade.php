@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ $title }} - {{ $settings->get('company_name', 'Highblossom') }}</title>
     @include('partials.favicons')
+    @include('partials.theme-script')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,7 +35,7 @@
         }
     </style>
 </head>
-<body class="font-body flex min-h-screen flex-col bg-[#0A0A0F] text-[#FAFAFA] antialiased">
+<body class="font-body flex min-h-screen flex-col bg-site text-site-text antialiased">
     <!-- Logo -->
     <div class="px-6 py-8">
         <a href="/" class="group inline-flex items-center gap-3">
@@ -50,7 +51,7 @@
                     class="h-10 w-auto rounded-lg object-contain transition-transform duration-200 group-hover:scale-105"
                 />
             @else
-                <span class="font-headline text-2xl font-bold text-[#FAFAFA] transition-transform duration-200 group-hover:scale-105">
+                <span class="font-headline text-2xl font-bold text-site-text transition-transform duration-200 group-hover:scale-105">
                     {{ $logoText }}
                 </span>
             @endif
@@ -62,7 +63,7 @@
 
     <!-- Footer -->
     <footer class="px-6 py-6 text-center">
-        <p class="text-sm text-[#A1A1AA]">
+        <p class="text-sm text-site-muted">
             &copy; {{ date('Y') }} {{ $settings->get('company_name', 'Highblossom Pty Ltd') }}. All rights reserved.
         </p>
     </footer>

@@ -7,7 +7,7 @@
     $expandable = $detailed !== '' && $detailed !== $summary;
 @endphp
 
-<p class="mb-6 text-lg leading-relaxed text-[#A1A1AA]">{{ $service->short_description }}</p>
+<p class="mb-6 text-lg leading-relaxed text-site-muted">{{ $service->short_description }}</p>
 
 @if ($expandable)
     <div x-data="{ open: false }" class="-mt-2 mb-6">
@@ -16,7 +16,7 @@
             x-collapse
             x-cloak
             id="service-detail-{{ $service->id }}"
-            class="text-base leading-relaxed text-[#A1A1AA]"
+            class="text-base leading-relaxed text-site-muted"
         >{!! nl2br(e($detailed)) !!}</div>
 
         <button
@@ -24,7 +24,7 @@
             x-on:click="open = ! open"
             :aria-expanded="open ? 'true' : 'false'"
             aria-controls="service-detail-{{ $service->id }}"
-            class="inline-flex items-center gap-2 text-sm font-semibold text-[#DC2626] transition-opacity hover:opacity-80"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-site-link transition-opacity hover:opacity-80"
         >
             <span x-text="open ? '{{ __('services.show_less') }}' : '{{ __('services.read_more') }}'"></span>
             <svg

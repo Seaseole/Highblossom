@@ -71,6 +71,104 @@
     --color-admin-input-border: #d1d5db;
     --color-admin-accent: #dc2626;
 
+    /* Public site semantic tokens.
+       Light values live here; exact current-dark values are overridden under .dark
+       in the theme layer below, so dark mode renders pixel-identical to before. */
+    --color-site: #f7f5f3;
+    --color-site-surface: #ffffff;
+    --color-site-raised: #ffffff;
+    --color-site-sunken: #efece9;
+    --color-site-line: rgba(23, 18, 18, 0.1);
+    --color-site-line-strong: rgba(23, 18, 18, 0.18);
+    --color-site-text: #1a1414;
+    --color-site-muted: #57504e;
+    --color-site-faint: #6e6562;
+    --color-site-fill: rgba(23, 18, 18, 0.04);
+    --color-site-fill-hover: rgba(23, 18, 18, 0.08);
+    --color-site-accent: #dc2626;
+    --color-site-accent-hover: #b91c1c;
+    --color-site-accent-soft: rgba(220, 38, 38, 0.08);
+    --color-site-accent-ink: #ffffff;
+    --color-site-link: #b91c1c;
+    --color-site-link-hover: #991b1b;
+    --color-site-glass: rgba(255, 255, 255, 0.85);
+    --color-site-glass-border: rgba(23, 18, 18, 0.08);
+    --shadow-site:
+        0 1px 2px rgba(23, 18, 18, 0.05), 0 8px 24px -12px rgba(23, 18, 18, 0.12);
+    --shadow-site-raised:
+        0 2px 4px rgba(23, 18, 18, 0.04), 0 16px 40px -12px rgba(23, 18, 18, 0.16);
+
+    /* =======================================================================
+       Design language v1 — "ui" tokens.
+
+       Deliberately its own namespace, parallel to --color-site-*,
+       --color-admin-*, --booking-* and the Material-3 palette. Pages migrate by
+       switching layout, not by editing these, so an unmigrated page renders
+       exactly as before. Contrast ratios are stated because the tokens, not the
+       views, are what enforce accessibility.
+       ======================================================================= */
+    --font-ui-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    --color-ui-bg: #f7f5f3;
+    --color-ui-surface: #ffffff;
+    --color-ui-surface-raised: #fbfaf9;
+    --color-ui-line: rgba(23, 18, 18, 0.1);
+    --color-ui-line-strong: rgba(23, 18, 18, 0.2);
+    --color-ui-text: #1a1414; /* 16.4:1 on surface */
+    --color-ui-muted: #71717a; /* 4.6:1 — the only token allowed to carry copy */
+    --color-ui-faint: #9a9aa2; /* icons, disabled, decoration. Never text. */
+    --color-ui-accent: #dc2626;
+    --color-ui-accent-hover: #b91c1c;
+    --color-ui-accent-ink: #ffffff; /* 4.8:1 on accent */
+    --color-ui-accent-soft: rgba(220, 38, 38, 0.07);
+    --color-ui-link: #dc2626; /* 4.8:1 */
+    --color-ui-link-hover: #b91c1c;
+    --color-ui-danger: #b91c1c;
+    --color-ui-danger-soft: rgba(185, 28, 28, 0.07);
+    --color-ui-success: #047857;
+    --color-ui-success-soft: rgba(4, 120, 87, 0.08);
+    --color-ui-info: #0369a1;
+    --color-ui-info-soft: rgba(3, 105, 161, 0.08);
+    --color-ui-warning: #b45309;
+    --color-ui-warning-soft: rgba(180, 83, 9, 0.08);
+
+    /* Brand panel. Quiet graphite with the accent used only as detail: a
+       full-bleed saturated field would be the loudest thing on the page. */
+    --color-ui-panel: #1c1917;
+    --color-ui-panel-tint: rgba(220, 38, 38, 0.16);
+    --color-ui-on-panel: #fafaf9; /* 15.9:1 on panel */
+    --color-ui-on-panel-muted: rgba(250, 250, 249, 0.66);
+    --color-ui-on-panel-line: rgba(250, 250, 249, 0.13);
+
+    --text-ui-xs: 0.75rem;
+    --text-ui-xs--line-height: 1rem;
+    --text-ui-sm: 0.8125rem;
+    --text-ui-sm--line-height: 1.125rem;
+    --text-ui-md: 0.9375rem;
+    --text-ui-md--line-height: 1.375rem;
+    --text-ui-lg: 1.0625rem;
+    --text-ui-lg--line-height: 1.5rem;
+    --text-ui-xl: 1.25rem;
+    --text-ui-xl--line-height: 1.625rem;
+    --text-ui-2xl: 1.5rem;
+    --text-ui-2xl--line-height: 1.875rem;
+    --text-ui-3xl: 1.875rem;
+    --text-ui-3xl--line-height: 2.25rem;
+
+    --radius-ui-xs: 6px;
+    --radius-ui-sm: 8px;
+    --radius-ui-md: 12px;
+    --radius-ui-lg: 16px;
+    --radius-ui-xl: 20px;
+    --radius-ui-pill: 9999px;
+
+    --shadow-ui-xs: 0 1px 2px rgba(23, 18, 18, 0.05);
+    --shadow-ui-sm: 0 1px 2px rgba(23, 18, 18, 0.04), 0 4px 12px -6px rgba(23, 18, 18, 0.08);
+    --shadow-ui-card: 0 1px 2px rgba(23, 18, 18, 0.04), 0 12px 32px -16px rgba(23, 18, 18, 0.14);
+    --shadow-ui-focus: 0 0 0 3px var(--color-ui-accent-soft);
+
+    --ease-ui-out: cubic-bezier(0.22, 1, 0.36, 1);
+
     /* Custom Design Engineering Easings */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
@@ -87,50 +185,69 @@
 /*
  * Booking flow surface.
  *
- * Scoped to .booking-flow on purpose: the flow shares the site's dark theme and
- * its red accent, but keeps its own panel/line/muted values so the wizard and
- * confirmation cards stay one edit away from any future site-wide token sweep.
+ * Scoped to .booking-flow on purpose: the flow keeps its own panel/line/muted
+ * values per theme so the wizard and confirmation cards stay one edit away from
+ * any site-wide token sweep. Dark values are identical to the original design.
  */
 .booking-flow {
     --booking-accent: #dc2626;
     --booking-accent-strong: #b91c1c;
     --booking-accent-ink: #ffffff;
+    --booking-panel: #ffffff;
+    --booking-panel-raised: #fbfaf9;
+    --booking-line: rgba(23, 18, 18, 0.12);
+    --booking-muted: #57504e;
+    --booking-input-bg: rgba(23, 18, 18, 0.03);
+    --booking-input-bg-focus: rgba(23, 18, 18, 0.05);
+    --booking-fill: rgba(23, 18, 18, 0.04);
+    --booking-fill-hover: rgba(23, 18, 18, 0.08);
+    --booking-placeholder: rgba(87, 80, 78, 0.7);
+    --booking-danger-line: rgba(185, 28, 28, 0.45);
+}
+
+.dark .booking-flow {
     --booking-panel: #14141a;
     --booking-panel-raised: #1b1b23;
     --booking-line: rgba(255, 255, 255, 0.08);
     --booking-muted: #9b9ba6;
+    --booking-input-bg: rgba(255, 255, 255, 0.04);
+    --booking-input-bg-focus: rgba(255, 255, 255, 0.07);
+    --booking-fill: rgba(255, 255, 255, 0.04);
+    --booking-fill-hover: rgba(255, 255, 255, 0.09);
+    --booking-placeholder: rgba(155, 155, 166, 0.75);
+    --booking-danger-line: rgba(248, 113, 113, 0.55);
 }
 
 .booking-flow .tnum {
     font-variant-numeric: tabular-nums;
 }
 
-/* White-on-dark inputs: the shared .form-input-premium is built for the light admin theme. */
+/* Theme-aware inputs for the booking flow. */
 .booking-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--booking-input-bg);
     border: 1px solid var(--booking-line);
     border-radius: 0.875rem;
     padding: 0.875rem 1rem;
-    color: #fafafa;
+    color: var(--color-site-text);
     font-size: 0.9375rem;
     min-height: 44px;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .booking-input::placeholder {
-    color: rgba(155, 155, 166, 0.75);
+    color: var(--booking-placeholder);
 }
 
 .booking-input:focus-visible {
     outline: none;
     border-color: var(--booking-accent);
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--booking-input-bg-focus);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
 }
 
 .booking-input[data-invalid="true"] {
-    border-color: rgba(248, 113, 113, 0.55);
+    border-color: var(--booking-danger-line);
 }
 
 .booking-flow :focus-visible {
@@ -167,6 +284,68 @@
         --color-admin-input-bg: rgba(255, 255, 255, 0.05);
         --color-admin-input-border: rgba(255, 255, 255, 0.1);
         --color-admin-accent: #dc2626;
+
+        /* Public site semantic tokens - dark (values identical to the pre-theme dark design) */
+        --color-site: #0a0a0f;
+        --color-site-surface: #121218;
+        --color-site-raised: #16161d;
+        --color-site-sunken: #0d0d12;
+        --color-site-line: rgba(255, 255, 255, 0.05);
+        --color-site-line-strong: rgba(255, 255, 255, 0.1);
+        --color-site-text: #fafafa;
+        --color-site-muted: #a1a1aa;
+        --color-site-faint: #71717a;
+        --color-site-fill: rgba(255, 255, 255, 0.05);
+        --color-site-fill-hover: rgba(255, 255, 255, 0.1);
+        --color-site-accent: #dc2626;
+        --color-site-accent-hover: #b91c1c;
+        --color-site-accent-soft: rgba(220, 38, 38, 0.12);
+        --color-site-accent-ink: #ffffff;
+        --color-site-link: #dc2626;
+        --color-site-link-hover: #b91c1c;
+        --color-site-glass: rgba(10, 10, 15, 0.9);
+        --color-site-glass-border: rgba(255, 255, 255, 0.05);
+        --shadow-site: 0 0 0 rgba(0, 0, 0, 0);
+        --shadow-site-raised: 0 0 0 rgba(0, 0, 0, 0);
+
+        /* Design language v1 — dark. Ground and line values track the public
+           site's established dark palette so both read as one product. Shadows
+           flatten to none here too: elevation on a near-black ground has to come
+           from surface steps and hairlines, not blur. */
+        --color-ui-bg: #0a0a0f;
+        --color-ui-surface: #121218;
+        --color-ui-surface-raised: #16161d;
+        --color-ui-line: rgba(255, 255, 255, 0.07);
+        --color-ui-line-strong: rgba(255, 255, 255, 0.14);
+        --color-ui-text: #fafafa;
+        --color-ui-muted: #a1a1aa; /* 6.6:1 on surface */
+        --color-ui-faint: #71717a;
+        --color-ui-accent: #dc2626;
+        --color-ui-accent-hover: #b91c1c;
+        --color-ui-accent-soft: rgba(220, 38, 38, 0.14);
+        /* #dc2626 is only 3.5:1 on this ground, so accent *text* lightens to
+           clear AA. Fills keep the brand red — white on #dc2626 is 4.8:1. */
+        --color-ui-link: #f87171;
+        --color-ui-link-hover: #fca5a5;
+        --color-ui-danger: #f87171;
+        --color-ui-danger-soft: rgba(248, 113, 113, 0.1);
+        --color-ui-success: #34d399;
+        --color-ui-success-soft: rgba(52, 211, 153, 0.1);
+        --color-ui-info: #38bdf8;
+        --color-ui-info-soft: rgba(56, 189, 248, 0.1);
+        --color-ui-warning: #fbbf24;
+        --color-ui-warning-soft: rgba(251, 191, 36, 0.1);
+
+        --color-ui-panel: #08070a;
+        --color-ui-panel-tint: rgba(220, 38, 38, 0.13);
+        --color-ui-on-panel: #fafaf9;
+        --color-ui-on-panel-muted: rgba(250, 250, 249, 0.6);
+        --color-ui-on-panel-line: rgba(250, 250, 249, 0.1);
+
+        --shadow-ui-xs: 0 0 0 rgba(0, 0, 0, 0);
+        --shadow-ui-sm: 0 0 0 rgba(0, 0, 0, 0);
+        --shadow-ui-card: 0 0 0 rgba(0, 0, 0, 0);
+        --shadow-ui-focus: 0 0 0 3px var(--color-ui-accent-soft);
     }
 }
 
@@ -248,8 +427,7 @@ select optgroup {
     position: absolute;
     left: 1rem;
     top: -40px;
-    background: var(--color-surface);
-    color: var(--color-on-surface);
+    X    color: var(--color-on-surface);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     z-index: 9999;
@@ -273,10 +451,30 @@ select optgroup {
    PREMIUM AUTOMOTIVE MODERN DESIGN SYSTEM
    ============================================ */
 
+/* Hover elevation: soft shadow on light, the original red glow on dark. */
+:root {
+    --glow-accent-hover: 0 6px 20px -6px rgba(185, 28, 28, 0.35);
+    --glass-bg: rgba(23, 18, 18, 0.03);
+    --glass-bg-hover: rgba(23, 18, 18, 0.06);
+    --glass-border: rgba(23, 18, 18, 0.15);
+    --glass-border-hover: rgba(23, 18, 18, 0.3);
+    --glass-glow-hover: var(--shadow-site);
+}
+
+.dark {
+    --glow-accent-hover: 0 0 30px rgba(220, 38, 38, 0.4);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.25);
+    --glass-glow-hover:
+        0 10px 30px -10px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
 /* Premium Button System */
 .btn-premium {
-    background: #dc2626;
-    color: white;
+    background: var(--color-site-accent);
+    color: var(--color-site-accent-ink);
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -297,8 +495,8 @@ select optgroup {
 }
 
 .btn-premium:hover {
-    background: #b91c1c;
-    box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
+    background: var(--color-site-accent-hover);
+    box-shadow: var(--glow-accent-hover);
     transform: translateY(-2px);
 }
 
@@ -308,8 +506,8 @@ select optgroup {
 
 /* Medium Premium Button for Mobile */
 .btn-premium-md {
-    background: #dc2626;
-    color: white;
+    background: var(--color-site-accent);
+    color: var(--color-site-accent-ink);
     padding: 0.625rem 1.25rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -331,8 +529,8 @@ select optgroup {
 }
 
 .btn-premium-md:hover {
-    background: #b91c1c;
-    box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
+    background: var(--color-site-accent-hover);
+    box-shadow: var(--glow-accent-hover);
     transform: translateY(-2px);
 }
 
@@ -342,8 +540,8 @@ select optgroup {
 
 .btn-ghost {
     background: transparent;
-    color: rgb(250, 250, 250);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-site-text);
+    border: 1px solid var(--color-site-line-strong);
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     font-weight: 600;
@@ -356,16 +554,6 @@ select optgroup {
     cursor: pointer;
 }
 
-.btn-ghost:not(.dark) {
-    color: #374151;
-    border-color: rgba(17, 24, 39, 0.15);
-}
-
-.btn-ghost:hover:not(.dark) {
-    background: rgba(17, 24, 39, 0.05);
-    border-color: rgba(17, 24, 39, 0.25);
-}
-
 @media (min-width: 768px) {
     .btn-ghost {
         padding: 0.875rem 2rem;
@@ -373,25 +561,22 @@ select optgroup {
 }
 
 .btn-ghost:hover {
-    background: var(--color-admin-surface-alt);
-    border-color: var(--color-admin-border);
+    background: var(--color-site-fill-hover);
+    border-color: var(--color-site-line-strong);
     transform: translateY(-2px);
 }
 
 /* Medium Ghost Button for Mobile */
 .btn-ghost-md {
-    color: rgb(250, 250, 250);
+    color: var(--color-site-text);
     letter-spacing: 0.01em;
     cursor: pointer;
     align-items: center;
     font-size: 0.8125rem;
     font-weight: 600;
     display: inline-flex;
-    background: 0px 0px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgba(255, 255, 255, 0.1);
-    border-image: initial;
+    background: transparent;
+    border: 1px solid var(--color-site-line-strong);
     border-radius: 9999px;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
@@ -406,8 +591,8 @@ select optgroup {
 }
 
 .btn-ghost-md:hover {
-    background: var(--color-admin-surface-alt);
-    border-color: var(--color-admin-border);
+    background: var(--color-site-fill-hover);
+    border-color: var(--color-site-line-strong);
     transform: translateY(-2px);
 }
 
@@ -421,9 +606,9 @@ select optgroup {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    color: #FAFAFA;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    color: var(--color-site-text);
+    border: 1px solid var(--glass-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 9999px;
@@ -435,11 +620,11 @@ select optgroup {
 }
 
 .btn-glass:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+    box-shadow: var(--glass-glow-hover);
+    color: var(--color-site-text);
 }
 
 .btn-glass:active {
@@ -530,17 +715,17 @@ select optgroup {
 
 /* Public Navigation Links */
 .nav-link {
-    color: var(--color-admin-text-muted);
+    color: var(--color-site-muted);
     transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
 
 .nav-link:hover {
-    color: var(--color-admin-text);
+    color: var(--color-site-text);
 }
 
 .nav-link.active {
-    color: #dc2626;
+    color: var(--color-site-link);
 }
 
 .nav-link.active::after {
@@ -550,7 +735,7 @@ select optgroup {
     left: 0;
     right: 0;
     height: 2px;
-    background: #dc2626;
+    background: var(--color-site-link);
     border-radius: 1px;
 }
 
@@ -825,6 +1010,9 @@ select optgroup {
    ============================================ */
 
 .prose {
+    --prose-th: #efece9;
+    --prose-strong: #1a1414;
+
     /* Headings */
     h1,
     h2,
@@ -832,7 +1020,7 @@ select optgroup {
     h4,
     h5,
     h6 {
-        color: white;
+        color: var(--color-site-text);
         font-weight: 700;
         margin-top: 1.5em;
         margin-bottom: 0.5em;
@@ -862,19 +1050,19 @@ select optgroup {
     p {
         margin-bottom: 1em;
         line-height: 1.75;
-        color: var(--color-admin-text-muted);
+        color: var(--color-site-muted);
     }
 
     /* Links */
     a {
-        color: #dc2626;
+        color: var(--color-site-link);
         text-decoration: underline;
         text-decoration-thickness: 1px;
         text-underline-offset: 2px;
     }
 
     a:hover {
-        color: #b91c1c;
+        color: var(--color-site-link-hover);
     }
 
     /* Lists */
@@ -899,25 +1087,25 @@ select optgroup {
 
     /* Blockquotes */
     blockquote {
-        border-left: 4px solid #dc2626;
+        border-left: 4px solid var(--color-site-accent);
         padding-left: 1em;
         margin: 1.5em 0;
         font-style: italic;
-        color: var(--color-admin-text-muted);
+        color: var(--color-site-muted);
     }
 
     /* Code */
     code {
-        background: rgba(220, 38, 38, 0.1);
-        color: #dc2626;
+        background: var(--color-site-accent-soft);
+        color: var(--color-site-link);
         padding: 0.2em 0.4em;
         border-radius: 4px;
         font-size: 0.875em;
     }
 
     pre {
-        background: var(--color-admin-surface);
-        border: 1px solid var(--color-admin-border);
+        background: var(--color-site-raised);
+        border: 1px solid var(--color-site-line-strong);
         border-radius: 8px;
         padding: 1em;
         overflow-x: auto;
@@ -927,7 +1115,7 @@ select optgroup {
     pre code {
         background: none;
         padding: 0;
-        color: var(--color-admin-text);
+        color: var(--color-site-text);
     }
 
     /* Tables */
@@ -939,33 +1127,33 @@ select optgroup {
 
     th,
     td {
-        border: 1px solid var(--color-admin-border);
+        border: 1px solid var(--color-site-line-strong);
         padding: 0.75em;
         text-align: left;
     }
 
     th {
-        background: var(--color-admin-surface-alt);
-        color: var(--color-admin-text);
+        background: var(--prose-th);
+        color: var(--color-site-text);
         font-weight: 600;
     }
 
     td {
-        color: var(--color-admin-text-muted);
+        color: var(--color-site-muted);
     }
 
     /* Horizontal Rule */
     hr {
         border: none;
         height: 1px;
-        background: var(--color-admin-border);
+        background: var(--color-site-line-strong);
         margin: 2em 0;
     }
 
     /* Strong/Bold */
     strong,
     b {
-        color: rgb(220, 220, 220);
+        color: var(--prose-strong);
         font-weight: 700;
     }
 
@@ -988,6 +1176,13 @@ select optgroup {
         border-radius: 0;
         margin: 0;
     }
+}
+
+/* Original dark prose values, preserved exactly. */
+.dark .prose,
+.prose.dark {
+    --prose-th: #1a1a24;
+    --prose-strong: #dcdcdc;
 }
 
 /* ============================================
@@ -1042,7 +1237,7 @@ select optgroup {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke: #71717a;
+    stroke: var(--color-site-faint);
     stroke-width: 1.5;
     transform: translate3d(0, 0, 0);
     transition: stroke 150ms ease;
@@ -1064,16 +1259,16 @@ select optgroup {
 }
 
 .ui-checkbox-wrapper:hover .ui-checkbox-check svg {
-    stroke: #dc2626;
+    stroke: var(--color-site-accent);
 }
 
 .group:hover .ui-checkbox-check svg {
-    stroke: #dc2626;
+    stroke: var(--color-site-accent);
 }
 
 /* Checked state */
 .ui-checkbox-input:checked + .ui-checkbox-check svg {
-    stroke: #dc2626;
+    stroke: var(--color-site-accent);
 }
 
 .ui-checkbox-input:checked + .ui-checkbox-check svg path {
@@ -1099,14 +1294,14 @@ select optgroup {
 
 /* Focus state for accessibility */
 .ui-checkbox-input:focus-visible + .ui-checkbox-check {
-    outline: 2px solid #dc2626;
+    outline: 2px solid var(--color-site-accent);
     outline-offset: 2px;
     border-radius: 4px;
 }
 
 /* Label styling */
 .ui-checkbox-label {
-    color: var(--checkbox-label, #a1a1aa);
+    color: var(--checkbox-label, var(--color-site-muted));
     font-size: 0.875rem;
     transition: color 0.2s ease;
     user-select: none;
@@ -1114,7 +1309,7 @@ select optgroup {
 
 .ui-checkbox-wrapper:hover .ui-checkbox-label,
 .group:hover .ui-checkbox-label {
-    color: var(--checkbox-label-hover, #fafafa);
+    color: var(--checkbox-label-hover, var(--color-site-text));
 }
 
 /* Disabled state */

@@ -177,7 +177,7 @@
         contenteditable="true"
         @input="updateContent"
         @paste="handlePaste"
-        class="prose prose-invert min-h-[200px] w-full max-w-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[#FAFAFA] transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-[#DC2626] focus:outline-none"
+        class="dark prose prose-invert min-h-[200px] w-full max-w-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[#FAFAFA] transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-[#DC2626] focus:outline-none"
         data-placeholder="{{ $placeholder }}"
     ></div>
 </div>

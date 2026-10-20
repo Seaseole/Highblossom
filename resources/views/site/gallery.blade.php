@@ -1,28 +1,28 @@
 <x-layouts::site title="Gallery">
     <!-- Hero Section -->
-    <section class="relative bg-[#0A0A0F] pt-32 pb-20">
+    <section class="relative bg-site pt-32 pb-20">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
-                <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                <div class="mb-4 text-sm font-semibold tracking-wider text-site-link uppercase">
                     {{ __('gallery.label') }}
                 </div>
-                <h1 class="font-headline mb-6 text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl lg:text-6xl">
+                <h1 class="font-headline mb-6 text-4xl font-bold tracking-tight text-site-text md:text-5xl lg:text-6xl">
                     {{ __('gallery.title') }}
                 </h1>
-                <p class="text-lg leading-relaxed text-[#A1A1AA]">{{ __('gallery.description') }}</p>
+                <p class="text-lg leading-relaxed text-site-muted">{{ __('gallery.description') }}</p>
             </div>
         </div>
     </section>
 
     <!-- Gallery Grid -->
-    <section class="bg-[#0A0A0F] py-24">
+    <section class="bg-site py-24">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
             <!-- Category Filters -->
             <div class="mb-16 flex flex-wrap justify-center gap-3">
                 <a
                     href="{{ route('gallery') }}"
                     wire:navigate
-                    class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ !$category ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}"
+                    class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ !$category ? 'bg-site-accent text-white' : 'glass-card text-site-muted hover:text-site-text hover:bg-site-fill' }}"
                 >
                     {{ __('gallery.all_projects') }}
                 </a>
@@ -30,7 +30,7 @@
                     <a
                         href="{{ route('gallery', ['category' => $cat->slug]) }}"
                         wire:navigate
-                        class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ $category === $cat->slug ? 'bg-[#DC2626] text-white' : 'glass-card text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-white/[0.06]' }}"
+                        class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all {{ $category === $cat->slug ? 'bg-site-accent text-white' : 'glass-card text-site-muted hover:text-site-text hover:bg-site-fill' }}"
                     >
                         {{ $cat->name }}
                     </a>
@@ -61,7 +61,7 @@
                             <div class="mt-4 flex items-center gap-3">
                                 <button
                                     onclick="openLightbox({{ $index }})"
-                                    class="rounded-full bg-[#DC2626] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#B91C1C]"
+                                    class="rounded-full bg-site-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-site-accent-hover"
                                 >
                                     {{ __('gallery.quick_view') }}
                                 </button>
@@ -77,10 +77,10 @@
                     </div>
                 @empty
                     <div class="col-span-1 flex flex-col items-center justify-center pt-16 pb-20 text-center md:col-span-2 md:pt-32 lg:col-span-3">
-                        <h3 class="font-headline mb-2 text-2xl font-bold text-[#FAFAFA]">
+                        <h3 class="font-headline mb-2 text-2xl font-bold text-site-text">
                             {{ __('gallery.no_projects') }}
                         </h3>
-                        <p class="mb-8 max-w-md text-[#A1A1AA]">
+                        <p class="mb-8 max-w-md text-site-muted">
                             {{ __('gallery.no_projects_description') }}
                         </p>
                         <x-site.contact-buttons size="lg" />
@@ -108,21 +108,21 @@
 
     <!-- Stats Section -->
     @if (! empty($galleryMetrics))
-        <section class="border-t border-white/5 bg-gradient-to-b from-[#0A0A0F] to-[#121218] py-24">
+        <section class="border-t border-site-line bg-gradient-to-b from-site to-site-surface py-24">
             <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
                 <div class="mb-12 text-center">
-                    <div class="mb-4 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+                    <div class="mb-4 text-sm font-semibold tracking-wider text-site-link uppercase">
                         {{ __('gallery.performance_metrics') }}
                     </div>
                 </div>
                 <div class="grid grid-cols-1 {{ count($galleryMetrics) >= 3 ? 'md:grid-cols-3' : (count($galleryMetrics) === 2 ? 'md:grid-cols-2' : '') }} gap-6">
                     @foreach ($galleryMetrics as $metric)
                         <div class="glass-card rounded-2xl p-8 text-center">
-                            <div class="mb-2 text-sm font-semibold tracking-wider text-[#A1A1AA] uppercase">
+                            <div class="mb-2 text-sm font-semibold tracking-wider text-site-muted uppercase">
                                 {{ $metric['label'] }}
                             </div>
-                            <div class="font-headline text-5xl font-bold text-[#FAFAFA]">
-                                {{ $metric['value'] }}<span class="text-[#DC2626]">{{ $metric['suffix'] }}</span>
+                            <div class="font-headline text-5xl font-bold text-site-text">
+                                {{ $metric['value'] }}<span class="text-site-link">{{ $metric['suffix'] }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -137,25 +137,25 @@
         <div class="absolute inset-0 bg-[#0A0A0F]/95 backdrop-blur-xl" onclick="closeLightbox()"></div>
         <button
             onclick="closeLightbox()"
-            class="glass-card absolute top-6 right-6 z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors hover:bg-white/[0.1]"
+            class="glass-card absolute top-6 right-6 z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors hover:bg-site-fill-hover"
         >
-            <svg class="h-6 w-6 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-6 w-6 text-site-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
         <button
             onclick="prevImage()"
-            class="glass-card absolute top-1/2 left-6 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full transition-colors hover:bg-white/[0.1]"
+            class="glass-card absolute top-1/2 left-6 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full transition-colors hover:bg-site-fill-hover"
         >
-            <svg class="h-6 w-6 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-6 w-6 text-site-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
         </button>
         <button
             onclick="nextImage()"
-            class="glass-card absolute top-1/2 right-6 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full transition-colors hover:bg-white/[0.1]"
+            class="glass-card absolute top-1/2 right-6 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full transition-colors hover:bg-site-fill-hover"
         >
-            <svg class="h-6 w-6 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-6 w-6 text-site-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
         </button>

@@ -10,37 +10,37 @@
 @endphp
 
 @if ($area !== '' || $coverage !== '' || $address !== '')
-    <section id="service-area" class="bg-[#121218] py-20 lg:py-24">
+    <section id="service-area" class="bg-site-surface py-20 lg:py-24">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
-            <div class="mb-3 text-sm font-semibold tracking-wider text-[#DC2626] uppercase">
+            <div class="mb-3 text-sm font-semibold tracking-wider text-site-link uppercase">
                 {{ __('site.home.service_area_label') }}
             </div>
 
             <div class="grid gap-4 md:grid-cols-3">
                 @if ($area !== '')
                     <div class="glass-card rounded-2xl p-6">
-                        <h3 class="font-headline mb-2 text-lg font-bold text-[#FAFAFA]">{{ __('site.home.service_area_label') }}</h3>
-                        <p class="text-sm leading-relaxed text-[#A1A1AA]">{{ $area }}</p>
+                        <h3 class="font-headline mb-2 text-lg font-bold text-site-text">{{ __('site.home.service_area_label') }}</h3>
+                        <p class="text-sm leading-relaxed text-site-muted">{{ $area }}</p>
                     </div>
                 @endif
 
                 @if ($coverage !== '')
                     <div class="glass-card rounded-2xl p-6">
-                        <h3 class="font-headline mb-2 text-lg font-bold text-[#FAFAFA]">{{ __('site.home.service_area_mobile') }}</h3>
-                        <p class="text-sm leading-relaxed text-[#A1A1AA]">{{ $coverage }}</p>
+                        <h3 class="font-headline mb-2 text-lg font-bold text-site-text">{{ __('site.home.service_area_mobile') }}</h3>
+                        <p class="text-sm leading-relaxed text-site-muted">{{ $coverage }}</p>
                     </div>
                 @endif
 
                 @if ($address !== '')
                     <div class="glass-card rounded-2xl p-6">
-                        <h3 class="font-headline mb-2 text-lg font-bold text-[#FAFAFA]">{{ __('site.home.service_area_workshop') }}</h3>
-                        <p class="text-sm leading-relaxed text-[#A1A1AA]">{{ $address }}</p>
+                        <h3 class="font-headline mb-2 text-lg font-bold text-site-text">{{ __('site.home.service_area_workshop') }}</h3>
+                        <p class="text-sm leading-relaxed text-site-muted">{{ $address }}</p>
                         @if ($mapDirectionsLink)
                             <a
                                 href="{{ $mapDirectionsLink }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="mt-4 inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[#DC2626] transition-colors hover:text-[#B91C1C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                class="mt-4 inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-site-link transition-colors hover:text-site-link-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             >
                                 <span>{{ __('site.home.service_area_directions') }}</span>
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -1,8 +1,12 @@
 {{--
-    Inline validation hints for one auth input.
+    Inline validation hints for one field.
 
     Page-level messages (failed credentials, lockout, invalid token) stay with the
     banner, so a sentence is never shown twice.
+
+    The `{{ $field }}-error` id is a contract: x-ui.input points
+    aria-describedby at it, and the login view's own aria wiring predates the
+    component. Renaming it silently breaks screen-reader association.
 --}}
 @props(['field'])
 
@@ -11,12 +15,10 @@
 @endphp
 
 @if ($messages !== [])
-    <div id="{{ $field }}-error" class="mt-2 space-y-1 px-1">
+    <div id="{{ $field }}-error" class="space-y-1">
         @foreach ($messages as $message)
-            <p class="flex items-start gap-1.5 text-sm font-medium text-[#DC2626]">
-                <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <p class="flex items-start gap-1.5 text-ui-sm font-medium text-ui-danger">
+                <x-ui.icon name="exclamation-circle" size="xs" class="mt-px shrink-0" />
                 <span>{{ $message }}</span>
             </p>
         @endforeach

@@ -45,16 +45,16 @@
     ];
 @endphp
 
-<div class="rounded-xl border border-white/10 bg-white/5 p-4">
+<div class="rounded-xl border border-site-line-strong bg-site-fill p-4">
     <div class="flex items-center gap-3">
-        <span class="text-sm font-medium text-[#A1A1AA]">{{ __('Share:') }}</span>
+        <span class="text-sm font-medium text-site-muted">{{ __('Share:') }}</span>
         <div class="flex items-center gap-2">
             @foreach ($networks as $key => $network)
                 <a
                     href="{{ $network['url'] }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="p-2.5 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-white/5 transition-colors duration-200 ease-out-quint hover:scale-110 active:scale-95 {{ $network['color'] }}"
+                    class="p-2.5 rounded-lg text-site-muted hover:text-white hover:bg-site-fill transition-colors duration-200 ease-out-quint hover:scale-110 active:scale-95 {{ $network['color'] }}"
                     title="{{ __('Share on :network', ['network' => $network['label']]) }}"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">

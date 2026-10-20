@@ -3,14 +3,6 @@
         class="mx-auto max-w-xl space-y-8 py-6 sm:py-10"
         x-data="{
             showPassword: false,
-            minLen: 8,
-            init() {
-                const passInput = $refs.passwordInput;
-                if (passInput && passInput.dataset.rules) {
-                    const minMatch = passInput.dataset.rules.match(/min:(\d+)/);
-                    if (minMatch) this.minLen = parseInt(minMatch[1]);
-                }
-            },
         }"
     >
         <!-- Header -->
@@ -48,6 +40,23 @@
                 </div>
 
                 <div>
+                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        value="{{ old('username') }}"
+                        autocomplete="username"
+                        required
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                        placeholder="theirname"
+                    />
+                    @error('username')
+                        <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ \App\Support\Username::formatHint() }}</p>
+                </div>
+
+                <div>
                     <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                     <input
                         type="email"
@@ -64,12 +73,12 @@
                     <div class="relative">
                         <input
                             :type="showPassword ? 'text' : 'password'"
+                            id="password"
                             name="password"
-                            x-ref="passwordInput"
                             required
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                             placeholder="Secure password"
-                            data-rules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                            passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
                         />
                         <button
                             type="button"
@@ -85,7 +94,7 @@
                             <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" /></svg>
                         </button>
                     </div>
-                    <p class="mt-1 text-xs text-gray-500" x-text="`Min ${minLen} characters`"></p>
+                    <x-ui.password-rules input="password" />
                 </div>
 
                 <div>

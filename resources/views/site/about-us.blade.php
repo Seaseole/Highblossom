@@ -1,5 +1,5 @@
 <x-layouts::site title="About Us">
-    <section class="bg-[#0A0A0F] pt-32 pb-24 lg:pb-32">
+    <section class="bg-site pt-32 pb-24 lg:pb-32">
         <div class="mx-auto max-w-350 px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-10">
                 <!-- Left Column (70%) - Title, Hero Image, Body -->
@@ -34,31 +34,31 @@
                         <div class="text-admin-accent mb-4 text-sm font-semibold tracking-wider uppercase">
                             About Us
                         </div>
-                        <h1 class="font-headline mb-6 text-4xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl lg:text-6xl">
+                        <h1 class="font-headline mb-6 text-4xl font-bold tracking-tight text-site-text md:text-5xl lg:text-6xl">
                             {!! nl2br(e($content->title)) !!}
                         </h1>
                         @if ($content->subtitle)
-                            <p class="mb-8 text-lg leading-relaxed text-[#A1A1AA]">{{ $content->subtitle }}</p>
+                            <p class="mb-8 text-lg leading-relaxed text-site-muted">{{ $content->subtitle }}</p>
                         @endif
                     @endif
 
                     @if (trim((string) $content->body) !== '')
-                        <div class="prose prose-invert prose-lg mb-20 max-w-none leading-relaxed text-[#A1A1AA]">
+                        <div class="prose prose-lg mb-20 max-w-none leading-relaxed text-site-muted">
                             {!! $content->body !!}
                         </div>
                     @endif
 
                     {{-- Team Section --}}
                     @if ($staff->isNotEmpty())
-                        <div class="mt-20 border-t border-white/5 pt-20">
+                        <div class="mt-20 border-t border-site-line pt-20">
                             <div class="mb-12">
-                                <div class="mb-3 text-sm font-semibold tracking-[0.2em] text-[#DC2626] uppercase">
+                                <div class="mb-3 text-sm font-semibold tracking-[0.2em] text-site-link uppercase">
                                     Excellence in Motion
                                 </div>
-                                <h2 class="font-headline text-3xl font-bold tracking-tight text-[#FAFAFA] md:text-5xl">
+                                <h2 class="font-headline text-3xl font-bold tracking-tight text-site-text md:text-5xl">
                                     Our Master Craftsmen
                                 </h2>
-                                <p class="mt-4 max-w-xl text-[#A1A1AA]">
+                                <p class="mt-4 max-w-xl text-site-muted">
                                     Meet the dedicated professionals who bring precision and care to every installation,
                                     ensuring your vehicle remains safe and beautiful.
                                 </p>
@@ -66,7 +66,7 @@
 
                             <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
                                 @foreach ($staff as $member)
-                                    <div class="group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#121218] shadow-2xl transition-all duration-500 hover:border-[#DC2626]/20">
+                                    <div class="group relative overflow-hidden rounded-[2.5rem] border border-site-line bg-site-surface shadow-2xl transition-all duration-500 hover:border-site-accent/20">
                                         {{-- Image Container --}}
                                         <div class="relative h-[400px] overflow-hidden">
                                             <img
@@ -80,22 +80,22 @@
                                         {{-- Content --}}
                                         <div class="relative p-8">
                                             <div class="mb-4">
-                                                <h3 class="font-headline text-2xl font-bold text-[#FAFAFA] transition-colors group-hover:text-[#DC2626]">
+                                                <h3 class="font-headline text-2xl font-bold text-site-text transition-colors group-hover:text-site-link">
                                                     {{ $member->name }}
                                                 </h3>
-                                                <div class="mt-1 text-xs font-bold tracking-widest text-[#DC2626] uppercase">
+                                                <div class="mt-1 text-xs font-bold tracking-widest text-site-link uppercase">
                                                     {{ $member->role }}
                                                 </div>
                                             </div>
 
                                             @if ($member->bio)
-                                                <p class="line-clamp-3 text-sm leading-relaxed text-[#A1A1AA] transition-all duration-300 group-hover:line-clamp-none">
+                                                <p class="line-clamp-3 text-sm leading-relaxed text-site-muted transition-all duration-300 group-hover:line-clamp-none">
                                                     {{ $member->bio }}
                                                 </p>
                                             @endif
 
                                             <div class="mt-6 flex gap-3">
-                                                <div class="h-[2px] w-8 rounded-full bg-[#DC2626] transition-all group-hover:w-12"></div>
+                                                <div class="h-[2px] w-8 rounded-full bg-site-accent transition-all group-hover:w-12"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -113,7 +113,7 @@
                                 <div class="text-admin-accent mb-4 text-sm font-semibold tracking-wider uppercase">
                                     Our Vision
                                 </div>
-                                <div class="leading-relaxed text-[#A1A1AA]">{!! $content->vision !!}</div>
+                                <div class="leading-relaxed text-site-muted">{!! $content->vision !!}</div>
                             </div>
                         @endif
 
@@ -122,7 +122,7 @@
                                 <div class="text-admin-accent mb-4 text-sm font-semibold tracking-wider uppercase">
                                     Our Mission
                                 </div>
-                                <div class="leading-relaxed text-[#A1A1AA]">{!! $content->mission !!}</div>
+                                <div class="leading-relaxed text-site-muted">{!! $content->mission !!}</div>
                             </div>
                         @endif
                     </div>

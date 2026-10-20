@@ -10,7 +10,7 @@
 @endphp
 
 <article class="glass-card glass-card-hover group relative flex flex-col overflow-hidden rounded-2xl">
-    <div class="{{ $featured ? 'aspect-[16/10]' : 'aspect-[4/3]' }} w-full overflow-hidden bg-[#121218]">
+    <div class="{{ $featured ? 'aspect-[16/10]' : 'aspect-[4/3]' }} w-full overflow-hidden bg-site-surface">
         <img
             src="{{ $image }}"
             alt="{{ $service->title }}"
@@ -23,12 +23,12 @@
     </div>
 
     <div class="flex flex-1 flex-col p-6">
-        <h3 class="font-headline mb-2 {{ $anchor }} font-bold tracking-tight text-[#FAFAFA]">
+        <h3 class="font-headline mb-2 {{ $anchor }} font-bold tracking-tight text-site-text">
             {{ $service->title }}
         </h3>
 
         @if (filled($service->short_description))
-            <p class="mb-5 line-clamp-2 text-sm leading-relaxed text-[#A1A1AA]">
+            <p class="mb-5 line-clamp-2 text-sm leading-relaxed text-site-muted">
                 {{ $service->short_description }}
             </p>
         @endif
@@ -37,7 +37,7 @@
         <x-site.link
             :href="$link"
             prefetch
-            class="mt-auto inline-flex min-h-[44px] items-center gap-2 self-start text-sm font-semibold text-[#DC2626] transition-all hover:text-[#B91C1C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+            class="mt-auto inline-flex min-h-[44px] items-center gap-2 self-start text-sm font-semibold text-site-link transition-all hover:text-site-link-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
             aria-label="{{ __('site.learn_more') }} — {{ $service->title }}"
         >
             <span>{{ __('site.learn_more') }}</span>

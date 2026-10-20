@@ -15,13 +15,13 @@
     class="fixed right-6 bottom-6 left-6 z-[9999] md:right-6 md:left-auto md:w-[400px]"
     style="display: none"
 >
-    <div class="glass-card rounded-2xl border border-white/10 bg-[#0A0A0F]/80 p-8 shadow-2xl backdrop-blur-2xl">
-        <h2 class="font-headline mb-4 text-xl font-bold text-[#FAFAFA]">Privacy Preference</h2>
-        <p class="mb-8 text-sm leading-relaxed text-[#A1A1AA]">
+    <div class="glass-card rounded-2xl border border-site-line-strong bg-site/80 p-8 shadow-2xl backdrop-blur-2xl">
+        <h2 class="font-headline mb-4 text-xl font-bold text-site-text">Privacy Preference</h2>
+        <p class="mb-8 text-sm leading-relaxed text-site-muted">
             We use cookies to enhance your experience, analyze site traffic, and provide personalized services. By
             clicking "Accept", you agree to our
-            <a href="{{ route('privacy') }}" wire:navigate class="font-semibold text-[#DC2626] hover:underline">Privacy Policy</a> and
-            <a href="{{ route('terms') }}" wire:navigate class="font-semibold text-[#DC2626] hover:underline">Terms of Service</a>.
+            <a href="{{ route('privacy') }}" wire:navigate class="font-semibold text-site-link hover:underline">Privacy Policy</a> and
+            <a href="{{ route('terms') }}" wire:navigate class="font-semibold text-site-link hover:underline">Terms of Service</a>.
         </p>
 
         <div class="flex flex-col gap-3">
@@ -30,7 +30,7 @@
                     open = false;
                     document.cookie = 'cookieConsent=true; max-age=31536000; path=/; SameSite=Lax';
                 "
-                class="w-full rounded-full bg-[#DC2626] px-6 py-3 text-sm font-bold text-[#FAFAFA] shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] hover:bg-[#B91C1C] active:scale-[0.98]"
+                class="w-full rounded-full bg-site-accent px-6 py-3 text-sm font-bold text-site-accent-ink shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] hover:bg-site-accent-hover active:scale-[0.98]"
             >
                 Accept All
             </button>
@@ -39,7 +39,7 @@
                     open = false;
                     document.cookie = 'cookieConsent=false; max-age=31536000; path=/; SameSite=Lax';
                 "
-                class="w-full rounded-full bg-white/5 px-6 py-3 text-sm font-semibold text-[#FAFAFA] transition-all hover:bg-white/10"
+                class="w-full rounded-full bg-site-fill px-6 py-3 text-sm font-semibold text-site-text transition-all hover:bg-site-fill-hover"
             >
                 Decline
             </button>

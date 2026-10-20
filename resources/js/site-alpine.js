@@ -610,3 +610,55 @@ siteAlpine.data('blogSearchPalette', () => ({
         }
     },
 }));
+
+// Public theme toggle (Light / Dark / System). All persistence and DOM application
+// lives in window.highblossomTheme (inline head script, partials/theme-script); this
+// component only drives the popup and re-reads the stored mode on every page so the
+// displayed state stays correct across wire:navigate.
+siteAlpine.data('themeToggle', () => ({
+    open: false,
+    mode: 'system',
+    options: ['light', 'dark', 'system'],
+
+    init() {
+        this.mode = window.highblossomTheme?.get() ?? 'system';
+    },
+
+    labelFor(option) {
+        return { light: 'Light', dark: 'Dark', system: 'System' }[option] ?? option;
+    },
+
+    toggle() {
+        this.open = !this.open;
+
+        if (this.open) {
+            this.$nextTick(() => this.focusOption(this.mode));
+        }
+    },
+
+    close() {
+        this.open = false;
+    },
+
+    choose(option) {
+        this.mode = option;
+        window.highblossomTheme?.set(option);
+        this.close();
+    },
+
+    onKeydown(event, index) {
+        const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+
+        if (step === undefined) {
+            return;
+        }
+
+        event.preventDefault();
+        this.focusOption(this.options[(index + step + this.options.length) % this.options.length]);
+    },
+
+    focusOption(option) {
+        const index = this.options.indexOf(option);
+        this.$el.querySelector(`[data-index="${index === -1 ? 0 : index}"]`)?.focus();
+    },
+}));

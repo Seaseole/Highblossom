@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Services\PasswordPolicy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
 /**
  * Password rules service provider.
  *
- * Sets default password validation rules (minimum length, mixed case, numbers, symbols).
+ * Registers the application's password policy once, so every form that validates with
+ * Password::default() — registration, the reset link, the Security page and the admin
+ * user forms — answers with the length and composition the administrator configured.
+ * The callback is read per validation rather than at boot, which is what lets a saved
+ * setting take effect without restarting anything.
  */
 class PasswordRulesServiceProvider extends ServiceProvider
 {
@@ -19,7 +24,7 @@ class PasswordRulesServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PasswordPolicy::class);
     }
 
     /**
@@ -27,12 +32,6 @@ class PasswordRulesServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Password::defaults(function () {
-            return Password::min(12)
-                ->max(64)
-                ->mixedCase()
-                ->numbers()
-                ->symbols();
-        });
+        Password::defaults(fn (): Password => app(PasswordPolicy::class)->rule());
     }
 }

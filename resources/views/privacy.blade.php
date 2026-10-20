@@ -3,7 +3,7 @@
         <h1 class="mb-8 text-4xl font-bold">Privacy Policy for Highblossom (Pty) Ltd</h1>
         <p class="mb-8 text-gray-400">Effective Date: June 2, 2026</p>
 
-        <div class="prose prose-invert max-w-none">
+        <div class="prose max-w-none">
             <p>
                 Highblossom (Pty) Ltd ("we," "us," or "our") operates the web platform accessible via
                 https://highblossom.net (the "Site"). We are committed to protecting and

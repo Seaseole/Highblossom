@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureConsentRecorded;
 use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
 use App\Http\Middleware\EnsureRegistrationIsEnabled;
 use App\Http\Middleware\ShareThemePreference;
+use App\Http\Middleware\ThrottleUsernameAvailability;
 use App\Http\Middleware\TrackUserSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -33,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             ShareThemePreference::class,
             TrackUserSession::class,
+            ThrottleUsernameAvailability::class,
         ]);
 
         $middleware->alias([

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="wp55DtE3P11yp5FAs8JlenWM70Bl8bVAyLNHt5MIDuk" />
     <x-seo.meta />
     @include('partials.favicons')
+    @include('partials.theme-script')
     <script src="/vendor/ckeditor/ckeditor.js"></script>
 
     <!-- Fonts -->
@@ -32,7 +33,7 @@
 
     <style>
         .glass-card {
-            background: #16161d;
+            background: var(--color-site-raised, #16161d);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
@@ -59,15 +60,18 @@
         .text-wrap-pretty {
             text-wrap: pretty;
         }
-        /* Base background color to prevent flash */
+        /* Base background colors to prevent flash (theme script sets .dark before paint) */
         html {
+            background-color: #f7f5f3;
+        }
+        html.dark {
             background-color: #0a0a0f;
         }
     </style>
 
     @stack('styles')
 </head>
-<body class="font-body bg-[#0A0A0F] text-[#FAFAFA] antialiased selection:bg-[#DC2626] selection:text-white">
+<body class="font-body bg-site text-site-text antialiased selection:bg-[#DC2626] selection:text-white">
     @include('partials.site-nav')
 
     <main>{{ $slot }}</main>

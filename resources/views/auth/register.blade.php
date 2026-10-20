@@ -1,179 +1,120 @@
-<x-auth-premium
-    title="Register"
-    :companyName="config('app.name')"
-    brandingSubtitle="Create your account to get started with our platform."
->
-    <div class="mb-10">
-        <h2 class="font-headline mb-2 text-3xl font-bold tracking-tight text-[#18181B]">Create Account</h2>
-        <p class="text-[#71717A]">Fill in your details to get started</p>
-    </div>
+{{--
+    Register.
 
+    Only reachable when the `enable_registration` company setting is on — the same
+    gate the login link checks, enforced server-side by EnsureRegistrationIsEnabled.
+    Restyled anyway so the flow stays one system if that toggle is switched on.
+--}}
+@php
+    $passwordRules = \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString();
+@endphp
+
+<x-layouts::auth
+    :title="__('auth.register.title')"
+    :heading="__('auth.register.heading')"
+    :subheading="__('auth.register.subheading')"
+    :brandLine="__('auth.register.brand_line')"
+>
     <x-ui.alert-banner />
 
-    @php
-        $nameErrors = \App\Support\AuthNotification::fieldMessages('name');
-        $emailErrors = \App\Support\AuthNotification::fieldMessages('email');
-        $passwordErrors = \App\Support\AuthNotification::fieldMessages('password');
-        $confirmationErrors = \App\Support\AuthNotification::fieldMessages('password_confirmation');
-    @endphp
-
-    <form method="POST" action="{{ route('register') }}" class="space-y-5">
+    <form method="POST" action="{{ route('register') }}" class="space-y-5" novalidate>
         @csrf
 
-        <div class="animate-fade-in-up delay-200">
-            <label for="name" class="mb-2 block px-1 text-xs font-bold tracking-widest text-[#71717A] uppercase"
-                >Full Name</label>
-            <input
-                id="name"
-                type="text"
+        <x-ui.field :label="__('auth.register.name_label')" field="name">
+            <x-ui.input
                 name="name"
-                class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('name') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
-                placeholder="John Doe"
-                required
+                type="text"
+                autocomplete="name"
+                placeholder="Full name"
                 autofocus
-                value="{{ old('name') }}"
-                @if ($nameErrors !== []) aria-describedby="name-error" aria-invalid="true" @endif
+                required
             />
-            <x-ui.field-errors field="name" />
-        </div>
+        </x-ui.field>
 
-        <div class="animate-fade-in-up delay-300">
-            <label for="email" class="mb-2 block px-1 text-xs font-bold tracking-widest text-[#71717A] uppercase"
-                >Email</label>
-            <input
-                id="email"
-                type="email"
+        <x-ui.field :label="__('auth.register.username_label')" field="username">
+            <x-ui.input
+                name="username"
+                type="text"
+                autocomplete="username"
+                :placeholder="__('auth.register.username_placeholder')"
+                required
+            />
+
+            <p class="mt-1.5 text-ui-xs text-ui-muted">{{ \App\Support\Username::formatHint() }}</p>
+        </x-ui.field>
+
+        <x-ui.field :label="__('auth.register.email_label')" field="email">
+            <x-ui.input
                 name="email"
-                class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('email') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
                 placeholder="you@example.com"
                 required
-                value="{{ old('email') }}"
-                @if ($emailErrors !== []) aria-describedby="email-error" aria-invalid="true" @endif
             />
-            <x-ui.field-errors field="email" />
-        </div>
+        </x-ui.field>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div class="animate-fade-in-up delay-400">
-                <div class="mb-2 flex h-5 items-center justify-between px-1">
-                    <label for="password" class="block text-xs font-bold tracking-widest text-[#71717A] uppercase"
-                        >Password</label>
-                    <button
-                        type="button"
-                        data-generate-password="password"
-                        data-confirm-target="password_confirmation"
-                        class="group flex items-center gap-1 text-[10px] font-bold tracking-wider text-[#DC2626] uppercase transition-colors hover:text-[#B91C1C]"
-                    >
-                        <svg class="h-3 w-3 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <span>Generate</span>
-                    </button>
-                </div>
-                <input
-                    id="password"
-                    type="password"
-                    name="password"
-                    class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('password') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
-                    placeholder="••••••••"
-                    passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                    data-min="12"
-                    data-max="64"
-                    autocomplete="new-password"
-                    required
-                    @if ($passwordErrors !== []) aria-describedby="password-error" aria-invalid="true" @endif
-                />
-                <x-ui.field-errors field="password" />
-            </div>
-            <div id="pw-hint" class="hidden text-[10px] text-[#A1A1AA] italic"></div>
-            <div class="animate-fade-in-up delay-400">
-                <div class="mb-2 flex h-5 items-center px-1">
-                    <label
-                        for="password_confirmation"
-                        class="block text-xs font-bold tracking-widest text-[#71717A] uppercase"
-                    >Confirm</label>
-                </div>
+        <x-ui.field :label="__('auth.register.password_label')" field="password">
+            <x-slot:action>
+                <button
+                    type="button"
+                    data-generate-password="password"
+                    data-confirm-target="password_confirmation"
+                    class="inline-flex items-center gap-1 rounded-ui-xs text-ui-xs font-semibold uppercase tracking-[0.06em] text-ui-link transition-colors hover:text-ui-link-hover focus:outline-none"
+                >
+                    <x-ui.icon name="bolt" size="xs" />
+                    {{ __('auth.ui.generate') }}
+                </button>
+            </x-slot:action>
 
-                <input
-                    id="password_confirmation"
-                    type="password"
-                    name="password_confirmation"
-                    class="w-full rounded-2xl border bg-white/50 px-5 py-3.5 text-[#18181B] shadow-sm transition-all duration-300 placeholder-[#A1A1AA] focus:ring-2 focus:border-[#DC2626] focus:ring-[#DC2626]/20 focus:outline-none {{ $errors->has('password_confirmation') ? 'border-[#DC2626]' : 'border-[#E4E4E7]' }}"
-                    placeholder="••••••••"
-                    passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                    autocomplete="new-password"
-                    required
-                    @if ($confirmationErrors !== []) aria-describedby="password_confirmation-error" aria-invalid="true" @endif
-                />
-                <x-ui.field-errors field="password_confirmation" />
-            </div>
-        </div>
-        <div class="animate-fade-in-up px-1 delay-500">
-            <div class="light-checkbox space-y-2">
-                <x-ui.checkbox name="terms" id="terms" required>
-                    I agree to the
-                    <a href="{{ route('terms') }}" class="font-bold text-[#DC2626] hover:text-[#B91C1C]">terms</a>
-                </x-ui.checkbox>
-                <x-ui.checkbox name="privacy" id="privacy" required>
-                    I agree to the
-                    <a href="{{ route('privacy') }}" class="font-bold text-[#DC2626] hover:text-[#B91C1C]">privacy policy</a>
-                </x-ui.checkbox>
-            </div>
+            <x-ui.input
+                name="password"
+                type="password"
+                reveal
+                autocomplete="new-password"
+                :placeholder="__('auth.login.password_placeholder')"
+                passwordrules="{{ $passwordRules }}"
+                required
+            />
+
+            <x-ui.password-rules input="password" />
+        </x-ui.field>
+
+        <x-ui.field :label="__('auth.register.password_confirmation_label')" field="password_confirmation">
+            <x-ui.input
+                name="password_confirmation"
+                type="password"
+                reveal
+                autocomplete="new-password"
+                :placeholder="__('auth.login.password_placeholder')"
+                passwordrules="{{ $passwordRules }}"
+                required
+            />
+        </x-ui.field>
+
+        <div class="space-y-2.5 pt-1">
+            <x-ui.checkbox name="terms" required>
+                I agree to the <x-ui.link :href="route('terms')" size="sm" underline>{{ __('auth.ui.terms_link') }}</x-ui.link>
+            </x-ui.checkbox>
+            <x-ui.checkbox name="privacy" required>
+                I agree to the <x-ui.link :href="route('privacy')" size="sm" underline>{{ __('auth.ui.privacy_link') }}</x-ui.link>
+            </x-ui.checkbox>
+
             <x-ui.field-errors field="terms" />
             <x-ui.field-errors field="privacy" />
         </div>
-        <div class="animate-fade-in-up pt-2 delay-500">
-            <button
-                type="submit"
-                data-submit-pending-button
-                class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-6 py-4 text-lg font-bold text-white shadow-xl shadow-[#DC2626]/20 transition-all duration-300 hover:bg-[#B91C1C] focus:ring-4 focus:ring-[#DC2626]/20 focus:outline-none active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
-            >
-                <span data-idle-state>Create Account</span>
-                <span data-pending-state class="hidden">
-                    <span class="flex items-center gap-2">
-                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        {{ __('auth.register.creating_account') }}
-                    </span>
-                </span>
-                <svg data-idle-state class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                </svg>
-            </button>
-        </div>
+
+        <x-ui.button
+            type="submit"
+            variant="primary"
+            size="lg"
+            block
+            :loading="__('auth.register.creating_account')"
+        >{{ __('auth.register.register_button') }}</x-ui.button>
     </form>
 
-    <div class="animate-fade-in-up mt-8 text-center delay-500">
-        <p class="font-medium text-[#71717A]">
-            Already have an account?
-            <a
-                href="{{ route('login') }}"
-                class="font-bold text-[#DC2626] underline decoration-[#DC2626]/20 decoration-2 underline-offset-4 transition-colors hover:text-[#B91C1C] hover:decoration-[#DC2626]"
-            >
-                Sign in
-            </a>
-        </p>
-    </div>
-
-    <script>
-        document.getElementById('password').addEventListener('input', function () {
-            const val = this.value;
-            const min = parseInt(this.dataset.min);
-            const max = parseInt(this.dataset.max);
-            const hint = document.getElementById('pw-hint');
-            const errors = [];
-
-            if (val.length < min) errors.push('At least ' + min + ' characters');
-            if (val.length > max) errors.push('At most ' + max + ' characters');
-            if (!/[a-z]/.test(val)) errors.push('One lowercase letter');
-            if (!/[A-Z]/.test(val)) errors.push('One uppercase letter');
-            if (!/[0-9]/.test(val)) errors.push('One number');
-            if (!/[^a-zA-Z0-9]/.test(val)) errors.push('One symbol');
-
-            hint.textContent = errors.join(' · ');
-            hint.classList.toggle('hidden', errors.length === 0);
-        });
-    </script>
-</x-auth-premium>
+    <p class="mt-6 text-ui-sm text-ui-muted">
+        {{ __('auth.register.already_have_account') }}
+        <x-ui.link :href="route('login')" size="sm">{{ __('auth.register.sign_in_link') }}</x-ui.link>
+    </p>
+</x-layouts::auth>

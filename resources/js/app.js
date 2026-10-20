@@ -3,6 +3,7 @@
 
 import './passkey-signin';
 import './submit-pending';
+import './password-rules';
 
 import { Passkeys } from '@laravel/passkeys';
 window.Passkeys = Passkeys;
@@ -66,6 +67,30 @@ document.addEventListener('click', (e) => {
 });
 
 // Show/hide password toggles. The auth pages boot no Alpine, so this stays vanilla.
+
+/**
+ * Flip a password input and keep its toggle button honest about the state, so a
+ * programmatic reveal (Generate) cannot leave the eye icon disagreeing with the
+ * field next to it.
+ *
+ * @param  HTMLInputElement  input
+ * @param  boolean  reveal
+ */
+function setRevealed(input, reveal) {
+    input.type = reveal ? 'text' : 'password';
+
+    const btn = document.querySelector(`[data-toggle-password="${input.id}"]`);
+
+    if (!btn) {
+        return;
+    }
+
+    btn.setAttribute('aria-label', reveal ? btn.dataset.hideLabel : btn.dataset.showLabel);
+    btn.setAttribute('aria-expanded', reveal ? 'true' : 'false');
+    btn.querySelector('[data-icon-eye]')?.classList.toggle('hidden', reveal);
+    btn.querySelector('[data-icon-eye-off]')?.classList.toggle('hidden', !reveal);
+}
+
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-toggle-password]');
     if (!btn) return;
@@ -74,12 +99,8 @@ document.addEventListener('click', (e) => {
     if (!input) return;
 
     const reveal = input.type === 'password';
-    input.type = reveal ? 'text' : 'password';
 
-    btn.setAttribute('aria-label', reveal ? btn.dataset.hideLabel : btn.dataset.showLabel);
-    btn.setAttribute('aria-expanded', reveal ? 'true' : 'false');
-    btn.querySelector('[data-icon-eye]')?.classList.toggle('hidden', reveal);
-    btn.querySelector('[data-icon-eye-off]')?.classList.toggle('hidden', !reveal);
+    setRevealed(input, reveal);
 
     input.focus({ preventScroll: true });
 
@@ -101,16 +122,16 @@ document.addEventListener('click', (e) => {
     if (input) {
         const password = window.generateSecurePassword(16);
         input.value = password;
-        input.type = 'text'; // Show it initially so they can see it? Or keep it hidden?
-        // Usually good to show it or have a toggle.
+
+        // Show the generated value so it can be copied, and mark the field
+        // changed so Livewire/Alpine listeners on the same input still fire.
+        setRevealed(input, true);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
 
         if (confirmInput) {
             confirmInput.value = password;
+            confirmInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
-
-        // Dispatch input event for frameworks like Livewire/Alpine
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        if (confirmInput) confirmInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
 });
 

@@ -22,12 +22,22 @@ class ResetUserPassword implements ResetsUserPasswords
     /**
      * Validate and reset the user's forgotten password.
      *
+     * Fortify's request already covers token, email and password presence; this adds
+     * the strength and confirmation rules. The Password::default() messages are left
+     * alone because that rule reports its own list of unmet requirements, and
+     * AuthNotificationBannerTest pins how often those sentences appear.
+     *
      * @param array<string, string> $input
      */
     public function reset(User $user, array $input): void
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),
+        ], [
+            'password.required' => 'Choose a new password.',
+            'password.confirmed' => 'The two passwords don’t match. Retype it in both boxes.',
+        ], [
+            'password' => 'new password',
         ])->validate();
 
         $user->forceFill([

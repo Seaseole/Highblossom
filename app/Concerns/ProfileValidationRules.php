@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Concerns;
 
 use App\Models\User;
+use App\Support\Username;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
@@ -24,8 +25,23 @@ trait ProfileValidationRules
     {
         return [
             'name' => $this->nameRules(),
+            'username' => $this->usernameRules($userId),
             'email' => $this->emailRules($userId),
         ];
+    }
+
+    /**
+     * Get the validation rules used to validate usernames.
+     *
+     * The shape, the reserved names and the uniqueness all come from Username, the same
+     * class the backfill command and the sign-in lookup read, so a name the form accepts is
+     * a name the login path can find.
+     *
+     * @return array<int, mixed>
+     */
+    protected function usernameRules(?int $userId = null): array
+    {
+        return Username::rules($userId);
     }
 
     /**

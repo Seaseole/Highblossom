@@ -21,7 +21,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="blog-search-backdrop fixed inset-0 z-[9990] bg-[#0A0A0F]/80 backdrop-blur-md"
+        class="blog-search-backdrop fixed inset-0 z-[9990] bg-site-glass backdrop-blur-md"
         @click="close()"
         aria-hidden="true"
     ></div>
@@ -53,13 +53,13 @@
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="blog-search-title"
-                class="blog-search-panel w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#16161D] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]"
+                class="blog-search-panel w-full max-w-2xl overflow-hidden rounded-[2rem] border border-site-line-strong bg-site-raised shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]"
             >
                 <h2 id="blog-search-title" class="sr-only">Search the blog</h2>
 
                 {{-- Query field --}}
-                <div class="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-                    <svg class="h-5 w-5 flex-shrink-0 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <div class="flex items-center gap-3 border-b border-site-line-strong px-5 py-4">
+                    <svg class="h-5 w-5 flex-shrink-0 text-site-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
 
@@ -79,11 +79,11 @@
                         enterkeyhint="search"
                         maxlength="80"
                         placeholder="Search articles, categories and tags"
-                        class="w-full bg-transparent text-base font-medium text-[#FAFAFA] placeholder:text-[#71717A] focus:outline-none"
+                        class="w-full bg-transparent text-base font-medium text-site-text placeholder:text-site-faint focus:outline-none"
                     />
 
                     <span x-show="loading" class="flex-shrink-0" aria-hidden="true">
-                        <svg class="h-5 w-5 animate-spin text-[#DC2626]" fill="none" viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 animate-spin text-site-accent" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
@@ -95,7 +95,7 @@
                         x-cloak
                         @click="query = ''; onInput(); $refs.input.focus()"
                         aria-label="Clear the search field"
-                        class="flex-shrink-0 rounded-full p-1 text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                        class="flex-shrink-0 rounded-full p-1 text-site-faint transition-colors hover:text-site-text"
                     >
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -113,7 +113,7 @@
                 >
                     <template x-for="group in groups()" :key="group.type + '|' + mode">
                         <div role="group" :aria-label="group.label">
-                            <p class="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-[0.14em] text-[#71717A] uppercase" x-text="group.label"></p>
+                            <p class="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-[0.14em] text-site-faint uppercase" x-text="group.label"></p>
 
                             <template x-for="opt in group.items" :key="opt.id + '|' + clean(query)">
                                 <div
@@ -122,7 +122,7 @@
                                     :aria-selected="active === opt.index"
                                     @click="choose(opt)"
                                     @mousemove="active = opt.index"
-                                    :class="active === opt.index ? 'bg-[#DC2626]/10' : 'hover:bg-white/5'"
+                                    :class="active === opt.index ? 'bg-site-accent-soft' : 'hover:bg-site-fill'"
                                     class="flex w-full cursor-pointer items-start gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-200"
                                 >
                                     <template x-if="opt.type === 'post'">
@@ -133,11 +133,11 @@
 
                                             <div class="min-w-0 flex-1">
                                                 <p
-                                                    class="font-headline truncate text-sm font-bold text-[#FAFAFA]"
+                                                    class="font-headline truncate text-sm font-bold text-site-text"
                                                     x-init="mark($el, opt.label, query)"
                                                 ></p>
-                                                <p class="mt-1 line-clamp-1 text-xs leading-relaxed text-[#A1A1AA]" x-text="opt.snippet"></p>
-                                                <p class="mt-1.5 flex items-center gap-2 text-[11px] text-[#71717A]">
+                                                <p class="mt-1 line-clamp-1 text-xs leading-relaxed text-site-muted" x-text="opt.snippet"></p>
+                                                <p class="mt-1.5 flex items-center gap-2 text-[11px] text-site-faint">
                                                     <span x-show="opt.category" x-text="opt.category"></span>
                                                     <span x-show="opt.category" aria-hidden="true">&middot;</span>
                                                     <span x-text="opt.date"></span>
@@ -149,12 +149,12 @@
                                     <template x-if="opt.type !== 'post'">
                                         <div class="flex w-full items-center gap-3">
                                             <span
-                                                class="text-sm font-semibold text-[#FAFAFA]"
-                                                :class="opt.type === 'tag' ? 'text-[#DC2626]' : ''"
+                                                class="text-sm font-semibold text-site-text"
+                                                :class="opt.type === 'tag' ? 'text-site-link' : ''"
                                                 x-init="mark($el, opt.label, query)"
                                             ></span>
 
-                                            <span class="ml-auto text-xs text-[#71717A]" x-text="opt.meta"></span>
+                                            <span class="ml-auto text-xs text-site-faint" x-text="opt.meta"></span>
                                         </div>
                                     </template>
 
@@ -166,7 +166,7 @@
                                         tabindex="-1"
                                         aria-hidden="true"
                                         @click.stop="removeHistory(opt.term)"
-                                        class="flex-shrink-0 self-center rounded-full p-1 text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                                        class="flex-shrink-0 self-center rounded-full p-1 text-site-faint transition-colors hover:text-site-text"
                                     >
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -178,27 +178,27 @@
                     </template>
 
                     {{-- Loading --}}
-                    <div x-show="loading && !options().length" class="px-3 py-8 text-center text-sm text-[#A1A1AA]">
+                    <div x-show="loading && !options().length" class="px-3 py-8 text-center text-sm text-site-muted">
                         Searching the blog&hellip;
                     </div>
 
                     {{-- Failure, including a tripped rate limit --}}
                     <div x-show="failed" class="px-3 py-8 text-center">
-                        <p class="text-sm text-[#A1A1AA]">Search is unavailable right now. Please try again in a moment.</p>
-                        <a href="{{ route('blog') }}" wire:navigate class="mt-2 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
+                        <p class="text-sm text-site-muted">Search is unavailable right now. Please try again in a moment.</p>
+                        <a href="{{ route('blog') }}" wire:navigate class="mt-2 inline-block text-sm font-semibold text-site-link hover:underline">Browse all posts</a>
                     </div>
 
                     {{-- Nothing matched --}}
                     <div x-show="!loading && !failed && !options().length && !isResting()" class="px-3 py-10 text-center">
-                        <p class="font-headline text-base font-semibold text-[#FAFAFA]">
+                        <p class="font-headline text-base font-semibold text-site-text">
                             No results for &ldquo;<span x-text="clean(query)"></span>&rdquo;
                         </p>
-                        <a href="{{ route('blog') }}" wire:navigate class="mt-3 inline-block text-sm font-semibold text-[#DC2626] hover:underline">Browse all posts</a>
+                        <a href="{{ route('blog') }}" wire:navigate class="mt-3 inline-block text-sm font-semibold text-site-link hover:underline">Browse all posts</a>
                     </div>
                 </div>
 
                 {{-- Footer --}}
-                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 px-5 py-3 text-[11px] text-[#71717A]">
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-site-line-strong px-5 py-3 text-[11px] text-site-faint">
                     <span class="flex items-center gap-1.5">
                         <kbd class="blog-search-kbd">&uarr;</kbd>
                         <kbd class="blog-search-kbd">&darr;</kbd>
@@ -222,7 +222,7 @@
                         x-show="history.length && isResting()"
                         x-cloak
                         @click="clearHistory()"
-                        class="ml-auto font-semibold text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                        class="ml-auto font-semibold text-site-muted transition-colors hover:text-site-link"
                     >
                         Clear history
                     </button>
@@ -239,17 +239,17 @@
             min-width: 1.5rem;
             padding: 0.15rem 0.4rem;
             border-radius: 0.45rem;
-            border: 1px solid rgb(255 255 255 / 0.12);
-            background: rgb(255 255 255 / 0.06);
+            border: 1px solid var(--color-site-line-strong);
+            background: var(--color-site-fill);
             font-size: 10px;
             font-weight: 600;
             line-height: 1.4;
-            color: #a1a1aa;
+            color: var(--color-site-muted);
         }
 
         #blog-search-dialog mark.blog-search-hit {
             background: rgb(220 38 38 / 0.22);
-            color: #fafafa;
+            color: var(--color-site-text);
             border-radius: 0.2rem;
             padding: 0 0.1rem;
         }

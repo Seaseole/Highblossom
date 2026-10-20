@@ -3,6 +3,11 @@
 
     Rendered server-side because the auth pages do not boot Alpine, so the
     session toaster cannot run here.
+
+    Page-level messages only — failed credentials, lockout, invalid reset token — or a
+    neutral summary when every message in the bag belongs to a field. The field sentences
+    belong to x-ui.field-errors, and App\Support\AuthNotification is what keeps the two
+    from overlapping, so never move a sentence from one to the other.
 --}}
 @props(['notification' => null])
 
@@ -10,11 +15,13 @@
     $notification ??= \App\Support\AuthNotification::fromSession();
 
     $styles = match ($notification['type'] ?? 'error') {
-        'success' => 'border-emerald-500/25 bg-emerald-500/10 text-emerald-700',
-        'info' => 'border-sky-500/25 bg-sky-500/10 text-sky-700',
-        'warning' => 'border-amber-500/25 bg-amber-500/10 text-amber-700',
-        default => 'border-[#DC2626]/25 bg-[#DC2626]/5 text-[#B91C1C]',
+        'success' => 'border-ui-success/25 bg-ui-success-soft text-ui-success',
+        'info' => 'border-ui-info/25 bg-ui-info-soft text-ui-info',
+        'warning' => 'border-ui-warning/25 bg-ui-warning-soft text-ui-warning',
+        default => 'border-ui-danger/25 bg-ui-danger-soft text-ui-danger',
     };
+
+    $icon = ($notification['type'] ?? 'error') === 'success' ? 'check' : 'exclamation-circle';
 @endphp
 
 @if ($notification && ! empty($notification['message']))
@@ -22,17 +29,9 @@
         data-auth-alert
         role="alert"
         aria-live="polite"
-        {{ $attributes->class('mb-6 flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm font-medium '.$styles) }}
+        {{ $attributes->class('mb-5 flex items-start gap-2.5 rounded-ui-md border px-3.5 py-3 text-ui-sm font-medium '.$styles) }}
     >
-        @if (($notification['type'] ?? 'error') === 'success')
-            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-        @else
-            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        @endif
+        <x-ui.icon :name="$icon" size="xs" class="mt-px shrink-0" />
 
         <p class="min-w-0 flex-1">{{ $notification['message'] }}</p>
     </div>

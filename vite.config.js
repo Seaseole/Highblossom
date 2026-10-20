@@ -13,6 +13,9 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/site-booking.js',
                 'resources/js/site-alpine.js',
+                // Design language v1 — scoped to layouts that opt in
+                'resources/css/auth.css',
+                'resources/js/auth-alpine.js',
                 // Admin panel (Bootstrap 5 + AdminLTE 4)
                 'resources/css/admin.css',
                 'resources/js/admin.js',

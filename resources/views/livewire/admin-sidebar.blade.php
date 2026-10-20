@@ -9,7 +9,7 @@
         'blog' => ['label' => 'Blog', 'icon' => 'newspaper', 'routes' => ['admin.posts', 'admin.categories', 'admin.tags']],
         'access' => ['label' => 'Team & Access', 'icon' => 'users', 'routes' => ['admin.users', 'admin.roles', 'admin.sessions']],
         'media' => ['label' => 'Media', 'icon' => 'photo', 'routes' => ['admin.media-library']],
-        'system' => ['label' => 'System', 'icon' => 'cog-6-tooth', 'routes' => ['admin.settings', 'admin.seo', 'admin.cache', 'admin.system-overview', 'admin.versions']],
+        'system' => ['label' => 'System', 'icon' => 'cog-6-tooth', 'routes' => ['admin.settings', 'admin.password-policy', 'admin.seo', 'admin.cache', 'admin.system-overview', 'admin.versions']],
     ];
 
     // Routes that need more than the shared 'access admin panel' gate
@@ -27,7 +27,7 @@
         'admin.gallery-categories' => 'Gallery Categories', 'admin.partners' => 'Partners', 'admin.staff' => 'Staff',
         'admin.glass-types' => 'Glass Types', 'admin.service-types' => 'Service Types', 'admin.contact-messages' => 'Messages',
         'admin.posts' => 'Posts', 'admin.categories' => 'Categories', 'admin.tags' => 'Tags', 'admin.users' => 'Users',
-        'admin.roles' => 'Roles', 'admin.sessions' => 'Sessions', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.seo' => 'SEO', 'admin.cache' => 'Cache', 'admin.system-overview' => 'System Overview', 'admin.versions' => 'Versions',
+        'admin.roles' => 'Roles', 'admin.sessions' => 'Sessions', 'admin.media-library' => 'Media', 'admin.settings' => 'Settings', 'admin.password-policy' => 'Security', 'admin.seo' => 'SEO', 'admin.cache' => 'Cache', 'admin.system-overview' => 'System Overview', 'admin.versions' => 'Versions',
     ][$route] ?? ucfirst(str_replace(['admin.', '-'], ['', ' '], $route));
     $badges = [
         'admin.users' => $userCount,

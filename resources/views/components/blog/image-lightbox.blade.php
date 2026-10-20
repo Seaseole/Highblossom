@@ -24,7 +24,7 @@
             class="fixed inset-0 z-[100] flex items-center justify-center"
             style="display: none"
         >
-            <div class="absolute inset-0 bg-[#0A0A0F]/95 backdrop-blur-xl" @click="close()"></div>
+            <div class="absolute inset-0 bg-site-glass backdrop-blur-xl" @click="close()"></div>
 
             <button
                 type="button"

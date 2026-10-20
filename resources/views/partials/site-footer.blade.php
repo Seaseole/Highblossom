@@ -1,4 +1,4 @@
-<footer class="w-full border-t border-white/5 bg-[#0A0A0F]">
+<footer class="w-full border-t border-site-line bg-site">
     {{-- Main Footer Content --}}
     <div class="mx-auto max-w-[1400px] px-6 py-16 lg:px-8 lg:py-20">
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
@@ -12,7 +12,7 @@
                         :show-badge="false"
                     />
                 </a>
-                <p class="mt-4 max-w-xs text-sm leading-relaxed text-[#A1A1AA]">
+                <p class="mt-4 max-w-xs text-sm leading-relaxed text-site-muted">
                     Premium automotive glass repair, restoration, and replacement for Gaborone's vehicle owners and
                     commercial fleets.
                 </p>
@@ -20,7 +20,7 @@
                     @if ($contact->hasPhone())
                         <a
                             href="{{ $contact->telHref($contact->primaryPhone) }}"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-site-muted transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             aria-label="{{ __('site.home.cta_band_call') }}"
                         >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -33,7 +33,7 @@
                             href="{{ $contact->whatsappHrefBare() }}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-site-muted transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             aria-label="{{ __('site.home.cta_band_whatsapp') }}"
                         >
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -44,7 +44,7 @@
                     @if ($contact->emailHref())
                         <a
                             href="{{ $contact->emailHref() }}"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-site-muted transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             aria-label="{{ __('site.home.cta_band_email') }}"
                         >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +59,7 @@
                             href="{{ $facebookUrl }}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                            class="text-site-muted transition-colors hover:text-site-link"
                             title="Facebook"
                         >
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
                             href="{{ $instagramUrl }}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                            class="text-site-muted transition-colors hover:text-site-link"
                             title="Instagram"
                         >
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@
                             href="{{ $linkedinUrl }}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-[#A1A1AA] transition-colors hover:text-[#DC2626]"
+                            class="text-site-muted transition-colors hover:text-site-link"
                             title="LinkedIn"
                         >
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -99,7 +99,7 @@
             {{-- Services Column: links point at each service's own block on the
                  services page instead of the top of /services for all five. --}}
             <div>
-                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-[#FAFAFA] uppercase">
+                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-site-text uppercase">
                     Services
                 </h4>
                 @if ($footerServices->isNotEmpty())
@@ -108,7 +108,7 @@
                             <li>
                                 <a
                                     href="{{ route('services') }}#service-{{ $footerService->slug }}"
-                                    class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                    class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                                 >
                                     {{ $footerService->title }}
                                 </a>
@@ -119,7 +119,7 @@
                     <a
                         href="{{ route('services') }}"
                         wire:navigate
-                        class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                        class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text"
                     >
                         {{ __('site.services') }}
                     </a>
@@ -128,13 +128,13 @@
 
             {{-- Company Column --}}
             <div>
-                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-[#FAFAFA] uppercase">Company</h4>
+                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-site-text uppercase">Company</h4>
                 <ul class="space-y-3">
                     <li>
                         <a
                             href="{{ route('home') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             {{ __('site.nav_home') }}
                         </a>
@@ -143,7 +143,7 @@
                         <a
                             href="{{ route('about-us') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             {{ __('site.about') }}
                         </a>
@@ -152,7 +152,7 @@
                         <a
                             href="{{ route('gallery') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             Our Work
                         </a>
@@ -161,7 +161,7 @@
                         <a
                             href="{{ route('blog') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             {{ __('site.blog') }}
                         </a>
@@ -170,7 +170,7 @@
                         <a
                             href="{{ route('quote') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             {{ __('site.get_quote') }}
                         </a>
@@ -179,7 +179,7 @@
                         <a
                             href="{{ route('contact') }}"
                             wire:navigate
-                            class="inline-flex min-h-[44px] items-center text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                            class="inline-flex min-h-[44px] items-center text-sm text-site-faint transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                         >
                             {{ __('site.contact') }}
                         </a>
@@ -189,21 +189,21 @@
 
             {{-- Contact Column --}}
             <div>
-                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-[#FAFAFA] uppercase">Contact</h4>
+                <h4 class="font-headline mb-6 text-sm font-semibold tracking-wide text-site-text uppercase">Contact</h4>
                 <div class="space-y-4">
                     @if ($contact->hasPhone())
                         <div class="glass-card rounded-xl p-4">
-                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Phone</div>
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-site-link uppercase">Phone</div>
                             <a
                                 href="{{ $contact->telHref($contact->primaryPhone) }}"
-                                class="font-headline inline-flex min-h-[44px] items-center font-semibold text-[#FAFAFA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                class="font-headline inline-flex min-h-[44px] items-center font-semibold text-site-text transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             >
                                 {{ $contact->primaryPhone }}
                             </a>
                             @if (filled($contact->secondaryPhone))
                                 <a
                                     href="{{ $contact->telHref($contact->secondaryPhone) }}"
-                                    class="font-headline mt-1 inline-flex min-h-[44px] items-center text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                    class="font-headline mt-1 inline-flex min-h-[44px] items-center text-sm font-medium text-site-muted transition-colors hover:text-site-link focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                                 >
                                     {{ $contact->secondaryPhone }}
                                 </a>
@@ -213,19 +213,19 @@
 
                     @if (filled($contact->address))
                         <div class="glass-card rounded-xl p-4">
-                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Location</div>
-                            <p class="text-sm leading-relaxed text-[#FAFAFA]">{{ $contact->address }}</p>
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-site-link uppercase">Location</div>
+                            <p class="text-sm leading-relaxed text-site-text">{{ $contact->address }}</p>
                         </div>
                     @endif
 
                     @if ($contact->hasWhatsapp())
                         <div class="glass-card rounded-xl p-4">
-                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">WhatsApp</div>
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-site-link uppercase">WhatsApp</div>
                             <a
                                 href="{{ $contact->whatsappHref() }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-[#FAFAFA] transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/60"
+                                class="inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-site-text transition-colors hover:text-[#25D366] focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
                             >
                                 <svg class="h-5 w-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.182-.008-.391-.011-.6-.011-.207 0-.544.079-.829.396-.286.319-1.095 1.068-1.095 2.617 0 1.55 1.095 3.05 1.248 3.26.153.21 2.153 3.3 5.223 4.63.73.315 1.3.483 1.743.618.753.225 1.438.193 1.983.117.604-.09 1.84-.752 2.103-1.479.262-.727.262-1.349.183-1.479-.079-.13-.296-.203-.594-.351m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.398 0 .16 5.237.157 11.716c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.504 0 11.79-5.286 11.793-11.793a11.821 11.821 0 00-3.48-8.413z"/>
@@ -237,8 +237,8 @@
 
                     @if ($contact->openingHours()->isNotEmpty())
                         <div class="glass-card rounded-xl p-4">
-                            <div class="mb-1 text-xs font-semibold tracking-wider text-[#DC2626] uppercase">Hours</div>
-                            <ul class="space-y-1 text-sm text-[#FAFAFA]">
+                            <div class="mb-1 text-xs font-semibold tracking-wider text-site-link uppercase">Hours</div>
+                            <ul class="space-y-1 text-sm text-site-text">
                                 @foreach ($contact->openingHours() as $line)
                                     <li>{{ $line }}</li>
                                 @endforeach
@@ -251,29 +251,29 @@
     </div>
 
     {{-- Bottom Bar --}}
-    <div class="border-t border-white/5">
+    <div class="border-t border-site-line">
         <div class="mx-auto max-w-[1400px] px-6 py-6 lg:px-8">
             <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
-                <p class="text-sm text-[#71717A]">© {{ date('Y') }} {{ $companyName }}. All rights reserved.</p>
+                <p class="text-sm text-site-faint">© {{ date('Y') }} {{ $companyName }}. All rights reserved.</p>
                 <div class="flex items-center gap-6">
                     <a
                         href="{{ route('privacy') }}"
                         wire:navigate
-                        class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                        class="text-sm text-site-faint transition-colors hover:text-site-text"
                     >
                         Privacy Policy
                     </a>
                     <a
                         href="{{ route('terms') }}"
                         wire:navigate
-                        class="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                        class="text-sm text-site-faint transition-colors hover:text-site-text"
                     >
                         Terms of Service
                     </a>
                 </div>
             </div>
-            <div class="mt-6 flex justify-center border-t border-white/5 pt-6">
-                <span class="flex items-center gap-2 text-sm text-[#71717A]">
+            <div class="mt-6 flex justify-center border-t border-site-line pt-6">
+                <span class="flex items-center gap-2 text-sm text-site-faint">
                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
@@ -281,7 +281,7 @@
                     <a
                         href="{{ route('home') }}"
                         wire:navigate
-                        class="font-medium text-[#A1A1AA] transition-colors duration-200 hover:text-[#DC2626]"
+                        class="font-medium text-site-muted transition-colors duration-200 hover:text-site-link"
                     >Eugene Seaseole</a>
                 </span>
             </div>
