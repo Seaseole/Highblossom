@@ -72,7 +72,7 @@
     </style>
 </head>
 <body
-    class="admin-panel min-h-[100dvh] bg-white font-sans text-gray-900 antialiased dark:bg-[#0A0A0F] dark:text-gray-100"
+    class="admin-panel h-dvh overflow-hidden bg-white font-sans text-gray-900 antialiased dark:bg-[#0A0A0F] dark:text-gray-100"
     x-data
     @keydown.escape.window="$store.mobileMenu.close()"
 >
@@ -92,12 +92,21 @@
         <div class="size-11"></div>
     </div>
 
-    <div class="flex min-h-[100dvh] pt-16 lg:pt-0">
-        <!-- Livewire Admin Sidebar -->
-        <livewire:admin-sidebar />
+    {{-- The row is viewport-tall rather than content-tall: with a min-height here the flex
+         line grows with the page, the sidebar's lg:h-full resolves against the whole
+         document instead of the screen, and the window becomes the scroll area. --}}
+    <div class="flex h-dvh pt-16 lg:pt-0">
+        {{-- Persisted so a wire:navigate between admin pages swaps the content and leaves the
+             rail standing. It is plain Blade rather than a Livewire component for the same
+             reason: a persisted component keeps answering to the snapshot of the page that
+             created it, and every later page has since replaced those bindings. The rail does
+             not need to talk to the server — it needs to stop talking to it. --}}
+        @persist('admin-sidebar')
+            <x-admin.sidebar />
+        @endpersist
 
         <!-- Main Content -->
-        <main class="admin-main flex-1 overflow-auto bg-white dark:bg-[#0A0A0F]">
+        <main class="admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F]">
             <div class="p-4 sm:p-8">
                 @if ($errors->any())
                     <div
@@ -125,8 +134,6 @@
                 {{ $slot }}
             </div>
         </main>
-    </div>
-
     </div>
 
     {{-- Environment Badge --}}
@@ -188,11 +195,34 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('mobileMenu', {
                 open: false,
+
                 toggle() {
-                    this.open = !this.open;
+                    this.open ? this.close() : this.show();
                 },
+
+                show() {
+                    this.open = true;
+                    this.lock();
+                    document.getElementById('sidebar-close-btn')?.focus();
+                },
+
                 close() {
+                    if (! this.open) {
+                        return;
+                    }
+
                     this.open = false;
+                    this.lock(false);
+
+                    // Hand focus back to the control that opened the drawer, so Tab does
+                    // not restart at the top of the document.
+                    document.getElementById('mobile-menu-btn')?.focus();
+                },
+
+                // Content scrolls inside .admin-main, not the window, so the backdrop has
+                // to suspend that scroller — locking <body> would do nothing at all.
+                lock(locked = true) {
+                    document.querySelector('.admin-main')?.classList.toggle('is-scroll-locked', locked);
                 },
             });
 

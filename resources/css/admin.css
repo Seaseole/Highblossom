@@ -285,6 +285,46 @@
     text-decoration: underline;
 }
 
+/* Admin Shell: scroll areas.
+   The layout row is viewport-tall, so content scrolls inside .admin-main and the menu
+   scrolls inside its own nav column. Two consequences these rules cover: a modal or the
+   mobile drawer has to suspend the scroller that actually moves (locking <body> does
+   nothing now that the body never scrolls), and a scrollbar must not eat into a column
+   that is 256px wide, or 80px when collapsed. */
+.admin-main.is-scroll-locked {
+    overflow: hidden;
+}
+
+.admin-nav-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(113, 113, 122, 0.35) transparent;
+}
+
+.dark .admin-nav-scroll {
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.admin-nav-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-nav-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-nav-scroll::-webkit-scrollbar-thumb {
+    background: rgba(113, 113, 122, 0.35);
+    border-radius: 9999px;
+}
+
+.admin-nav-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(113, 113, 122, 0.6);
+}
+
+.dark .admin-nav-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+}
+
 /* x-ui.checkbox label colors — dark-friendly on light admin surfaces */
 body {
     --checkbox-label: #374151;
@@ -294,4 +334,252 @@ body {
 .dark body {
     --checkbox-label: #a1a1aa;
     --checkbox-label-hover: #fafafa;
+}
+
+/* ==========================================================================
+   Admin sidebar — the rebuilt navigation surface.
+
+   Scope notes that are not obvious from the CSS itself:
+
+   * Colours resolve against --color-admin-* (app.css @theme + its .dark block),
+     the palette the panel already ships. Those variables are frozen — this block
+     reads them and never repoints them, so no other admin surface moves.
+   * Rules here are unlayered on purpose. Tailwind utilities live in
+     @layer utilities and app.css's global *:focus-visible is unlayered, so a
+     focus:ring-* utility on a sidebar control would lose. Unlayered + scoped
+     wins where it has to.
+   * The sidebar background stays #ffffff / #0a0a0f because those values sit in
+     class strings the shell layout test asserts on; the pill is the colour that
+     changes, not the panel.
+   ========================================================================== */
+
+body {
+    --admin-nav-gap: 2px;
+    --admin-nav-radius: 10px;
+    --admin-nav-hover: #f4f4f5;
+    --admin-nav-active: #ececed;
+    --admin-nav-text: var(--color-admin-text);
+    --admin-nav-muted: #52525e;
+    --admin-nav-label: #71717a;
+    --admin-nav-line: #dcdce2;
+    --admin-nav-sheen: rgba(255, 255, 255, 0.06);
+}
+
+.dark body {
+    --admin-nav-hover: rgba(255, 255, 255, 0.06);
+    --admin-nav-active: rgba(255, 255, 255, 0.11);
+    --admin-nav-muted: #a9a9b3;
+    --admin-nav-label: #a1a1aa;
+    --admin-nav-line: rgba(255, 255, 255, 0.12);
+    --admin-nav-sheen: rgba(255, 255, 255, 0.04);
+}
+
+/* One row height everywhere, so the rail cannot grow a scrollbar by retyping a label.
+   40px matches the reference while min-h-[44px] on touch stays untouched for the drawer. */
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: var(--admin-nav-radius);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--admin-nav-muted);
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.admin-nav-item:hover {
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-nav-text);
+}
+
+.admin-nav-item[data-admin-nav-active='true'] {
+    background-color: var(--admin-nav-active);
+    color: var(--admin-nav-text);
+    font-weight: 600;
+}
+
+.admin-nav-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: var(--admin-nav-radius);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--admin-nav-label);
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.admin-nav-heading:hover {
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-nav-text);
+}
+
+/* The tree: a hairline down the left of an open group with a dot per child. The line is
+   inset so it never crosses the pill, and the active child's dot takes the brand accent —
+   the accent appears only as this 6px mark and never as body text, which is what keeps
+   every label above AA on both grounds. */
+.admin-nav-tree {
+    position: relative;
+    padding-left: 18px;
+    margin: 2px 0 4px;
+}
+
+.admin-nav-tree::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 4px;
+    bottom: 6px;
+    width: 1px;
+    background-color: var(--admin-nav-line);
+}
+
+.admin-nav-child {
+    position: relative;
+}
+
+.admin-nav-child::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 9999px;
+    background-color: var(--admin-nav-line);
+}
+
+.admin-nav-child[data-admin-nav-active='true']::before {
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    left: -8px;
+    background-color: var(--color-admin-accent);
+}
+
+.admin-nav-badge {
+    min-width: 1.5rem;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    /* The only solid chip in the rail, so its text is the panel's own foreground at
+       full weight — 15:1 on light, 17:1 on dark. Nothing here relies on a mid-grey. */
+    background-color: var(--admin-nav-active);
+    color: var(--admin-nav-text);
+}
+
+.admin-nav-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: var(--admin-nav-radius);
+    background-color: var(--admin-nav-hover);
+    border: 1px solid transparent;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease;
+}
+
+.admin-nav-field:focus-within {
+    background-color: var(--color-admin-surface);
+    border-color: var(--color-admin-input-border);
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+}
+
+.admin-nav-field input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    outline: none;
+    font-size: 0.875rem;
+    color: var(--admin-nav-text);
+}
+
+.admin-nav-field input::placeholder {
+    color: var(--admin-nav-label);
+}
+
+.admin-nav-mark {
+    background-color: var(--color-ui-accent-soft);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+.admin-nav-card {
+    border: 1px solid var(--color-admin-border-subtle);
+    border-radius: 14px;
+    background-color: var(--admin-nav-hover);
+    padding: 6px;
+}
+
+.dark .admin-nav-card {
+    background-color: var(--admin-nav-sheen);
+}
+
+/* Group bodies animate through x-collapse, which drives height; a chevron rotation and a
+   pill colour are the only other motion, both under 200ms. People who ask for less get
+   none of it, including the rail's width transition. */
+@media (prefers-reduced-motion: reduce) {
+    .admin-nav-item,
+    .admin-nav-heading,
+    .admin-nav-field,
+    #desktop-sidebar,
+    #desktop-sidebar * {
+        transition-duration: 0ms !important;
+    }
+}
+
+/* The theme chip in the account card. Small, so it carries the panel's own foreground at
+   full weight rather than a mid-grey that would fail AA at this size. */
+.admin-nav-chip {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background-color: var(--admin-nav-active);
+    color: var(--admin-nav-text);
+}
+
+/* @persist injects a plain <div x-persist="…"> and it — not the sidebar component — is the
+   layout row's flex item. Two consequences: it must not shrink when the rail expands, and the
+   height has to be definite here so the chain below it (sidebar root → #desktop-sidebar →
+   the nav column) can resolve h-full and actually have something to scroll inside. Without
+   this, the desktop nav grows to its content and the wheel does nothing, while the drawer —
+   which is fixed h-dvh — keeps scrolling, which is what makes the bug look mobile-specific. */
+div[x-persist="admin-sidebar"] {
+    flex-shrink: 0;
+    height: 100%;
+}
+
+/* The account panel floats above its trigger, so it needs the surfaces a card would have had in
+   flow: an opaque ground (it overlaps the nav column), a border to separate it from whatever it
+   covers, and a shadow that reads as elevation rather than as a layout row. */
+.admin-nav-pop {
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--color-admin-border);
+    background-color: var(--color-admin-surface);
+    box-shadow:
+        0 1px 2px rgb(0 0 0 / 0.05),
+        0 8px 24px -12px rgb(0 0 0 / 0.25);
 }

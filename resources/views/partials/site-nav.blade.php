@@ -4,11 +4,10 @@
 >
     @php
         $isAnnounceActive = $announcementActive ?? $settings->get('announcement_active', false);
-        $announceList = $announcements ?? $settings->get('announcements', []);
-        $announceList = collect($announceList)
-            ->filter(fn ($a) => empty($a['expires_at'] ?? null) || \Carbon\Carbon::parse($a['expires_at'])->isFuture())
-            ->values()
-            ->all();
+        // Expiry is decided in GlobalSettingsComposer, which also produces the dismissal
+        // key the layout hands to the browser. Filtering again here would let the messages
+        // on screen and the fingerprint they are dismissed under disagree.
+        $announceList = $announcements ?? [];
     @endphp
     @if ($isAnnounceActive && ! empty($announceList))
         <style>
@@ -33,6 +32,32 @@
             .ticker-item {
                 display: inline-flex;
                 align-items: center;
+            }
+            /* The Material Symbols stylesheet declares font-size: 24px and line-height: 24px,
+               which outranks the text-[15px] / text-[16px] classes on these glyphs. That is why
+               the bar's content measured 47px inside a box hardcoded to 34px: the icons were
+               being clipped. Sized here, the row is its own height and needs no declared one. */
+            #announcement-ticker-bar .material-symbols-outlined {
+                font-size: 15px;
+                line-height: 1;
+            }
+            #close-announcement-btn .material-symbols-outlined {
+                font-size: 16px;
+            }
+            /* Keyboard users get the pause too, not only a hovering pointer. */
+            .ticker-container:focus-within .ticker-wrapper {
+                animation-play-state: paused;
+            }
+            /* One attribute both hides the bar and releases the space it took: the bar is a
+               normal-flow child of the sticky header, so nothing else reserves its height. */
+            html[data-announcement="dismissed"] #announcement-ticker-bar {
+                display: none;
+            }
+            #announcement-ticker-bar.is-closing {
+                padding-top: 0;
+                padding-bottom: 0;
+                border-bottom-width: 0;
+                opacity: 0;
             }
             @keyframes marquee-scroll {
                 0% {
@@ -62,11 +87,31 @@
                     transform: translateX(100%);
                 }
             }
+            @media (prefers-reduced-motion: reduce) {
+                .ticker-wrapper,
+                .shimmer-glow::after,
+                #announcement-ticker-bar .animate-pulse {
+                    animation: none;
+                }
+                /* Static text still has to be reachable, so the row becomes scrollable. */
+                .ticker-container {
+                    overflow-x: auto;
+                }
+                #announcement-ticker-bar {
+                    transition: none;
+                }
+            }
         </style>
+        {{-- Deliberately no declared height. The bar is one line of text with fixed
+             padding inside a normal-flow column, so its space is released by itself when it
+             is dismissed. The inline min-height: 34px removed here is exactly what stayed
+             behind as an empty gap: the old handler zeroed height, padding, opacity and the
+             border, but min-height outranks height, so the box never collapsed. --}}
         <div
             id="announcement-ticker-bar"
             class="announcement-gradient shimmer-glow relative flex w-full items-center overflow-hidden border-b border-white/10 px-4 py-1.5 text-white transition-all duration-300 ease-out select-none"
-            style="height: 34px; min-height: 34px"
+            role="region"
+            aria-label="Announcements"
         >
             <div class="z-10 mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4">
                 <!-- Label on left -->
@@ -87,7 +132,7 @@
                                             $link = route($link);
                                         }
                                     @endphp
-                                    <div class="ticker-item mx-4 text-[11px] font-medium tracking-wide text-white">
+                                    <div class="ticker-item mx-4 text-[11px] font-medium tracking-wide text-white" aria-hidden="{{ $i === 0 ? 'false' : 'true' }}">
                                         @if (! empty($link))
                                             <x-site.link :href="$link" class="flex items-center gap-1 transition-colors hover:text-white/80">
                                                 <span>{{ $announcement['text'] }}</span>
@@ -107,9 +152,13 @@
                 <button
                     type="button"
                     id="close-announcement-btn"
-                    class="group relative flex-shrink-0 p-0.5 text-white/60 transition-colors hover:text-white"
-                    aria-label="Close announcement"
+                    class="group relative flex-shrink-0 rounded p-0.5 leading-none text-white/60 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 before:absolute before:-inset-3 before:content-['']"
+                    aria-label="Dismiss announcement"
                 >
+                    {{-- The 44px target is grown with a pseudo-element rather than padding,
+                         because padding would have made the bar taller than it is today. The
+                         bar clips its own overflow, so the target is 44px wide and exactly as
+                         tall as the bar. --}}
                     <span class="material-symbols-outlined text-[16px]">close</span>
                 </button>
             </div>
@@ -535,6 +584,57 @@
             // Expose globally for onclick handlers on anchor tags
             window.closeMobileMenu = closeMobileMenu;
 
+            /**
+             * Take the announcement bar out of the layout and remember that it went.
+             *
+             * The dismissal is stored against the fingerprint of the live messages, so an
+             * edited announcement comes back while the same one stays hidden across reloads
+             * and navigations. The attribute on <html> is what actually removes the bar — the
+             * collapse is only played first so the header does not snap upward.
+             */
+            function dismissAnnouncement() {
+                const root = document.documentElement;
+                const bar = document.getElementById('announcement-ticker-bar');
+
+                try {
+                    localStorage.setItem('hb-announcement', root.dataset.announcementKey || '');
+                } catch (err) {
+                    /* private mode: the dismissal still holds for this visit */
+                }
+
+                if (! bar || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    root.dataset.announcement = 'dismissed';
+
+                    return;
+                }
+
+                // Height has to be pinned to a number before it can be transitioned to zero,
+                // because auto is not an animatable endpoint.
+                bar.style.height = `${bar.offsetHeight}px`;
+                void bar.offsetHeight;
+                bar.style.height = '0px';
+                bar.classList.add('is-closing');
+
+                let settled = false;
+
+                const settle = () => {
+                    if (settled) {
+                        return;
+                    }
+
+                    settled = true;
+                    bar.style.height = '';
+                    bar.classList.remove('is-closing');
+                    root.dataset.announcement = 'dismissed';
+                };
+
+                bar.addEventListener('transitionend', settle, { once: true });
+
+                // A transition interrupted before the frame is painted never reports an end,
+                // so the bar leaves the layout on a timer as well.
+                setTimeout(settle, 400);
+            }
+
             // Delegated rather than bound to the elements themselves: wire:navigate
             // replaces the whole <body>, so any direct binding points at a detached node
             // from the previous page.
@@ -546,16 +646,7 @@
                 }
 
                 if (e.target.closest('#close-announcement-btn')) {
-                    const bar = document.getElementById('announcement-ticker-bar');
-
-                    if (bar) {
-                        bar.style.height = '0px';
-                        bar.style.paddingTop = '0px';
-                        bar.style.paddingBottom = '0px';
-                        bar.style.opacity = '0';
-                        bar.style.borderBottomWidth = '0px';
-                        sessionStorage.setItem('dismissed_announcement', 'true');
-                    }
+                    dismissAnnouncement();
 
                     return;
                 }

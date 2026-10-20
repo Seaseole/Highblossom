@@ -7,6 +7,8 @@ namespace App\Http\View\Composers;
 use App\Services\Contact\ContactDetails;
 use App\Services\FaviconSetGenerator;
 use App\Services\Settings\SettingsManager;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 /**
@@ -65,7 +67,8 @@ final readonly class GlobalSettingsComposer
             'instagramUrl' => $settings->get('instagram_url'),
             'linkedinUrl' => $settings->get('linkedin_url'),
             'announcementActive' => (bool) $settings->get('announcement_active'),
-            'announcements' => $settings->get('announcements'),
+            'announcements' => $this->liveAnnouncements($settings),
+            'announcementKey' => $this->announcementKey($settings),
             'galleryMetrics' => $settings->get('gallery_metrics'),
             'googleSiteVerification' => $settings->get('google_site_verification'),
             'contact' => ContactDetails::fromSettings($this->settings),
@@ -82,5 +85,47 @@ final readonly class GlobalSettingsComposer
             'homeServiceArea' => $settings->get('home_service_area'),
             'homeMobileCoverage' => $settings->get('home_mobile_coverage'),
         ]);
+    }
+
+    /**
+     * The announcements still inside their active window.
+     *
+     * Decided here rather than in the partial so the ticker and the dismissal key can
+     * never disagree about which messages are live.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function liveAnnouncements(Collection $settings): array
+    {
+        return collect((array) $settings->get('announcements', []))
+            ->filter(fn ($announcement): bool => empty($announcement['expires_at'] ?? null)
+                || Carbon::parse($announcement['expires_at'])->isFuture())
+            ->values()
+            ->all();
+    }
+
+    /**
+     * A fingerprint of the live messages, used as the dismissal key.
+     *
+     * Tied to the text and the link rather than to a row, because the announcements are one
+     * JSON array with no ids: editing a message changes the fingerprint, so a visitor who
+     * dismissed the old notice sees the new one, while the same notice stays hidden across
+     * reloads and SPA navigations.
+     */
+    private function announcementKey(Collection $settings): ?string
+    {
+        $live = $this->liveAnnouncements($settings);
+
+        if ($live === []) {
+            return null;
+        }
+
+        return sha1((string) json_encode(array_map(
+            static fn (array $announcement): array => [
+                $announcement['text'] ?? '',
+                $announcement['link'] ?? '',
+            ],
+            $live,
+        )));
     }
 }

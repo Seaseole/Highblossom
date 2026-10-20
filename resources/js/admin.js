@@ -7,12 +7,56 @@ console.log('Admin JS: Script loaded');
 // Initialize Passkeys
 window.Passkeys = Passkeys;
 
+/**
+ * Suspend or restore the admin content scroller.
+ *
+ * The layout row is viewport-tall, so content moves inside .admin-main instead of the
+ * window. Overlays used to lock <body>, which after that change is an element that never
+ * scrolls — the lock would be silently inert and the page would run behind the modal.
+ */
+function lockAdminContentScroll(locked) {
+    document.querySelector('.admin-main')?.classList.toggle('is-scroll-locked', locked);
+}
+
 // Register plugins and components when Alpine is ready
 document.addEventListener('alpine:init', () => {
     console.log('Admin JS: alpine:init fired');
 
     // Register plugins
     window.Alpine.plugin(collapse);
+
+    // The mobile navigation drawer. The cycle is written by hand because
+    // @alpinejs/focus is not installed, so x-trap would fail silently and Tab would walk
+    // out of the drawer into the page behind the overlay. Elements hidden by a collapsed
+    // group are filtered out, otherwise the first/last pair brackets invisible links.
+    window.Alpine.data('adminDrawer', () => ({
+        trap(event) {
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const focusables = Array.from(
+                this.$el.querySelectorAll(
+                    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+                ),
+            ).filter((element) => element.offsetParent !== null);
+
+            if (focusables.length === 0) {
+                return;
+            }
+
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (! event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        },
+    }));
 
     // Types whose editors host nested block lists; they cannot be added inside a nested list.
     const NESTING_TYPES = ['columns', 'tabs', 'carousel'];
@@ -303,7 +347,7 @@ document.addEventListener('alpine:init', () => {
             this.errors = [];
 
             this.$nextTick(() => {
-                document.body.style.overflow = 'hidden';
+                lockAdminContentScroll(true);
 
                 if (this.$refs.input) this.$refs.input.focus();
             });
@@ -314,7 +358,7 @@ document.addEventListener('alpine:init', () => {
 
             this.kind = null;
             this.errors = [];
-            document.body.style.overflow = '';
+            lockAdminContentScroll(false);
         },
 
         // @alpinejs/focus is not installed, so x-trap is unavailable and the cycle is
@@ -468,7 +512,7 @@ document.addEventListener('alpine:init', () => {
 
         focusDialog() {
             this.$nextTick(() => {
-                document.body.style.overflow = 'hidden';
+                lockAdminContentScroll(true);
 
                 if (this.$refs.input) this.$refs.input.focus();
             });
@@ -480,7 +524,7 @@ document.addEventListener('alpine:init', () => {
             this.mode = null;
             this.row = null;
             this.errors = [];
-            document.body.style.overflow = '';
+            lockAdminContentScroll(false);
         },
 
         // @alpinejs/focus is not installed, so x-trap is unavailable and the cycle is
@@ -1471,6 +1515,14 @@ window.generateSecurePassword = function(length = 16) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Admin JS: DOMContentLoaded');
 
+    // The menu now scrolls inside its own column, so on a short screen the active link can
+    // sit below that column with nothing indicating it. Bring it into view without touching
+    // the content scroller. behavior is explicit because <html> sets scroll-behavior: smooth.
+    document.querySelector('#desktop-sidebar .admin-nav-active')?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'auto',
+    });
+
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-generate-password]');
         if (!btn) return;
@@ -1568,3 +1620,463 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 })();
+
+
+/* --------------------------------------------------------------------------
+   Admin sidebar: navigation that survives an SPA swap.
+
+   The rail is persisted, so nothing inside it re-renders when a new page arrives —
+   including the markup that decided which item was lit. Livewire's own navigate
+   fixture solves that with a reactive href plus a $current magic, and this is that
+   pattern widened to prefix matching: /admin/quotes/12 has to keep Quotes lit, and
+   an exact href comparison would let it go dark one click after arriving.
+
+   Longest prefix wins, because two real paths genuinely nest: /admin/gallery/settings
+   starts with /admin/gallery, so matching the shorter one first would light Gallery
+   while the user is reading Gallery Settings.
+
+   Search works the same way, and for the same reason: it cannot ask the server, because
+   asking the server is a navigation. So the rail publishes one blob — the paths it can
+   reach and the words each row answers to — and both questions get answered against it.
+   A menu entry therefore cannot be made unsearchable by forgetting a rule in a second
+   language; adding the row to the config is the whole of the work.
+
+   data-navigate-once matters more than it looks: without it the magic is re-registered
+   after every body swap, each copy closing over its own reactive state, and only the
+   newest one would still be listening.
+   -------------------------------------------------------------------------- */
+document.addEventListener('alpine:init', () => {
+    const state = Alpine.reactive({
+        theme: (window.__ADMIN_NAV__ && window.__ADMIN_NAV__.theme) || "auto",
+        path: window.location.pathname,
+        lit: (window.__ADMIN_NAV__ && window.__ADMIN_NAV__.active) || window.location.pathname,
+        query: new URLSearchParams(window.location.search).get('nav_search') || '',
+    });
+
+    const strip = (subject) => String(subject ?? '/').replace(/\/+$/, '');
+
+    /* Config arrives from window.initAdminNav(), called by the rail's boot script. Either side
+       may get there first: Alpine's init fires before an inline body script on a fresh load,
+       and after one on a subsequent visit. So both write to the same object and both check
+       whether the other has arrived. It lives on window rather than in the DOM because a body
+       swap replaces every element that is not persisted, including a script tag of JSON that
+       was never marked to survive. */
+    window.__ADMIN_NAV__ = window.__ADMIN_NAV__ || { path: null, active: null, theme: 'auto', themeUrl: '', text: {}, badges: {} };
+
+    const cfg = window.__ADMIN_NAV__;
+
+    const navText = () => cfg.text || {};
+
+    /* The row that owns a path, by the longest match: /admin/quotes/12 is Quotes, and
+       /admin/gallery/settings is Gallery Settings rather than Gallery even though both are
+       prefixes of it. Sorted once at boot, because this runs on every navigation and the index
+       is small. */
+    const longestPrefix = (path) => {
+        const here = strip(path);
+
+        return (
+            Object.keys(navText())
+                .map(strip)
+                .sort((a, b) => b.length - a.length)
+                .find((target) => here === target || (target !== '' && here.startsWith(`${target}/`))) ?? here
+        );
+    };
+
+    const termsOf = (query) => String(query).trim().toLowerCase().split(/\s+/).filter(Boolean);
+
+    const escapeHtml = (value) => String(value).replace(/[&<>"]/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+    })[character]);
+
+    const matchesPrefix = (href) => {
+        const target = strip(href);
+
+        if (target === '' || target === '/') {
+            return strip(state.path) === '/';
+        }
+
+        return strip(state.path) === target || strip(state.path).startsWith(`${target}/`);
+    };
+
+    Alpine.magic('current', () => (expected) => matchesPrefix(expected));
+
+    // Every group mounted on the page, so a navigation can reopen the branch the new
+    // page lives in. A persisted rail keeps its Alpine roots alive across swaps, which
+    // is exactly why nothing else would notice the arrival.
+    const navGroups = new Set();
+
+    /* One remembered open/closed per group, keyed by its label. The key is worth naming
+       rather than inlining: the same string is read on every group's init, and a typo in a
+       literal here silently means "the sidebar forgets everything" with no error anywhere. */
+    const REMEMBER_KEY = 'adminSidebarGroups';
+
+    const readRemembered = () => {
+        try {
+            const parsed = JSON.parse(window.localStorage.getItem(REMEMBER_KEY) || '{}');
+
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (cause) {
+            // Safari in private mode throws on the read, not just the write.
+            return {};
+        }
+    };
+
+    /* The server renders from a cookie because a first paint driven only by localStorage would
+       open every branch that holds the page, then snap shut the ones the person closed — a
+       flicker that reads as a bug rather than as a restore. Both write here so the two copies
+       cannot drift into different shapes. */
+    const writeRemembered = (remembered) => {
+        try {
+            window.localStorage.setItem(REMEMBER_KEY, JSON.stringify(remembered));
+            document.cookie = `${REMEMBER_KEY}=${encodeURIComponent(JSON.stringify(remembered))}; path=/; max-age=31536000; SameSite=Lax`;
+        } catch (cause) {
+            // Nothing further to do: the group still opens, it just forgets next time.
+        }
+    };
+
+    Alpine.store('adminNav', {
+        get query() {
+            return state.query;
+        },
+
+        set query(value) {
+            state.query = value || '';
+        },
+
+        get searching() {
+            return state.query.trim() !== '';
+        },
+
+        /* The single lit path. Rows compare themselves to it rather than each walking the
+           prefix list, so one navigation costs one pass over the index instead of one per
+           row per column — and every copy of a row in the rail agrees by construction. */
+        get lit() {
+            return state.lit;
+        },
+
+        get theme() {
+            // Held in the reactive state rather than read from cfg: cfg is a plain
+            // window object, and a getter over a non-reactive field never re-runs, so the
+            // theme chip would keep printing whatever the page was rendered with.
+            return state.theme;
+        },
+
+        /* Called by the rail's boot script on a full load, when the server has settled both
+           questions — where we are, and which row owns it. */
+        boot() {
+            state.theme = cfg.theme ?? state.theme;
+            state.path = window.location.pathname;
+            state.lit = cfg.active ?? strip(state.path);
+        },
+
+        /* Called after livewire:navigate swaps the page. The boot script does not run again
+           inside a persisted island, so the rail has to answer both questions itself, and the
+           only new fact is the location: the row that owns it is the longest known prefix. */
+        sync() {
+            state.path = window.location.pathname;
+            state.lit = longestPrefix(state.path);
+        },
+
+        /* Every word has to land, on any field, in any order — so "gallery category" finds
+           Gallery Categories while "settings cache" finds nothing. The group name is in the
+           haystack, which is why typing "blog" reveals the whole branch. */
+        matches(href) {
+            if (! this.searching) {
+                return true;
+            }
+
+            const text = navText()[href] || '';
+
+            return termsOf(state.query).every((term) => text.includes(term));
+        },
+
+        /* Escaped first, tags added afterwards, so there is no moment in which a label — or the
+           query, which is inside the pattern — could be read as markup. */
+        highlightAll(root) {
+            const terms = termsOf(state.query).sort((a, b) => b.length - a.length);
+            const pattern = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+
+            root.querySelectorAll('[data-nav-label]').forEach((link) => {
+                const slot = link.querySelector('[data-nav-text]');
+                const label = link.getAttribute('data-nav-label') || '';
+
+                if (! slot) {
+                    return;
+                }
+
+                if (pattern === '') {
+                    slot.textContent = label;
+
+                    return;
+                }
+
+                slot.innerHTML = escapeHtml(label).replace(
+                    new RegExp(`(${pattern})`, 'gi'),
+                    '<mark class="admin-nav-mark">$1</mark>',
+                );
+            });
+        },
+
+        cycleTheme() {
+            const order = ['auto', 'light', 'dark'];
+            const next = order[(order.indexOf(state.theme) + 1) % order.length];
+
+            this.setTheme(next);
+        },
+
+        /* The dark class and both localStorage keys are written exactly as the pre-paint seed
+           in the layout writes them; the layout reads them before Flux does, so a third
+           spelling would have the two disagree on the next load. The POST keeps the preference
+           on the account rather than only on this browser, which is what the person who set it
+           from an admin page on a second machine expects. */
+        setTheme(theme) {
+            cfg.theme = theme;
+            state.theme = theme;
+
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            document.documentElement.classList.toggle(
+                'dark',
+                theme === 'dark' || (theme === 'auto' && prefersDark),
+            );
+
+            window.localStorage.setItem('theme', theme);
+            window.localStorage.setItem('flux.appearance', theme === 'auto' ? 'system' : theme);
+
+            document.querySelectorAll('[data-admin-theme-chip]').forEach((chip) => {
+                chip.setAttribute('data-admin-theme-chip', theme);
+            });
+
+            // The rail publishes this URL with the rest of its index; there is no global
+            // route() helper in this app and inventing one for a single POST is not worth it.
+            window.fetch(cfg.themeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({ theme }),
+            }).catch(() => {
+                // The preference is already applied locally; the write can wait for the next try.
+            });
+        },
+    });
+
+    document.addEventListener('livewire:navigated', () => {
+        queueMicrotask(() => {
+            // A new page means a new lit row, and the rail cannot learn that by itself: it was
+            // not re-rendered, and nothing asks the server again.
+            Alpine.store('adminNav').sync();
+
+            navGroups.forEach((group) => {
+                if (group.syncOnNavigate()) {
+                    group.open = true;
+                }
+            });
+
+            // The menu scrolls inside its own column, so on a short screen the lit item can
+            // sit below that column with nothing indicating it. behaviour is explicit because
+            // <html> sets scroll-behavior: smooth and a nav jump should not glide.
+            document.querySelectorAll('.admin-nav-scroll').forEach((column) => {
+                column.querySelector('[data-admin-nav-active="true"]')?.scrollIntoView({
+                    block: 'nearest',
+                    behavior: 'auto',
+                });
+            });
+        });
+    });
+
+    window.Alpine.data('adminNavGroup', (definition = {}) => ({
+        open: true,
+        key: definition.key || '',
+        serverHasActive: definition.serverHasActive === true,
+
+        // Only the desktop column can shrink to an 80px rail; the drawer is always full width
+        // and must not reach into a store whose state it does not reflect.
+        rail: definition.rail === true,
+
+        /* The row the rail considers current, published as a one-item list so the branch markup
+           can ask "do I contain it" with a plain method call. Exposed as a getter to keep it
+           reactive across a navigation. */
+        get litPaths() {
+            return [Alpine.store('adminNav').lit];
+        },
+
+        init() {
+            const remembered = readRemembered();
+
+            // An unlisted group keeps whatever the server rendered — which is open when it
+            // holds the active item, so a first visit lands with the right branch expanded.
+            this.open = Object.prototype.hasOwnProperty.call(remembered, this.key)
+                ? remembered[this.key] === true
+                : definition.open !== false;
+
+            navGroups.add(this);
+        },
+
+        destroy() {
+            navGroups.delete(this);
+        },
+
+        toggle() {
+            // A collapsed rail hides every branch body by CSS, so a plain toggle there would be
+            // a click with no visible outcome and no way to reach the rows. Widening the rail and
+            // opening the branch the person aimed at is what the old rail did; keep doing it.
+            if (this.rail && Alpine.store('sidebar').collapsed) {
+                Alpine.store('sidebar').toggle();
+                this.open = true;
+                writeRemembered(Object.assign(readRemembered(), { [this.key]: true }));
+
+                return;
+            }
+
+            this.open = ! this.open;
+
+            const remembered = readRemembered();
+            remembered[this.key] = this.open;
+            writeRemembered(remembered);
+        },
+
+        // True when this navigation landed somewhere this branch owns. Only ever opens,
+        // because silently shutting a branch the user left open is worse than one that
+        // stays open after they leave it.
+        syncOnNavigate() {
+            return Array.from(this.$el.querySelectorAll('[data-nav-href]')).some((link) =>
+                matchesPrefix(link.getAttribute('data-nav-href')),
+            );
+        },
+
+        /* A branch stays visible while any row in it answers the query, and comes back whole
+           the moment the field is cleared — the rows themselves are only hidden, never
+           removed, so nothing has to be rebuilt. Reading store.searching is what subscribes
+           this expression: it is a getter over the reactive query, whereas matches() would be
+           an opaque call Alpine has no reason to re-run. */
+        anyMatches() {
+            const store = Alpine.store('adminNav');
+
+            if (! store.searching) {
+                return true;
+            }
+
+            return Array.from(this.$el.querySelectorAll('[data-nav-href]')).some((link) =>
+                store.matches(link.getAttribute('data-nav-href')),
+            );
+        },
+
+        /* Typing in search has to reveal every match even inside a branch the user shut, and
+           hide them again the moment the query clears without overwriting what was
+           remembered — which is why this reads the search flag instead of writing state. */
+        isOpen() {
+            return Alpine.store('adminNav').searching ? true : this.open;
+        },
+    }));
+
+    /* The column that holds the groups. One root per column — the drawer and the rail each
+       have their own — and both read the same store, so a query typed in one filters the other
+       as well, which matters because they are never both on screen but are both mounted. */
+    window.Alpine.data('adminNavRoot', () => ({
+        /* Exposed as a getter so the "no matches" line and the group rows all read the same
+           reactive answer, and so matches() — which is a call, not a property — is never the
+           only thing standing between a keystroke and a re-evaluation. */
+        get searching() {
+            return Alpine.store('adminNav').searching;
+        },
+
+        get query() {
+            return Alpine.store('adminNav').query;
+        },
+
+        anyMatch() {
+            const store = Alpine.store('adminNav');
+
+            if (! store.searching) {
+                return true;
+            }
+
+            return Array.from(this.$el.querySelectorAll('[data-nav-href]')).some((link) =>
+                store.matches(link.getAttribute('data-nav-href')),
+            );
+        },
+
+        /* Highlighting is a DOM write, not a binding: Alpine cannot express "replace this
+           text node with marked-up text" without re-parsing the row on every keystroke. So the
+           column asks the store to rewrite the label slots once per query change, and the
+           untouched text node comes back the moment the query does. */
+        sync() {
+            this.$watch(
+                () => Alpine.store('adminNav').query,
+                () => Alpine.store('adminNav').highlightAll(this.$el),
+            );
+
+            Alpine.store('adminNav').highlightAll(this.$el);
+        },
+    }));
+});
+
+window.initAdminNav = (config) => {
+    // Whichever side arrives first, the other reads from the same object afterwards.
+    window.__ADMIN_NAV__ = Object.assign(window.__ADMIN_NAV__ || {}, config);
+
+    const store = Alpine.store?.('adminNav');
+
+    if (store) {
+        store.boot();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const focusSearch = (event) => {
+        const field = Array.from(document.querySelectorAll('.admin-nav-search-field'))
+            .find((candidate) => candidate.offsetParent !== null);
+
+        if (! field) {
+            return;
+        }
+
+        event.preventDefault();
+        field.focus();
+        field.select();
+    };
+
+    // Cmd+K on a Mac, Ctrl+K everywhere else — picked over a bare "/" as the primary because
+    // it is the muscle memory people already carry for "search this app". Nothing in the
+    // panel binds it today, and it stays unbound in the content area.
+    window.addEventListener('keydown', (event) => {
+        if ((event.metaKey || event.ctrlKey) && String(event.key).toLowerCase() === 'k') {
+            focusSearch(event);
+        }
+    });
+
+    // "/" is the weaker of the two and must stay out of the way of whoever is typing, so it
+    // only reaches for the rail when focus is not already inside a field. That also leaves
+    // Firefox quick-find working on any page where the sidebar search is not the target.
+    window.addEventListener('keydown', (event) => {
+        if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) {
+            return;
+        }
+
+        const active = document.activeElement;
+        const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(active?.tagName || '')
+            || active?.isContentEditable === true;
+
+        if (! typing) {
+            focusSearch(event);
+        }
+    });
+});
+
+/* The rail's boot script and Livewire's Alpine may initialise in either order — a module
+   script loaded in the head waits for the parser, an inline body script does not — so both
+   sides check for the other instead of assuming. Anything queued here runs the moment Alpine
+   is ready, before its first tree walk. */
+document.addEventListener('alpine:initialized', () => {
+    const store = Alpine.store?.('adminNav');
+
+    if (store && window.__ADMIN_NAV__ && window.__ADMIN_NAV__.active) {
+        store.boot();
+    }
+});

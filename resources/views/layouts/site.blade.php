@@ -7,6 +7,39 @@
     <x-seo.meta />
     @include('partials.favicons')
     @include('partials.theme-script')
+    {{-- Announcement dismissal, decided before first paint. One attribute on <html> both
+         hides the bar and releases the space it took, so a returning visitor never sees the
+         bar or a gap where it was. The value is a fingerprint of the live messages, so an
+         edited announcement shows again while the same one stays hidden. --}}
+    <script>
+        (function () {
+            var STORAGE_KEY = 'hb-announcement';
+            var root = document.documentElement;
+            var current = @js($announcementKey ?? '');
+
+            function apply() {
+                var dismissed = null;
+
+                try {
+                    dismissed = localStorage.getItem(STORAGE_KEY);
+                } catch (e) {
+                    /* private mode: the bar simply stays visible for this visit */
+                }
+
+                root.dataset.announcement = dismissed !== null && dismissed !== '' && dismissed === current ? 'dismissed' : 'visible';
+            }
+
+            // Read by the dismiss handler in partials/site-nav so the two can never
+            // disagree about what the current announcement is.
+            root.dataset.announcementKey = current;
+
+            apply();
+
+            // <html> survives a wire:navigate body swap, so this only has to catch the
+            // announcement changing mid-session without a full load.
+            document.addEventListener('livewire:navigated', apply);
+        })();
+    </script>
     <script src="/vendor/ckeditor/ckeditor.js"></script>
 
     <!-- Fonts -->
