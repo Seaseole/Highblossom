@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\AdminNavLayout;
 use App\Enums\Theme;
 use App\Support\Username;
 use Database\Factories\UserFactory;
@@ -20,9 +21,10 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'username', 'email', 'phone', 'password', 'theme', 'avatar_path', 'terms_accepted_at', 'privacy_accepted_at'])]
+#[Fillable(['name', 'username', 'email', 'phone', 'password', 'theme', 'admin_nav_layout', 'avatar_path', 'terms_accepted_at', 'privacy_accepted_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 /**
  * The authenticatable user model with roles, passkeys, and two-factor authentication.
@@ -31,7 +33,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -46,6 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'privacy_accepted_at' => 'datetime',
             'password' => 'hashed',
             'theme' => Theme::class,
+            'admin_nav_layout' => AdminNavLayout::class,
         ];
     }
 

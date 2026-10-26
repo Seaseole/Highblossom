@@ -354,7 +354,6 @@ body {
    ========================================================================== */
 
 body {
-    --admin-nav-gap: 2px;
     --admin-nav-radius: 10px;
     --admin-nav-hover: #f4f4f5;
     --admin-nav-active: #ececed;
@@ -387,14 +386,38 @@ body {
     line-height: 1.25rem;
     font-weight: 500;
     color: var(--admin-nav-muted);
+    cursor: pointer;
     transition:
         background-color 180ms ease,
         color 180ms ease;
 }
 
+/* A rail row that only exists on a phone — the account menu's copy of a bar control that has no
+   room on a narrow screen. It cannot be spelled `sm:hidden` in the markup: `.admin-nav-item` is
+   unlayered and declares `display: flex`, which outranks the utility, so the desktop account menu
+   kept a second "Full screen" command beside the one already standing in the bar. */
+.admin-nav-item-narrow {
+    display: none;
+}
+
+@media (max-width: 639px) {
+    .admin-nav-item-narrow {
+        display: flex;
+    }
+}
+
 .admin-nav-item:hover {
     background-color: var(--admin-nav-hover);
     color: var(--admin-nav-text);
+}
+
+.admin-nav-item.admin-nav-item-danger {
+    color: var(--color-ui-danger);
+}
+
+.admin-nav-item.admin-nav-item-danger:hover {
+    background-color: var(--color-ui-accent-soft);
+    color: var(--color-ui-danger);
 }
 
 .admin-nav-item[data-admin-nav-active='true'] {
@@ -483,56 +506,478 @@ body {
     color: var(--admin-nav-text);
 }
 
-.admin-nav-field {
-    display: flex;
+/* ---------------------------------------------------------------------------
+   Top bar.
+
+   Every value here is drawn from the --admin-nav-* layer above rather than
+   restated, because the bar sits one hairline above the rail and any second
+   palette of greys would show up as a seam the moment dark mode was opened.
+   The bar is frozen-token territory by design: DESIGN.md keeps --*-ui-* off
+   the admin until the panel is migrated as a whole.
+   --------------------------------------------------------------------------- */
+
+/* 44px on touch, 36 under a pointer. The larger number is the WCAG 2.2 target
+   the mobile bar already met; shrinking it on desktop is a mouse concession,
+   not a licence to make a phone tap a small one. */
+.admin-bar-btn {
+    /* No `display` here, on purpose. This file is unlayered, so a declaration of it would outrank
+       every Tailwind utility on the same element — which is how `hidden sm:inline-flex` on the
+       full-screen control and `lg:hidden` on the phone search button printed nothing but a second,
+       permanent copy of both. Display belongs to the markup that owns the breakpoint. */
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--admin-nav-radius);
+    color: var(--admin-nav-muted);
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.admin-bar-btn:hover {
+    color: var(--admin-nav-text);
+    background-color: var(--admin-nav-hover);
+}
+
+.admin-bar-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+    color: var(--admin-nav-text);
+}
+
+@media (min-width: 1024px) {
+    .admin-bar-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* The search control is a button shaped like the field the palette opens into,
+   so the eye carries the affordance across the two states. */
+.admin-bar-search {
+    /* Display comes from the markup's `hidden lg:flex`, for the reason spelled out on
+       `.admin-bar-btn`: an unlayered declaration here outranks that utility. */
     align-items: center;
     gap: 8px;
-    min-height: 40px;
+    height: 36px;
+    width: 220px;
     padding: 0 10px;
+    margin-right: 4px;
     border-radius: var(--admin-nav-radius);
-    background-color: var(--admin-nav-hover);
     border: 1px solid transparent;
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-nav-label);
+    font-size: 0.875rem;
+    cursor: pointer;
     transition:
         background-color 180ms ease,
         border-color 180ms ease;
 }
 
-.admin-nav-field:focus-within {
+.admin-bar-search:hover {
+    background-color: var(--admin-nav-active);
+}
+
+.admin-bar-search:focus-visible {
+    outline: none;
     background-color: var(--color-admin-surface);
     border-color: var(--color-admin-input-border);
     box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
 }
 
-.admin-nav-field input {
+@media (min-width: 1280px) {
+    .admin-bar-search {
+        width: 280px;
+    }
+}
+
+.admin-bar-kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 5px;
+    border-radius: 5px;
+    border: 1px solid var(--admin-nav-line);
+    background-color: var(--color-admin-surface);
+    color: var(--admin-nav-label);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.admin-bar-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    max-width: 220px;
+    padding: 4px 6px;
+    border-radius: var(--admin-nav-radius);
+    border: 0;
+    background-color: transparent;
+    color: var(--admin-nav-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 180ms ease;
+}
+
+.admin-bar-user:hover {
+    background-color: var(--admin-nav-hover);
+}
+
+.admin-bar-user:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+}
+
+@media (min-width: 1024px) {
+    .admin-bar-user {
+        min-height: 36px;
+    }
+}
+
+/* A menu that outgrows the screen has to scroll inside itself; the alternative
+   is a panel whose last item is unreachable on a laptop. */
+.admin-bar-pop {
+    max-height: min(70vh, 30rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.admin-bar-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 17px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    border: 2px solid var(--color-admin-surface);
+    background-color: var(--color-admin-accent);
+    color: #ffffff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.admin-bar-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 9999px;
+    background-color: var(--admin-nav-active);
+    color: var(--admin-nav-text);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.admin-bar-tag-muted {
+    background-color: transparent;
+    border: 1px solid var(--admin-nav-line);
+    color: var(--admin-nav-muted);
+}
+
+/* On/off is a state, so it is the one place in the bar allowed a colour beyond
+   the accent — and it is never the only signal: the word is always printed. */
+.admin-bar-tag-ok {
+    background-color: rgba(4, 120, 87, 0.12);
+    color: #047857;
+}
+
+.admin-bar-tag-warn {
+    background-color: rgba(180, 83, 9, 0.12);
+    color: #b45309;
+}
+
+.dark .admin-bar-tag-ok {
+    background-color: rgba(52, 211, 153, 0.14);
+    color: #34d399;
+}
+
+.dark .admin-bar-tag-warn {
+    background-color: rgba(251, 191, 36, 0.14);
+    color: #fbbf24;
+}
+
+.admin-bar-rule {
+    height: 1px;
+    margin: 4px 6px;
+    background-color: var(--admin-nav-line);
+}
+
+.admin-bar-heading {
+    padding: 6px 10px 2px;
+    color: var(--admin-nav-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-bar-foot {
+    padding: 8px 10px 4px;
+    color: var(--admin-nav-muted);
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.admin-bar-env {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background-color: var(--color-admin-accent);
+}
+
+.admin-bar-env-local {
+    background-color: #10b981;
+}
+
+.admin-bar-env-development {
+    background-color: #3b82f6;
+}
+
+.admin-bar-env-staging {
+    background-color: #f59e0b;
+}
+
+.admin-bar-sep {
+    width: 1px;
+    height: 18px;
+    flex-shrink: 0;
+    background-color: var(--admin-nav-line);
+}
+
+/* ---------------------------------------------------------------------------
+   Command palette.
+   --------------------------------------------------------------------------- */
+
+.admin-palette-panel {
+    border-radius: 14px;
+    border: 1px solid var(--color-admin-border);
+    background-color: var(--color-admin-surface);
+    box-shadow:
+        0 1px 2px rgb(0 0 0 / 0.05),
+        0 24px 60px -20px rgb(0 0 0 / 0.35);
+    overflow: hidden;
+}
+
+.admin-palette-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--admin-nav-line);
+}
+
+.admin-palette-field:focus-within {
+    background-color: var(--admin-nav-hover);
+}
+
+.admin-palette-input {
     flex: 1;
     min-width: 0;
     background: transparent;
     border: 0;
     outline: none;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--admin-nav-text);
 }
 
-.admin-nav-field input::placeholder {
+.admin-palette-input::placeholder {
     color: var(--admin-nav-label);
 }
 
-.admin-nav-mark {
-    background-color: var(--color-ui-accent-soft);
-    color: inherit;
-    border-radius: 3px;
-    padding: 0 1px;
-}
-
-.admin-nav-card {
-    border: 1px solid var(--color-admin-border-subtle);
-    border-radius: 14px;
-    background-color: var(--admin-nav-hover);
+.admin-palette-scroll {
+    max-height: min(52vh, 26rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 6px;
 }
 
-.dark .admin-nav-card {
-    background-color: var(--admin-nav-sheen);
+.admin-palette-group + .admin-palette-group {
+    margin-top: 4px;
+}
+
+.admin-palette-heading {
+    padding: 8px 10px 4px;
+    color: var(--admin-nav-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-palette-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 6px 10px;
+    border-radius: var(--admin-nav-radius);
+    color: var(--admin-nav-text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-palette-row:hover {
+    background-color: var(--admin-nav-hover);
+}
+
+.admin-palette-row:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+}
+
+/* The keyboard cursor is drawn the same way a pointer hover is, so the two
+   never disagree about which row Enter would activate. */
+.admin-palette-row-active {
+    background-color: var(--admin-nav-active);
+}
+
+.admin-palette-empty {
+    padding: 18px 12px;
+    color: var(--admin-nav-muted);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.admin-palette-foot {
+    display: flex;
+    gap: 14px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--admin-nav-line);
+    color: var(--admin-nav-muted);
+    font-size: 0.75rem;
+}
+
+.admin-palette-keys {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    margin-right: 4px;
+    padding: 0 4px;
+    border-radius: 4px;
+    border: 1px solid var(--admin-nav-line);
+    color: var(--admin-nav-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.6875rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Create dialog. Shares the palette's panel and footer; only the body differs,
+   because a short list of destinations wants tiles you can read at a glance,
+   not rows you have to scan.
+   --------------------------------------------------------------------------- */
+
+.admin-create-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--admin-nav-line);
+}
+
+.admin-create-title {
+    color: var(--admin-nav-text);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+}
+
+.admin-create-lede {
+    margin-top: 2px;
+    color: var(--admin-nav-muted);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+}
+
+.admin-create-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    max-height: min(60vh, 32rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 10px;
+}
+
+@media (min-width: 640px) {
+    .admin-create-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.admin-create-tile {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding: 12px;
+    border-radius: var(--admin-nav-radius);
+    border: 1px solid transparent;
+    color: var(--admin-nav-text);
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease;
+}
+
+.admin-create-tile:hover {
+    background-color: var(--admin-nav-hover);
+    border-color: var(--admin-nav-line);
+}
+
+.admin-create-tile:focus-visible {
+    outline: none;
+    background-color: var(--admin-nav-active);
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+}
+
+.admin-create-tile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 1px solid var(--admin-nav-line);
+    background-color: var(--color-admin-surface);
+    color: var(--admin-nav-muted);
+}
+
+.admin-create-tile:hover .admin-create-tile-icon,
+.admin-create-tile:focus-visible .admin-create-tile-icon {
+    color: var(--admin-nav-text);
+}
+
+.admin-create-tile-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+}
+
+.admin-create-tile-sub {
+    display: block;
+    margin-top: 1px;
+    color: var(--admin-nav-muted);
+    font-size: 0.75rem;
+    line-height: 1rem;
 }
 
 /* Group bodies animate through x-collapse, which drives height; a chevron rotation and a
@@ -541,23 +986,17 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .admin-nav-item,
     .admin-nav-heading,
-    .admin-nav-field,
+    .admin-bar-btn,
+    .admin-bar-search,
+    .admin-bar-user,
+    .admin-bar-menu-item,
+    .admin-bar-menu-caret,
+    .admin-palette-row,
+    .admin-create-tile,
     #desktop-sidebar,
     #desktop-sidebar * {
         transition-duration: 0ms !important;
     }
-}
-
-/* The theme chip in the account card. Small, so it carries the panel's own foreground at
-   full weight rather than a mid-grey that would fail AA at this size. */
-.admin-nav-chip {
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    background-color: var(--admin-nav-active);
-    color: var(--admin-nav-text);
 }
 
 /* @persist injects a plain <div x-persist="…"> and it — not the sidebar component — is the
@@ -582,4 +1021,205 @@ div[x-persist="admin-sidebar"] {
     box-shadow:
         0 1px 2px rgb(0 0 0 / 0.05),
         0 8px 24px -12px rgb(0 0 0 / 0.25);
+}
+
+/* ==========================================================================
+   Top-navigation mode.
+
+   Both shells are printed on every admin page and this section decides which one
+   is standing, from the single class the layout seeds onto <html> before paint.
+   That shape is deliberate, not laziness: swapping markup would mean putting a
+   Livewire component over a `@persist` island, and a persisted island is exactly
+   the thing that must not be re-rendered underneath a navigation. One class also
+   means the two modes cannot disagree about which one is current, because there
+   is only ever one answer to read.
+
+   Nothing in here is position:fixed. The bar keeps its place in the flex column and the
+   content scrolls inside `.admin-main`, so an anchor cannot land behind a bar and the
+   three scroll locks this shell owns — the drawer, the taxonomy modal and the
+   sub-categories modal — keep working without being retargeted at the window.
+   ========================================================================== */
+
+/* The rail is the sidebar's desktop half only. The drawer lives in the same persisted island and
+   stays reachable, because below `lg` both layouts hand the menu to it. */
+html.admin-nav-top #desktop-sidebar {
+    display: none;
+}
+
+/* One button for two jobs: open the drawer below `lg`, widen the rail above it. With no rail to
+   widen there is nothing left for it to press on a desktop, and the mobile half must survive. */
+@media (min-width: 1024px) {
+    html.admin-nav-top #mobile-menu-btn {
+        display: none;
+    }
+}
+
+/* The menu belongs to the bar, and only where the bar has room for it. Hiding it below `lg` is
+   not a compromise: a horizontal strip of thirty labels is the layout this preference explicitly
+   refuses to offer on a phone, where the drawer is the answer in both modes. */
+.admin-bar-menu {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    html.admin-nav-top .admin-bar-menu {
+        display: flex;
+    }
+}
+
+/* The group word in the context chip is what the lit trigger already prints, so top mode drops it
+   and keeps the page word — the one thing a closed menu cannot show. Both children are hidden
+   rather than the span carrying `x-show`, so Alpine and this rule never write to the same
+   property and fight over it. */
+html.admin-nav-top .admin-bar-context-page {
+    display: none;
+}
+
+/* The menu row itself.
+   It lives in the bar's own flex line and takes whatever width is left, because the fit maths
+   reads `clientWidth` on this element — a row that sized to its content could never know how
+   much of the bar it was allowed to take, and that is the whole overflow question.
+
+   Nothing here is a new palette: every colour is the same --admin-nav-* value the rail uses, so
+   the two layouts are two shapes of one panel rather than two panels.
+
+   The seam between two destinations is 8px, and it is measured against the 6px inside a pill
+   rather than picked as a round number: an icon and its own label have to be the tighter pair, or
+   a group and its neighbour sit the same distance apart and the row has no structure left to read.
+   The original value was the rail's 2px row hairline borrowed for sideways use, which put the next
+   section's icon on top of this section's word. */
+.admin-bar-menu {
+    --admin-bar-item-gap: 8px;
+
+    align-items: center;
+    gap: var(--admin-bar-item-gap);
+    min-width: 0;
+    flex-wrap: nowrap;
+}
+
+/* A slot is either in the row or it is in More. `flex: 0 0 auto` is what makes that true: with
+   the default shrink of 1 the browser crushes the slot below its own content, the item inside
+   (which cannot shrink) spills across its neighbour, and — the part that hid this for as long
+   as it lasted — `measure()` reads `getBoundingClientRect()` and records the crushed width as
+   the natural one, so the overflow maths concludes everything fits and More never opens.
+   Measured: at a 760px row the slots were 85–148px wide holding 91–158px items, six overlaps, and
+   no overflow pill at any width. Refusing the shrink instead gives the maths its real numbers —
+   zero overlaps at every row width, and the pill appearing below the row's 899px natural one. */
+.admin-bar-menu-slot {
+    display: flex;
+    flex: 0 0 auto;
+}
+
+/* While the row measures itself, the overflow pill has to be laid out in order to have a width at
+   all and must not take up any. Absolutely positioned and invisible is the only pair that does
+   both: a `display:none` pill measures zero, which would make the reserve free, and an in-flow
+   one would change the very width being measured.
+
+   The `!important` is doing real work. Alpine's `x-show` writes an inline `display: none`, and the
+   rule that is supposed to reveal the pill for measuring is itself a class on the ancestor — so
+   without the override, a measure taken before Alpine has re-run that directive records a zero
+   Inline styles beat a plain selector; nothing beats this. The `overflow` on the row is the
+   one-frame insurance for the same reason: with slots no longer willing to shrink, a row that is
+   momentarily too wide spills instead of crushing, and the spill would be visible between paint
+   and the first layout pass. */
+.admin-bar-menu.is-measuring {
+    overflow: hidden;
+}
+
+/* Every slot, not only the pill. `measure()` is written to read the row with everything shown, and
+   it asks Alpine for that by setting `forcing` — but Alpine answers the directive on its own
+   schedule, and a read taken one microtask later sees the slots the last layout hid still carrying
+   an inline `display: none`, which records their width as zero. A row measured that way believes it
+   has room for everything and then prints all seven groups through the tools cluster. This rule
+   makes the measuring state self-contained: while it is on, nothing in the row is hidden, whatever
+   the inline styles say. */
+.admin-bar-menu.is-measuring [data-menu-slot] {
+    display: flex !important;
+}
+
+.admin-bar-menu.is-measuring [data-menu-more] {
+    display: flex !important;
+    position: absolute;
+    visibility: hidden;
+}
+
+/* The branch is the panel's containing block, which is what lets a dropdown hang off its own
+   trigger instead of being placed by hand. */
+.admin-bar-menu-branch {
+    position: relative;
+}
+
+/* A group with one destination is a link, not a dropdown, so the bar prints the rail's own row for
+   it rather than redrawing one. Reused is not the same as matched, though: `.admin-nav-item` is a
+   40px tall, 10px-gapped, 0.875rem/500 line built to sit alone in a vertical column, and next to
+   the 36px pills beside it the row read as two different widgets wearing one navigation bar.
+   The selector is a slot's direct child on purpose — the rows inside a dropdown panel are still a
+   vertical list, and those keep the rail shape because that is what a list wants. */
+.admin-bar-menu-item,
+.admin-bar-menu-slot > .admin-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: 36px;
+    /* 12px, not the bar button's 10: a pill whose word touches its own edge reads as a label
+       attached to the row rather than as a destination. The item cannot shrink, so this cost is
+       paid by the overflow maths, not by a clipped glyph. */
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--admin-nav-radius);
+    background-color: transparent;
+    color: var(--admin-nav-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.admin-bar-menu-item:hover {
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-nav-text);
+}
+
+.admin-bar-menu-item:focus-visible,
+.admin-bar-menu-slot > .admin-nav-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-ui-accent-soft);
+    color: var(--admin-nav-text);
+}
+
+/* Open and current are separate claims, so they are separate colours: the first is a transient
+   state of the bar, the second is a fact about the page underneath it. */
+.admin-bar-menu-item[aria-expanded='true'] {
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-nav-text);
+}
+
+.admin-bar-menu-item.admin-bar-menu-lit {
+    background-color: var(--admin-nav-active);
+    color: var(--admin-nav-text);
+}
+
+.admin-bar-menu-caret {
+    display: inline-flex;
+    /* Two pixels tighter than the icon's 6px, so the row reads as {icon + word} then {caret} then
+       the 8px seam to the next destination. At one uniform 6px the caret is equidistant from its
+       own word and from its neighbour's, which is the definition of a group with no structure. */
+    margin-inline-start: -2px;
+    color: var(--admin-nav-label);
+    transition: transform 200ms ease;
+}
+
+/* A branch that holds waiting work, while it is shut. The number stays on the row inside, which
+   is why this is a dot: a count printed here would be a second copy that can disagree. */
+.admin-bar-menu-flag {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background-color: var(--color-admin-accent);
 }

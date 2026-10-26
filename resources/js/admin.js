@@ -18,6 +18,63 @@ function lockAdminContentScroll(locked) {
     document.querySelector('.admin-main')?.classList.toggle('is-scroll-locked', locked);
 }
 
+/**
+ * Keep Tab inside the element this runs on.
+ *
+ * Written by hand because @alpinejs/focus is not installed in this bundle, so x-trap would fail
+ * silently and Tab would walk out from under the person using the overlay. Elements hidden by a
+ * collapsed group are filtered out, otherwise the first/last pair brackets invisible links.
+ *
+ * Two surfaces need it: the mobile drawer, and the command palette's dialog.
+ *
+ * @param {KeyboardEvent} event
+ */
+function trapTab(event) {
+    if (event.key !== 'Tab') {
+        return;
+    }
+
+    const focusables = Array.from(
+        this.$el.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+    ).filter((element) => element.offsetParent !== null);
+
+    if (focusables.length === 0) {
+        return;
+    }
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (! event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+}
+
+/**
+ * The key the command palette keeps its own history under, and the read of it.
+ *
+ * A store is not an Alpine component, so it gets no init() hook; the history therefore has to be
+ * in place when the store object is written rather than filled in afterwards.
+ */
+const PALETTE_RECENT_KEY = 'adminPaletteRecent';
+
+function readPaletteRecents() {
+    try {
+        const stored = JSON.parse(window.localStorage.getItem(PALETTE_RECENT_KEY) || '[]');
+
+        return Array.isArray(stored) ? stored.filter((term) => typeof term === 'string').slice(0, 6) : [];
+    } catch (cause) {
+        // Safari in private mode throws on the read; an empty history is not worth a fault.
+        return [];
+    }
+}
+
 // Register plugins and components when Alpine is ready
 document.addEventListener('alpine:init', () => {
     console.log('Admin JS: alpine:init fired');
@@ -25,37 +82,11 @@ document.addEventListener('alpine:init', () => {
     // Register plugins
     window.Alpine.plugin(collapse);
 
-    // The mobile navigation drawer. The cycle is written by hand because
-    // @alpinejs/focus is not installed, so x-trap would fail silently and Tab would walk
-    // out of the drawer into the page behind the overlay. Elements hidden by a collapsed
-    // group are filtered out, otherwise the first/last pair brackets invisible links.
-    window.Alpine.data('adminDrawer', () => ({
-        trap(event) {
-            if (event.key !== 'Tab') {
-                return;
-            }
-
-            const focusables = Array.from(
-                this.$el.querySelectorAll(
-                    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-                ),
-            ).filter((element) => element.offsetParent !== null);
-
-            if (focusables.length === 0) {
-                return;
-            }
-
-            const first = focusables[0];
-            const last = focusables[focusables.length - 1];
-
-            if (event.shiftKey && document.activeElement === first) {
-                event.preventDefault();
-                last.focus();
-            } else if (! event.shiftKey && document.activeElement === last) {
-                event.preventDefault();
-                first.focus();
-            }
-        },
+    /* The one focus cycle, named for what it does rather than for the element that first used
+       it: the mobile drawer and the command palette's dialog both have to keep Tab inside, and
+       a second copy is how the two start disagreeing about what counts as focusable. */
+    window.Alpine.data('adminFocusTrap', () => ({
+        trap: trapTab,
     }));
 
     // Types whose editors host nested block lists; they cannot be added inside a nested list.
@@ -1622,6 +1653,32 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 
+/* One arrow-key walker, shared by every menu in the shell.
+
+   The four bar popovers already had this behaviour inside `adminPopover`; the top-navigation
+   branches need the same rule, and a second implementation is how two menus start disagreeing
+   about where Up from the first row goes. Visibility is filtered here rather than by the
+   caller, because a menu whose hidden rows are still in the tab order is a menu that appears to
+   drop keys on the floor. */
+const walkMenuRows = (root, delta) => {
+    if (! root) {
+        return;
+    }
+
+    const rows = Array.from(root.querySelectorAll('[role="menuitem"], [role="menuitemradio"]')).filter(
+        (element) => element.offsetParent !== null,
+    );
+
+    if (rows.length === 0) {
+        return;
+    }
+
+    const at = rows.indexOf(document.activeElement);
+    const next = at === -1 ? (delta > 0 ? 0 : rows.length - 1) : (at + delta + rows.length) % rows.length;
+
+    rows[next].focus();
+};
+
 /* --------------------------------------------------------------------------
    Admin sidebar: navigation that survives an SPA swap.
 
@@ -1646,24 +1703,35 @@ document.addEventListener('DOMContentLoaded', () => {
    newest one would still be listening.
    -------------------------------------------------------------------------- */
 document.addEventListener('alpine:init', () => {
+    /* Config is PULLED here rather than pushed, because the shell's inline script is a classic
+       one and this module is deferred: on a fresh load the script runs first, and a call to a
+       function that does not exist yet takes the whole blob with it. That is what was happening
+       — `themeUrl`, `navUrl` and the search index were all still empty defaults, so the bar's
+       theme POST was going to the current page and Ctrl+K could only ever find records.
+
+       Either side may still arrive first, so both directions are honoured: `__ADMIN_NAV_BOOT__`
+       is what the layout published, and `window.initAdminNav()` remains for the case where this
+       module is already standing (a `wire:navigate`, where the layout script re-runs with the
+       page that just arrived). */
+    window.__ADMIN_NAV__ = Object.assign(
+        { path: null, active: null, theme: 'auto', themeUrl: '', navUrl: '', searchUrl: '', text: {}, labels: {}, badges: {} },
+        window.__ADMIN_NAV__ || {},
+        window.__ADMIN_NAV_BOOT__ || {},
+    );
+
+    const cfg = window.__ADMIN_NAV__;
+
     const state = Alpine.reactive({
-        theme: (window.__ADMIN_NAV__ && window.__ADMIN_NAV__.theme) || "auto",
+        theme: cfg.theme || 'auto',
         path: window.location.pathname,
-        lit: (window.__ADMIN_NAV__ && window.__ADMIN_NAV__.active) || window.location.pathname,
-        query: new URLSearchParams(window.location.search).get('nav_search') || '',
+        lit: cfg.active || window.location.pathname,
+        // Read from the class the layout put on <html> before paint, exactly as $store.sidebar
+        // does for the rail width: one written fact, so the controls and the CSS cannot disagree
+        // about which navigation is current on the first render.
+        navTop: document.documentElement.classList.contains('admin-nav-top'),
     });
 
     const strip = (subject) => String(subject ?? '/').replace(/\/+$/, '');
-
-    /* Config arrives from window.initAdminNav(), called by the rail's boot script. Either side
-       may get there first: Alpine's init fires before an inline body script on a fresh load,
-       and after one on a subsequent visit. So both write to the same object and both check
-       whether the other has arrived. It lives on window rather than in the DOM because a body
-       swap replaces every element that is not persisted, including a script tag of JSON that
-       was never marked to survive. */
-    window.__ADMIN_NAV__ = window.__ADMIN_NAV__ || { path: null, active: null, theme: 'auto', themeUrl: '', text: {}, badges: {} };
-
-    const cfg = window.__ADMIN_NAV__;
 
     const navText = () => cfg.text || {};
 
@@ -1738,18 +1806,6 @@ document.addEventListener('alpine:init', () => {
     };
 
     Alpine.store('adminNav', {
-        get query() {
-            return state.query;
-        },
-
-        set query(value) {
-            state.query = value || '';
-        },
-
-        get searching() {
-            return state.query.trim() !== '';
-        },
-
         /* The single lit path. Rows compare themselves to it rather than each walking the
            prefix list, so one navigation costs one pass over the index instead of one per
            row per column — and every copy of a row in the rail agrees by construction. */
@@ -1762,6 +1818,24 @@ document.addEventListener('alpine:init', () => {
             // window object, and a getter over a non-reactive field never re-runs, so the
             // theme chip would keep printing whatever the page was rendered with.
             return state.theme;
+        },
+
+        /* The two words the top bar prints for the current page. Answered from `lit` rather
+           than from the location so the bar and the rail can never disagree: they are reading
+           the same single fact, recomputed by the same sync() on the same navigation.
+
+           Nulls mean no menu row owns this path. The bar then shows the business name alone —
+           the alternative is a label invented from a URL, which would be a claim about a page
+           the navigation does not know. */
+        get context() {
+            const entry = (cfg.labels || {})[state.lit];
+
+            return entry ?? { group: null, label: null };
+        },
+
+        // The theme word the trigger's aria-label reads, spelled as the menu spells it.
+        label() {
+            return { light: 'Light', dark: 'Dark', auto: 'System' }[state.theme] ?? 'System';
         },
 
         /* Called by the rail's boot script on a full load, when the server has settled both
@@ -1778,46 +1852,6 @@ document.addEventListener('alpine:init', () => {
         sync() {
             state.path = window.location.pathname;
             state.lit = longestPrefix(state.path);
-        },
-
-        /* Every word has to land, on any field, in any order — so "gallery category" finds
-           Gallery Categories while "settings cache" finds nothing. The group name is in the
-           haystack, which is why typing "blog" reveals the whole branch. */
-        matches(href) {
-            if (! this.searching) {
-                return true;
-            }
-
-            const text = navText()[href] || '';
-
-            return termsOf(state.query).every((term) => text.includes(term));
-        },
-
-        /* Escaped first, tags added afterwards, so there is no moment in which a label — or the
-           query, which is inside the pattern — could be read as markup. */
-        highlightAll(root) {
-            const terms = termsOf(state.query).sort((a, b) => b.length - a.length);
-            const pattern = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-
-            root.querySelectorAll('[data-nav-label]').forEach((link) => {
-                const slot = link.querySelector('[data-nav-text]');
-                const label = link.getAttribute('data-nav-label') || '';
-
-                if (! slot) {
-                    return;
-                }
-
-                if (pattern === '') {
-                    slot.textContent = label;
-
-                    return;
-                }
-
-                slot.innerHTML = escapeHtml(label).replace(
-                    new RegExp(`(${pattern})`, 'gi'),
-                    '<mark class="admin-nav-mark">$1</mark>',
-                );
-            });
         },
 
         cycleTheme() {
@@ -1846,10 +1880,6 @@ document.addEventListener('alpine:init', () => {
             window.localStorage.setItem('theme', theme);
             window.localStorage.setItem('flux.appearance', theme === 'auto' ? 'system' : theme);
 
-            document.querySelectorAll('[data-admin-theme-chip]').forEach((chip) => {
-                chip.setAttribute('data-admin-theme-chip', theme);
-            });
-
             // The rail publishes this URL with the rest of its index; there is no global
             // route() helper in this app and inventing one for a single POST is not worth it.
             window.fetch(cfg.themeUrl, {
@@ -1862,6 +1892,62 @@ document.addEventListener('alpine:init', () => {
                 body: JSON.stringify({ theme }),
             }).catch(() => {
                 // The preference is already applied locally; the write can wait for the next try.
+            });
+        },
+
+        /* ------------------------------------------------------------------
+           Navigation layout.
+
+           The theme did this first and the shape is copied on purpose: apply locally, then POST
+           so the choice is waiting on the second machine too. `syncLayout()` exists because the
+           class on <html> is the one fact both sides read — the layout seeds it before paint on a
+           full load, and its body-level twin re-asserts it after every `wire:navigate`. That is
+           how a switch costs neither a navigation nor a re-render, and how a choice made
+           elsewhere lands without waiting for a reload.
+           ------------------------------------------------------------------ */
+        get navTop() {
+            // Through the reactive state rather than straight off the DOM: a getter that reads a
+            // class is not a dependency anything can invalidate, so the control would print
+            // whatever mode the page was rendered with and never update.
+            return state.navTop;
+        },
+
+        // The same fact spelled the way the enum spells it, so a control can compare against the
+        // value it was rendered with instead of inventing its own boolean.
+        get navLayout() {
+            return state.navTop ? 'top' : 'sidebar';
+        },
+
+        syncLayout() {
+            state.navTop = document.documentElement.classList.contains('admin-nav-top');
+        },
+
+        setNavLayout(layout) {
+            const top = layout === 'top';
+
+            state.navTop = top;
+            document.documentElement.classList.toggle('admin-nav-top', top);
+
+            window.dispatchEvent(new CustomEvent('toast', {
+                detail: {
+                    type: 'success',
+                    message: top
+                        ? 'Admin navigation moved to the top bar. Phones and tablets keep the slide-out menu.'
+                        : 'Admin navigation moved back to the sidebar. Phones and tablets keep the slide-out menu.',
+                },
+            }));
+
+            window.fetch(cfg.navUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({ admin_nav_layout: layout }),
+            }).catch(() => {
+                // Same concession as the theme: the panel already looks the way it was asked to,
+                // and a lost write is retried the next time the control is used.
             });
         },
     });
@@ -1950,69 +2036,693 @@ document.addEventListener('alpine:init', () => {
             );
         },
 
-        /* A branch stays visible while any row in it answers the query, and comes back whole
-           the moment the field is cleared — the rows themselves are only hidden, never
-           removed, so nothing has to be rebuilt. Reading store.searching is what subscribes
-           this expression: it is a getter over the reactive query, whereas matches() would be
-           an opaque call Alpine has no reason to re-run. */
-        anyMatches() {
-            const store = Alpine.store('adminNav');
+    }));
 
-            if (! store.searching) {
-                return true;
-            }
+    /* ---------------------------------------------------------------------
+       Top bar.
 
-            return Array.from(this.$el.querySelectorAll('[data-nav-href]')).some((link) =>
-                store.matches(link.getAttribute('data-nav-href')),
-            );
+       Each piece answers one question the bar cannot answer by itself. They are
+       Alpine rather than Blade because the bar is a persisted island: anything it
+       needs to know after a wire:navigate has to be computed in the browser, and
+       the only browser-side facts it is given are the navigation index the rail
+       publishes and the location.
+       --------------------------------------------------------------------- */
+
+    /* One popover for the bar's three menus — waiting queues, theme, and account. Create is not
+       in this list: it opens a dialog, because its tiles want a title and a description each.
+       They were four hand-written copies in the sidebar footer, which is how three of them came
+       to disagree about whether Escape returned focus. The trigger is reached through x-ref
+       rather than a query because the panel is a sibling of the button, and a $el-scoped
+       selector would find whichever of the two happened to be written first. */
+    window.Alpine.data('adminPopover', () => ({
+        open: false,
+
+        toggle() {
+            this.open ? this.close() : this.show();
         },
 
-        /* Typing in search has to reveal every match even inside a branch the user shut, and
-           hide them again the moment the query clears without overwriting what was
-           remembered — which is why this reads the search flag instead of writing state. */
-        isOpen() {
-            return Alpine.store('adminNav').searching ? true : this.open;
+        show(fromEnd = false) {
+            this.open = true;
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const items = this.items();
+                    const item = fromEnd ? items.at(-1) : items[0];
+
+                    item?.focus();
+                });
+            });
+        },
+
+        close(refocus = true) {
+            if (! this.open) {
+                return;
+            }
+
+            this.open = false;
+
+            if (refocus) {
+                this.$refs.trigger?.focus();
+            }
+        },
+
+        items() {
+            return Array.from(
+                this.$el.querySelectorAll('[role="menuitem"], [role="menuitemradio"]'),
+            ).filter((element) => element.offsetParent !== null);
+        },
+
+        /* Arrow keys walk the menu and wrap, because a menu long enough to need scrolling is a
+           menu whose end is a reason to keep going rather than a wall. Separators are skipped:
+           they carry the role for assistive tech but nothing to activate. The rule lives in one
+           function so the top-navigation branches cannot drift from the bar's own menus. */
+        move(delta) {
+            walkMenuRows(this.$el, delta);
         },
     }));
 
-    /* The column that holds the groups. One root per column — the drawer and the rail each
-       have their own — and both read the same store, so a query typed in one filters the other
-       as well, which matters because they are never both on screen but are both mounted. */
-    window.Alpine.data('adminNavRoot', () => ({
-        /* Exposed as a getter so the "no matches" line and the group rows all read the same
-           reactive answer, and so matches() — which is a call, not a property — is never the
-           only thing standing between a keystroke and a re-evaluation. */
-        get searching() {
-            return Alpine.store('adminNav').searching;
+    /* One drawer, one dialog, and now a rail toggle that has to know which of the two it is
+       standing next to. The stores keep the state; this only translates a press into the verb
+       for the current viewport, so the control can be one button instead of two. */
+    window.Alpine.data('adminSidebarToggle', () => ({
+        isDesktop: () => window.matchMedia('(min-width: 1024px)').matches,
+
+        collapsed: () => Alpine.store('sidebar').collapsed,
+
+        open: () => (window.matchMedia('(min-width: 1024px)').matches
+            ? ! Alpine.store('sidebar').collapsed
+            : Alpine.store('mobileMenu').open),
+
+        label: () => (window.matchMedia('(min-width: 1024px)').matches
+            ? (Alpine.store('sidebar').collapsed ? 'Expand navigation' : 'Collapse navigation')
+            : 'Open navigation'),
+
+        toggle() {
+            if (this.isDesktop()) {
+                Alpine.store('sidebar').toggle();
+
+                return;
+            }
+
+            Alpine.store('mobileMenu').toggle();
+        },
+    }));
+
+    /* ---------------------------------------------------------------------
+       Top navigation.
+
+       One Alpine root for the whole menu row, because both of its questions belong to
+       the row rather than to a branch: which panel is open, and how many branches the
+       measured width can actually hold. Keys follow the ARIA menu bar pattern — Left and
+       Right between triggers, Down into the panel, Escape back out to the trigger that
+       opened it, Home and End at the ends — and the rows inside the panels are the same
+       row component the rail and the drawer print, so "which row is the current page"
+       stays one computation shared by all three.
+
+       Hover opens with intent and closes with a delay. Both halves matter: a pointer
+       crossing the bar on its way somewhere else must not throw every panel open in
+       turn, and a diagonal move from a trigger down into its own panel must not close
+       the panel it was aimed at.
+       --------------------------------------------------------------------- */
+    window.Alpine.data('adminMenuBar', () => ({
+        open: null,
+        fit: null,
+        forcing: false,
+        slots: [],
+        widths: [],
+        moreWidth: 0,
+        gap: 0,
+        measured: false,
+        measuring: false,
+        remeasure: false,
+        observer: null,
+        timer: null,
+
+        HOVER_OPEN_MS: 120,
+        HOVER_CLOSE_MS: 250,
+
+        init() {
+            this.slots = Array.from(this.$el.querySelectorAll('[data-menu-slot]'));
+            this.gap = parseFloat(window.getComputedStyle(this.$el).columnGap) || 0;
+
+            /* The row's own width is the budget, and a ResizeObserver is the only honest way to
+               watch it: this bar can lose room to the window, to the context chip taking a longer
+               page name, or to a language that spells a section name wider — and only one of those
+               is a window resize. Until a measurement exists, a size change is the measurement
+               request: the row below `lg` is `display: none`, so the tick that makes it visible is
+               the first one that can answer anything. */
+            this.observer = new ResizeObserver(() => {
+                this.measured ? this.layout() : this.measure();
+            });
+            this.observer.observe(this.$el);
+
+            this.measure();
+
+            /* `display=swap` means the first measurement is taken in the fallback face, which is
+               not the same width as Geist. Re-measuring when the real one lands is what stops a
+               row that fitted at first paint from spilling past the search box a moment later. */
+            document.fonts?.ready.then(() => this.measure());
         },
 
-        get query() {
-            return Alpine.store('adminNav').query;
+        destroy() {
+            this.observer?.disconnect();
+            window.clearTimeout(this.timer);
         },
 
-        anyMatch() {
-            const store = Alpine.store('adminNav');
+        /* Measure with everything visible, then decide what to hide. A width read off a hidden
+           slot answers zero, which is how an overflow menu ends up holding the entire navigation
+           after a window drag. */
+        async measure() {
+            /* Zeroes are not a small measurement, they are no measurement: a row that recorded
+               them concludes that all seven groups fit in anything, and then prints them at their
+               natural width straight through the search field and the tools cluster. Declining here
+               is safe because whatever makes the row laid out also fires the observer, which asks
+               again. */
+            if (this.$el.clientWidth === 0) {
+                this.measured = false;
 
-            if (! store.searching) {
+                return;
+            }
+
+            /* The observer and the font promise can both ask at once, and two runs interleaved over
+               one `await` hand the second one a row the first has already un-hidden — which is a
+               fresh set of zeroes written over good numbers. The later ask is remembered, not
+               dropped, because it is the one that saw the newest size. */
+            if (this.measuring) {
+                this.remeasure = true;
+
+                return;
+            }
+
+            this.measuring = true;
+            this.forcing = true;
+            this.$el.classList.add('is-measuring');
+
+            await this.$nextTick();
+
+            this.widths = this.slots.map((slot) => slot.getBoundingClientRect().width);
+            this.moreWidth = this.$el.querySelector('[data-menu-more]')?.getBoundingClientRect().width || 0;
+
+            this.$el.classList.remove('is-measuring');
+            this.forcing = false;
+            this.measuring = false;
+
+            this.measured = this.widths.some((width) => width > 0);
+
+            this.layout();
+
+            if (this.remeasure) {
+                this.remeasure = false;
+
+                await this.measure();
+            }
+        },
+
+        layout() {
+            if (this.forcing || this.widths.length === 0) {
+                return;
+            }
+
+            const room = Math.floor(this.$el.clientWidth);
+
+            if (room <= 0) {
+                return;
+            }
+
+            const natural = this.widths.reduce((sum, width) => sum + width, 0) + this.gap * (this.widths.length - 1);
+
+            if (natural <= room) {
+                this.fit = this.widths.length;
+
+                return;
+            }
+
+            /* Something has to move, so More has to be affordable before it is chosen: reserve its
+               own width plus the gap that would sit in front of it. Fitting first and discovering
+               afterwards that there was no room left for the pill is the one way this row can hide
+               navigation entirely. */
+            const budget = room - this.moreWidth - this.gap;
+            let used = 0;
+            let fit = 0;
+
+            for (const width of this.widths) {
+                const step = used + width + (used > 0 ? this.gap : 0);
+
+                if (step > budget) {
+                    break;
+                }
+
+                used = step;
+                fit += 1;
+            }
+
+            this.fit = fit;
+        },
+
+        /* Which slots stay in the row. Nothing is hidden before the first measurement, so a
+           browser without script — or one that threw on the way here — still shows the whole
+           navigation instead of quietly dropping the tail. */
+        shows(index) {
+            return this.forcing || this.fit === null || index < this.fit;
+        },
+
+        hasOverflow() {
+            if (this.forcing) {
+                // Laid out but invisible while measured: see `.is-measuring` in admin.css.
                 return true;
             }
 
-            return Array.from(this.$el.querySelectorAll('[data-nav-href]')).some((link) =>
-                store.matches(link.getAttribute('data-nav-href')),
+            return this.fit !== null && this.fit < this.slots.length;
+        },
+
+        overflows(index) {
+            return this.hasOverflow() && this.fit !== null && index >= this.fit;
+        },
+
+        isOpen(key) {
+            return this.open === key;
+        },
+
+        toggle(key) {
+            this.open === key ? this.close(true) : this.openBranch(key);
+        },
+
+        openBranch(key) {
+            window.clearTimeout(this.timer);
+            this.open = key;
+        },
+
+        close(refocus) {
+            if (this.open === null) {
+                return;
+            }
+
+            const previous = this.open;
+
+            this.open = null;
+
+            if (refocus) {
+                this.triggerOf(previous)?.focus();
+            }
+        },
+
+        /* Down and Enter both end up in the panel, so they do the same thing: open it and put the
+           cursor on its first row. The row is `display: none` until `x-show` has written over the
+           state change, and a focus attempt before that is silently dropped — one microtask is not
+           enough, because the directive's effect and this callback are queued in the same flush and
+           the row loses. Waiting for the next frame asks after the paint has happened, which is the
+           point where the row is real. A keydown means the tab is visible, so that frame arrives. */
+        openAndEnter(key) {
+            this.openBranch(key);
+
+            window.requestAnimationFrame(() => {
+                this.panelOf(key)?.querySelector('[data-nav-href]')?.focus();
+            });
+        },
+
+        /* Hover state belongs to the branch, which is the trigger and its panel together. Read off
+           the trigger alone it was wrong in a way that looked like the menu closing on its own: the
+           panel is the trigger's *sibling*, so moving down into the panel left the trigger, started
+           this countdown, and nothing inside the panel could call it back — the submenu shut under
+           the pointer about 250ms after it arrived. On the branch, crossing that gap never leaves
+           the element being hovered, and the countdown starts only once the pointer has gone. */
+        hoverIn(key, event) {
+            if (!this.isMouse(event)) {
+                return;
+            }
+
+            window.clearTimeout(this.timer);
+            this.timer = window.setTimeout(() => this.openBranch(key), this.HOVER_OPEN_MS);
+        },
+
+        hoverOut(event) {
+            if (!this.isMouse(event)) {
+                return;
+            }
+
+            window.clearTimeout(this.timer);
+            // Longer leaving than arriving: sliding sideways to the next section passes through the
+            // page behind the bar for a frame, and a menu that shuts mid-crossing is a menu nobody
+            // can click.
+            this.timer = window.setTimeout(() => this.close(false), this.HOVER_CLOSE_MS);
+        },
+
+        /* There is no pointer-type modifier in Alpine — unrecognised modifiers are dropped unless
+           the event is a key or click one — so the `.pointer-type-mouse` this intent used to be
+           spelled with filtered nothing. A tap was therefore a hover: pointerenter, then
+           pointerleave as soon as the touch pointer was lifted, which opened the branch on the
+           click and closed it again a quarter second later on any touch machine wide enough to
+           show the bar. */
+        isMouse(event) {
+            return event?.pointerType === 'mouse';
+        },
+
+        walk(delta) {
+            walkMenuRows(document.activeElement?.closest('[role="menu"]'), delta);
+        },
+
+        /* Left and Right move along the triggers and wrap, and close whatever is open on the way,
+           because an arrow that leaves a panel standing behind it is a panel nobody pressed for. */
+        moveTrigger(delta) {
+            const list = this.triggers();
+
+            if (list.length === 0) {
+                return;
+            }
+
+            const at = list.indexOf(document.activeElement);
+
+            let next;
+
+            if (delta === 'first') {
+                next = 0;
+            } else if (delta === 'last') {
+                next = list.length - 1;
+            } else {
+                next = at === -1 ? (delta > 0 ? 0 : list.length - 1) : (at + delta + list.length) % list.length;
+            }
+
+            this.close(false);
+            list[next].focus();
+        },
+
+        triggerOf(key) {
+            return this.$el.querySelector(`[data-menu-trigger="${key}"]`);
+        },
+
+        panelOf(key) {
+            return this.$el.querySelector(`[data-menu-panel="${key}"]`);
+        },
+
+        triggers() {
+            return Array.from(this.$el.querySelectorAll('[data-menu-trigger]')).filter(
+                (element) => element.offsetParent !== null,
             );
         },
 
-        /* Highlighting is a DOM write, not a binding: Alpine cannot express "replace this
-           text node with marked-up text" without re-parsing the row on every keystroke. So the
-           column asks the store to rewrite the label slots once per query change, and the
-           untouched text node comes back the moment the query does. */
-        sync() {
-            this.$watch(
-                () => Alpine.store('adminNav').query,
-                () => Alpine.store('adminNav').highlightAll(this.$el),
-            );
+        /* Which branch owns the page: the section name the shell already resolved for the lit row,
+           compared with the section this branch is labelled. One answer, computed once, shared by
+           the context chip, the palette and the bar — which is why this does not walk the rows and
+           match paths here. A persisted island is restored from Livewire's store after Alpine has
+           walked it, so a subtree query made on the first paint can legitimately see nothing, and
+           a branch that reads its own children would stay dark until something made it look again. */
+        holdsPage(index) {
+            const slot = this.$el.querySelector(`[data-menu-slot="${index}"]`);
 
-            Alpine.store('adminNav').highlightAll(this.$el);
+            if (! slot) {
+                return false;
+            }
+
+            return slot.dataset.menuGroup === Alpine.store('adminNav').context.group;
+        },
+    }));
+
+    /* Full screen is the browser's state, not the page's, so the store only mirrors it. The
+       listener is registered here rather than inside the store because a store gets no init hook
+       — and Esc leaves full screen without telling either of the two buttons that offer it. */
+    const fullscreen = Alpine.reactive({
+        on: document.fullscreenElement !== null,
+
+        toggle() {
+            if (document.fullscreenElement !== null) {
+                document.exitFullscreen?.();
+
+                return;
+            }
+
+            // Rejected when the document is not focused or the browser refuses; either way the
+            // change event never fires, so `on` stays false and the icon stays honest.
+            document.documentElement.requestFullscreen?.().catch(() => {});
+        },
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        fullscreen.on = document.fullscreenElement !== null;
+    });
+
+    Alpine.store('fullscreen', fullscreen);
+
+    /* The command palette.
+       Pages are matched here, in the browser, against the index the rail publishes — the same
+       rule the old inline field used (every word must land somewhere in the row's haystack, in
+       any order), so a destination that was findable before is findable now. Records come from
+       admin.search, debounced, and only for the modules the account can open. */
+    Alpine.store('adminPalette', {
+        open: false,
+        query: '',
+        cursor: 0,
+        loading: false,
+        records: [],
+        recent: readPaletteRecents(),
+        token: 0,
+        timer: null,
+
+        RECENT_KEY: PALETTE_RECENT_KEY,
+        MINIMUM: 2,
+
+        show() {
+            // The create dialog shares the palette's stacking level, so the two must not be up
+            // at once — Ctrl+K is reachable from inside the dialog.
+            Alpine.store('adminCreate')?.hide(false);
+
+            this.open = true;
+            this.cursor = 0;
+        },
+
+        hide() {
+            this.open = false;
+            this.query = '';
+            this.records = [];
+            this.cursor = 0;
+        },
+
+        isEmpty() {
+            return this.query.trim() === '';
+        },
+
+        /* Every word has to land, on any field, in any order — so "gallery category" finds
+           Gallery Categories while "settings cache" finds nothing. The group name is in the
+           haystack, which is why typing "blog" reveals the whole branch. */
+        matchesPage(href) {
+            const text = navText()[href] || '';
+
+            return termsOf(this.query).every((term) => text.includes(term));
+        },
+
+        pages() {
+            if (this.isEmpty()) {
+                return [];
+            }
+
+            return Object.entries(navText())
+                .filter(([href]) => this.matchesPage(href))
+                .map(([href]) => {
+                    const entry = (cfg.labels || {})[href] || {};
+
+                    return {
+                        label: entry.label || href,
+                        sub: entry.group || '',
+                        url: href,
+                        badge: null,
+                    };
+                })
+                .sort((a, b) => a.label.localeCompare(b.label));
+        },
+
+        /* The flat list the arrow keys walk, built once per read so the on-screen order and the
+           cursor can never disagree — each row is tagged with the index it is drawn at. */
+        groups() {
+            const pages = this.pages();
+            const built = [];
+
+            if (pages.length > 0) {
+                built.push({ label: 'Pages', items: pages });
+            }
+
+            this.records.forEach((group) => {
+                built.push({
+                    label: group.group,
+                    items: group.items.map((item) => ({ ...item, badge: null })),
+                });
+            });
+
+            let cursor = 0;
+
+            return built.map((group) => ({
+                label: group.label,
+                items: group.items.map((item) => ({ ...item, idx: cursor++ })),
+            }));
+        },
+
+        total() {
+            return this.groups().reduce((carry, group) => carry + group.items.length, 0);
+        },
+
+        at(index) {
+            return this.groups().flatMap((group) => group.items)[index] ?? null;
+        },
+
+        move(delta) {
+            const count = this.total();
+
+            if (count === 0) {
+                return;
+            }
+
+            // Wraps rather than stops, because the list is long enough that reaching the end is
+            // a reason to keep going down, not a wall.
+            this.cursor = (this.cursor + delta + count) % count;
+        },
+
+        status() {
+            if (! this.open) {
+                return '';
+            }
+
+            if (this.isEmpty()) {
+                return this.recent.length > 0 ? 'Recent searches shown.' : 'Type to search.';
+            }
+
+            return `${this.total()} results for ${this.query}.`;
+        },
+
+        select() {
+            const item = this.at(this.cursor);
+
+            if (item) {
+                this.choose(item);
+            }
+        },
+
+        choose(item) {
+            this.remember(this.query);
+            this.hide();
+
+            // Livewire.navigate keeps the rail and the bar standing; a bare location.href would
+            // reload both, and the whole point of the persisted shell is that they do not move.
+            if (window.Livewire?.navigate) {
+                window.Livewire.navigate(item.url);
+
+                return;
+            }
+
+            window.location.href = item.url;
+        },
+
+        remember(term) {
+            const trimmed = String(term || '').trim();
+
+            if (trimmed === '') {
+                return;
+            }
+
+            this.recent = [trimmed, ...this.recent.filter((existing) => existing !== trimmed)].slice(0, 6);
+
+            try {
+                window.localStorage.setItem(this.RECENT_KEY, JSON.stringify(this.recent));
+            } catch (cause) {
+                // The history is a convenience; losing the write loses the convenience only.
+            }
+        },
+
+        /* The record lookup, debounced.
+           The token is the guard rather than a timestamp: a keystroke whose response arrives after
+           the box has moved on must not be able to draw itself, and closing the dialog has to
+           count as moving on. Pages never wait for this — they are matched in the browser, so the
+           palette answers the moment it opens even with the network down. */
+        run(term) {
+            const mine = ++this.token;
+            const trimmed = String(term || '').trim();
+
+            this.cursor = 0;
+            this.records = [];
+
+            if (trimmed.length < this.MINIMUM) {
+                this.loading = false;
+
+                return;
+            }
+
+            this.loading = true;
+
+            window.clearTimeout(this.timer);
+            this.timer = window.setTimeout(async () => {
+                try {
+                    const response = await fetch(`${cfg.searchUrl}?q=${encodeURIComponent(trimmed)}`, {
+                        headers: { Accept: 'application/json' },
+                    });
+
+                    if (! response.ok || mine !== this.token) {
+                        return;
+                    }
+
+                    const body = await response.json();
+
+                    this.records = Array.isArray(body.groups) ? body.groups : [];
+                } catch (cause) {
+                    // A dropped lookup leaves the page results, which needed no server.
+                } finally {
+                    if (mine === this.token) {
+                        this.loading = false;
+                    }
+                }
+            }, 200);
+        },
+    });
+
+    /* The dialog's own root: it owns the input ref and the watcher, because $watch belongs to an
+       Alpine scope and the store is not one. Everything the person sees is still read from the
+       store, so the bar's trigger and this dialog can never disagree about whether it is open. */
+    window.Alpine.data('adminPaletteDialog', () => ({
+        trap: trapTab,
+
+        init() {
+            this.$watch('$store.adminPalette.query', (value) => {
+                Alpine.store('adminPalette').run(value);
+            });
+        },
+    }));
+
+    /* The create dialog's flag, kept in a store for the same reason the palette's is: two
+       controls open it (the bar's `+` and the account menu's phone row) and one panel shows it,
+       and none of the three share an Alpine scope. `returnTo` is the element that opened it, so
+       Escape and the backdrop put focus back where the person was rather than on the body. A
+       navigation closes it without refocusing: the page under it is about to be replaced. */
+    Alpine.store('adminCreate', {
+        open: false,
+        returnTo: null,
+
+        show(trigger = null) {
+            this.returnTo = trigger instanceof HTMLElement ? trigger : document.activeElement;
+            this.open = true;
+        },
+
+        hide(refocus = true) {
+            if (! this.open) {
+                return;
+            }
+
+            this.open = false;
+
+            if (refocus) {
+                this.returnTo?.focus?.();
+            }
+
+            this.returnTo = null;
+        },
+    });
+
+    window.Alpine.data('adminCreateDialog', () => ({
+        trap: trapTab,
+
+        focusFirst() {
+            this.$el.querySelector('[role="menuitem"]')?.focus();
+        },
+
+        /* The tiles are a grid, but they read as one list: arrows walk it in document order and
+           wrap, the same rule the bar's drop-down menus use. */
+        move(delta) {
+            walkMenuRows(this.$el, delta);
         },
     }));
 });
@@ -2029,31 +2739,30 @@ window.initAdminNav = (config) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    const focusSearch = (event) => {
-        const field = Array.from(document.querySelectorAll('.admin-nav-search-field'))
-            .find((candidate) => candidate.offsetParent !== null);
+    /* Both keys now open the command palette. They used to focus the sidebar's inline filter,
+       which the palette replaces: one shortcut, one behaviour, and a box that searches the
+       records as well as the rows.
 
-        if (! field) {
-            return;
-        }
-
+       Registered here rather than in the Alpine scope because the bar is a persisted island and
+       a directive on it would be re-added on every full load while surviving every navigation —
+       which is exactly how a shortcut ends up firing twice. The window listener is added once
+       per document, and the store it writes to outlives both. */
+    const openPalette = (event) => {
         event.preventDefault();
-        field.focus();
-        field.select();
+        Alpine.store('adminPalette').show();
     };
 
     // Cmd+K on a Mac, Ctrl+K everywhere else — picked over a bare "/" as the primary because
-    // it is the muscle memory people already carry for "search this app". Nothing in the
-    // panel binds it today, and it stays unbound in the content area.
+    // it is the muscle memory people already carry for "search this app".
     window.addEventListener('keydown', (event) => {
         if ((event.metaKey || event.ctrlKey) && String(event.key).toLowerCase() === 'k') {
-            focusSearch(event);
+            openPalette(event);
         }
     });
 
     // "/" is the weaker of the two and must stay out of the way of whoever is typing, so it
-    // only reaches for the rail when focus is not already inside a field. That also leaves
-    // Firefox quick-find working on any page where the sidebar search is not the target.
+    // only reaches for the palette when focus is not already inside a field. That also leaves
+    // Firefox quick-find working on any page where the palette is not the target.
     window.addEventListener('keydown', (event) => {
         if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) {
             return;
@@ -2064,7 +2773,7 @@ document.addEventListener('DOMContentLoaded', () => {
             || active?.isContentEditable === true;
 
         if (! typing) {
-            focusSearch(event);
+            openPalette(event);
         }
     });
 });

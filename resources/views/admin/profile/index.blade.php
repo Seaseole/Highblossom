@@ -379,6 +379,89 @@
                                 </div>
                             </div>
 
+                            {{-- Desktop navigation, chosen the same way and saved by the same
+                                 button. The two diagrams are the whole argument for putting a
+                                 control here at all: a person can see which shape they are
+                                 picking before the panel rearranges itself. --}}
+                            <div class="space-y-4 border-t border-gray-100 pt-6 dark:border-white/10">
+                                <div class="space-y-1">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Desktop navigation
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Which holds the menu on a wide screen. Phones and tablets use the
+                                        slide-out menu either way, so this is a desk preference and not a
+                                        change to what you can reach.
+                                    </p>
+                                    @error('admin_nav_layout')
+                                        <p class="text-xs text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    @foreach (\App\Enums\AdminNavLayout::options() as $layout)
+                                        @php
+                                            // Old input wins after a rejected submit, or the form would
+                                            // redisplay the saved value and quietly discard what was
+                                            // just typed. `$current` is what the person is actually
+                                            // looking at, which is the only thing worth ticking.
+                                            $current = old('admin_nav_layout', \App\Support\AdminNav::for($user)->value);
+                                        @endphp
+
+                                        <label class="relative cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="admin_nav_layout"
+                                                value="{{ $layout->value }}"
+                                                {{ $current === $layout->value ? 'checked' : '' }}
+                                                class="peer sr-only"
+                                            />
+                                            <div class="flex h-full flex-col gap-4 rounded-xl border-2 border-gray-100 p-4 transition-all peer-checked:border-gray-900 peer-checked:bg-gray-50 dark:border-white/5 dark:peer-checked:border-white dark:peer-checked:bg-white/5">
+                                                <span class="block w-full text-gray-200 dark:text-white/15" aria-hidden="true">
+                                                    @if ($layout === \App\Enums\AdminNavLayout::Sidebar)
+                                                        {{-- A rail down the left edge, a bar across the top,
+                                                             and content as lines beside both. --}}
+                                                        <svg class="h-16 w-full" fill="none" viewBox="0 0 120 56" preserveAspectRatio="none">
+                                                            <rect class="stroke-current" x="0.75" y="0.75" width="118.5" height="54.5" rx="4" stroke-width="1.5" />
+                                                            <rect class="fill-current text-gray-400 dark:text-white/30" x="2" y="2" width="30" height="52" rx="3" />
+                                                            <line class="stroke-current" x1="32" y1="14" x2="119" y2="14" stroke-width="1.5" />
+                                                            <rect class="fill-current text-gray-400 dark:text-white/30" x="4" y="6" width="26" height="4" rx="2" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="40" y="24" width="60" height="4" rx="2" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="40" y="34" width="44" height="4" rx="2" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="40" y="44" width="52" height="4" rx="2" />
+                                                        </svg>
+                                                    @else
+                                                        {{-- The same parts with the menu turned sideways:
+                                                             a filled band carrying the items, and the
+                                                             content below it at full width. --}}
+                                                        <svg class="h-16 w-full" fill="none" viewBox="0 0 120 56" preserveAspectRatio="none">
+                                                            <rect class="stroke-current" x="0.75" y="0.75" width="118.5" height="54.5" rx="4" stroke-width="1.5" />
+                                                            <rect class="fill-current text-gray-400 dark:text-white/30" x="2" y="2" width="116" height="14" rx="3" />
+                                                            <rect class="fill-current text-white dark:text-[#0A0A0F]" x="6" y="7" width="18" height="4" rx="2" />
+                                                            <rect class="fill-current text-white dark:text-[#0A0A0F]" x="28" y="7" width="18" height="4" rx="2" />
+                                                            <rect class="fill-current text-white dark:text-[#0A0A0F]" x="50" y="7" width="14" height="4" rx="2" />
+                                                            <circle class="fill-current text-white dark:text-[#0A0A0F]" cx="110" cy="9" r="4" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="8" y="24" width="90" height="4" rx="2" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="8" y="34" width="70" height="4" rx="2" />
+                                                            <rect class="fill-current text-gray-300 dark:text-white/15" x="8" y="44" width="78" height="4" rx="2" />
+                                                        </svg>
+                                                    @endif
+                                                </span>
+
+                                                <span class="block">
+                                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {{ $layout->label() }}
+                                                    </span>
+                                                    <span class="mt-1 block text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                                                        {{ $layout->description() }}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
                             <div class="pt-4">
                                 <button
                                     type="submit"

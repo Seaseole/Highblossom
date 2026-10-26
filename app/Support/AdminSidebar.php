@@ -17,10 +17,11 @@ use Illuminate\Http\Request;
  * it — which is how the two drifted into disagreeing about what the user is allowed to see.
  * These methods answer a question each, and the navigation is rendered once and placed twice.
  *
- * Nothing here filters by the search query. A persisted sidebar is not re-rendered when
- * `wire:navigate` swaps the page, so filtering could not live on the server and stay honest;
- * the query text and the paths are handed to the browser instead, in the shape described by
- * AdminMenu::index().
+ * Nothing here filters by a search query, and nothing here can. A persisted sidebar is not
+ * re-rendered when `wire:navigate` swaps the page, so filtering could not live on the server and
+ * stay honest; the paths, their labels, and the counts beside them are handed to the browser
+ * instead, in the shape described by AdminMenu::index(), and both the rail and the top bar answer
+ * their questions from that one blob.
  */
 final class AdminSidebar
 {
@@ -28,20 +29,6 @@ final class AdminSidebar
      * The cookie that mirrors the browser's memory of open branches back to the server.
      */
     public const REMEMBER_COOKIE = 'adminSidebarGroups';
-
-    /**
-     * The query in the field, or null when it is blank.
-     *
-     * Reading it server-side is what lets the input be prefilled on a reload or a pasted
-     * `?nav_search=` link; filtering the rows themselves is the browser's job, because the
-     * rail that holds the field is not re-rendered to be filtered by.
-     */
-    public static function query(Request $request): ?string
-    {
-        $query = trim((string) $request->input('nav_search', ''));
-
-        return $query === '' ? null : $query;
-    }
 
     /**
      * The path a menu entry lives at, host stripped.
@@ -113,7 +100,7 @@ final class AdminSidebar
      * `active` is resolved here rather than left to the browser because the first paint after
      * a full reload must not depend on JavaScript running to know what is lit.
      *
-     * @return array{text: array<string, string>, badges: array<string, int>, active: string|null}
+     * @return array{text: array<string, string>, labels: array<string, array{label: string, group: string}>, badges: array<string, int>, active: string|null, theme: string}
      */
     public static function clientData(Request $request): array
     {
@@ -132,8 +119,13 @@ final class AdminSidebar
 
         return [
             'text' => collect($index)->map(fn (array $entry) => $entry['search'])->all(),
+            'labels' => collect($index)->map(fn (array $entry) => [
+                'label' => $entry['label'],
+                'group' => $entry['group'],
+            ])->all(),
             'badges' => AdminMenu::badges(),
             'active' => $active === null ? $path : $active,
+            'theme' => self::theme($request),
         ];
     }
 

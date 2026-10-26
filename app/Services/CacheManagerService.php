@@ -195,11 +195,11 @@ final class CacheManagerService
         }
 
         return match ($group) {
-            'settings' => $this->queryStats(fn ($query) => $query->where('key', 'like', '%company_setting.%')),
+            'settings' => $this->queryStats(fn ($query) => $query->where('key', 'like', '%company_setting%')),
             'seo' => $this->queryStats(fn ($query) => $query->where('key', 'like', '%seo.sitemap%')->orWhere('key', 'like', '%seo.robots%')),
             'versions' => $this->queryStats(fn ($query) => $query->where('key', 'like', '%application-version.%')),
             'app' => $this->queryStats(fn ($query) => $query
-                ->where('key', 'not like', '%company_setting.%')
+                ->where('key', 'not like', '%company_setting%')
                 ->where('key', 'not like', '%seo.sitemap%')
                 ->where('key', 'not like', '%seo.robots%')
                 ->where('key', 'not like', '%application-version.%')
@@ -250,15 +250,18 @@ final class CacheManagerService
     }
 
     /**
-     * Forget every company setting cache key.
+     * Forget the aggregate settings cache, then sweep any legacy per-key
+     * entries left over from before settings were cached as one aggregate.
      */
     private function clearSettingsCache(): void
     {
-        $keys = collect(array_keys($this->settings->getDefaults()))
+        CompanySetting::flushCache();
+
+        $legacyKeys = collect(array_keys($this->settings->getDefaults()))
             ->merge(CompanySetting::query()->pluck('key'))
             ->unique();
 
-        foreach ($keys as $key) {
+        foreach ($legacyKeys as $key) {
             Cache::forget("company_setting.{$key}");
         }
     }

@@ -34,12 +34,11 @@
 <div
     class="space-y-1"
     x-data="adminNavGroup({ key: '{{ $label }}', open: {{ $open ? 'true' : 'false' }}, serverHasActive: {{ $hasActive ? 'true' : 'false' }}, rail: {{ $mobile ? 'false' : 'true' }} })"
-    x-show="anyMatches()"
 >
     <button
         type="button"
         @click="toggle()"
-        :aria-expanded="isOpen().toString()"
+        :aria-expanded="open.toString()"
         aria-label="{{ $label }} section"
         title="{{ $label }}"
         class="admin-nav-heading"
@@ -54,7 +53,7 @@
 
         <svg
             class="size-3 shrink-0 transition-transform duration-200 {{ $hideOnRail }}"
-            :class="isOpen() ? 'rotate-180' : ''"
+            :class="open ? 'rotate-180' : ''"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -65,11 +64,11 @@
     {{-- The rail's collapsed state is owned by CSS, not by an expression: `sidebar-collapsed` is
          already seeded onto <html> before paint, and a bound x-show is the one hiding rule that
          silently does nothing if the expression ever throws — which would dump all 32 rows into
-         an 80px column. x-show still owns open/closed and search, so the two mechanisms stack
-         instead of competing: Alpine removes display:none when a branch opens, and the class
-         keeps it hidden until the rail itself is widened. --}}
+         an 80px column. x-show owns open/closed, so the two mechanisms stack instead of
+         competing: Alpine removes display:none when a branch opens, and the class keeps it hidden
+         until the rail itself is widened. --}}
     <div
-        x-show="isOpen()"
+        x-show="open"
         x-collapse.duration.200ms
         class="{{ $hideOnRail }}"
     >

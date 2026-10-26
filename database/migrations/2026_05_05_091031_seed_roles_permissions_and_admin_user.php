@@ -49,6 +49,7 @@ return new class extends Migration
             // Settings
             'view settings',
             'update settings',
+            'manage settings',
 
             // SEO
             'manage seo',
@@ -89,7 +90,7 @@ return new class extends Migration
             'view inspections', 'create inspections', 'update inspections', 'delete inspections',
             'view gallery', 'manage gallery',
             'view services', 'manage services',
-            'view settings',
+            'view settings', 'manage settings',
             'manage pages', 'manage categories', 'manage tags', 'manage testimonials',
             'view contact messages', 'manage contact numbers',
             'manage absences',

@@ -201,6 +201,37 @@ Three steps carry the hierarchy: `2xl`/600 heading → `md`/400 body →
   entrance for the card — not a per-field stagger. Reduced motion is a single block
   in `auth.css`, never per component.
 
+### Photographic hero surface — the one scoped exception
+
+The homepage cinematic hero (`<x-hero.cinematic>`, `.hb-hero`) is the only place in
+the app that paints type and cards over a photograph instead of a flat surface. The
+`ui` rules above are written for the latter, so this surface is allowed four
+deviations — and only these, only inside `.hb-hero`, and only through the
+page-scoped `--hero-*` custom properties declared on that root (never in `app.css`,
+never as globals, never touching `--*-ui-*`):
+
+| Token | Value | Why the `ui` token cannot stand in |
+|---|---|---|
+| `--hero-radius` | 28px | The card is full-bleed at 1920px; `ui-xl` 20px reads as a chip at that span. |
+| `--hero-word-weight` | 800 | The giant gradient word sits behind the subject; 700 disappears into the photo. Geist `400..900` is now in the site font request purely for this. |
+| `--hero-on` / `--hero-on-muted` | `#fafafa` / `rgba(250,250,250,.72)` | Fixed light values: the text sits on the scrim, not on `--ui-surface`, so it must not flip with the theme. Contrast is carried by `--hero-scrim`, not by the ink. |
+| `--hero-scrim` | bottom gradient `rgba(10,10,15,.86)` → transparent at 75%, plus a corner vignette | The only AA lever available over unknown photography. Body copy must land on the gradient's ≥ 60% opacity band. |
+
+Rules that come with the exception:
+
+- **Gradient-fill display type is legal here.** `background-clip: text` on the giant
+  word is the exception to "no gradient text" — it is a photographic treatment of one
+  decorative word (`aria-hidden`, never the `h1`), not a heading style.
+- **Sizes stay on the ramp.** Anything that is not the giant word uses the existing
+  `text-ui-*` steps; the word itself is `clamp()`-sized and must never force
+  horizontal overflow at 360px.
+- **Everything outside `.hb-hero` keeps the `ui` contract** — spacing, radius, shadow,
+  theme-flipping ink. The header, announcement bar, footer and the sections below the
+  hero are unchanged.
+- **Motion reuses `--ease-ui-out`** and the `ui` durations; the hero adds no new ease.
+  Reduced motion kills autoplay, count-up and the crossfade from one
+  `prefers-reduced-motion` block inside the component.
+
 ## Components
 
 In `resources/views/components/ui/`, addressed as `<x-ui.*>`.

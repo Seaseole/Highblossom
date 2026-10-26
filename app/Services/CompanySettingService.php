@@ -7,6 +7,9 @@ namespace App\Services;
 use App\Enums\BookingServiceType;
 use App\Models\CompanySetting;
 use App\Services\Settings\SettingsManager;
+use App\Support\AdminNav;
+use App\Support\HeroAssets;
+use App\Support\HeroSlides;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Http\Request;
 use Illuminate\Image\ImageException;
@@ -28,6 +31,7 @@ final class CompanySettingService
         'home_tagline', 'home_years_experience', 'home_warranty_heading', 'home_warranty_text',
         'home_urgency_text', 'home_cta_heading', 'home_cta_text', 'home_service_area',
         'home_mobile_coverage', 'home_whatsapp_message', 'home_final_cta_heading', 'home_final_cta_text',
+        'home_hero_style', 'home_hero_button_label', 'home_hero_button_url',
     ];
 
     /** @var list<string> Homepage repeater fields stored as JSON arrays */
@@ -42,6 +46,7 @@ final class CompanySettingService
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
         'booking_lead_time_hours', 'booking_slot_interval_minutes', 'booking_capacity_workshop',
         'booking_capacity_mobile', 'require_email_verification', 'session_idle_timeout_minutes',
+        'admin_nav_layout',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
         ...self::HOME_SIMPLE_FIELDS,
     ];
@@ -77,6 +82,7 @@ final class CompanySettingService
         $this->handleHeroImageUpload($request);
         $this->saveSimpleFields($data);
         $this->saveJsonFields($data);
+        $this->saveHeroSettings($data, $request);
         $this->handleEnvUpdate($data);
         CompanySetting::set('announcement_active', $request->boolean('announcement_active') ? '1' : '0', 'boolean');
         CompanySetting::set('enable_registration', $request->boolean('enable_registration') ? '1' : '0', 'boolean');
@@ -341,6 +347,41 @@ final class CompanySettingService
     }
 
     /**
+     * Persist the cinematic hero: its slides, its counters, and whether the slides advance.
+     *
+     * Guarded by the marker the hero section prints instead of saved whenever the key is
+     * missing. The gallery screen posts the same request to this same service carrying only
+     * its own fields, and an absent repeater there means "this screen does not manage the
+     * hero" — not "delete every photograph", which would also sweep the derived widths off
+     * the disk. On the homepage the marker is always present, so removing the last slide
+     * really does empty the setting.
+     *
+     * Generation comes before pruning: {@see HeroSlides::persist()} writes the new variants
+     * for the sources that survived, and only then is anything unreferenced deleted.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function saveHeroSettings(array $data, Request $request): void
+    {
+        if (! $request->boolean('hero_settings_submitted') && ! array_key_exists('home_hero_slides', $data)) {
+            return;
+        }
+
+        $slides = HeroSlides::persist($data['home_hero_slides'] ?? []);
+        $stats = $this->pruneRows(array_slice($data['home_hero_stats'] ?? [], 0, HeroSlides::MAX_STATS));
+
+        CompanySetting::set('home_hero_slides', $slides, 'json');
+        CompanySetting::set('home_hero_stats', $stats, 'json');
+        CompanySetting::set('home_hero_autoplay', $request->boolean('home_hero_autoplay') ? '1' : '0', 'boolean');
+
+        $sources = collect($slides)
+            ->flatMap(fn (array $slide): array => array_filter([$slide['background'], $slide['cutout'] ?? '']))
+            ->all();
+
+        HeroAssets::prune($sources);
+    }
+
+    /**
      * Drop empty repeater rows so an unsaved admin tab cannot blank a section's
      * fallback copy, and so nothing renders a tile or accordion with no content.
      *
@@ -446,6 +487,9 @@ final class CompanySettingService
             'require_email_verification' => filter_var(CompanySetting::get('require_email_verification', '0'), FILTER_VALIDATE_BOOLEAN),
             'enable_registration' => filter_var(CompanySetting::get('enable_registration', '0'), FILTER_VALIDATE_BOOLEAN),
             'session_idle_timeout_minutes' => (int) CompanySetting::get('session_idle_timeout_minutes', 0),
+            // Normalised rather than echoed: the form must tick the layout a person actually
+            // gets, and a stray value in the table should read as the default, not as a blank select.
+            'admin_nav_layout' => AdminNav::siteDefault()->value,
             'announcement_active' => CompanySetting::get('announcement_active', false),
             'announcements' => CompanySetting::get('announcements', []),
             'gallery_metrics' => CompanySetting::get('gallery_metrics', [
@@ -468,7 +512,7 @@ final class CompanySettingService
     private function homepageSettings(): array
     {
         $sharedDefaults = $this->settingsManager->getDefaults();
-        $keys = [...self::HOME_SIMPLE_FIELDS, ...self::HOME_JSON_FIELDS, 'hero_image'];
+        $keys = [...self::HOME_SIMPLE_FIELDS, ...self::HOME_JSON_FIELDS, 'hero_image', 'home_hero_slides', 'home_hero_stats'];
 
         $settings = [];
 
@@ -478,6 +522,11 @@ final class CompanySettingService
 
         $settings['home_urgency_enabled'] = filter_var(
             CompanySetting::get('home_urgency_enabled', $sharedDefaults['home_urgency_enabled'] ?? true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $settings['home_hero_autoplay'] = filter_var(
+            CompanySetting::get('home_hero_autoplay', $sharedDefaults['home_hero_autoplay'] ?? true),
             FILTER_VALIDATE_BOOLEAN
         );
 

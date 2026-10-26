@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\GlassTypeController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\InspectionController;
 use App\Http\Controllers\Admin\MediaLibraryController;
+use App\Http\Controllers\Admin\NavLayoutController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PasswordPolicyController;
 use App\Http\Controllers\Admin\PostController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProfileSessionController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
@@ -270,6 +272,16 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
 
     // Theme
     Route::post('theme', [ThemeController::class, 'store'])->name('theme.store');
+
+    // Desktop navigation layout. Same shape as the theme POST: it writes one account's own
+    // preference and answers in JSON, so the control can swap the panel without a navigation.
+    Route::post('nav-layout', [NavLayoutController::class, 'store'])->name('nav-layout.store');
+
+    // Top bar command palette. Read-only, and gated per module inside the controller rather than
+    // by one ability here, because "may search" is six different questions. The throttle is the
+    // only reason it exists: each hit costs up to six LIKE queries, and the box re-queries as
+    // you type.
+    Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('search');
 
     Route::get('decompose', [DecomposerController::class, 'index'])->middleware('can:manage environment')->name('decompose');
 });

@@ -4,8 +4,6 @@
 
 <div
     class="admin-nav-scroll flex-1 space-y-2 overflow-y-auto overscroll-contain p-4"
-    x-data="adminNavRoot()"
-    x-init="sync()"
     role="navigation"
     aria-label="Admin navigation"
 >
@@ -34,14 +32,4 @@
             No navigation items available.
         </p>
     @endforelse
-
-    {{-- Only a search can empty the rail, so this branch is unreachable until the field has
-         something in it. It sits beside the groups rather than beside the field because the
-         field and the list are rendered into different columns of the shell. --}}
-    <p
-        x-show="searching && ! anyMatch()"
-        class="px-3 py-6 text-center text-sm text-gray-400 dark:text-gray-500"
-    >
-        No matches for “<span x-text="$store.adminNav.query"></span>”.
-    </p>
 </div>

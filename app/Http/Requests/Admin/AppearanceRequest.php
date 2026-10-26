@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AdminNavLayout;
 use App\Enums\Theme;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -30,6 +31,10 @@ final class AppearanceRequest extends FormRequest
     {
         return [
             'theme' => ['required', Rule::enum(Theme::class)],
+            // Required rather than nullable on purpose: this form always sends a choice, and a
+            // missing key here would mean the tab silently un-set someone's layout. Choosing to
+            // follow the site-wide default again is done by the account having never saved one.
+            'admin_nav_layout' => ['required', Rule::enum(AdminNavLayout::class)],
         ];
     }
 }

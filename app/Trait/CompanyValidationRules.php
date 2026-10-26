@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Trait;
 
+use App\Enums\AdminNavLayout;
+use App\Enums\HeroStyle;
 use App\Rules\SafeStoredUploadPath;
+use App\Support\HeroSlides;
+use Illuminate\Validation\Rule;
 
 /**
  * Validation rules for company settings.
@@ -13,6 +17,14 @@ use App\Rules\SafeStoredUploadPath;
  */
 trait CompanyValidationRules
 {
+    /**
+     * Folders an adopted image path may live in, for the fields that store a path rather than
+     * carry a multipart file.
+     *
+     * @var array<int, string>
+     */
+    private const IMAGE_PATH_DIRS = ['settings', 'uploads', 'uploads/images', 'uploads/videos', 'uploads/videos/thumbnails'];
+
     /**
      * Get the validation rules for company settings.
      *
@@ -62,6 +74,9 @@ trait CompanyValidationRules
             'require_email_verification' => ['nullable', 'in:0,1'],
             'enable_registration' => ['nullable', 'boolean'],
             'session_idle_timeout_minutes' => ['nullable', 'integer', 'min:0', 'max:4320'],
+            // Nullable so an absent key leaves the stored default alone, which is what
+            // `saveSimpleFields()`'s array_key_exists guard expects; the select always sends one.
+            'admin_nav_layout' => ['nullable', Rule::enum(AdminNavLayout::class)],
             'announcement_active' => ['nullable', 'boolean'],
             'announcements' => ['nullable', 'array'],
             'announcements.*.text' => ['required', 'string', 'max:500'],
@@ -91,6 +106,26 @@ trait CompanyValidationRules
             'home_fact_tiles.*.label' => ['required', 'string', 'max:60'],
             'home_fact_tiles.*.value' => ['required', 'string', 'max:30'],
             'home_fact_tiles.*.suffix' => ['nullable', 'string', 'max:10'],
+            'home_hero_style' => ['nullable', Rule::enum(HeroStyle::class)],
+            'home_hero_autoplay' => ['nullable', 'boolean'],
+            'home_hero_button_label' => ['nullable', 'string', 'max:40'],
+            'home_hero_button_url' => ['nullable', 'string', 'max:500'],
+            // A slide is its photograph: everything painted over it is optional and hides when
+            // blank, but a slide with no image is a frame that cannot render, so it is refused
+            // here rather than dropped at save where nobody would be told why.
+            'home_hero_slides' => ['nullable', 'array', 'max:'.HeroSlides::MAX_SLIDES],
+            'home_hero_slides.*.background' => ['required', 'string', new SafeStoredUploadPath(self::IMAGE_PATH_DIRS)],
+            'home_hero_slides.*.cutout' => ['nullable', 'string', new SafeStoredUploadPath(self::IMAGE_PATH_DIRS)],
+            'home_hero_slides.*.alt' => ['required', 'string', 'max:160'],
+            'home_hero_slides.*.word' => ['nullable', 'string', 'max:24'],
+            'home_hero_slides.*.headline' => ['nullable', 'string', 'max:80'],
+            'home_hero_slides.*.tagline' => ['nullable', 'string', 'max:160'],
+            'home_hero_slides.*.button_label' => ['nullable', 'string', 'max:40'],
+            'home_hero_slides.*.button_url' => ['nullable', 'string', 'max:500'],
+            'home_hero_stats' => ['nullable', 'array', 'max:'.HeroSlides::MAX_STATS],
+            'home_hero_stats.*.label' => ['required', 'string', 'max:60'],
+            'home_hero_stats.*.value' => ['required', 'string', 'max:30'],
+            'home_hero_stats.*.suffix' => ['nullable', 'string', 'max:10'],
             'home_warranty_highlights' => ['nullable', 'array', 'max:3'],
             'home_warranty_highlights.*.title' => ['required', 'string', 'max:80'],
             'home_warranty_highlights.*.text' => ['required', 'string', 'max:400'],

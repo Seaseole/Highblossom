@@ -39,6 +39,15 @@ return [
         'hero_view_work' => 'View Our Work',
         'hero_years_badge' => ':years years of experience',
 
+        // Cinematic hero (the layered, sliding variant of the section above)
+        'hero_carousel_label' => 'Featured work',
+        'hero_next_up' => 'Next',
+        'hero_previous_slide' => 'Previous slide',
+        'hero_next_slide' => 'Next slide',
+        'hero_slide_of' => 'Slide :current of :total',
+        'hero_goto_slide' => 'Go to slide :number',
+        'hero_whatsapp_cta' => 'Message us on WhatsApp',
+
         // Services section
         'services_section_label' => 'What We Do',
         'services_title' => 'Our Services',

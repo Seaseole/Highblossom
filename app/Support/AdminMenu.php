@@ -349,7 +349,11 @@ final class AdminMenu
      * Paths come from `route()` rather than being hand-written, so a prefix change in the
      * route file cannot leave the sidebar highlighting nothing on the pages it moved.
      *
-     * @return array<string, array{search: string, badge: string|null}>
+     * `label` and `group` are here for the same reason `search` is: the top bar has to name the
+     * page it is standing over, and the only honest answer is the one the menu itself declared.
+     * A second list of page names would drift from this the first time an entry was renamed.
+     *
+     * @return array<string, array{search: string, label: string, group: string, badge: string|null}>
      */
     public static function index(): array
     {
@@ -365,6 +369,8 @@ final class AdminMenu
             foreach ($group['items'] as $item) {
                 $built[self::normalize(route($item['route']))] = [
                     'search' => mb_strtolower($item['label'].' '.($item['keywords'] ?? '').' '.$group['label']),
+                    'label' => $item['label'],
+                    'group' => $group['label'],
                     'badge' => $item['badge'] ?? null,
                 ];
             }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\HeroStyle;
 use App\Models\AboutUsContent;
 use App\Models\GalleryCategory;
 use App\Models\GalleryImage;
@@ -16,6 +17,7 @@ use App\Models\ServiceType;
 use App\Models\Staff;
 use App\Models\Testimonial;
 use App\Services\Settings\SettingsManager;
+use App\Support\HeroSlides;
 use Highblossom\ContentBlocks\Support\MediaUrl;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -62,8 +64,24 @@ final readonly class SiteService
             ->filter()
             ->values();
 
+        // The cinematic hero is opt-in, and it is only opt-in when there is a photograph to
+        // opt into: a style set to cinematic with no usable slide resolves back to the classic
+        // block here, so no view branch has to know that rule.
+        $heroSettings = $this->settings->all();
+        $heroStyle = HeroSlides::style($heroSettings);
+        $heroSlides = $heroStyle === HeroStyle::Cinematic ? HeroSlides::visible($heroSettings) : [];
+
+        if ($heroSlides === []) {
+            $heroStyle = HeroStyle::Static;
+        }
+
         return [
             'heroImage' => $this->heroImage(),
+            'heroStyle' => $heroStyle,
+            'heroSlides' => $heroSlides,
+            'heroStats' => HeroSlides::stats($heroSettings),
+            'heroAutoplay' => HeroSlides::autoplay($heroSettings),
+            'heroButton' => HeroSlides::button($heroSettings),
             'featuredTestimonial' => $featuredTestimonial,
             'otherTestimonials' => $otherTestimonials,
             'hasTestimonials' => $testimonials->isNotEmpty(),

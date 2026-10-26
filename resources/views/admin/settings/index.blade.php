@@ -1,4 +1,43 @@
 <x-layouts::admin title="Company Settings">
+    @php
+        // The repeaters below are Alpine state rather than Blade markup, so each one is seeded
+        // as a plain array here. Rejected input wins over the stored row: a save that failed
+        // validation has to redisplay what the person just typed, not what is still in the
+        // database behind it.
+        //
+        // Only the fields a person edits go into a slide. The derived widths, the dimensions and
+        // the placeholder colour are the server's to recompute from the photograph on every save,
+        // so echoing them into the form would only invite them to be posted back.
+        $heroSlidesState = collect(old('home_hero_slides', $settings['home_hero_slides'] ?? []))
+            ->filter('is_array')
+            ->map(fn (array $slide, int $index): array => [
+                'key' => 'hero-slide-'.$index,
+                'word' => (string) ($slide['word'] ?? ''),
+                'headline' => (string) ($slide['headline'] ?? ''),
+                'tagline' => (string) ($slide['tagline'] ?? ''),
+                'alt' => (string) ($slide['alt'] ?? ''),
+                'background' => (string) ($slide['background'] ?? ''),
+                'backgroundUrl' => filled($slide['background'] ?? null) ? media_url($slide['background']) : '',
+                'cutout' => (string) ($slide['cutout'] ?? ''),
+                'cutoutUrl' => filled($slide['cutout'] ?? null) ? media_url($slide['cutout']) : '',
+                'buttonLabel' => (string) ($slide['button_label'] ?? ''),
+                'buttonUrl' => (string) ($slide['button_url'] ?? ''),
+                'cutoutError' => (string) $errors->first("home_hero_slides.{$index}.cutout"),
+            ])
+            ->values()
+            ->all();
+
+        $heroStatsState = collect(old('home_hero_stats', $settings['home_hero_stats'] ?? []))
+            ->filter('is_array')
+            ->map(fn (array $stat, int $index): array => [
+                'key' => 'hero-stat-'.$index,
+                'label' => (string) ($stat['label'] ?? ''),
+                'value' => (string) ($stat['value'] ?? ''),
+                'suffix' => (string) ($stat['suffix'] ?? ''),
+            ])
+            ->values()
+            ->all();
+    @endphp
     <div
         class="mx-auto max-w-5xl space-y-10 py-6 sm:py-10"
         x-data="{
@@ -10,6 +49,10 @@
         warrantyHighlights: {{ \Illuminate\Support\Js::from($settings['home_warranty_highlights'] ?? []) }},
         processSteps: {{ \Illuminate\Support\Js::from($settings['home_process_steps'] ?? []) }},
         faqs: {{ \Illuminate\Support\Js::from($settings['home_faqs'] ?? []) }},
+        heroSlides: {{ \Illuminate\Support\Js::from($heroSlidesState) }},
+        heroStats: {{ \Illuminate\Support\Js::from($heroStatsState) }},
+        heroStyle: {{ \Illuminate\Support\Js::from(old('home_hero_style', $settings['home_hero_style'] ?? 'static')) }},
+        heroDrag: null,
         heroPreview: '{{ $settings['hero_image'] ? media_url($settings['hero_image']) : null }}',
         init() {
             this.$watch('tab', value => {
@@ -29,7 +72,50 @@
         addStep() { this.processSteps.push({ title: '', text: '' }); },
         removeStep(index) { this.processSteps.splice(index, 1); },
         addFaq() { this.faqs.push({ question: '', answer: '' }); },
-        removeFaq(index) { this.faqs.splice(index, 1); }
+        removeFaq(index) { this.faqs.splice(index, 1); },
+        addHeroSlide() {
+            if (this.heroSlides.length >= 6) return;
+            this.heroSlides.push({
+                key: `hero-slide-${Date.now()}`, word: '', headline: '', tagline: '', alt: '',
+                background: '', backgroundUrl: '', cutout: '', cutoutUrl: '',
+                buttonLabel: '', buttonUrl: '', cutoutError: '',
+            });
+        },
+        removeHeroSlide(index) { this.heroSlides.splice(index, 1); },
+        // The order a slide plays in is its position in the array, so moving it is the whole of
+        // the sort control — there is no number to type and nothing to get out of step.
+        moveHeroSlide(index, delta) {
+            const target = index + delta;
+            if (target < 0 || target >= this.heroSlides.length) return;
+            const [row] = this.heroSlides.splice(index, 1);
+            this.heroSlides.splice(target, 0, row);
+        },
+        dropHeroSlide(target) {
+            if (this.heroDrag === null || this.heroDrag === target) return;
+            const [row] = this.heroSlides.splice(this.heroDrag, 1);
+            this.heroSlides.splice(target, 0, row);
+            this.heroDrag = null;
+        },
+        pickHeroImage(index, slot) {
+            this.$dispatch('open-media-picker', { field: `slide-${index}-${slot}`, multiple: false });
+        },
+        onHeroImage(detail) {
+            const picked = /^slide-(\d+)-(background|cutout)$/.exec(detail.field ?? '');
+            if (!picked) return;
+            const row = this.heroSlides[Number(picked[1])];
+            if (!row) return;
+            const slot = picked[2];
+            row[slot] = detail.path ?? '';
+            row[`${slot}Url`] = detail.url ?? '';
+            // A fresh cutout is a different file, so the shape complaint that was about the old
+            // one no longer belongs on the screen. The server decides again on save.
+            if (slot === 'cutout') row.cutoutError = '';
+        },
+        addHeroStat() {
+            if (this.heroStats.length >= 3) return;
+            this.heroStats.push({ key: `hero-stat-${Date.now()}`, label: '', value: '', suffix: '' });
+        },
+        removeHeroStat(index) { this.heroStats.splice(index, 1); }
     }"
     >
         <!-- Header -->
@@ -236,6 +322,33 @@
                                     value="{{ old('session_idle_timeout_minutes', $settings['session_idle_timeout_minutes']) }}"
                                     class="w-24 shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
                                 />
+                            </div>
+                            <div class="flex items-center justify-between gap-4 border-t border-gray-100 pt-5 dark:border-white/10">
+                                <div class="space-y-1">
+                                    <label for="admin_nav_layout" class="text-sm text-gray-700 dark:text-gray-300">
+                                        Default admin layout
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Which navigation an account gets before anyone chooses for itself. Anyone who has
+                                        saved a layout on their own profile keeps that choice, and phones and tablets use
+                                        the slide-out menu either way — this only decides the wide screen.
+                                    </p>
+                                    @error('admin_nav_layout')
+                                        <p class="text-xs text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <select
+                                    id="admin_nav_layout"
+                                    name="admin_nav_layout"
+                                    class="w-40 shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                >
+                                    @foreach (\App\Enums\AdminNavLayout::options() as $layout)
+                                        <option
+                                            value="{{ $layout->value }}"
+                                            {{ old('admin_nav_layout', $settings['admin_nav_layout']) === $layout->value ? 'selected' : '' }}
+                                        >{{ $layout->label() }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -838,6 +951,283 @@
                             @error('hero_image')
                                 <p class="text-xs text-red-500">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        {{-- Cinematic hero: the layered card, its slides and its counters. --}}
+                        @php
+                            // A rejected row is named with its position, because "the background
+                            // field is required" means nothing on a screen holding six of them.
+                            // The cutout complaint is not listed here — it belongs on the row it
+                            // is about, and it is already rendered there.
+                            $heroRowErrors = [];
+
+                            foreach ($errors->getMessages() as $key => $messages) {
+                                if (preg_match('/^home_hero_(slides|stats)\.(\d+)\.(?!cutout)\w+$/', (string) $key, $matched) === 1) {
+                                    $label = $matched[1] === 'slides' ? 'Slide' : 'Counter';
+
+                                    foreach ($messages as $message) {
+                                        $heroRowErrors[] = $label.' '.((int) $matched[2] + 1).': '.$message;
+                                    }
+                                }
+                            }
+                        @endphp
+
+                        <div class="space-y-8 rounded-2xl border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-white/10 dark:bg-white/5">
+                            {{-- The marker that tells the server this screen owns the hero. Removing
+                                 the last slide leaves no inputs behind, and "no inputs" would
+                                 otherwise read as "this form never mentioned slides". --}}
+                            <input type="hidden" name="hero_settings_submitted" value="1" />
+
+                            <div class="space-y-1">
+                                <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero Layout</h5>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Which hero the homepage opens with. Cinematic only takes effect once at least one slide has a photograph.
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                @foreach (\App\Enums\HeroStyle::options() as $style)
+                                    <label class="relative cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="home_hero_style"
+                                            value="{{ $style->value }}"
+                                            x-model="heroStyle"
+                                            class="peer sr-only"
+                                        />
+                                        <div class="flex h-full flex-col gap-4 rounded-xl border-2 border-gray-200 p-4 transition-all peer-checked:border-gray-900 peer-checked:bg-white dark:border-white/10 dark:peer-checked:border-white dark:peer-checked:bg-white/10">
+                                            <span class="block w-full text-gray-300 dark:text-white/20" aria-hidden="true">
+                                                @if ($style === \App\Enums\HeroStyle::Cinematic)
+                                                    {{-- A card with a word behind a subject and a bar
+                                                         of counters under it. --}}
+                                                    <svg class="h-16 w-full" fill="none" viewBox="0 0 120 56" preserveAspectRatio="none">
+                                                        <rect class="stroke-current" x="0.75" y="0.75" width="118.5" height="54.5" rx="8" stroke-width="1.5" />
+                                                        <text class="fill-current" x="60" y="34" font-size="22" font-weight="800" text-anchor="middle" fill-opacity=".55">Aa</text>
+                                                        <circle class="fill-current" cx="78" cy="30" r="14" fill-opacity=".8" />
+                                                        <rect class="fill-current" x="10" y="42" width="22" height="4" rx="2" fill-opacity=".7" />
+                                                        <rect class="fill-current" x="38" y="42" width="22" height="4" rx="2" fill-opacity=".7" />
+                                                        <rect class="fill-current" x="92" y="42" width="18" height="6" rx="3" fill-opacity=".7" />
+                                                    </svg>
+                                                @else
+                                                    {{-- One band of text over one photograph. --}}
+                                                    <svg class="h-16 w-full" fill="none" viewBox="0 0 120 56" preserveAspectRatio="none">
+                                                        <rect class="stroke-current" x="0.75" y="0.75" width="118.5" height="54.5" rx="8" stroke-width="1.5" />
+                                                        <rect class="fill-current" x="26" y="18" width="68" height="6" rx="3" fill-opacity=".8" />
+                                                        <rect class="fill-current" x="36" y="28" width="48" height="4" rx="2" fill-opacity=".5" />
+                                                        <rect class="fill-current" x="44" y="38" width="32" height="8" rx="4" fill-opacity=".8" />
+                                                    </svg>
+                                                @endif
+                                            </span>
+                                            <span>
+                                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $style->label() }}</span>
+                                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $style->description() }}</span>
+                                            </span>
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            @error('home_hero_style')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+
+                            <div x-show="heroStyle === 'cinematic'" class="space-y-10 border-t border-gray-200 pt-8 dark:border-white/10">
+                                {{-- Slides --}}
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Slides</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Up to six, played in the order they are listed. Drag a slide, or use the arrows.</p>
+                                        </div>
+                                        <button type="button" @click="addHeroSlide()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Slide</button>
+                                    </div>
+
+                                    <p x-show="heroSlides.length === 0" class="rounded-xl border border-dashed border-gray-300 p-6 text-center text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">
+                                        No slides yet. Add one and pick a photograph — everything else on a slide is optional.
+                                    </p>
+
+                                    @foreach ($heroRowErrors as $message)
+                                        <p class="text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @endforeach
+
+                                    <div class="space-y-4" @image-selected.window="onHeroImage($event.detail)">
+                                        <template x-for="(slide, index) in heroSlides" :key="slide.key">
+                                            <div
+                                                class="grid grid-cols-1 gap-4 rounded-2xl border bg-white p-4 sm:p-6 dark:bg-white/5"
+                                                :class="heroDrag === index ? 'border-gray-900 dark:border-white' : 'border-gray-100 dark:border-white/5'"
+                                                @dragover.prevent
+                                                @drop.prevent="dropHeroSlide(index)"
+                                            >
+                                                <div class="space-y-3">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="cursor-grab text-gray-400 select-none" draggable="true" title="Drag to reorder" @dragstart="heroDrag = index" @dragend="heroDrag = null" aria-hidden="true">⠿</span>
+                                                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-[10px] font-bold text-white dark:bg-white dark:text-gray-900" x-text="index + 1">1</span>
+                                                    </div>
+
+                                                    {{-- Live preview: the same three layers the homepage stacks, at
+                                                         thumbnail size, so the word can be judged against the photo
+                                                         before anyone saves. --}}
+                                                    <div class="relative aspect-[16/9] overflow-hidden rounded-xl bg-gray-900">
+                                                        <template x-if="slide.backgroundUrl">
+                                                            <img :src="slide.backgroundUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
+                                                        </template>
+                                                        <template x-if="slide.word">
+                                                            <span class="absolute inset-0 flex items-center justify-center text-3xl font-extrabold tracking-tight text-white/30 uppercase" x-text="slide.word"></span>
+                                                        </template>
+                                                        <template x-if="slide.cutoutUrl">
+                                                            <img :src="slide.cutoutUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
+                                                        </template>
+                                                        <template x-if="slide.headline">
+                                                            <p class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-2 text-xs font-semibold text-white" x-text="slide.headline"></p>
+                                                        </template>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-2">
+                                                        <button type="button" @click="moveHeroSlide(index, -1)" :disabled="index === 0" class="rounded-lg border border-gray-200 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/10" aria-label="Move this slide earlier">↑</button>
+                                                        <button type="button" @click="moveHeroSlide(index, 1)" :disabled="index === heroSlides.length - 1" class="rounded-lg border border-gray-200 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/10" aria-label="Move this slide later">↓</button>
+                                                        <button type="button" @click="removeHeroSlide(index)" class="ml-auto rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600">Delete</button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-1 space-y-4">
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Display Word</label>
+                                                            <input type="text" :name="`home_hero_slides[${index}][word]`" x-model="slide.word" maxlength="24" placeholder="GLASS" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Painted behind the subject. Leave blank for no word.</p>
+                                                        </div>
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Headline</label>
+                                                            <input type="text" :name="`home_hero_slides[${index}][headline]`" x-model="slide.headline" maxlength="80" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">This becomes the page heading on that slide. Blank uses the site tagline.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="space-y-1.5">
+                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Tagline</label>
+                                                        <input type="text" :name="`home_hero_slides[${index}][tagline]`" x-model="slide.tagline" maxlength="160" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                    </div>
+
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Photograph</label>
+                                                            <input type="hidden" :name="`home_hero_slides[${index}][background]`" x-model="slide.background" />
+                                                            <button type="button" @click="pickHeroImage(index, 'background')" class="flex w-full items-center justify-between rounded-xl border border-dashed border-gray-300 px-4 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:border-white">
+                                                                <span x-text="slide.background ? 'Change photograph' : 'Choose a photograph'">Choose a photograph</span>
+                                                                <span class="text-gray-400">Media Library</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Foreground Cutout</label>
+                                                            <input type="hidden" :name="`home_hero_slides[${index}][cutout]`" x-model="slide.cutout" />
+                                                            <button type="button" @click="pickHeroImage(index, 'cutout')" class="flex w-full items-center justify-between rounded-xl border border-dashed border-gray-300 px-4 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:border-white">
+                                                                <span x-text="slide.cutout ? 'Change cutout' : 'Choose a foreground cutout'">Choose a foreground cutout</span>
+                                                                <span class="text-gray-400">Media Library</span>
+                                                            </button>
+                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">The subject with its background erased, exported at the same pixel size as the photograph.</p>
+                                                            <p x-show="slide.cutoutError" x-text="slide.cutoutError" class="text-[10px] font-medium text-red-600 dark:text-red-400"></p>
+                                                            <button type="button" x-show="slide.cutout" @click="slide.cutout = ''; slide.cutoutUrl = ''; slide.cutoutError = ''" class="text-[10px] font-medium text-gray-500 underline hover:text-red-500 dark:text-gray-400">Remove the cutout</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="space-y-1.5">
+                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Photo Description</label>
+                                                        <input type="text" :name="`home_hero_slides[${index}][alt]`" x-model="slide.alt" maxlength="160" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Read out instead of the photograph. Required, because the photograph carries meaning.</p>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Button Label</label>
+                                                            <input type="text" :name="`home_hero_slides[${index}][button_label]`" x-model="slide.buttonLabel" maxlength="40" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                        </div>
+                                                        <div class="space-y-1.5">
+                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Button Link</label>
+                                                            <input type="text" :name="`home_hero_slides[${index}][button_url]`" x-model="slide.buttonUrl" maxlength="500" placeholder="/quote" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                {{-- Counters --}}
+                                <div class="space-y-4 border-t border-gray-200 pt-8 dark:border-white/10">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero Counters</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Up to three, bottom-left of the card. A number counts up from zero on the first view; anything else is shown exactly as typed.</p>
+                                        </div>
+                                        <button type="button" @click="addHeroStat()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Counter</button>
+                                    </div>
+
+                                    <p x-show="heroStats.length === 0" class="rounded-xl border border-dashed border-gray-300 p-4 text-center text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">
+                                        No counters. The hero simply shows no numbers — nothing here is invented.
+                                    </p>
+
+                                    <div class="space-y-4">
+                                        <template x-for="(stat, index) in heroStats" :key="stat.key">
+                                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
+                                                <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+                                                    <div class="space-y-1.5">
+                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Label</label>
+                                                        <input type="text" :name="`home_hero_stats[${index}][label]`" x-model="stat.label" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                    </div>
+                                                    <div class="space-y-1.5">
+                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Value</label>
+                                                        <input type="text" :name="`home_hero_stats[${index}][value]`" x-model="stat.value" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                    </div>
+                                                    <div class="space-y-1.5">
+                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Suffix</label>
+                                                        <input type="text" :name="`home_hero_stats[${index}][suffix]`" x-model="stat.suffix" placeholder="+" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
+                                                    </div>
+                                                </div>
+                                                <button type="button" @click="removeHeroStat(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                {{-- Defaults and behaviour --}}
+                                <div class="space-y-6 border-t border-gray-200 pt-8 dark:border-white/10">
+                                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default Button Label</label>
+                                            <input
+                                                type="text"
+                                                name="home_hero_button_label"
+                                                value="{{ old('home_hero_button_label', $settings['home_hero_button_label'] ?? '') }}"
+                                                placeholder="{{ __('site.home.hero_get_quote') }}"
+                                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                            />
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Used by any slide that does not name its own button.</p>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default Button Link</label>
+                                            <input
+                                                type="text"
+                                                name="home_hero_button_url"
+                                                value="{{ old('home_hero_button_url', $settings['home_hero_button_url'] ?? '') }}"
+                                                placeholder="/quote"
+                                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Advance slides automatically</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Every seven seconds, pausing on hover, on focus and on a hidden tab. Switched off, the visitor drives — and anyone who has reduced motion set in their system never sees it move at all.</p>
+                                        </div>
+                                        <label class="group inline-flex shrink-0 cursor-pointer items-center">
+                                            <input type="checkbox" name="home_hero_autoplay" value="1" {{ old('home_hero_autoplay', $settings['home_hero_autoplay'] ?? true) ? 'checked' : '' }} class="peer sr-only" />
+                                            <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
+                                            <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Autoplay</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

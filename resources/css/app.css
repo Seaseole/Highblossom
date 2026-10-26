@@ -5,6 +5,12 @@
 
 @custom-variant sidebar-collapsed (&:where(html.sidebar-collapsed, html.sidebar-collapsed *));
 
+/* Set by the admin layout before paint from navigator.platform, so a Mac sees ⌘ and everyone
+   else sees Ctrl with no flash of the wrong glyph. A media query cannot tell the two apart —
+   there is no honest CSS signal for the operating system — and the previous spelling of this
+   rule matched an attribute nothing ever wrote, so it silently printed "Ctrl" everywhere. */
+@custom-variant os-mac (&:where(html.os-mac, html.os-mac *));
+
 @utility no-scrollbar {
     scrollbar-width: none;
     &::-webkit-scrollbar {

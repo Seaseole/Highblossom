@@ -662,3 +662,258 @@ siteAlpine.data('themeToggle', () => ({
         this.$el.querySelector(`[data-index="${index === -1 ? 0 : index}"]`)?.focus();
     },
 }));
+
+// The cinematic hero. Its autoplay is a CSS fill rather than a timer: when the fill finishes,
+// the slide changes, so the progress bar cannot drift from the interval it is drawing, and one
+// `animation-play-state` pauses both. Reduced motion removes the fill, which removes the tick —
+// the carousel does not slow down, it holds still.
+//
+// The deck itself is read from the slides the component already printed, so there is no second
+// copy of it in JavaScript. The nodes are queried rather than stored: Alpine proxies anything
+// parked in its state, and a proxied DOM element is a slow way to learn what a classList is.
+siteAlpine.data('heroCinematic', () => ({
+    index: 0,
+    count: 0,
+    slides: [],
+    autoplay: true,
+    reduced: false,
+    hovered: false,
+    focused: false,
+    tabHidden: false,
+    live: '',
+    touchFrom: null,
+
+    init() {
+        const nodes = [...this.$el.querySelectorAll('[data-hero-slide]')];
+
+        this.count = nodes.length;
+        this.slides = nodes.map((node) => ({ ...node.dataset }));
+        this.autoplay = this.$el.dataset.heroAutoplay !== '0';
+        this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        this.onVisibility = () => {
+            this.tabHidden = document.hidden;
+        };
+
+        document.addEventListener('visibilitychange', this.onVisibility);
+
+        this.loadRemainingSlides();
+        this.watchCounters();
+        this.restart();
+    },
+
+    destroy() {
+        document.removeEventListener('visibilitychange', this.onVisibility);
+        this.statsObserver?.disconnect();
+        this.idleHandle !== undefined && window.cancelIdleCallback?.(this.idleHandle);
+        this.idleTimer !== undefined && window.clearTimeout(this.idleTimer);
+        this.raf !== undefined && window.cancelAnimationFrame(this.raf);
+    },
+
+    get current() {
+        return this.slides[this.index] ?? {};
+    },
+
+    get next() {
+        return this.slides[(this.index + 1) % Math.max(this.count, 1)] ?? {};
+    },
+
+    get paused() {
+        return this.hovered || this.focused || this.tabHidden;
+    },
+
+    get running() {
+        return this.autoplay && this.count > 1 && !this.reduced;
+    },
+
+    node(index) {
+        return this.$el.querySelectorAll('[data-hero-slide]')[index];
+    },
+
+    go(index, announce = false) {
+        if (this.count === 0) {
+            return;
+        }
+
+        const target = ((index % this.count) + this.count) % this.count;
+
+        if (target === this.index) {
+            return;
+        }
+
+        this.node(this.index)?.classList.remove('is-active');
+        this.node(this.index)?.setAttribute('aria-hidden', 'true');
+
+        this.index = target;
+
+        this.node(target)?.classList.add('is-active');
+        this.node(target)?.setAttribute('aria-hidden', 'false');
+
+        this.loadSlide(target);
+
+        if (announce) {
+            this.live = this.slides[target]?.label ?? '';
+        }
+
+        this.enterCopy();
+        this.restart();
+    },
+
+    advance() {
+        this.go(this.index + 1, true);
+    },
+
+    previous() {
+        this.go(this.index - 1, true);
+    },
+
+    tick() {
+        this.go(this.index + 1, false);
+    },
+
+    swipe(event) {
+        if (this.touchFrom === null) {
+            return;
+        }
+
+        const delta = event.clientX - this.touchFrom;
+
+        this.touchFrom = null;
+
+        if (Math.abs(delta) < 48) {
+            return;
+        }
+
+        delta < 0 ? this.advance() : this.previous();
+    },
+
+    // Reflow-gated restart: removing the class and adding it back in the same frame is read as
+    // no change at all, which is why the reflow has to be forced between the two.
+    restart() {
+        const bar = this.$refs.bar;
+
+        if (!bar || !this.running) {
+            return;
+        }
+
+        bar.classList.remove('is-running');
+        void bar.offsetWidth;
+        bar.classList.add('is-running');
+    },
+
+    enterCopy() {
+        const copy = this.$refs.copy;
+
+        if (!copy || this.reduced) {
+            return;
+        }
+
+        copy.classList.remove('is-entering');
+        void copy.offsetWidth;
+        copy.classList.add('is-entering');
+    },
+
+    loadRemainingSlides() {
+        const task = () => {
+            for (let index = 1; index < this.count; index++) {
+                this.loadSlide(index);
+            }
+        };
+
+        // The first slide is the largest paint, so everything else waits until the page is
+        // quiet. Idle rather than immediate, and with a timeout, so a busy main thread still
+        // gets the next frame loaded long before the seven-second interval asks for it.
+        if (typeof window.requestIdleCallback === 'function') {
+            this.idleHandle = window.requestIdleCallback(task, { timeout: 2000 });
+
+            return;
+        }
+
+        this.idleTimer = window.setTimeout(task, 400);
+    },
+
+    loadSlide(index) {
+        this.node(index)?.querySelectorAll('[data-hero-src]').forEach((image) => {
+            image.setAttribute('src', image.dataset.heroSrc);
+
+            if (image.dataset.heroSrcset) {
+                image.setAttribute('srcset', image.dataset.heroSrcset);
+            }
+
+            delete image.dataset.heroSrc;
+            delete image.dataset.heroSrcset;
+        });
+    },
+
+    watchCounters() {
+        const list = this.$el.querySelector('[data-hero-stats]');
+
+        if (!list) {
+            return;
+        }
+
+        const counters = [...list.querySelectorAll('[data-count-to]')].map((element) => ({
+            element,
+            to: Number.parseFloat(element.dataset.countTo),
+            decimals: Number.parseInt(element.dataset.decimals ?? '0', 10),
+            grouped: element.dataset.grouped === '1',
+        }));
+
+        if (counters.length === 0 || this.reduced || typeof IntersectionObserver !== 'function') {
+            // Reduced motion and no observer both mean the same thing here: the number an admin
+            // typed is already in the HTML, and it is not going to move.
+            return;
+        }
+
+        this.statsObserver = new IntersectionObserver((entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) {
+                return;
+            }
+
+            this.statsObserver.disconnect();
+            this.countUp(counters);
+        }, { threshold: 0.25 });
+
+        this.statsObserver.observe(list);
+    },
+
+    countUp(counters) {
+        const duration = 1400;
+        const started = performance.now();
+
+        const frame = (now) => {
+            const progress = Math.min(1, (now - started) / duration);
+            const eased = 1 - (1 - progress) ** 3;
+
+            counters.forEach((counter) => {
+                counter.element.textContent = this.format(counter, counter.to * eased);
+            });
+
+            if (progress < 1) {
+                this.raf = window.requestAnimationFrame(frame);
+            }
+        };
+
+        counters.forEach((counter) => {
+            counter.element.textContent = this.format(counter, 0);
+        });
+
+        this.raf = window.requestAnimationFrame(frame);
+    },
+
+    format(counter, value) {
+        const text = value.toFixed(counter.decimals);
+
+        if (!counter.grouped) {
+            return text;
+        }
+
+        const [whole, fraction] = text.split('.');
+
+        return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (fraction ? `.${fraction}` : '');
+    },
+
+    padded(value) {
+        return String(value).padStart(2, '0');
+    },
+}));

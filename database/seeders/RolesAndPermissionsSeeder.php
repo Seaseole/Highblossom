@@ -51,6 +51,7 @@ class RolesAndPermissionsSeeder extends Seeder
             // Settings
             'view settings',
             'update settings',
+            'manage settings',
 
             // SEO
             'manage seo',
@@ -115,6 +116,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view services',
             'manage services',
             'view settings',
+            'manage settings',
             'manage pages',
             'manage categories',
             'manage tags',
