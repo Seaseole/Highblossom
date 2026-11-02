@@ -1,0 +1,1 @@
+Root of a Laravel 13 + Livewire starter kit that bootstraps the PHP backend, Vite/Tailwind frontend, Docker containers, and project-wide conventions.

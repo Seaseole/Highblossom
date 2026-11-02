@@ -1,0 +1,67 @@
+schema_version: 1
+module_path: root
+title: Laravel Livewire Starter Kit — Project Root
+scope:
+    - .gitignore
+    - AGENTS.md
+    - CLAUDE.md
+    - CONVENTIONS.md
+    - DESIGN.md
+    - PRODUCT.md
+    - composer.json
+    - composer.lock
+    - package.json
+    - package-lock.json
+    - vite.config.js
+    - Dockerfile
+    - docker-compose.yml
+    - .dockerignore
+    - .editorconfig
+    - .gitattributes
+    - .npmrc
+    - pint.json
+source_files: []
+depends_on: []
+related_to: []
+kk_module_id: e018f06d-2d99-48e2-a82a-0f6c66fba14c
+kk_cards:
+    architecture_design:
+        id: 391f383f-a4f9-45c9-bd63-a376c1e5c1be
+        title: Laravel Livewire Starter Kit — Project Root
+    coding_conventions:
+        id: 4e3be465-8176-4bc8-9fef-1c9a59a40950
+        title: Laravel Livewire Starter Kit — Project Root
+    overview:
+        id: 0459303f-b8f5-421b-ab4a-6496a7f31cf4
+        title: Laravel Livewire Starter Kit — Project Root
+    tech_stack:
+        id: f0116df4-63d2-464f-9bd3-ada43c763e9c
+        title: Laravel Livewire Starter Kit — Project Root
+    unique_setup_and_commands:
+        id: 91274c3c-21c5-4cf4-87d4-e07fe0d71c0a
+        title: Laravel Livewire Starter Kit — Project Root
+    build_system:
+        id: 09746765-09d9-4a9f-9807-1a4820a67d0d
+        title: Build, Containerization & CI Pipeline (Laravel + Vite + Docker)
+    configuration_system:
+        id: d2074c7e-1caa-42ea-90d6-4371e3466221
+        title: Laravel Configuration System via env() and config/ PHP Arrays
+    dependency_management:
+        id: bca91072-a59b-4069-9f59-5407d16417a6
+        title: Composer + NPM Dual Dependency Management with Local Path Package
+    error_handling:
+        id: b04bb427-b1e9-46be-9125-c8f5fc6cf607
+        title: Laravel Exception Handling, Logging, and Validation Error Presentation
+    frontend_style:
+        id: 2df13fc6-2db2-4032-a75c-cb29f84dfaea
+        title: "Three-Tier Frontend Style System: Tailwind v4 Tokens, Scoped Design Language v1, and Bootstrap AdminLTE"
+    logging_system:
+        id: c623f2b3-4221-4d1f-9694-b6d2e4e536bb
+        title: Laravel Monolog Logging with Stack Channels and Log Viewer
+kk_repo_cards:
+    - build_system
+    - configuration_system
+    - dependency_management
+    - error_handling
+    - frontend_style
+    - logging_system

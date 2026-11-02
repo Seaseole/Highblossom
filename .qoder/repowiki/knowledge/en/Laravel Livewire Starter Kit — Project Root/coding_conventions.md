@@ -1,0 +1,3 @@
+- PHP code is formatted with Laravel Pint using the default preset plus vertical-aligned, separated, trimmed PHPDoc blocks governed by `pint.json`.
+- Frontend assets are organized per audience with separate Vite entry points (`resources/css/app.css`, `resources/js/site-*.js`, `resources/css/auth.css`, `resources/js/auth-alpine.js`, `resources/css/admin.css`, `resources/js/admin.js`) so each UI surface can consume its own Tailwind/Alpine stack.
+- Backend follows the Route → Middleware → Controller → Service → Model flow documented in `CONVENTIONS.md`, with Actions and Services keeping controllers thin.

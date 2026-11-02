@@ -1,0 +1,1 @@
+Laravel 13 + Livewire 4 stack with Fortify/Sanctum/Passkeys for auth, Tailwind CSS v4 + Alpine.js for the public site, Bootstrap 4 + jQuery + Popper for legacy auth pages, and Bootstrap 5 + AdminLTE for the admin panel. Containerized on PHP 8.4-FPM Alpine with nginx and supervisord orchestrating FPM, queue worker, and scheduler.

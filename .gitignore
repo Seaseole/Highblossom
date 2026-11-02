@@ -75,3 +75,4 @@ yarn-error.log
 *.log
 /backups
 /public/favicon-version.txt
+.devswarm-temp/
