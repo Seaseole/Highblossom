@@ -1,0 +1,63 @@
+
+=== bench /admin/settings?tab=general (js=true) total CLS 0.1052 formH=1621 top=280 sheet=1911 panes=1543 generalDisplay=
+[
+ {
+  "value": 0.1052,
+  "t": 1793,
+  "sources": [
+   {
+    "node": "div.space-y-1",
+    "old": "16,448 223x452",
+    "new": "16,176 223x40"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "0,0 0x0",
+    "new": "16,368 223x352"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "16,176 223x264",
+    "new": "16,128 223x40"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "0,0 0x0",
+    "new": "16,320 223x40"
+   }
+  ]
+ }
+]
+
+=== bench /admin/settings?tab=general (js=false) total CLS 0 formH=1621 top=280 sheet=1911 panes=1543 generalDisplay=
+[]
+
+=== desk /dashboard (js=true) total CLS 0.0868 formH=null top=null sheet=0 panes=0 generalDisplay=undefined
+[
+ {
+  "value": 0.0868,
+  "t": 1812,
+  "sources": [
+   {
+    "node": "div.space-y-1",
+    "old": "16,448 223x452",
+    "new": "16,224 223x40"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "0,0 0x0",
+    "new": "16,368 223x40"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "0,0 0x0",
+    "new": "16,320 223x40"
+   },
+   {
+    "node": "div.space-y-1",
+    "old": "0,0 0x0",
+    "new": "16,416 223x40"
+   }
+  ]
+ }
+]

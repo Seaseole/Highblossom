@@ -42,22 +42,22 @@ kk_cards:
         title: Laravel Livewire Starter Kit — Project Root
     build_system:
         id: 09746765-09d9-4a9f-9807-1a4820a67d0d
-        title: Build, Containerization & CI Pipeline (Laravel + Vite + Docker)
+        title: Laravel + Vite Build, Docker Packaging & CI Pipeline
     configuration_system:
         id: d2074c7e-1caa-42ea-90d6-4371e3466221
-        title: Laravel Configuration System via env() and config/ PHP Arrays
+        title: Laravel .env + Config Files with Admin-Editable Allowlist
     dependency_management:
         id: bca91072-a59b-4069-9f59-5407d16417a6
-        title: Composer + NPM Dual Dependency Management with Local Path Package
+        title: Composer + npm/Vite Dual Dependency Management with Local Path Package
     error_handling:
         id: b04bb427-b1e9-46be-9125-c8f5fc6cf607
-        title: Laravel Exception Handling, Logging, and Validation Error Presentation
+        title: "Laravel Error Handling: Exceptions, Logging, and HTTP Responses"
     frontend_style:
         id: 2df13fc6-2db2-4032-a75c-cb29f84dfaea
-        title: "Three-Tier Frontend Style System: Tailwind v4 Tokens, Scoped Design Language v1, and Bootstrap AdminLTE"
+        title: Tailwind CSS v4 Design Tokens, Flux UI and Dual-Site Theming
     logging_system:
         id: c623f2b3-4221-4d1f-9694-b6d2e4e536bb
-        title: Laravel Monolog Logging with Stack Channels and Log Viewer
+        title: Laravel Monolog Logging with Stack Channels and Opcodes Log Viewer
 kk_repo_cards:
     - build_system
     - configuration_system

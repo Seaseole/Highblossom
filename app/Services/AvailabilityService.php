@@ -359,6 +359,22 @@ final class AvailabilityService implements AvailabilityServiceInterface
     }
 
     /**
+     * Opening and closing times for a day, or null when the business is closed on it.
+     *
+     * Published for the day desk, which draws its rail against the real trading
+     * hours rather than a guessed 9 to 5. Same rule the slot maths uses, so a job
+     * cannot appear on the rail at a time the booking form would have refused.
+     *
+     * @param DateTimeInterface $date The day to read
+     *
+     * @return array{open: string, close: string}|null
+     */
+    public function openHoursOn(DateTimeInterface $date): ?array
+    {
+        return $this->openHoursFor(Date::parse($date));
+    }
+
+    /**
      * Format a moment for display using the configured 12/24-hour preference.
      *
      * @param DateTimeInterface $moment The moment to format

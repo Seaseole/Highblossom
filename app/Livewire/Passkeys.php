@@ -17,10 +17,12 @@ use Livewire\Component;
 class Passkeys extends Component
 {
     #[On('passkeyRegistered')]
-    #[On('passkeyDeleted')]
-    #[On('passkeyRenamed')]
     /**
-     * Refresh the passkey list after a registration, deletion, or rename event.
+     * Refresh the passkey list after a registration.
+     *
+     * Deletion and rename refresh on their own: they are method calls on this component, and
+     * Livewire renders the response. Only registration arrives from outside — the WebAuthn ceremony
+     * is the passkeys package's own fetch — so it is the only one that has to be announced.
      */
     public function update()
     {
@@ -43,21 +45,25 @@ class Passkeys extends Component
         }
 
         $deletePasskey(Auth::user(), $passkey);
-        $this->dispatch('passkeyDeleted');
 
+        /* No `passkeyDeleted` echo. This component is the only listener, and Livewire already
+           renders it once for the action that was just called — so the round trip was a second
+           render of the same list, and a row that visibly flickered twice on its way out. */
         $this->dispatch('toast', [
             'type' => 'success',
-            'message' => 'Passkey deleted successfully.',
+            'message' => 'Passkey removed.',
         ]);
     }
 
     #[On('renamePasskeyRequest')]
     /**
      * Handle a rename request dispatched from the frontend.
+     *
+     * The id arrives through a `dataset` read in the view, which is always a string.
      */
-    public function handleRenamePasskey(int $id, string $name)
+    public function handleRenamePasskey(string|int $id, string $name)
     {
-        $this->renamePasskey($id, $name);
+        $this->renamePasskey((int) $id, $name);
     }
 
     /**
@@ -70,7 +76,7 @@ class Passkeys extends Component
         if ($newName === '' || mb_strlen($newName) > 255) {
             $this->dispatch('toast', [
                 'type' => 'error',
-                'message' => 'Passkey name must be between 1 and 255 characters.',
+                'message' => 'A passkey needs a name, and 255 characters is the most it can hold.',
             ]);
 
             return;
@@ -99,11 +105,9 @@ class Passkeys extends Component
 
         $passkey->update(['name' => $newName]);
 
-        $this->dispatch('passkeyRenamed');
-
         $this->dispatch('toast', [
             'type' => 'success',
-            'message' => 'Passkey renamed successfully.',
+            'message' => 'Passkey renamed.',
         ]);
     }
 

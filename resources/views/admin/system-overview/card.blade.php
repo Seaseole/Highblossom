@@ -5,69 +5,66 @@
 
 <section
     id="system-overview-{{ $section->key }}"
-    class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+    class="hb-desk-card"
 >
-    <header class="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-4 dark:border-white/10">
-        <div class="flex items-start gap-3">
-            <x-ui.icon :name="$section->icon" size="sm" class="mt-0.5 text-gray-500 dark:text-gray-400" />
-            <div>
-                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ $section->label }}</h2>
-                <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{{ $section->description }}</p>
+    <header class="hb-desk-card__head">
+        <div class="flex min-w-0 items-start gap-2">
+            <x-ui.icon :name="$section->icon" size="xs" class="mt-1 shrink-0 text-gray-400 dark:text-gray-500" />
+            <div class="min-w-0">
+                <h2 class="hb-desk-card__title">{{ $section->label }}</h2>
+                <p class="hb-desk-card__desc">{{ $section->description }}</p>
             </div>
         </div>
-        <span
-            @class([
-                'inline-block h-2.5 w-2.5 shrink-0 rounded-full mt-2',
-                'bg-emerald-500' => $section->status->value === 'ok',
-                'bg-gray-400' => $section->status->value === 'info',
-                'bg-amber-500' => $section->status->value === 'warn',
-                'bg-red-500' => $section->status->value === 'fail',
-                'bg-blue-500' => $section->status->value === 'pending',
-            ])
-            title="{{ ucfirst($section->status->value) }}"
-        ></span>
+        {{-- The word is the record; the mark beside it is only where the eye finds
+             the word. A colour alone would be a second, quieter copy of the same
+             verdict that greyscale and screen readers never receive. --}}
+        <p class="hb-desk-card__verdict hb-desk-card__verdict--{{ $section->status->value }}">
+            <span class="hb-mark" aria-hidden="true"></span>{{ ucfirst($section->status->value) }}
+        </p>
     </header>
 
     <dl>
         @foreach ($section->items as $item)
-            <div class="flex items-start justify-between gap-6 border-t border-gray-50 px-6 py-3 first:border-t-0 dark:border-white/5">
-                <dt class="text-sm text-gray-500 dark:text-gray-400">{{ $item->label }}</dt>
-                <dd class="min-w-0 text-right">
+            {{-- A neutral line has no severity at all, and `@class` evaluates every
+                 key in its array whether the condition passes or not, so the tone is
+                 resolved once here rather than inside the attribute. --}}
+            @php $tone = $item->status?->value; @endphp
+            <div @class([
+                'hb-desk-row',
+                'hb-desk-row--'.$tone => $tone !== null,
+            ])>
+                <dt>{{ $item->label }}</dt>
+                <dd>
                     <div class="flex items-center justify-end gap-2">
-                        @if ($item->status !== null)
-                            <span
-                                @class([
-                                    'inline-block h-1.5 w-1.5 shrink-0 rounded-full',
-                                    'bg-emerald-500' => $item->status->value === 'ok',
-                                    'bg-gray-400' => $item->status->value === 'info',
-                                    'bg-amber-500' => $item->status->value === 'warn',
-                                    'bg-red-500' => $item->status->value === 'fail',
-                                    'bg-blue-500' => $item->status->value === 'pending',
-                                ])
-                            ></span>
+                        @if ($tone !== null)
+                            {{-- The dot is where the eye finds the verdict; the word is the verdict. --}}
+                            <span class="hb-dot hb-dot--{{ $tone }}" aria-hidden="true"></span>
+                            <span class="sr-only">{{ ucfirst($tone) }}</span>
                         @endif
 
                         @if ($item->value === null)
-                            <span class="text-sm text-gray-400 dark:text-gray-500">&mdash;</span>
+                            <span class="hb-muted">&mdash;</span>
                         @elseif ($item->route !== null && Route::has($item->route))
                             <a
+                                class="hb-link hb-num"
                                 href="{{ route($item->route) }}"
-                                class="text-sm font-medium text-blue-600 underline-offset-4 hover:underline dark:text-blue-400"
                             >{{ $item->value }}</a>
                         @else
-                            <span class="break-words text-sm font-medium text-gray-900 dark:text-white">{{ $item->value }}</span>
+                            {{-- Mono is for what was measured: a number, a version, a path.
+                                 A value that is a whole sentence is set in the text face. --}}
+                            <span @class(['hb-num' => mb_strlen((string) $item->value) <= 24])>{{ $item->value }}</span>
                         @endif
                     </div>
 
                     @if ($item->hint !== null)
-                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ $item->hint }}</p>
+                        <span class="hb-desk-row__hint">{{ $item->hint }}</span>
                     @endif
                 </dd>
             </div>
         @endforeach
     </dl>
 
-    <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 px-6 py-3 text-xs text-gray-400 dark:border-white/10 dark:text-gray-500">
+    <footer class="hb-desk-card__foot">
         <span>
             @if ($section->warmAt === null)
                 {{ __('messages.system_overview_never_measured') }}
@@ -85,7 +82,7 @@
                 wire:click="measure"
                 wire:loading.attr="disabled"
                 wire:target="measure"
-                class="rounded-lg border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60 dark:border-white/10 dark:text-gray-200 dark:hover:bg-white/5"
+                class="hb-btn hb-btn--small"
             >
                 <span wire:loading.remove wire:target="measure">{{ __('messages.system_overview_measure_now') }}</span>
                 <span wire:loading wire:target="measure">{{ __('messages.system_overview_measuring') }}</span>
@@ -95,11 +92,9 @@
         @if ($action !== null)
             <form method="POST" action="{{ route($action['route']) }}" onsubmit="return confirm('{{ $action['confirm'] }}');">
                 @csrf
-                <button
-                    type="submit"
-                    class="rounded-lg border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-300 dark:hover:bg-amber-500/10"
-                >{{ $action['label'] }}</button>
+                <button type="submit" class="hb-btn hb-btn--small">{{ $action['label'] }}</button>
             </form>
         @endif
     </footer>
+</section>
 </section>

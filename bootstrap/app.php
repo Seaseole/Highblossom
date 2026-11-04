@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureRegistrationIsEnabled;
 use App\Http\Middleware\ShareThemePreference;
 use App\Http\Middleware\ThrottleUsernameAvailability;
 use App\Http\Middleware\TrackUserSession;
+use App\Support\AdminSidebar;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,12 +31,23 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Added by EnvKit so shared (public) URLs keep the https scheme and
-        // public host. Safe locally; remove to opt out.
-        $middleware->trustProxies(at: '*');
+        // public host. Trusts loopback only (the tunnel/Octane proxy); remove to opt out.
+        $middleware->trustProxies(at: ['127.0.0.1', '::1', '::ffff:127.0.0.1']);
         $middleware->web(append: [
             ShareThemePreference::class,
             TrackUserSession::class,
             ThrottleUsernameAvailability::class,
+        ]);
+
+        /* Which sidebar branches were left open is written by the browser, so it arrives as a
+           plain cookie and Laravel's decryption would turn it into nothing at all. The server
+           then rendered every branch that owns the page as open, Alpine closed the ones the
+           person had shut a beat later, and that snap was the largest layout shift in the
+           panel. Excluded rather than read out of $_COOKIE, because this is the mechanism the
+           framework provides for exactly that case. The value is a map of booleans, so nothing
+           sensitive is at stake in leaving it unencrypted. */
+        $middleware->encryptCookies(except: [
+            AdminSidebar::REMEMBER_COOKIE,
         ]);
 
         $middleware->alias([

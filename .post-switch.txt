@@ -1,0 +1,87 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CinematicHeroTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe homepage keeps the classic hero until a slide exists[39m[90m                                                    [39m [90m1.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised stored style reads as the classic hero[39m[90m                                                      [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma configured slide renders its layers with one heading and the word hidden[39m[90m                                  [39m [90m1.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly the first slide is fetched with the html[39m[90m                                                               [39m [90m1.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a wide source encodes the missing widths and leaves the top slot alone[39m[90m                               [39m [90m0.63s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma source narrower than the ladder is never upscaled[39m[90m                                                         [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe generated widths are offered to the browser with explicit dimensions[39m[90m                                    [39m [90m0.67s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a photograph leaves its derived widths behind[39m[90m                                                     [39m [90m1.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command rebuilds widths a deploy left behind[39m[90m                                                            [39m [90m0.85s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command stays quiet when the homepage is not using the card[39m[90m                                             [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout that is a different shape is rejected on the field it belongs to[39m[90m                                   [39m [90m0.76s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout of the same shape is kept and resized without being cropped[39m[90m                                        [39m [90m1.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a photograph is refused rather than dropped silently[39m[90m                                        [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a description is refused[39m[90m                                                                    [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma seventh slide is refused[39m[90m                                                                                  [39m [90m2.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mderived paths come from the photograph never from the request[39m[90m                                               [39m [90m2.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe placeholder colour is only ever a hex triplet[39m[90m                                                           [39m [90m1.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma real photograph yields a real placeholder colour[39m[90m                                                          [39m [90m1.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90man emptied repeater clears the deck and an absent one leaves it alone[39m[90m                                       [39m [90m2.90s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe carousel advances itself by default[39m[90m                                                                     [39m [90m3.90s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe autoplay switch reaches the markup[39m[90m                                                                      [39m [90m3.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe counter row is split into a number and a suffix[39m[90m                                                         [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mno counters are configured until an admin types them[39m[90m                                                        [39m [90m1.88s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide with no optional parts hides every one of them[39m[90m                                                      [39m [90m2.92s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview and progress controls appear once there is something to advance[39m[90m                                 [39m [90m2.78s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings screen offers the hero controls to an account that manages settings[39m[90m                            [39m [90m1.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe button defaults are saved as plain settings[39m[90m                                                             [39m [90m0.65s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileDetailsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mprofile page displays summary and activity[39m[90m                                                                  [39m [90m1.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mphone can be updated[39m[90m                                                                                        [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid phone is rejected[39m[90m                                                                                   [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar can be uploaded[39m[90m                                                                                      [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting avatar is replaced on upload[39m[90m                                                                       [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar is kept when no file is uploaded[39m[90m                                                                     [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows blog post counts and recent posts[39m[90m                                                            [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows empty state without posts[39m[90m                                                                    [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposts index filters by author[39m[90m                                                                               [39m [90m0.48s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminNavLayoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90man account that has never chosen follows the site default[39m[90m                                                   [39m [90m0.88s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar is what a nobody chose account gets when no default is stored[39m[90m                                   [39m [90m0.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe account choice beats the site default[39m[90m                                                                   [39m [90m0.77s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised site default falls back instead of resolving to nothing[39m[90m                                     [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar stores the choice on the account without a navigation[39m[90m                                               [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint refuses a layout that does not exist and changes nothing[39m[90m                                       [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint is only reachable by someone who can reach the panel[39m[90m                                           [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance form saves the layout alongside the theme[39m[90m                                                    [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance tab ticks the effective layout not the raw column[39m[90m                                            [39m [90m1.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings page offers the default and persists what is chosen[39m[90m                                            [39m [90m1.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mboth layouts print the same permitted rows and no others[39m[90m                                                    [39m [90m0.78s[39m  
+  [32;1m✓[39;22m[90m [39m[90mevery branch labels itself with the group name the menu declared[39m[90m                                            [39m [90m0.81s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe shell publishes the urls the bar controls post to[39m[90m                                                       [39m [90m0.69s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe top bar shell still mints no duplicate ids[39m[90m                                                              [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe choice survives a fresh request from a different session[39m[90m                                                [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bars rows carry the attributes and drawing its controls read[39m[90m                                            [39m [90m0.66s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma lit row is answered by the store alone[39m[90m                                                                    [39m [90m0.86s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\TwoFactorSettingsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtwo factor setup can be completed with a valid code[39m[90m                                                         [39m [90m1.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfigured totp window allows previous slot codes[39m[90m                                                           [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcodes outside the totp window are rejected[39m[90m                                                                  [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcode separators are normalized before verification[39m[90m                                                          [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling twice does not rotate an existing secret[39m[90m                                                           [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending setup can be cancelled[39m[90m                                                                              [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelling setup refuses to touch a confirmed configuration[39m[90m                                                 [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling two factor requires a recently confirmed password[39m[90m                                                  [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling two factor requires a recently confirmed password[39m[90m                                                 [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint marks the session as password confirmed[39m[90m                                           [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint rejects a wrong password[39m[90m                                                          [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprofile page renders the enable two factor password modal[39m[90m                                                   [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrecovery codes flash does not break the alpine attribute after confirmation[39m[90m                                 [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge accepts a recovery code and replaces it[39m[90m                                                     [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge view offers a recovery code input[39m[90m                                                           [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BookingAdminSurfacesTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe booking list shows the service the vehicle and the reference[39m[90m                                            [39m [90m0.84s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe booking detail page shows every field the form collects[39m[90m                                                 [39m [90m0.85s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings page renders the availability controls[39m[90m                                                         [39m [90m0.98s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can widen capacity and the public slots follow[39m[90m                                                     [39m [90m0.62s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe closed dates page is reachable from settings[39m[90m                                                            [39m [90m1.51s[39m  
+
+  [90mTests:[39m    [32;1m73 passed[39;22m[90m (443 assertions)[39m
+  [90mDuration:[39m [39m66.51s[39m
+

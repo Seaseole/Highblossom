@@ -1,0 +1,24 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SessionPruningTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcounts separate valid expired guest and authenticated rows[39m[90m                                                  [39m [90m2.99s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune deletes expired framework rows and keeps live ones[39m[90m                                                    [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune closes a sign in whose session row is gone[39m[90m                                                            [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in inside the grace window is not called orphaned[39m[90m                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in backed by a live session stays open[39m[90m                                                               [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in whose session expired is closed as expired not orphaned[39m[90m                                           [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdry run reports the sweep without changing anything[39m[90m                                                         [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe session being pruned from is never touched[39m[90m                                                              [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90midle timeout closes a session that is still inside the lifetime[39m[90m                                             [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma recently seen session survives the idle timeout[39m[90m                                                           [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune records the run so the card can show it[39m[90m                                                               [39m [90m1.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card reports valid and stale sessions separately[39m[90m                                                        [39m [90m1.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card reads clean when nothing is waiting[39m[90m                                                                [39m [90m1.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune now requires the manage user sessions permission[39m[90m                                                      [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can prune from the card[39m[90m                                                                            [39m [90m0.48s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpruning from the card spares the admins own session[39m[90m                                                         [39m [90m0.87s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhistory past the retention window is dropped[39m[90m                                                                [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command reports the sweep and supports a dry run[39m[90m                                                        [39m [90m0.18s[39m  
+
+  [90mTests:[39m    [32;1m18 passed[39;22m[90m (72 assertions)[39m
+  [90mDuration:[39m [39m11.59s[39m
+

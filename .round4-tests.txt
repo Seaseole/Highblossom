@@ -1,0 +1,829 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminNavLayoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90man account that has never chosen follows the site default[39m[90m                                                   [39m [90m1.70s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar is what a nobody chose account gets when no default is stored[39m[90m                                   [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe account choice beats the site default[39m[90m                                                                   [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised site default falls back instead of resolving to nothing[39m[90m                                     [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar stores the choice on the account without a navigation[39m[90m                                               [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint refuses a layout that does not exist and changes nothing[39m[90m                                       [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint is only reachable by someone who can reach the panel[39m[90m                                           [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance form saves the layout alongside the theme[39m[90m                                                    [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance tab ticks the effective layout not the raw column[39m[90m                                            [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings page offers the default and persists what is chosen[39m[90m                                            [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mboth layouts print the same permitted rows and no others[39m[90m                                                    [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mevery branch labels itself with the group name the menu declared[39m[90m                                            [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe shell publishes the urls the bar controls post to[39m[90m                                                       [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe top bar shell still mints no duplicate ids[39m[90m                                                              [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe choice survives a fresh request from a different session[39m[90m                                                [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bars rows carry the attributes and drawing its controls read[39m[90m                                            [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma lit row is answered by the store alone[39m[90m                                                                    [39m [90m0.33s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminShellLayoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe body and the layout row are sized to the viewport[39m[90m                                                       [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe content is the only document level scroller[39m[90m                                                             [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe top bar is a sibling of the scroller rather than an overlay[39m[90m                                             [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar fills the viewport and its header cannot be squeezed[39m[90m                                            [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe navigation column is the sole scroller inside the sidebar[39m[90m                                               [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe mobile drawer is a trapped dialog[39m[90m                                                                       [39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe active link is marked for the scroll restore[39m[90m                                                            [39m [90m0.50s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminSidebarMenuTest[39m
+  [32;1m✓[39;22m[90m [39m[90mevery declared destination exists and is named as declared[39m[90m                                                  [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90meach items permission matches the middleware on its own route[39m[90m                                               [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mno two entries resolve to the same path[39m[90m                                                                     [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe search haystack carries the label and the group[39m[90m                                                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "dashboard"[39m[90m                                     [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "a list page"[39m[90m                                   [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "a detail page belongs to its list"[39m[90m             [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "nested gallery detail"[39m[90m                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "longest prefix wins over gallery"[39m[90m              [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "longest prefix wins over bookings"[39m[90m             [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "hyphenated sibling is not the parent"[39m[90m          [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "a renamed destination"[39m[90m                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "seo has no index route"[39m[90m                        [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "an unlisted admin page falls through to itself[39m[90m…[39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current page resolves to the expected row with data set "an unknown path stays unknown"[39m[90m                 [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrows the role cannot open are absent and empty groups disappear[39m[90m                                             [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma group that holds the page opens and the others do not[39m[90m                                                     [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man explicitly remembered branch overrides the active default[39m[90m                                                [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unremembered branch falls through to the active default[39m[90m                                                  [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbadges count the queues the config names[39m[90m                                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma second read in the same request does not query again[39m[90m                                                      [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90man account with no badged row pays for no badges[39m[90m                                                            [39m [90m0.21s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminTopbarTest[39m
+  [32;1m✓[39;22m[90m [39m[90mevery declared action exists and is named as declared[39m[90m                                                       [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90meach actions permission matches the middleware on its own route[39m[90m                                             [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90meach search module declares the ability its result link enforces[39m[90m                                            [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma role is offered only the creates it can actually start[39m[90m                                                    [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuper admin is offered the whole list[39m[90m                                                                       [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthere is no booking create because no admin route exists for one[39m[90m                                            [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90man empty system prints no bell[39m[90m                                                                              [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bell lists the queue that has work waiting[39m[90m                                                              [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe context line names the section and page that own the path[39m[90m                                               [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unlisted path yields no context rather than an invented one[39m[90m                                              [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe search refuses a short term and an empty one[39m[90m                                                            [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe search returns only the modules the role may open[39m[90m                                                       [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma hit links to the page that shows it[39m[90m                                                                       [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma wildcard in the box is treated as the characters they are[39m[90m                                                 [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe dashboard renders the bar once with no duplicate ids[39m[90m                                                    [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe create dialog prints one tile per permitted action[39m[90m                                                      [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar and the account menu open the same create dialog[39m[90m                                                    [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90man account with no creates prints no dialog[39m[90m                                                                 [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar publishes the labels and urls the browser needs[39m[90m                                                     [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe account menu links to each profile tab and keeps logout as a post[39m[90m                                       [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "the dashboard"[39m[90m               [39m [90m0.82s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "the longest prefix wins over[39m[90m…[39m [90m0.78s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "the longest prefix wins over[39m[90m…[39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "a settings page"[39m[90m             [39m [90m0.82s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "a group whose name carries a[39m[90m…[39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar names the right section and page on each kind of screen with data set "a page outside the menu"[39m[90m     [39m [90m0.55s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ApplicationVersionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mguests are redirected from the versions page[39m[90m                                                                [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe versions page renders with the current release[39m[90m                                                          [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe timeline shows only the newest releases and offers more[39m[90m                                                 [39m [90m0.67s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe history fragment appends the older releases without page chrome[39m[90m                                         [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe history fragment clamps page requests to the available releases[39m[90m                                         [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers without the permission cannot read the history fragment[39m[90m                                               [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers without the permission cannot manage versions[39m[90m                                                         [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe release history is seeded from the baseline onwards[39m[90m                                                     [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid semantic versions[39m[90m                                                                        [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects versions that are not newer than current[39m[90m                                                         [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit records a newer release and refreshes the current version[39m[90m                                                [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcurrent version is cached and forgotten on record[39m[90m                                                           [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnext bump suggestions are computed from the current version[39m[90m                                                 [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbump suggestions fall back to the baseline when nothing is recorded[39m[90m                                         [39m [90m0.18s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BlockBuilderTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit restores blocks when the round trip value is a json string[39m[90m                                               [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit serves editor metadata from the block registry[39m[90m                                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistry defaults have the shape their rules require[39m[90m                                                        [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma post with builder divider styles can be saved[39m[90m                                                             [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unsupported divider style is rejected with a block scoped error[39m[90m                                          [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mflashed block errors are mapped onto their block ids[39m[90m                                                        [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe builder page renders the block toolbar[39m[90m                                                                  [39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe admin layout surfaces validation errors after a failed save[39m[90m                                             [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe layout and collection blocks expose editors[39m[90m                                                             [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistry defaults for the new editors satisfy their shape rules[39m[90m                                             [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlayout and collection blocks round trip through the save validation[39m[90m                                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma gallery image missing its alt text is rejected[39m[90m                                                            [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview renders blocks through the production renderer[39m[90m                                                  [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview degrades gracefully on broken input[39m[90m                                                             [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe media library answers json for the picker[39m[90m                                                               [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe media library pages and filters for the picker[39m[90m                                                          [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man image block accepts an ordered set of images[39m[90m                                                             [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma legacy single image block still saves[39m[90m                                                                     [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man image set entry without a source is rejected[39m[90m                                                             [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man image set beyond the registered cap is rejected[39m[90m                                                          [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe image block defaults start with an empty set[39m[90m                                                            [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview renders an image set as a viewer ready grid[39m[90m                                                     [39m [90m0.12s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BlogPostsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe create form offers taxonomy chips counters and the publish checklist[39m[90m                                    [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe edit form preselects the posts categories and tags[39m[90m                                                      [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe index offers the status menu and bulk controls[39m[90m                                                          [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mindex shows who published the post[39m[90m                                                                          [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mstore records the creating admin as the author[39m[90m                                                              [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpublishing from the form requires excerpt category and content[39m[90m                                              [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdrafts save without the publishing requirements[39m[90m                                                             [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma title longer than the limit is rejected[39m[90m                                                                   [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90man excerpt longer than the limit is rejected[39m[90m                                                                [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma duplicate title receives a disambiguated slug[39m[90m                                                             [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtags sync on store and clear on update[39m[90m                                                                      [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe status endpoint publishes a ready post[39m[90m                                                                  [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe status endpoint refuses an unfinished post[39m[90m                                                              [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe status endpoint always allows unpublishing[39m[90m                                                              [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbulk status updates every selected post[39m[90m                                                                     [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbulk status refuses to publish unfinished posts[39m[90m                                                             [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbulk status requires a selection and a known status[39m[90m                                                         [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mstatus endpoints require the update blog permission[39m[90m                                                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unfinished draft can be archived[39m[90m                                                                         [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90marchiving hides a post from the public site[39m[90m                                                                 [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90munarchiving an unfinished post to published is still blocked[39m[90m                                                [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90munarchiving a finished post publishes it[39m[90m                                                                    [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90marchived can be set from the post form[39m[90m                                                                      [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown status is rejected[39m[90m                                                                               [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbulk archive moves every selected post[39m[90m                                                                      [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe index lists each posts categories and tags[39m[90m                                                              [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe row menu offers only statuses other than the current one[39m[90m                                                [39m [90m0.55s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BlogTaxonomyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe modal endpoint returns the created category[39m[90m                                                             [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe modal endpoint returns the created tag[39m[90m                                                                  [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma blank name is rejected inside the modal[39m[90m                                                                   [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma duplicate name is rejected with a readable message[39m[90m                                                        [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo names that slug the same get distinct slugs[39m[90m                                                             [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupdating a term keeps its own name valid[39m[90m                                                                    [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe full page still redirects rather than returning json[39m[90m                                                    [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe post form renders the quick add dialog and targets[39m[90m                                                      [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma quick added term can be saved with the post[39m[90m                                                               [39m [90m0.21s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BookingAdminSurfacesTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe booking list shows the service the vehicle and the reference[39m[90m                                            [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe booking detail page shows every field the form collects[39m[90m                                                 [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings page renders the availability controls[39m[90m                                                         [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can widen capacity and the public slots follow[39m[90m                                                     [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe closed dates page is reachable from settings[39m[90m                                                            [39m [90m0.79s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\BookingClosureTest[39m
+  [32;1m✓[39;22m[90m [39m[90man admin can block a date and it renders in the list[39m[90m                                                        [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma past date is refused[39m[90m                                                                                      [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe same date cannot be blocked twice[39m[90m                                                                       [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can re open a blocked date[39m[90m                                                                         [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma customer without the booking permission cannot block a date[39m[90m                                               [39m [90m0.20s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CacheManagementTest[39m
+  [32;1m✓[39;22m[90m [39m[90mguests are redirected from the cache page[39m[90m                                                                   [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers without cache permission are forbidden[39m[90m                                                                [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe cache page lists all groups[39m[90m                                                                             [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclearing the settings group forgets company setting keys[39m[90m                                                    [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90moptimizing the seo group rebuilds the sitemap cache[39m[90m                                                         [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclear all flushes the application cache[39m[90m                                                                     [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown cache groups are not found[39m[90m                                                                          [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mapplication cache group cannot be optimized[39m[90m                                                                 [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CinematicHeroTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe homepage keeps the classic hero until a slide exists[39m[90m                                                    [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised stored style reads as the classic hero[39m[90m                                                      [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma configured slide renders its layers with one heading and the word hidden[39m[90m                                  [39m [90m1.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly the first slide is fetched with the html[39m[90m                                                               [39m [90m1.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a wide source encodes the missing widths and leaves the top slot alone[39m[90m                               [39m [90m1.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma source narrower than the ladder is never upscaled[39m[90m                                                         [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe generated widths are offered to the browser with explicit dimensions[39m[90m                                    [39m [90m0.87s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a photograph leaves its derived widths behind[39m[90m                                                     [39m [90m2.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command rebuilds widths a deploy left behind[39m[90m                                                            [39m [90m0.96s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command stays quiet when the homepage is not using the card[39m[90m                                             [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout that is a different shape is rejected on the field it belongs to[39m[90m                                   [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout of the same shape is kept and resized without being cropped[39m[90m                                        [39m [90m1.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a photograph is refused rather than dropped silently[39m[90m                                        [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a description is refused[39m[90m                                                                    [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma seventh slide is refused[39m[90m                                                                                  [39m [90m1.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mderived paths come from the photograph never from the request[39m[90m                                               [39m [90m0.99s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe placeholder colour is only ever a hex triplet[39m[90m                                                           [39m [90m0.76s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma real photograph yields a real placeholder colour[39m[90m                                                          [39m [90m0.74s[39m  
+  [32;1m✓[39;22m[90m [39m[90man emptied repeater clears the deck and an absent one leaves it alone[39m[90m                                       [39m [90m1.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe carousel advances itself by default[39m[90m                                                                     [39m [90m1.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe autoplay switch reaches the markup[39m[90m                                                                      [39m [90m1.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe counter row is split into a number and a suffix[39m[90m                                                         [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mno counters are configured until an admin types them[39m[90m                                                        [39m [90m0.81s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide with no optional parts hides every one of them[39m[90m                                                      [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview and progress controls appear once there is something to advance[39m[90m                                 [39m [90m1.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings screen offers the hero controls to an account that manages settings[39m[90m                            [39m [90m0.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe button defaults are saved as plain settings[39m[90m                                                             [39m [90m0.31s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\EmailVerificationEnforcementTest[39m
+  [32;1m✓[39;22m[90m [39m[90munverified user is blocked when enforcement is on[39m[90m                                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mverified user passes when enforcement is on[39m[90m                                                                 [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90munverified user passes when enforcement is off[39m[90m                                                              [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90munverified user passes when setting is missing[39m[90m                                                              [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mjson requests get forbidden when enforcement is on[39m[90m                                                          [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\FaviconSetTest[39m
+  [32;1m✓[39;22m[90m [39m[90muploading a favicon writes the full icon set to the root[39m[90m                                                    [39m [90m0.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90msite icon links carry the generated version[39m[90m                                                                 [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe manifest advertises the generated version[39m[90m                                                               [39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe set self heals after the root was rebuilt[39m[90m                                                               [39m [90m0.82s[39m  
+  [32;1m✓[39;22m[90m [39m[90mremoving the favicon restores the bundled icons[39m[90m                                                             [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a favicon updates the version and files[39m[90m                                                           [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90man undersized favicon is rejected[39m[90m                                                                           [39m [90m0.23s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\GlassSubCategoryModalTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe edit page mounts the modal instead of linking to the create screen[39m[90m                                      [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe edit page lists inactive sub categories so they stay manageable[39m[90m                                         [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit creates a sub category under the preset glass type and returns json[39m[90m                                      [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit generates the slug server side when the modal sends none[39m[90m                                                 [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports a missing name inside the modal error bag[39m[90m                                                        [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports a slug already taken by another glass type[39m[90m                                                       [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit updates a sub category and returns the saved values[39m[90m                                                      [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit deletes a sub category without quotes[39m[90m                                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to delete a sub category referenced by a quote[39m[90m                                                   [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers without the service permission cannot use the modal routes[39m[90m                                            [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe standalone create page still redirects after a html save[39m[90m                                                [39m [90m0.29s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\InspectionNotesTest[39m
+  [32;1m✓[39;22m[90m [39m[90man admin can add a note that is attributed and stamped[39m[90m                                                      [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma blank note is rejected[39m[90m                                                                                    [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90man action item can be closed and reopened[39m[90m                                                                   [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma note is visible to admins with its timestamp[39m[90m                                                              [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma note never reaches the customer status page[39m[90m                                                               [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma note cannot be reached through another inspection[39m[90m                                                         [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user without inspection permissions cannot add notes[39m[90m                                                      [39m [90m0.21s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\OptionalContentColumnTest[39m
+  [32;1m✓[39;22m[90m [39m[90mservice can be created with no icon field[39m[90m                                                                   [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mservices table has no icon column[39m[90m                                                                           [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mservice list renders without an icon column[39m[90m                                                                 [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtestimonial can be created with a blank role[39m[90m                                                                [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpages render a testimonial without a role[39m[90m                                                                   [39m [90m0.66s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileDetailsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mprofile page displays summary and activity[39m[90m                                                                  [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mphone can be updated[39m[90m                                                                                        [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid phone is rejected[39m[90m                                                                                   [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar can be uploaded[39m[90m                                                                                      [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting avatar is replaced on upload[39m[90m                                                                       [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar is kept when no file is uploaded[39m[90m                                                                     [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows blog post counts and recent posts[39m[90m                                                            [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows empty state without posts[39m[90m                                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposts index filters by author[39m[90m                                                                               [39m [90m0.23s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileSessionsTabTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sessions tab lists another device with a sign out action[39m[90m                                                [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use is marked and has no sign out action[39m[90m                                                      [39m [90m0.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user can sign out one of their own other devices[39m[90m                                                          [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user cannot sign out another users device[39m[90m                                                                 [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use cannot be signed out from the list[39m[90m                                                        [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out other devices spares the one in use[39m[90m                                                             [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosed sessions appear in the history list[39m[90m                                                                  [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SeoStaticRouteTest[39m
+  [32;1m✓[39;22m[90m [39m[90mupdate succeeds without route name field[39m[90m                                                                    [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupdate does not change route name[39m[90m                                                                           [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mstore still requires route name[39m[90m                                                                             [39m [90m0.21s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ServiceImageUploadTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcreate stores an uploaded image on the public disk[39m[90m                                                          [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90majax upload endpoint then create saves the stored path[39m[90m                                                      [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate rejects a non image file[39m[90m                                                                             [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate rejects an oversized image[39m[90m                                                                           [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90majax upload endpoint rejects an oversized image[39m[90m                                                             [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing the image deletes the old file[39m[90m                                                                    [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90madopted paths outside services are never deleted[39m[90m                                                            [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mremove image keeps the other field updates[39m[90m                                                                  [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupdate without a new image keeps the existing file[39m[90m                                                          [39m [90m0.25s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SessionIdleTimeoutSettingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe settings page offers the idle timeout field[39m[90m                                                             [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe idle timeout is saved and read back by the sweep[39m[90m                                                        [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mleaving the idle timeout blank disables it[39m[90m                                                                  [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90man idle timeout outside the bounds is rejected[39m[90m                                                              [39m [90m0.25s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SessionPruningTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcounts separate valid expired guest and authenticated rows[39m[90m                                                  [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune deletes expired framework rows and keeps live ones[39m[90m                                                    [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune closes a sign in whose session row is gone[39m[90m                                                            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in inside the grace window is not called orphaned[39m[90m                                                    [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in backed by a live session stays open[39m[90m                                                               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sign in whose session expired is closed as expired not orphaned[39m[90m                                           [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdry run reports the sweep without changing anything[39m[90m                                                         [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe session being pruned from is never touched[39m[90m                                                              [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90midle timeout closes a session that is still inside the lifetime[39m[90m                                             [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma recently seen session survives the idle timeout[39m[90m                                                           [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune records the run so the card can show it[39m[90m                                                               [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card reports valid and stale sessions separately[39m[90m                                                        [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card reads clean when nothing is waiting[39m[90m                                                                [39m [90m0.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune now requires the manage user sessions permission[39m[90m                                                      [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can prune from the card[39m[90m                                                                            [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpruning from the card spares the admins own session[39m[90m                                                         [39m [90m0.49s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhistory past the retention window is dropped[39m[90m                                                                [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command reports the sweep and supports a dry run[39m[90m                                                        [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SidebarAvatarTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar falls back to initials without an avatar[39m[90m                                                        [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar shows the picture after a profile upload[39m[90m                                                        [39m [90m0.48s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe initials stay in the markup behind the picture[39m[90m                                                          [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma replacement upload removes the file it supersedes[39m[90m                                                         [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90man avatar file that fails to store leaves the old one in place[39m[90m                                              [39m [90m0.26s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SortOrderTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe first record is numbered one[39m[90m                                                                            [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe next number follows the highest not the row count[39m[90m                                                       [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mediting without touching the number saves clean[39m[90m                                                             [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma taken number is refused and names the record[39m[90m                                                              [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe blur endpoint reports the clash[39m[90m                                                                         [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe same number is allowed in a different scope[39m[90m                                                             [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mgallery and library number separately[39m[90m                                                                       [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mchanging status leaves the order untouched[39m[90m                                                                  [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mstatus only submit does not renumber[39m[90m                                                                        [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe database also refuses a duplicate[39m[90m                                                                       [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma lost race retries instead of failing[39m[90m                                                                      [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe create form prefills the next number[39m[90m                                                                    [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe blur endpoint respects scope and incomplete scopes[39m[90m                                                      [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mevery admin form renders the sort order field[39m[90m                                                               [39m [90m4.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mzero is auto assigned and negative is rejected[39m[90m                                                              [39m [90m0.31s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SystemOverviewAuthorizationTest[39m
+  [32;1m✓[39;22m[90m [39m[90man environment value is cached once and revealed by ability[39m[90m                                                 [39m [90m0.66s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe granted reader still sees the environment value[39m[90m                                                         [39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma warm up with no reader still stores the gated line[39m[90m                                                        [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card refuses a reader without the overview ability[39m[90m                                                      [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe card still serves a reader with the ability[39m[90m                                                             [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SystemOverviewExportTest[39m
+  [32;1m✓[39;22m[90m [39m[90mreading the overview does not allow an export[39m[90m                                                               [39m [90m0.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma guest is redirected from the export[39m[90m                                                                       [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe export downloads json with every section[39m[90m                                                                [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe export withholds every line marked sensitive[39m[90m                                                            [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe export carries no configured secrets[39m[90m                                                                    [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90man export never measures a heavy section[39m[90m                                                                    [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe export is recorded in the audit trail[39m[90m                                                                   [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe export serves the same sections the page shows[39m[90m                                                          [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SystemOverviewPostureTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe overview lists the posture section[39m[90m                                                                      [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe registration and verification verdicts follow the settings[39m[90m                                              [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma missing setting row reads as the default[39m[90m                                                                  [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposture is measured inline and never queued[39m[90m                                                                 [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe forwarded header line is never exportable[39m[90m                                                               [39m [90m0.19s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SystemOverviewTest[39m
+  [32;1m✓[39;22m[90m [39m[90mguests are redirected from the overview[39m[90m                                                                     [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers without the permission are forbidden[39m[90m                                                                  [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe overview lists every light section[39m[90m                                                                      [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90msections are cached and remeasured only on demand[39m[90m                                                           [39m [90m0.75s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma throwing probe becomes a failed section instead of an exception[39m[90m                                           [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unreadable cache entry is re measured[39m[90m                                                                    [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe database endpoint is never exported[39m[90m                                                                     [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe database section measures on sqlite[39m[90m                                                                     [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe overview does not render configuration secrets[39m[90m                                                          [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma page request never measures a heavy section[39m[90m                                                               [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unmeasured heavy section offers both ways to measure[39m[90m                                                     [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma measured heavy section stops polling[39m[90m                                                                      [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmeasuring in line fills the section and its cache[39m[90m                                                           [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mwarming in background dispatches a job for that section only[39m[90m                                                [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe warm job measures every heavy section[39m[90m                                                                   [39m [90m0.81s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe footprint section lists the size of every cache group[39m[90m                                                   [39m [90m0.74s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe queue section reports throughput and workers[39m[90m                                                            [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma section that is not registered cannot be mounted[39m[90m                                                          [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mre measuring clears the sections and queues the heavy ones[39m[90m                                                  [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe package table appears only once the section is measured[39m[90m                                                 [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe package table searches the measured rows[39m[90m                                                                [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe package table filters by lock file[39m[90m                                                                      [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe package table pages through the cached rows[39m[90m                                                             [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user without the permission cannot read the package table[39m[90m                                                 [39m [90m0.20s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\UserSessionManagementTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe session pages require the session permission[39m[90m                                                            [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin sees sessions from every account[39m[90m                                                                   [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe status filter narrows the ledger[39m[90m                                                                        [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device filter only returns matching devices[39m[90m                                                             [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe search filter matches an account email[39m[90m                                                                  [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man invalid filter value is rejected[39m[90m                                                                         [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe per user page only lists that account[39m[90m                                                                   [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe current device is badged and offers no sign out[39m[90m                                                         [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can sign out a single session[39m[90m                                                                      [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin cannot sign out the session in use[39m[90m                                                                 [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90man admin can sign out every session of an account[39m[90m                                                           [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out an account spares the admins own session[39m[90m                                                        [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\AuthNotificationBannerTest[39m
+  [32;1m✓[39;22m[90m [39m[90ma failed login is reported by the banner and not repeated inline[39m[90m                                            [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma failed login flashes the credential error on the email key[39m[90m                                                [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma lockout is answered by the throttle response not the banner[39m[90m                                               [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown reset account gets the same banner as a known one[39m[90m                                                [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sent reset link renders a success banner[39m[90m                                                                  [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90man invalid reset token is reported by the banner[39m[90m                                                            [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mweak password failures stay with the box under a neutral banner[39m[90m                                             [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma completed reset announces itself on the login page[39m[90m                                                        [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe login inputs turn red when the credentials are rejected[39m[90m                                                 [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma clean login page carries no banner[39m[90m                                                                        [39m [90m0.08s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\AuthScreenRenderTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin renders with the passkey and pending contracts[39m[90m                                                        [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mforgot password renders[39m[90m                                                                                     [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreset password renders with its token[39m[90m                                                                       [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo factor challenge renders for a pending session[39m[90m                                                          [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password renders for a signed in user[39m[90m                                                               [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mverification notice renders for an unverified user[39m[90m                                                          [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconsent renders for a signed in user[39m[90m                                                                        [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregister renders when the setting is on[39m[90m                                                                     [39m [90m0.13s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\AuthValidationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe application login request is bound over fortifys[39m[90m                                                        [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma blank sign in answers each field once[39m[90m                                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma malformed email is named rather than reported as a credential failure[39m[90m                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma wrong password stays generic so the form cannot confirm an address[39m[90m                                        [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma valid credential attempt still authenticates[39m[90m                                                              [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90man untouched consent form asks once[39m[90m                                                                         [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma half completed consent form names the missing box[39m[90m                                                         [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmismatched passwords are described as a pair[39m[90m                                                                [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90man empty reset email names the box instead of the field[39m[90m                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe forgot password screen accepts a username shape without a framework error[39m[90m                               [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90man empty password confirmation asks for the password[39m[90m                                                        [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma wrong password confirmation keeps fortifys own answer[39m[90m                                                     [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe login form does not delegate validation to the browser[39m[90m                                                  [39m [90m0.13s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\AuthenticationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin screen can be rendered[39m[90m                                                                                [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers can authenticate using the login screen[39m[90m                                                               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers can not authenticate with invalid password[39m[90m                                                            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers with two factor enabled are redirected to two factor challenge[39m[90m                                        [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers can logout[39m[90m                                                                                            [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe login page offers a password reveal toggle[39m[90m                                                              [39m [90m0.08s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\EmailVerificationTest[39m
+  [32;1m✓[39;22m[90m [39m[90memail verification screen can be rendered[39m[90m                                                                   [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90memail can be verified[39m[90m                                                                                       [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90memail is not verified with invalid hash[39m[90m                                                                     [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90malready verified user visiting verification link is redirected without firing event again[39m[90m                   [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\PasswordConfirmationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mconfirm password screen can be rendered[39m[90m                                                                     [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\PasswordResetTest[39m
+  [32;1m✓[39;22m[90m [39m[90mreset password link screen can be rendered[39m[90m                                                                  [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreset password link can be requested[39m[90m                                                                        [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreset password screen can be rendered[39m[90m                                                                       [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword can be reset with valid token[39m[90m                                                                      [39m [90m0.26s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\PostLoginConsentTest[39m
+  [32;1m✓[39;22m[90m [39m[90muser without consent is redirected to the consent page[39m[90m                                                      [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90muser with consent passes the gate[39m[90m                                                                           [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconsent page is reachable for an unconsented user[39m[90m                                                           [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccepting both policies records consent and continues[39m[90m                                                       [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccepting only terms fails validation[39m[90m                                                                       [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mguest is redirected to login not the consent page[39m[90m                                                           [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mjson requests from unconsented users are forbidden[39m[90m                                                          [39m [90m0.10s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\RegistrationConsentTest[39m
+  [32;1m✓[39;22m[90m [39m[90mregistration records consent timestamps[39m[90m                                                                     [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration is rejected without terms consent[39m[90m                                                              [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration is rejected without privacy consent[39m[90m                                                            [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration is rejected when consent is absent[39m[90m                                                             [39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\RegistrationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mregistration screen can be rendered[39m[90m                                                                         [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnew users can register[39m[90m                                                                                      [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration screen is not found when registration is disabled[39m[90m                                              [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnew users cannot register when registration is disabled[39m[90m                                                     [39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\TwoFactorChallengeTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtwo factor challenge redirects to login when not authenticated[39m[90m                                              [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo factor challenge can be rendered[39m[90m                                                                        [39m [90m0.08s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\TwoFactorSettingsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtwo factor setup can be completed with a valid code[39m[90m                                                         [39m [90m0.48s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfigured totp window allows previous slot codes[39m[90m                                                           [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcodes outside the totp window are rejected[39m[90m                                                                  [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcode separators are normalized before verification[39m[90m                                                          [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling twice does not rotate an existing secret[39m[90m                                                           [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending setup can be cancelled[39m[90m                                                                              [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelling setup refuses to touch a confirmed configuration[39m[90m                                                 [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling two factor requires a recently confirmed password[39m[90m                                                  [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling two factor requires a recently confirmed password[39m[90m                                                 [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint marks the session as password confirmed[39m[90m                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint rejects a wrong password[39m[90m                                                          [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprofile page renders the enable two factor password modal[39m[90m                                                   [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrecovery codes flash does not break the alpine attribute after confirmation[39m[90m                                 [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge accepts a recovery code and replaces it[39m[90m                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge view offers a recovery code input[39m[90m                                                           [39m [90m0.10s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\UserSessionTrackingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin records the session id the user was actually issued[39m[90m                                                   [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin stores the parsed device and method[39m[90m                                                                   [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mremembered login is flagged[39m[90m                                                                                 [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma session recovered from the remember cookie is flagged as a remembered device[39m[90m                              [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma request that reuses a recorded session does not open a second row[39m[90m                                         [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity is written once the touch throttle window has passed[39m[90m                                               [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma new ip address is recorded immediately[39m[90m                                                                    [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma session idle past the framework lifetime is no longer active[39m[90m                                              [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe logout event listener closes the matching ledger row[39m[90m                                                    [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma logout only closes the signing out sessions row[39m[90m                                                           [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosing one session leaves the same users other devices alone[39m[90m                                               [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrevoking other sessions spares the exempt session[39m[90m                                                           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mchanging a password revokes the users other sessions[39m[90m                                                        [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword change revocation can be switched off[39m[90m                                                              [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune closes sessions the framework let lapse[39m[90m                                                               [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune drops history older than the retention window[39m[90m                                                         [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe prune command reports what it removed[39m[90m                                                                   [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe prune command rejects a non positive retention window[39m[90m                                                   [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\UsernameSignInTest[39m
+  [32;1m✓[39;22m[90m [39m[90ma username signs in[39m[90m                                                                                         [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma username signs in whatever the casing typed[39m[90m                                                               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90man email address still signs in[39m[90m                                                                             [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma wrong password is answered identically for both identifiers[39m[90m                                               [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown identifier gets the same answer as a wrong password[39m[90m                                              [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mswitching between the two identifiers does not dodge the throttle[39m[90m                                           [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma password hashed under older bcrypt options still signs in[39m[90m                                                 [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma reset can be requested with a username[39m[90m                                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown reset identifier is answered like a known one[39m[90m                                                    [39m [90m0.49s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma username can be changed on the profile and is stored lowercase[39m[90m                                            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma taken or reserved username is rejected on the profile[39m[90m                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe admin security page saves a policy the forms then use[39m[90m                                                   [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe guard rails reject a policy that is too weak or too long[39m[90m                                                [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a policy records who changed what[39m[90m                                                                    [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe security page is closed to a user without the permission[39m[90m                                                [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe login screen labels the field for both identifiers[39m[90m                                                      [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe security page renders the controls and the live policy[39m[90m                                                  [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe admin user forms carry the username field and the live checklist[39m[90m                                        [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe profile and password pages render the checklist once per form[39m[90m                                           [39m [90m0.34s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Settings\EnableRegistrationSettingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe settings form renders the registration toggle in the general tab[39m[90m                                        [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe registration toggle is not in the environment tab[39m[90m                                                       [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe registration toggle is checked when the setting is on[39m[90m                                                   [39m [90m0.74s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling the toggle persists a boolean[39m[90m                                                                      [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling the toggle closes registration[39m[90m                                                                    [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration is closed when the setting row is absent[39m[90m                                                       [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Settings\EnvironmentEditorSecurityTest[39m
+  [32;1m✓[39;22m[90m [39m[90msettings page never renders secret env values[39m[90m                                                               [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuper admin env submission rejects non allowlisted keys[39m[90m                                                     [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnon super admin cannot write any env key[39m[90m                                                                    [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90msource decompose is forbidden for non super admins[39m[90m                                                          [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90msmtp settings never return the password to the view[39m[90m                                                         [39m [90m0.17s[39m  
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\Settings\ProfileUpdateTest[39m
+  [31;1m⨯[39;22m[90m [39m[90mprofile page is displayed[39m[90m                                                                                   [39m [90m0.07s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mprofile information can be updated[39m[90m                                                                          [39m [90m0.07s[39m  
+  [31;1m⨯[39;22m[90m [39m[90memail verification status is unchanged when email address is unchanged[39m[90m                                      [39m [90m0.07s[39m  
+  [31;1m⨯[39;22m[90m [39m[90muser can delete their account[39m[90m                                                                               [39m [90m0.08s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mcorrect password must be provided to delete account[39m[90m                                                         [39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Settings\SecondaryPhoneSettingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe settings form renders the secondary phone field[39m[90m                                                         [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a secondary phone persists it[39m[90m                                                                        [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclearing the secondary phone removes the value[39m[90m                                                              [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe secondary phone is rejected when too long[39m[90m                                                               [39m [90m0.24s[39m  
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\Settings\SecurityTest[39m
+  [31;1m⨯[39;22m[90m [39m[90msecurity settings page can be rendered[39m[90m                                                                      [39m [90m0.08s[39m  
+  [31;1m⨯[39;22m[90m [39m[90msecurity settings page requires password confirmation when enabled[39m[90m                                          [39m [90m0.07s[39m  
+  [31;1m⨯[39;22m[90m [39m[90msecurity settings page renders without two factor when feature is disabled[39m[90m                                  [39m [90m0.07s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mtwo factor authentication disabled when confirmation abandoned between requests[39m[90m                             [39m [90m0.08s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mpassword can be updated[39m[90m                                                                                     [39m [90m0.08s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mcorrect password must be provided to update password[39m[90m                                                        [39m [90m0.09s[39m  
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\Settings\SmtpSettingTest[39m
+  [31;1m⨯[39;22m[90m [39m[90msmtp index page is accessible[39m[90m                                                                               [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AnnouncementTickerTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe bar is sized by its content and declares no height[39m[90m                                                      [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe dismissed attribute removes the bar from the layout[39m[90m                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly the first copy of the marquee is read out[39m[90m                                                              [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe fingerprint follows the live messages and is stable[39m[90m                                                     [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90man expired announcement renders no bar and reserves no space[39m[90m                                                [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mswitching announcements off in the admin removes the bar[39m[90m                                                    [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma live message keeps an expired one out of the fingerprint[39m[90m                                                  [39m [90m0.13s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PasskeyDeletionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mpasskey can be deleted[39m[90m                                                                                      [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PasskeyLoginRecoveryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin page renders the recovery panels[39m[90m                                                                      [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90munrecognized passkey is reported as a recoverable reason[39m[90m                                                    [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired challenge is reported instead of an unknown passkey[39m[90m                                                 [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mknown credential rejected by the assertion is reported as a failure[39m[90m                                         [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreenrol banner shows once and can be dismissed[39m[90m                                                              [39m [90m0.07s[39m  
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\ProfileUpdateTest[22m [90m>[39m profile page is displayed               [41;1m RouteNotFoundException [49;22m  
+[39;1m  Route [profile.edit] not defined.[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39m:[32m542[39m
+    538▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    539▕             return $url;
+    540▕         }
+    541▕ 
+  ➜ 542▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    543▕     }
+    544▕ 
+    545▕     /**
+    546▕      * Get the URL for a given route instance.
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39;22m:[39;1m542[39;22m
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Foundation\helpers.php[39;22m:[39;1m870[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\ProfileUpdateTest[22m [90m>[39m profile information can be updated  [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.profile][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\ProfileUpdateTest[22m [90m>[39m email verification status is uncha… [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.profile][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\ProfileUpdateTest[22m [90m>[39m user can delete their account       [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.delete-user-modal][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\ProfileUpdateTest[22m [90m>[39m correct password must be provided…  [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.delete-user-modal][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m security settings page can be rendered       [41;1m RouteNotFoundException [49;22m  
+[39;1m  Route [security.edit] not defined.[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39m:[32m542[39m
+    538▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    539▕             return $url;
+    540▕         }
+    541▕ 
+  ➜ 542▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    543▕     }
+    544▕ 
+    545▕     /**
+    546▕      * Get the URL for a given route instance.
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39;22m:[39;1m542[39;22m
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Foundation\helpers.php[39;22m:[39;1m870[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m security settings page requires password co… [41;1m RouteNotFoundException [49;22m  
+[39;1m  Route [security.edit] not defined.[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39m:[32m542[39m
+    538▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    539▕             return $url;
+    540▕         }
+    541▕ 
+  ➜ 542▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    543▕     }
+    544▕ 
+    545▕     /**
+    546▕      * Get the URL for a given route instance.
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39;22m:[39;1m542[39;22m
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Foundation\helpers.php[39;22m:[39;1m870[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m security settings page renders without two…  [41;1m RouteNotFoundException [49;22m  
+[39;1m  Route [security.edit] not defined.[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39m:[32m542[39m
+    538▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    539▕             return $url;
+    540▕         }
+    541▕ 
+  ➜ 542▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    543▕     }
+    544▕ 
+    545▕     /**
+    546▕      * Get the URL for a given route instance.
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39;22m:[39;1m542[39;22m
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Foundation\helpers.php[39;22m:[39;1m870[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m two factor authentication disabled when… [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.security][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m password can be updated                  [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.security][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SecurityTest[22m [90m>[39m correct password must be provided to up… [41;1m ComponentNotFoundException [49;22m  
+[39;1m  Unable to find component: [pages::settings.security][39;22m
+
+  at [32mvendor\livewire\livewire\src\Factory\Factory.php[39m:[32m76[39m
+     72▕             }
+     73▕         }
+     74▕ 
+     75▕         if (! $class || ! class_exists($class) || ! is_subclass_of($class, Component::class)) {
+  ➜  76▕             throw new ComponentNotFoundException(
+     77▕                 "Unable to find component: [{$name}]"
+     78▕             );
+     79▕         }
+     80▕
+
+  [33m1   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m76[39;22m
+  [33m2   [39m[39;1mvendor\livewire\livewire\src\Factory\Factory.php[39;22m:[39;1m23[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\Settings\SmtpSettingTest[22m [90m>[39m smtp index page is accessible             [41;1m RouteNotFoundException [49;22m  
+[39;1m  Route [smtp.index] not defined.[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39m:[32m542[39m
+    538▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    539▕             return $url;
+    540▕         }
+    541▕ 
+  ➜ 542▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    543▕     }
+    544▕ 
+    545▕     /**
+    546▕      * Get the URL for a given route instance.
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php[39;22m:[39;1m542[39;22m
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Foundation\helpers.php[39;22m:[39;1m870[39;22m
+
+
+  [90mTests:[39m    [31;1m12 failed[39;22m[90m,[39m[39m [39m[32;1m491 passed[39;22m[90m (2078 assertions)[39m
+  [90mDuration:[39m [39m147.14s[39m
+

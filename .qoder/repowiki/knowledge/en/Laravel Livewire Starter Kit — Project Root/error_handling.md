@@ -1,60 +1,34 @@
 ## Approach
 
-This is a Laravel 13 + Livewire application. Error handling follows the framework's defaults with one explicit customization in `bootstrap/app.php`:
-- No custom exception classes are defined anywhere in `app/`; business validation failures use PHP built-ins (`InvalidArgumentException`, `RuntimeException`) or domain exceptions from third-party packages (e.g. `ImageException`, `DeadlockException`, `UniqueConstraintViolationException`).
-- Global error rendering is only customized for `ValidationException` on passkey routes, returning structured JSON `{message, reason, errors}` via an `Exceptions::render` callback that delegates to `ResolvePasskeyLoginFailure`.
-- HTTP-level errors are raised with `abort()` (only found once: `SiteController` returns 404).
-- There is no `catch`/`throw` sentinel-error hierarchy of the project's own; all `throw new ...Exception` calls in the codebase use either `InvalidArgumentException`, `RuntimeException`, or package-provided types.
+This is a Laravel 13 application that relies on the framework's built-in exception/error infrastructure rather than defining custom domain exception types. Errors are handled through three main channels:
 
-## Key Files
+1. **HTTP-level errors** — `abort()`, `abort_unless()`, and explicit `throw new NotFoundHttpException` / `ModelNotFoundException` propagate to Laravel's global exception handler.
+2. **Domain/database exceptions** — Framework-provided `Illuminate\Database\UniqueConstraintViolationException`, `Illuminate\Database\DeadlockException`, and third-party `Illuminate\Image\ImageException` are caught at call sites to translate into user-facing responses.
+3. **Logging via `Log` facade** — `Log::error`, `Log::warning`, and `Log::info` are used throughout services, controllers, listeners, and commands; there is no custom logger wrapper or structured log level policy beyond this facade usage.
 
-- `bootstrap/app.php` — single place where global exception rendering is hooked (`withExceptions`). It also wires middleware aliases (`role`, `permission`, `verified.if_required`, `consent.required`, `registration.enabled`).
-- `app/Actions/Fortify/AuthenticateSignIn.php` — catches `Throwable` when resolving passkeys and delegates failure reporting to `ResolvePasskeyLoginFailure`.
-- `lang/lang/en/validation.php` — provides user-facing messages for form validation errors.
-- Blade view components under `resources/views/components/ui/field-errors.blade.php`, `resources/views/flux/error.blade.php`, and the many `flux/*` field views render per-field validation errors returned by Livewire/Laravel validators.
-- `resources/views/errors/506.blade.php`, `resources/views/errors/403.blade.php` — custom error pages for those status codes (Laravel convention: one file per HTTP status). Other statuses fall back to default Laravel error templates.
+There are no custom `App\Exceptions\*` classes and no `app/Exceptions` directory in the tree — error taxonomy is delegated entirely to Symfony/Laravel exception classes.
 
-## Architecture & Conventions
+## Key Files and Patterns
 
-**1. Validation-driven flow control**
-Most input paths go through Laravel Form Requests or Livewire property validation rather than manual checks. When validation fails, `ValidationException` is thrown automatically and rendered as HTML field errors by the Flux/UI field components or as JSON for API/Livewire requests.
+- **Controllers** — `SiteController.php` uses `abort(404)` and `abort_unless(..., 404)` for missing resources; it also throws `NotFoundHttpException` / `ModelNotFoundException` where model binding fails. The `PollController` catches `UniqueConstraintViolationException` from DB transactions and returns JSON with 422 status; generic `\Exception` catch blocks return 500 JSON responses.
+- **Actions** — `StoreBookingAction.php` wraps its `execute()` method in a broad `catch (\Exception $e)` block that logs via `Log::error` and returns a normalized array `['success' => false, 'message' => ...]`. Its `reserve()` method retries on `DeadlockException` up to `LOCK_ATTEMPTS` with a fixed `usleep(120_000)` backoff before giving up.
+- **Services** — Image-processing services (`ImageUploadService`, `GalleryService`, `ProfileService`, `CompanySettingService`, `SeoService`, `AboutUsService`, `MediaLibraryService`, `ServiceService`) all import `Illuminate\Image\ImageException` and catch it to log an error message then continue (often falling back to storing the raw file or skipping processing). `VideoUploadService` throws `\RuntimeException` for unsupported file types and storage failures; `GlassSubCategoryService` throws a bare `\Exception` for business-rule violations ("Cannot delete sub-category with associated quotes").
+- **System Overview probes** — `ProbeRunner.php` and individual probe classes use `try/catch (Throwable $e)` to isolate probe failures so one failing probe does not abort the entire system overview report; failures are logged via `Log::warning`.
+- **ContentBlocks package** — `AbstractBlock.php` and `OEmbedResolver.php` follow the same pattern: validation/rendering failures are caught, logged, and the block is skipped gracefully.
+- **Views** — Blade templates under `resources/views/errors/` provide per-status HTML pages (404, 500, etc.) rendered by Laravel's default renderer; some Flux icon views throw `\Exception` for unsupported variants as developer-facing guard clauses.
 
-**2. Service-layer guard clauses throw typed built-in exceptions**
-Service methods validate preconditions and throw `InvalidArgumentException` (invalid arguments) or `RuntimeException` (operational failures like "Unable to write {$file}"), e.g.:
-- `DataTransferObjects\SeoMetadata` throws `InvalidArgumentException` for out-of-range priority / invalid changefreq.
-- `BookingTimeline` throws `InvalidArgumentException` for unknown milestone/event mappings.
-- `EnvEditor` throws `InvalidArgumentException` for invalid env keys.
-- `CacheManagerService` throws `InvalidArgumentException` for unknown/unoptimizable cache groups.
-- `FaviconSetGenerator` throws `RuntimeException` for filesystem-write failures.
-- `SystemOverview\ProbeRegistry` throws `InvalidArgumentException` for unknown probes.
+## Architecture and Conventions
 
-**3. Catch sites log and degrade gracefully**
-Catch blocks follow a consistent pattern: catch a specific exception type, call `Log::error(...)` (or `Log::warning`/`Log::debug`/`Log::info` depending on severity), then either rethrow, return a fallback value, or continue processing. Examples include image upload failures across `ImageUploadService`, `AboutUsService`, `CompanySettingService`, `GalleryService`, `MediaLibraryService`, `ProfileService`, `SeoService`, `ServiceService`; email sending in `SendContactMessageEmail`; video thumbnail generation in `VideoUploadService`; system-overview probe execution in `ProbeRunner`.
+- **No custom exception hierarchy.** All thrown exceptions are either framework types (`NotFoundHttpException`, `ModelNotFoundException`, `UniqueConstraintViolationException`, `DeadlockException`, `InvalidArgumentException`) or plain `\RuntimeException` / `\Exception`. There is no `App\Exceptions` namespace.
+- **Catch-and-log at boundaries.** Services typically `catch` specific exceptions (`ImageException`, `JsonException`, `Throwable`) inside their own methods, log them, and either return a fallback result or rethrow nothing — making them "fail-open" rather than surfacing errors upward. Broader `\Exception` catches live in controller/action entry points to normalize response shapes.
+- **Structured logging via `Log` facade.** Every catch block logs context (poll_id, image path, reason, request data) using `Log::error` or `Log::warning`; successful operations often log via `Log::info` (e.g., poll vote attempts/completion, session pruning).
+- **Idempotency + retry patterns.** Booking submissions use an idempotency token service plus explicit retry loops for `DeadlockException`, treating database deadlocks as transient rather than fatal.
+- **Validation-first approach.** Request validation happens via Form Requests (`ContactFormRequest`, `QuoteFormRequest`) and manual `Validator::make(...)->fails()` checks, which short-circuit early and avoid throwing exceptions for user input errors.
 
-**4. Logging levels used descriptively**
-- `Log::error` — failed operations (image/video processing, mail send, quote submission, favicon generation).
-- `Log::warning` — recoverable issues (unavailable settings, unreadable cache entries, failed deletions, skipped hero variants, orphaned temp files).
-- `Log::info` — completed background work (session pruning, temp-file cleanup).
-- `Log::debug` — diagnostic traces (Facebook URL resolution).
+## Conventions and Constraints
 
-**5. Domain-specific catch targets**
-The codebase catches concrete exception types rather than generic `Exception` wherever possible:
-- `ImageException` (intervention/image library) in image-handling actions/services.
-- `DeadlockException` in `StoreBookingAction` for concurrent booking inserts.
-- `UniqueConstraintViolationException` in `PollController` and `UserSessionService` for duplicate votes/session collisions.
-- `JsonException` in `ProbeRunner`, `PackageCatalog`, `PhpRuntimeProbe` for malformed cached JSON.
-- `Throwable` at boundaries (Fortify authentication, console commands, system-overview probes, hero asset generation) to prevent unhandled crashes.
-
-**6. Passkey validation response shaping**
-A dedicated `ResolvePasskeyLoginFailure` action translates `ValidationException`s from `/passkeys` and `/user/passkeys` routes into a flat JSON envelope `{ message, reason?, errors }`, overriding Laravel's default behavior so the passkey client can display the specific failure reason.
-
-**7. No repository-wide sentinel error types**
-There is no `App\Exceptions` namespace and no custom base exception class. All domain errors propagate as PHP built-ins or third-party exceptions, which callers catch explicitly.
-
-## Conventions Observed
-
-- Failures in I/O-heavy service methods are caught locally, logged at the appropriate level, and never allowed to bubble up as unhandled exceptions.
-- Validation failures are expressed through Laravel's validator/Form Request pipeline; controllers/actions do not manually construct error arrays.
-- User-facing error messages live in `lang/lang/en/*.php` (e.g. `validation.php`, `auth.php`, `passwords.php`, feature-specific language files); Blade templates resolve them via `__()` or `$errors` bags.
-- Custom HTTP error pages exist for selected codes under `resources/views/errors/<code>.blade.php` (403, 506 observed); others use Laravel defaults.
-- The only global exception hook is the passkey `ValidationException` renderer in `bootstrap/app.php`; there is no global `report` override or global try/catch wrapper around the request lifecycle.
+- Catching broad `\Exception` or `Throwable` is used in strategic boundary layers (actions, controllers, probe runners) to prevent unhandled exceptions from reaching the global handler — but catching it deep in business logic (e.g., `PasswordPolicy.php`, `HeroAssets.php`) is observed as well, sometimes swallowing the exception after logging.
+- Image-processing failures are consistently handled by catching `Illuminate\Image\ImageException`, logging the exception message, and continuing execution rather than aborting the caller — a deliberate fail-open convention across multiple services.
+- Database constraint and deadlock errors are treated as distinct control-flow signals: `UniqueConstraintViolationException` maps to 422 user-recoverable responses; `DeadlockException` triggers bounded retries with fixed sleep intervals.
+- No `panic`/`recover` equivalent exists (this is PHP); `throw` is used only for exceptional conditions, while normal error signaling goes through returned arrays (`['success' => false, 'message' => ...]`) or HTTP status codes.
+- The repository has no lint rule or CI check enforcing exception naming or handling style; the patterns above are purely observed conventions.

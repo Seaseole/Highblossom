@@ -18,7 +18,7 @@
         :aria-expanded="open.toString()"
         aria-haspopup="menu"
         aria-controls="notifications-menu"
-        :aria-label="open ? 'Waiting queues, close' : 'Waiting queues'"
+        :aria-label="open ? 'Waiting queues, close' : 'Waiting queues, {{ $total }} waiting'"
         title="Waiting for someone"
         class="admin-bar-btn relative inline-flex"
     >

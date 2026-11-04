@@ -1,6 +1,7 @@
 import collapse from '@alpinejs/collapse';
 import { Passkeys } from '@laravel/passkeys';
 import './password-rules';
+import './admin-sheet';
 
 console.log('Admin JS: Script loaded');
 
@@ -8,34 +9,27 @@ console.log('Admin JS: Script loaded');
 window.Passkeys = Passkeys;
 
 /**
- * Suspend or restore the admin content scroller.
- *
- * The layout row is viewport-tall, so content moves inside .admin-main instead of the
- * window. Overlays used to lock <body>, which after that change is an element that never
- * scrolls — the lock would be silently inert and the page would run behind the modal.
- */
-function lockAdminContentScroll(locked) {
-    document.querySelector('.admin-main')?.classList.toggle('is-scroll-locked', locked);
-}
-
-/**
- * Keep Tab inside the element this runs on.
+ * Keep Tab inside `container`.
  *
  * Written by hand because @alpinejs/focus is not installed in this bundle, so x-trap would fail
  * silently and Tab would walk out from under the person using the overlay. Elements hidden by a
  * collapsed group are filtered out, otherwise the first/last pair brackets invisible links.
  *
- * Two surfaces need it: the mobile drawer, and the command palette's dialog.
+ * The container is a parameter rather than `this.$el` so that every overlay on the desk cycles
+ * through this one function: the drawer and the command palette call it through `trapTab`, and
+ * anything wearing `x-dialog` calls it directly. Two copies is how two overlays start disagreeing
+ * about what counts as focusable.
  *
+ * @param {Element} container
  * @param {KeyboardEvent} event
  */
-function trapTab(event) {
-    if (event.key !== 'Tab') {
+function trapWithin(container, event) {
+    if (event.key !== 'Tab' || !container) {
         return;
     }
 
     const focusables = Array.from(
-        this.$el.querySelectorAll(
+        container.querySelectorAll(
             'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ),
     ).filter((element) => element.offsetParent !== null);
@@ -54,6 +48,142 @@ function trapTab(event) {
         event.preventDefault();
         first.focus();
     }
+}
+
+/**
+ * The drawer's and palette's view of the cycle, kept as it was so their wiring is untouched.
+ *
+ * @param {KeyboardEvent} event
+ */
+function trapTab(event) {
+    trapWithin(this.$el, event);
+}
+
+/**
+ * Whether a caller that manages the lock itself — the create dialog, the taxonomy drawer, the
+ * palette — is currently holding it.
+ */
+let legacyScrollLock = false;
+
+/**
+ * Put the desk's scroller to sleep while anything is covering it.
+ *
+ * Two owners, one rule. `lockAdminContentScroll()` is the old, idempotent switch those three
+ * surfaces already call, and the stack below is what anything wearing `x-dialog` goes through. As
+ * a single boolean the second overlay to close switched the scroller back on while the first was
+ * still covering the page; as a counter it could drift upward if a surface re-opened without
+ * closing, which strands the desk unable to scroll for the rest of the visit. Reading both owners
+ * on every change can do neither.
+ */
+function applyScrollLock() {
+    document.querySelector('.admin-main')?.classList.toggle(
+        'is-scroll-locked',
+        legacyScrollLock || openDialogs.length > 0,
+    );
+}
+
+/**
+ * Lock or release the desk's scroller for one of the surfaces that owns the flag itself.
+ *
+ * @param {boolean} locked
+ */
+function lockAdminContentScroll(locked) {
+    legacyScrollLock = Boolean(locked);
+    applyScrollLock();
+}
+
+/**
+ * Overlays currently standing, innermost last.
+ *
+ * Keyboard handling is offered to the top of this stack and to nothing else. Without it, Escape
+ * pressed over a confirm that was asked from inside a dialog would close the dialog behind it, and
+ * Tab would cycle through whichever panel registered its listener first.
+ */
+const openDialogs = [];
+
+/**
+ * @param {Element} el
+ */
+function pushDialog(el) {
+    openDialogs.push(el);
+    applyScrollLock();
+}
+
+/**
+ * @param {Element} el
+ */
+function popDialog(el) {
+    const index = openDialogs.lastIndexOf(el);
+
+    if (index === -1) {
+        return;
+    }
+
+    openDialogs.splice(index, 1);
+    applyScrollLock();
+}
+
+/**
+ * @returns {Element|null}
+ */
+function topDialog() {
+    return openDialogs.length > 0 ? openDialogs[openDialogs.length - 1] : null;
+}
+
+/**
+ * The first thing worth standing on inside an overlay: whatever the author marked, and failing
+ * that the first control that can take focus.
+ *
+ * @param {Element} container
+ * @returns {HTMLElement|null}
+ */
+function firstDialogTarget(container) {
+    const marked = container.querySelector('[data-dialog-initial]');
+
+    /* A marked target is the author's answer and is taken even while it cannot be measured yet;
+       see `focusWhenShown`, which only calls this once the panel is on screen. */
+    if (marked) {
+        return /** @type {HTMLElement} */ (marked);
+    }
+
+    return Array.from(
+        container.querySelectorAll(
+            'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        ),
+    ).find((element) => element.offsetParent !== null) ?? null;
+}
+
+/**
+ * Put the caret on the first thing in the panel, once the panel can hold it.
+ *
+ * A frame, not a timeout: `x-show` without a transition reveals on `setTimeout`, but with one it
+ * reveals inside `requestAnimationFrame` (Alpine's `performTransition`), so a focus attempt made on
+ * the same tick finds an element that is still `display: none` and measures nothing. This retries
+ * down to the first frame where the panel is actually on screen and stops after eight, because an
+ * overlay that never became visible is a bug in the page, not something to keep polling.
+ *
+ * @param {Element} container
+ * @param {() => boolean} stillOpen
+ * @param {number} attempt
+ */
+function focusWhenShown(container, stillOpen, attempt = 0) {
+    window.requestAnimationFrame(() => {
+        if (! stillOpen() || ! document.contains(container)) {
+            return;
+        }
+
+        const target = firstDialogTarget(container);
+
+        if (target) {
+            target.focus();
+
+            return;
+        }
+
+        if (attempt < 8) {
+            focusWhenShown(container, stillOpen, attempt + 1);
+        }
+    });
 }
 
 /**
@@ -88,6 +218,222 @@ document.addEventListener('alpine:init', () => {
     window.Alpine.data('adminFocusTrap', () => ({
         trap: trapTab,
     }));
+
+    /* An overlay's obligations, in one place.
+     *
+     * A profile modal used to be a `x-show` and a wish: Tab walked out from behind it, Escape
+     * worked only when focus happened to already be inside it, focus went to <body> when it shut,
+     * and the desk scrolled under it. Each of those was written once per modal, which is how three
+     * of them ended up disagreeing.
+     *
+     * `x-dialog="flag"` on the overlay's panel takes all of it off the author. The flag is read
+     * through the element's own scope chain, so a modal can sit inside a page-wide `x-data` and
+     * still watch one of its properties. Semantics (`role="dialog"`, `aria-modal`,
+     * `aria-labelledby`) stay in the markup, where a screen reader needs them with the JavaScript
+     * off.
+     *
+     * The key handler sits on the document and defers to the top of the dialog stack, not because
+     * a handler on the panel reads better but because it does not work: while `x-show` is still
+     * waiting on a frame to reveal the panel, focus is not inside it yet, so a panel-bound listener
+     * hears nothing and the first Escape a person presses is lost. */
+    window.Alpine.directive('dialog', (el, { expression }, { effect, evaluate, evaluateLater, cleanup }) => {
+        const read = evaluateLater(expression);
+        /* Escape shuts the overlay. Most authors just want the flag put back, and that is the
+           default; a dialog whose state lives in a store names its own way out instead, because
+           dropping `open` without settling the pending question would leave the caller waiting on
+           a promise nobody can answer. */
+        const close = () => (el.dataset.dialogClose
+            ? evaluate(el.dataset.dialogClose)
+            : evaluate(`${expression} = false`));
+
+        let wasOpen = false;
+        let returnTo = null;
+
+        const onKeyDown = (event) => {
+            if (topDialog() !== el) {
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                event.stopPropagation();
+                close();
+
+                return;
+            }
+
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            /* Tab pulls focus back in rather than letting it walk past the overlay. A panel that
+               has just been opened has not been focused yet — and with a transition it may not have
+               been focusable a frame ago — so this is the common case, not the corner. */
+            if (! el.contains(document.activeElement)) {
+                event.preventDefault();
+                firstDialogTarget(el)?.focus();
+
+                return;
+            }
+
+            trapWithin(el, event);
+        };
+
+        const onToggle = (open) => {
+            if (open && !wasOpen) {
+                wasOpen = true;
+                returnTo = document.activeElement;
+                pushDialog(el);
+                document.addEventListener('keydown', onKeyDown, true);
+                focusWhenShown(el, () => wasOpen);
+
+                return;
+            }
+
+            if (! open && wasOpen) {
+                wasOpen = false;
+                document.removeEventListener('keydown', onKeyDown, true);
+                popDialog(el);
+
+                /* Back where the person was standing, provided that spot still exists. It does
+                   not after a save redraws the row that opened the dialog. */
+                if (returnTo && document.contains(returnTo)) {
+                    returnTo.focus();
+                }
+
+                returnTo = null;
+            }
+        };
+
+        effect(() => read(onToggle));
+
+        cleanup(() => {
+            document.removeEventListener('keydown', onKeyDown, true);
+
+            if (wasOpen) {
+                wasOpen = false;
+                popDialog(el);
+            }
+        });
+    });
+
+    /* One ask, in this design's words.
+     *
+     * Three tabs, three confirm idioms: a browser confirm() written inline in an onsubmit, another
+     * inside Alpine, and Livewire's wire:confirm, which the bundle resolves to window.confirm as
+     * well. All three are blocking, none of them read as this product, and on a phone they are a
+     * system sheet over a form the person was mid-way through.
+     *
+     * `adminConfirm({...})` answers the same question in the desk's own panel and resolves to a
+     * boolean. Forms use it without any JavaScript of their own by carrying `data-confirm`, and
+     * Livewire islands can drop wire:confirm for the same helper, so one screen asks one way. */
+    Alpine.store('adminConfirm', {
+        open: false,
+        title: '',
+        message: '',
+        confirmLabel: '',
+        cancelLabel: '',
+        danger: false,
+        answer: null,
+
+        /**
+         * @param {{title: string, message: string, confirm?: string, cancel?: string, danger?: boolean}} ask
+         * @param {(proceed: boolean) => void} resolve
+         */
+        ask(ask, resolve) {
+            this.title = ask.title;
+            this.message = ask.message;
+            this.confirmLabel = ask.confirm || 'Continue';
+            this.cancelLabel = ask.cancel || 'Cancel';
+            this.danger = Boolean(ask.danger);
+            this.answer = resolve;
+            this.open = true;
+        },
+
+        /**
+         * @param {boolean} proceed
+         */
+        settle(proceed) {
+            if (! this.open) {
+                return;
+            }
+
+            const answer = this.answer;
+
+            this.open = false;
+            this.answer = null;
+
+            if (answer) {
+                answer(Boolean(proceed));
+            }
+        },
+    });
+
+    /**
+     * Ask the person before an action runs.
+     *
+     * @param {{title: string, message: string, confirm?: string, cancel?: string, danger?: boolean}} ask
+     * @returns {Promise<boolean>}
+     */
+    window.adminConfirm = (ask) => new Promise((resolve) => {
+        const store = Alpine.store('adminConfirm');
+
+        /* A second ask over an unanswered one would strand the first promise. The newest question
+           is the one on screen, so the older one resolves as a refusal rather than hanging. */
+        store.settle(false);
+        store.ask(ask, resolve);
+    });
+
+    /* A question answered against a page that has already gone is not answerable.
+     *
+     * The store outlives the panel: `adminConfirm` lives on the module, while the dialog asking it
+     * is re-rendered by every navigation. Without this, a person who navigated away from "Remove
+     * this passkey" while it was still open would arrive somewhere else with the same question on
+     * screen, and pressing Yes would call `$wire.deletePasskey()` on a component that no longer
+     * exists. Settling as a refusal also releases the caller's promise, which nothing else can do
+     * once its island is gone. */
+    document.addEventListener('livewire:navigated', () => {
+        Alpine.store('adminConfirm').settle(false);
+    });
+
+    /* The declarative half: a form that has to be confirmed before it may submit.
+     *
+     * Held on the capture phase so it runs before the browser starts the navigation, and marked
+     * on the element rather than in a WeakMap because a re-render can hand us a new node for the
+     * same form. */
+    document.addEventListener(
+        'submit',
+        (event) => {
+            const form = event.target;
+
+            if (! form || ! form.matches || ! form.matches('form[data-confirm]') || form.dataset.confirmed === '1') {
+                return;
+            }
+
+            event.preventDefault();
+
+            const proceed = async () => {
+                const yes = await window.adminConfirm({
+                    title: form.dataset.confirmTitle || 'Confirm this',
+                    message: form.dataset.confirm,
+                    confirm: form.dataset.confirmYes || 'Continue',
+                    danger: form.dataset.confirmDanger === '1',
+                });
+
+                if (! yes) {
+                    return;
+                }
+
+                form.dataset.confirmed = '1';
+
+                /* requestSubmit() would run the validation the browser already ran and then be
+                   intercepted by this same listener; the flag stops the loop either way. */
+                form.submit();
+            };
+
+            proceed();
+        },
+        true,
+    );
 
     // Types whose editors host nested block lists; they cannot be added inside a nested list.
     const NESTING_TYPES = ['columns', 'tabs', 'carousel'];
@@ -2789,3 +3135,228 @@ document.addEventListener('alpine:initialized', () => {
         store.boot();
     }
 });
+
+/* ============================================================
+   THE DAY DESK — /dashboard
+   ------------------------------------------------------------
+   One module, one clock. It does three things and nothing else: it advances the
+   now line and the masthead clock from the real time, it rolls a figure up when
+   its section is first read, and it lets each section and each span arrive.
+   Everything it touches is already correct in the HTML the server sent, so a
+   page without JavaScript is a complete page, and `prefers-reduced-motion` never
+   starts the loop at all.
+
+   The engine this project would normally reach for is GSAP, and GSAP is
+   deliberately not installed: one page is not worth a dependency in the bundle
+   and the deploy. The rule that engine exists to enforce is kept anyway — there
+   is exactly one rAF loop here, it is the only clock, and it stops when the desk
+   leaves the page.
+   ============================================================ */
+
+const deskPrefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const deskPad = (value) => String(value).padStart(2, '0');
+
+/**
+ * The clock text, in whichever of the two shapes the app's own format uses:
+ * 24-hour, or 12-hour with a meridiem and a padded hour, which is what a PHP
+ * 'h:i A' prints. Takes a minute of the day and gives back what a visitor reads.
+ */
+function deskClockText(minuteOfDay, use24) {
+    const total = Math.max(0, Math.floor(minuteOfDay)) % 1440;
+    const hour = Math.floor(total / 60);
+    const minute = total % 60;
+
+    if (use24) {
+        return `${deskPad(hour)}:${deskPad(minute)}`;
+    }
+
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    const twelve = hour % 12 === 0 ? 12 : hour % 12;
+
+    return `${deskPad(twelve)}:${deskPad(minute)} ${suffix}`;
+}
+
+/**
+ * Start the desk over the page currently in the shell.
+ *
+ * @returns {Function|null} what to undo when the desk navigates away
+ */
+function bootDayDesk() {
+    const root = document.querySelector('[data-dash]');
+
+    if (! root) {
+        return null;
+    }
+
+    if (deskPrefersReduced()) {
+        /* The server has already placed the line, chosen the day's state and
+           written every figure. Under reduced motion that is the page, and it
+           stays the page: no loop, nothing hidden waiting to be shown. */
+        return null;
+    }
+
+    const rail = root.querySelector('[data-dash-rail]');
+    const daybar = root.querySelector('[data-dash-daybar]');
+    const clocks = [...root.querySelectorAll('[data-dash-clock]')];
+    const state = root.querySelector('[data-dash-state]');
+    const reveals = [...root.querySelectorAll('[data-dash-reveal]')];
+    const scroller = document.querySelector('main.admin-main');
+
+    const openMinute = Number.parseFloat(root.dataset.openMinute ?? '');
+    const windowMinutes = Number.parseFloat(root.dataset.windowMinutes ?? '');
+    const renderMinute = Number.parseFloat(root.dataset.renderMinute ?? '');
+    const renderEpoch = Number.parseInt(root.dataset.renderEpoch ?? '', 10);
+    const use24 = root.dataset.clockFormat === '24';
+    const timed = Number.isFinite(openMinute) && Number.isFinite(windowMinutes)
+        && Number.isFinite(renderMinute) && Number.isFinite(renderEpoch) && windowMinutes > 0;
+
+    root.setAttribute('data-dash-ready', '');
+
+    let lastMinute = -1;
+    let lastFraction = null;
+    let lastPhase = null;
+    let handle = 0;
+
+    const clockAt = (epoch) => {
+        const minute = renderMinute + (epoch - renderEpoch) / 60_000;
+
+        return {
+            minute,
+            fraction: Math.min(1, Math.max(0, (minute - openMinute) / windowMinutes)),
+            phase: minute < openMinute ? 'before' : (minute > openMinute + windowMinutes ? 'after' : 'in'),
+        };
+    };
+
+    const frame = () => {
+        const epoch = Date.now();
+
+        if (timed) {
+            const now = clockAt(epoch);
+
+            if (Math.floor(now.minute) !== lastMinute) {
+                lastMinute = Math.floor(now.minute);
+
+                const text = deskClockText(now.minute, use24);
+                const iso = new Date(epoch).toISOString();
+
+                clocks.forEach((element) => {
+                    element.textContent = text;
+                    element.setAttribute('datetime', iso);
+                });
+            }
+
+            if (state && now.phase !== lastPhase) {
+                lastPhase = now.phase;
+                state.textContent = state.dataset[`label${now.phase.charAt(0).toUpperCase()}${now.phase.slice(1)}`] ?? state.textContent;
+            }
+
+            /* Sub-minute precision: the day is genuinely moving, even where an eye
+               cannot follow it. The line is placed by `left` off a custom property,
+               which changes about once a minute and never per frame. */
+            if (Math.abs(now.fraction - (lastFraction ?? -1)) > 0.00008) {
+                lastFraction = now.fraction;
+
+                const value = now.fraction.toFixed(5);
+                rail?.style.setProperty('--nowf', value);
+                daybar?.style.setProperty('--nowf', value);
+            }
+        }
+
+        // The only thing that changes after the paint is the minute, and the minute
+        // only changes once a minute. With no clock to keep there is no loop to run.
+        if (! timed) {
+            handle = 0;
+
+            return;
+        }
+
+        handle = window.requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+        if (! handle) {
+            handle = window.requestAnimationFrame(frame);
+        }
+    };
+
+    const settle = (spans) => {
+        spans.forEach((span, index) => {
+            // Spans are laid in the order they happen, which is the order they are set.
+            const delay = Math.min(index * 40, 240);
+
+            span.style.transitionDelay = `${delay}ms`;
+            span.classList.add('is-set');
+
+            // The delay belongs to the settle only. Left in place it would also
+            // hold up every hover for the rest of the visit, and feedback that
+            // arrives 240ms late is not feedback.
+            window.setTimeout(() => {
+                span.style.transitionDelay = '';
+            }, delay + 400);
+        });
+    };
+
+    const show = (section) => {
+        if (section.classList.contains('is-in')) {
+            return;
+        }
+
+        section.classList.add('is-in');
+        settle([...section.querySelectorAll('.hb-span')]);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (! entry.isIntersecting) {
+                return;
+            }
+
+            show(entry.target);
+            observer.unobserve(entry.target);
+        });
+    }, {
+        root: scroller || null,
+        rootMargin: '0px 0px -6% 0px',
+        threshold: 0.08,
+    });
+
+    reveals.forEach((section) => observer.observe(section));
+
+    /* The observer only fires on a change of intersection, so whatever is already
+       in view when the desk arrives would wait for a scroll to appear. One pass,
+       after the first paint, says otherwise. */
+    window.setTimeout(() => {
+        reveals.forEach((section) => {
+            if (section.getBoundingClientRect().top < window.innerHeight - 24) {
+                show(section);
+                observer.unobserve(section);
+            }
+        });
+    }, 80);
+
+    start();
+
+    return () => {
+        if (handle) {
+            window.cancelAnimationFrame(handle);
+            handle = 0;
+        }
+
+        observer.disconnect();
+        root.removeAttribute('data-dash-ready');
+    };
+}
+
+let deskTeardown = null;
+
+function deskRefresh() {
+    if (typeof deskTeardown === 'function') {
+        deskTeardown();
+    }
+
+    deskTeardown = bootDayDesk();
+}
+
+document.addEventListener('DOMContentLoaded', deskRefresh);
+document.addEventListener('livewire:navigated', () => window.setTimeout(deskRefresh, 0));

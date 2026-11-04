@@ -5,10 +5,19 @@
 - [Dockerfile](file://Dockerfile)
 - [docker-compose.yml](file://docker-compose.yml)
 - [.dockerignore](file://.dockerignore)
+- [gitignore](file://.gitignore)
+- [storage/framework/.gitignore](file://storage/framework/.gitignore)
 - [docker/entrypoint.sh](file://docker/entrypoint.sh)
 - [docker/nginx.conf](file://docker/nginx.conf)
 - [docker/supervisord.conf](file://docker/supervisord.conf)
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Updated the Data Persistence Strategies section to reflect centralized Livewire view cache management through root `.gitignore` and `storage/framework/.gitignore`
+- Revised Development Versus Production Container Configuration to address containerized development behavior for Livewire view cache files
+- Enhanced Build Optimization Strategies with specific guidance on Livewire view cache handling
+- Added targeted troubleshooting information for Livewire view cache issues in containers
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -368,12 +377,15 @@ The current configuration targets production behavior:
 - Dependencies are installed without development packages.
 - Frontend assets are prebuilt.
 
+**Updated** Livewire view cache management has been centralized through the root `.gitignore` and `storage/framework/.gitignore`, eliminating the need for per-directory ignore rules under `storage/framework/views/livewire/`. This change simplifies containerized development setup and ensures consistent treatment of Livewire view cache files across all environments.
+
 Development recommendations:
 - Override `APP_ENV` and `APP_DEBUG` through a local `.env` or compose override file.
 - Mount source code for live reload during development.
 - Mount development caches separately.
 - Publish development ports selectively.
 - Enable verbose logging temporarily while diagnosing issues.
+- Be aware that Livewire view cache files in `storage/framework/views/` are now governed by the root `.gitignore` and `storage/framework/.gitignore` rules rather than per-directory ignore files.
 
 Production recommendations:
 - Keep debug mode disabled.
@@ -382,7 +394,9 @@ Production recommendations:
 - Use read-only root filesystem where possible.
 - Restrict resource limits and capabilities.
 
-[No sources needed since this section provides general guidance]
+**Section sources**
+- [gitignore:1-78](file://.gitignore#L1-L78)
+- [storage/framework/.gitignore:1-10](file://storage/framework/.gitignore#L1-L10)
 
 ### Container Networking Patterns
 - Internal service-to-service communication uses Compose DNS names.
@@ -401,14 +415,18 @@ Best practices:
 Current persistence:
 - MySQL data is persisted through a named volume.
 
+**Updated** Livewire view cache files are now managed centrally through the root `.gitignore` and `storage/framework/.gitignore`, replacing the previous per-directory approach under `storage/framework/views/livewire/`. The `storage/framework/.gitignore` file specifically excludes the entire `framework/views` directory, which encompasses Livewire view cache files along with other compiled view templates.
+
 Application data considerations:
 - Uploaded media, cache, sessions, and logs reside inside the container filesystem by default.
 - For stateless deployments, move uploads to object storage and configure Laravel accordingly.
 - For shared cache or session backends, use Redis or another external service.
 - When binding application storage directories to host volumes, ensure consistent permissions.
+- Livewire view cache files in `storage/framework/views/` should be treated as ephemeral container artifacts that are regenerated as needed by the application.
 
 **Section sources**
 - [docker-compose.yml:1-31](file://docker-compose.yml#L1-L31)
+- [storage/framework/.gitignore:1-10](file://storage/framework/.gitignore#L1-L10)
 
 ### Inter-Service Communication
 - The app service depends on MySQL availability.
@@ -438,6 +456,8 @@ The Dockerfile and ignore list optimize builds through:
 - Ignore rules:
   - Excludes `.git`, `node_modules`, `.env`, logs, IDE files, generated build outputs, and cached framework artifacts.
 
+**Updated** Livewire view cache management is now handled through centralized `.gitignore` rules rather than per-directory ignore files, simplifying the build process and ensuring consistent behavior across development and production environments.
+
 ```mermaid
 flowchart TD
     Start(["Docker Build"]) --> Ignore[".dockerignore applied"]
@@ -455,6 +475,8 @@ flowchart TD
 **Section sources**
 - [Dockerfile:1-32](file://Dockerfile#L1-L32)
 - [.dockerignore:1-21](file://.dockerignore#L1-L21)
+- [gitignore:1-78](file://.gitignore#L1-L78)
+- [storage/framework/.gitignore:1-10](file://storage/framework/.gitignore#L1-L10)
 
 ### Security Best Practices
 - Use minimal Alpine-based images.
@@ -539,18 +561,25 @@ Potential risks:
 | Database connection refused | MySQL service not available | Check compose service status and network connectivity |
 | Queue jobs not processed | Queue worker disabled or failed | Verify `RUN_QUEUE=true` and inspect queue worker logs |
 | Scheduled tasks not running | Scheduler disabled | Verify `RUN_SCHEDULER=true` and inspect scheduler logs |
+| Livewire components not rendering properly | View cache corruption or permission issues | Clear `storage/framework/views/` cache and verify `www-data` ownership |
+
+**Updated** Added Livewire component rendering issue to address view cache problems that may occur due to the centralized cache management approach.
 
 ### Debugging Techniques
 - View container logs:
-  - Use the orchestrator’s log viewer or stream stdout/stderr.
+  - Use the orchestrator's log viewer or stream stdout/stderr.
 - Inspect running processes:
-  - Use Supervisor’s RPC interface or shell access to check process states.
+  - Use Supervisor's RPC interface or shell access to check process states.
 - Test database connectivity:
   - Connect from the app container to the database service using the configured hostname and credentials.
 - Validate Nginx routing:
   - Request a known route and confirm PHP-FPM receives the request.
 - Temporary shell access:
   - Open a shell inside the running container to inspect configuration and logs.
+- Livewire view cache debugging:
+  - Check `storage/framework/views/` directory permissions and ownership.
+  - Verify that view cache files are being generated correctly.
+  - Clear view cache if components fail to render after deployment.
 
 **Section sources**
 - [docker/entrypoint.sh:1-20](file://docker/entrypoint.sh#L1-L20)
@@ -567,7 +596,7 @@ Recommended improvements:
 [No sources needed since this section provides general guidance]
 
 ## Conclusion
-Highblossom’s containerization centers around a single production-ready image that runs Nginx, PHP-FPM, a queue worker, and a scheduler under Supervisor. The compose stack adds MySQL with persistent storage. The design emphasizes simplicity, predictable process management, and clean separation between build-time and runtime concerns. For production, replace hard-coded secrets, add health checks, externalize stateful data, and apply platform-level security controls.
+Highblossom's containerization centers around a single production-ready image that runs Nginx, PHP-FPM, a queue worker, and a scheduler under Supervisor. The compose stack adds MySQL with persistent storage. The design emphasizes simplicity, predictable process management, and clean separation between build-time and runtime concerns. Recent changes to Livewire view cache management through centralized `.gitignore` rules simplify containerized development while maintaining consistent behavior across environments. For production, replace hard-coded secrets, add health checks, externalize stateful data, and apply platform-level security controls.
 
 [No sources needed since this section summarizes without analyzing specific files]
 
@@ -612,3 +641,15 @@ Highblossom’s containerization centers around a single production-ready image 
 | Kubernetes | Convert compose services to Deployments and Services, use ConfigMaps and Secrets, and add probes |
 
 [No sources needed since this section provides general guidance]
+
+### Livewire View Cache Management
+**Updated** The repository has moved from per-directory `.gitignore` files under `storage/framework/views/livewire/` to centralized ignore rules. This affects containerized development in the following ways:
+
+- **Centralized Control**: Livewire view cache files are now governed by the root `.gitignore` and `storage/framework/.gitignore` rules.
+- **Simplified Setup**: Containerized development no longer requires special handling for Livewire view cache directories.
+- **Consistent Behavior**: All environments treat Livewire view cache files uniformly, whether in development containers, production deployments, or CI/CD pipelines.
+- **Cache Directory Structure**: The `storage/framework/views/` directory (excluding the `livewire` subdirectory from version control) contains compiled view templates including Livewire component views.
+
+**Section sources**
+- [gitignore:1-78](file://.gitignore#L1-L78)
+- [storage/framework/.gitignore:1-10](file://storage/framework/.gitignore#L1-L10)

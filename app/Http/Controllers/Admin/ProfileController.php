@@ -23,6 +23,18 @@ use Laravel\Fortify\Features;
  */
 final class ProfileController extends Controller
 {
+    /**
+     * The groups this page paints, in the order the sheet reads them.
+     *
+     * The view owns the labels; this owns what is a valid `?tab=`. A nonsense value used to
+     * fall back to the first group *inside* the view, which meant a mistyped or stale link
+     * answered 200 with a page titled something else — a soft 404 that no crawler and no
+     * browser history can correct. It now says where it actually took you.
+     *
+     * @var array<int, string>
+     */
+    public const TABS = ['profile', 'appearance', 'security', 'passkeys', 'sessions'];
+
     public function __construct(
         private readonly ProfileService $profileService,
         private readonly UserSessionService $userSessions,
@@ -31,22 +43,39 @@ final class ProfileController extends Controller
     /**
      * Display the profile page with user information and optional QR code.
      *
-     * @return View
+     * @return View|RedirectResponse
      */
     public function index()
     {
         $user = auth()->user();
+
+        // A tab that is not one of the five is not this page. Redirect rather than substitute,
+        // so the address bar, the status code and the title all end up describing the same
+        // thing; the sheet still decides its own first frame from the query, unchanged.
+        $requested = request()->query('tab');
+
+        if (filled($requested) && ! in_array((string) $requested, self::TABS, true)) {
+            return redirect()->route('admin.profile.index', ['tab' => self::TABS[0]]);
+        }
+
         $user->loadMissing('roles');
         $user->loadCount(['bookings', 'bookingEvents', 'inspectionNotes', 'posts']);
         $qrCodeSvg = null;
 
+        /* Setup is unfinished until a code comes back, and a QR is only one of the two ways to get
+           one. The typed key rides along with the picture whenever the picture does, because the
+           person with no second camera is not an edge case — they are on this machine right now. */
+        $manualSetup = null;
+
         if ($user->two_factor_secret && ! $user->two_factor_confirmed_at) {
             $qrCodeSvg = $this->profileService->getTwoFactorQrCodeSvg($user);
+            $manualSetup = $this->profileService->getTwoFactorManualSetup($user);
         }
 
         return view('admin.profile.index', [
             'user' => $user,
             'qrCodeSvg' => $qrCodeSvg,
+            'manualSetup' => $manualSetup,
             'recentBookings' => $user->bookings()->latest()->limit(5)->get(),
             'recentPosts' => $user->posts()->orderByDesc('created_at')->orderByDesc('id')->limit(5)->get(),
             'activeSessions' => $this->userSessions->activeFor($user),

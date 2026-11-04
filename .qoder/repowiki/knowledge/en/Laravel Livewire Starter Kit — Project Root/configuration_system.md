@@ -2,44 +2,56 @@
 
 ## Approach
 
-The application uses Laravel's built-in configuration system. All runtime configuration is defined as PHP arrays under `config/` and values are resolved through the global `env()` helper, which reads from the `.env` file (or environment variables). There is no custom configuration loader — the framework handles loading, caching, and merging.
+The application follows the standard Laravel configuration model: runtime settings live in `config/*.php` files that wrap `env(<KEY>, <default>)` calls, and secret/operational values are supplied via a `.env` file (and per-environment overrides such as `.env.testing`). The application is bootstrapped through `bootstrap/app.php`, which uses `Application::configure(...)->withRouting(...)->withMiddleware(...)->withExceptions(...)->create()` — no custom config loader.
 
-## Key Files and Packages
+In addition to framework-level configuration, the app provides a **runtime-editable environment variable subsystem** so administrators can change certain non-secret `.env` values from the UI without touching the server. This is implemented by `app/Services/EnvEditor.php` and gated behind `App\Services\CompanySettingService::handleEnvUpdate()` plus a `manage environment` permission gate.
 
-- `config/app.php` — core app settings (`APP_NAME`, `APP_ENV`, `APP_DEBUG`, `APP_URL`, `APP_TIMEZONE`, `APP_LOCALE`, `APP_KEY`, `APP_PREVIOUS_KEYS`, maintenance driver/store).
-- `config/database.php` — default MySQL/MariaDB/PostgreSQL/SQL Server/SQLite connections plus Redis `default` and `cache` clusters.
-- `config/mail.php` — mailer transports (`smtp`, `ses`, `postmark`, `resend`, `sendmail`, `log`, `array`) with failover and round-robin groups.
-- `config/services.php` — third-party credentials (Postmark, Resend, SES, Slack) keyed by service name.
-- `config/seo.php` — site metadata, OG/Twitter defaults, AI model settings, static route list.
-- `config/{fortify,auth,sanctum,livewire,session,cache,queue,logging,filesystems,permission,passkeys,auditify,debugbar,decomposer,icons,jobs-monitor,log-viewer,scheduler-list,trace-replay,user-sessions}` — one file per package.
-- `packages/ContentBlocks/config/content-blocks.php` — vendor package configuration (published alongside its source).
+## Key Files
+
+- `bootstrap/app.php` — single entry point configuring routing, middleware aliases, exception rendering; no custom config loading.
+- `config/app.php` — application name, env, debug, URL, timezone, locale, cipher/key, maintenance driver/store.
+- `config/services.php` — third-party service credentials (Postmark, Resend, SES, Slack).
+- `config/{database,mail,filesystems,cache,queue,session,...}.php` — all use `env()` for their transport/connection parameters.
+- `app/Services/EnvEditor.php` — read/write `.env` parser with atomic writes and a strict allowlist of editable keys.
+- `app/Services/SmtpSettingService.php` — dedicated writer for `MAIL_*` variables (uses raw `set()`, not the admin allowlist) and invokes `Artisan::call('config:clear')` after changes.
+- `app/Services/CompanySettingService.php` — orchestrates persisted company settings (`CompanySetting` model) and delegates `.env` edits through `EnvEditor::setEditable()`.
+- `app/Models/CompanySetting.php` (plus its migration `2026_04_17_110000_create_company_settings_table.php`) — database-backed key/value store for business settings distinct from `.env`.
+- `packages/ContentBlocks/config/content-blocks.php` — example of a package providing its own config file.
 
 ## Architecture and Conventions
 
-1. **Single source of truth is a PHP array.** Every file in `config/` returns a plain associative array. No YAML, TOML, or JSON config files are used.
+1. **Two-tier configuration:**
+   - *Deployment secrets* (DB credentials, API keys, `APP_KEY`, etc.) → `.env` / `config/*.php` via `env()`.
+   - *Business/runtime settings* (company name, logo, working hours, hero copy, social links, announcement flag, registration toggle) → `company_settings` table via the `CompanySetting` model and `SettingsManager`.
 
-2. **Environment overrides via `env(key, default)`.** Values that vary per deployment go through `env()`, with sensible defaults hard-coded in the array. Examples:
-   - `database.php`: `'host' => env('DB_HOST', '127.0.0.1')`, `'port' => env('DB_PORT', '3306')`, `'sslmode' => env('DB_SSLMODE', 'prefer')`.
-   - `mail.php`: `'default' => env('MAIL_MAILER', 'log')`, `'url' => env('MAIL_URL')`.
-   - `services.php`: `'key' => env('POSTMARK_API_KEY')`, `'region' => env('AWS_DEFAULT_REGION', 'us-east-1')`.
-   - `app.php`: `'key' => env('APP_KEY')`, `'previous_keys' => [...explode(',', (string) env('APP_PREVIOUS_KEYS', ''))...]`.
+2. **Config access pattern:** code reads through Laravel's `config()` helper or `Config` facade; there is no custom registry. Service classes receive dependencies rather than reaching for config directly, except where a setting is truly global (e.g. `SmtpSettingService::getSettings()`).
 
-3. **Secrets live only in env.** Database passwords, API keys, SMTP credentials, AWS access keys, Slack tokens, Redis auth, and encryption keys are all read via `env()` from `config/*.php`. No secrets are committed in code.
+3. **Runtime `.env` editing is opt-in and allowlisted.** `EnvEditor::SAFE_EDITABLE_KEYS` enumerates the only keys the admin UI may view/edit:
+   ```
+   APP_NAME, APP_URL, APP_TIMEZONE, APP_LOCALE, APP_FAKER_LOCALE, APP_FALLBACK_LOCALE
+   ```
+   `isSafeEditableKey()` additionally allows any key prefixed with `FEATURES_`. Keys like `APP_KEY`, `DB_*`, `REDIS_*`, `MAIL_*`, session/queue drivers are deliberately excluded so they cannot be exposed to the browser or overwritten from untrusted request input.
 
-4. **Per-feature config files, not one monolith.** Each concern gets its own file: `fortify.php`, `sanctum.php`, `livewire.php`, `seo.php`, `permission.php`, `passkeys.php`, etc. This keeps related options grouped while keeping individual files small.
+4. **Atomic `.env` persistence.** `EnvEditor::writeAtomically()` writes to a temp file (`.env.tmp.<random>`) then `rename()`s it over the original under `LOCK_EX`, preventing partial writes.
 
-5. **Nested groupings for complex settings.** Arrays use nested keys to organize related options (e.g., `maintenance.driver`/`maintenance.store`, `redis.default` vs `redis.cache`, `ai.model`/`ai.temperature`/`ai.max_tokens`/`ai.rate_limit`, `static_routes` list).
+5. **Write paths diverge by trust level:**
+   - Untrusted admin UI input → `EnvEditor::setEditable()` (allowlist-checked).
+   - Trusted service code (SMTP editor) → `EnvEditor::set()` (key validated by regex `^[A-Za-z_][A-Za-z0-9_]*$`, but value is never returned to the client).
 
-6. **Vendor packages follow the same pattern.** The `ContentBlocks` package ships its own `config/content-blocks.php` alongside its source, so consumers can publish it into the project's `config/` directory if they need to override defaults.
+6. **Config cache invalidation.** Both `SmtpSettingService::update()` and `CompanySettingService::handleEnvUpdate()` call `Artisan::call('config:clear')` after mutating `.env`, forcing Laravel to re-read the file on the next request.
 
-7. **No feature-flag service.** Feature toggles are not implemented as a separate flag system; instead, behavior is gated on environment values (e.g., `APP_ENV`, `APP_DEBUG`) or database-backed settings (see `CompanySetting` model and `CompanySettingService` / `SmtpSettingService` for runtime-persisted settings).
+7. **Package config convention.** Third-party packages ship their own files under `config/` (e.g. `adminlte`, `auditify`, `fortify`, `livewire`, `passkeys`, `permission`, `seo`, `debugbar`, `log-viewer`, `jobs-monitor`, `scheduler-list`, `trace-replay`, `decomposer`); the project's own code lives in `config/app.php`, `config/services.php`, and `config/session.php`.
 
-8. **Runtime settings stored in DB, not env.** Application-level settings that change without redeploying (SMTP settings, company profile data) are persisted via models (`CompanySetting`, `User`, `Staff`, etc.) and accessed through dedicated services (`CompanySettingService`, `SmtpSettingService`). These are distinct from deploy-time configuration in `config/`.
+8. **Feature flags via `FEATURES_*` prefix.** The allowlist explicitly whitelists `FEATURES_*` keys, giving teams a namespaced way to toggle capabilities at runtime without adding new entries to `SAFE_EDITABLE_KEYS`.
 
-## Constraints and Rules
+## Conventions and Constraints
 
-- **All config values are resolved through `config('file.key')`; raw env calls are avoided in application code.** The `config/` files themselves are the place where `env()` is used.
-- **Deployment-sensitive values must have a default in the config file.** Every `env()` call in `config/*.php` provides a second argument unless the value is intentionally required at boot (e.g., `APP_KEY` has no default, so missing it will fail fast).
-- **Third-party credentials belong in `config/services.php` keyed by service name**, following Laravel convention so packages can discover them via `config('services.<name>.<key>')`.
-- **Package configs should be published, not edited in-place.** Vendor-provided config files (like `ContentBlocks/config/content-blocks.php`) are meant to be copied into the project's `config/` directory for customization.
-- **Runtime-configurable business settings are modeled as Eloquent entities** (e.g., `CompanySetting`, `SeoStaticRoute`) and manipulated via services, never read directly from `env()`.
+- Every deployment secret is referenced exclusively through `env(<KEY>, <default>)` inside a `config/*.php` file — never hard-coded. Across the repo this pattern appears ~357 times in 18 config files.
+- Runtime-editable `.env` keys must be declared in `EnvEditor::SAFE_EDITABLE_KEYS`; anything else is silently dropped by `setEditable()` (enforced by the allowlist check).
+- Arbitrary key names written via `EnvEditor::set()` are rejected by a regex validator; an `InvalidArgumentException` is thrown on invalid identifiers.
+- Values containing whitespace, quotes, `$`, `#`, backticks, or backslashes are quoted when persisted by `EnvEditor::quote()` so dotenv casting remains correct.
+- `.env` mutations are performed atomically via a temp file + rename under exclusive lock — no partial `.env` state is possible.
+- Changes to `.env` always trigger `config:clear` so newly written values take effect immediately.
+- Secrets (`APP_KEY`, `DB_*`, `REDIS_*`, `MAIL_*`, session/queue drivers) are excluded from the admin allowlist and never rendered by `displayable()` — enforced by `isSafeEditableKey()`.
+- Company-wide business settings are persisted to the `company_settings` table, not to `.env`; the two stores are kept separate (documented in `CompanySettingService`'s docblock).
+- Package configuration files follow Laravel's convention of one PHP file per package under `config/`, returning an associative array.

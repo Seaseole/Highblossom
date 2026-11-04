@@ -1,76 +1,58 @@
-## Overview
+## What system/approach is used
 
-The application uses Laravel's built-in logging system, which is a thin wrapper around **Monolog**. All log output is configured via `config/logging.php` and consumed through the `Illuminate\Support\Facades\Log` facade. A secondary integration — **Opcodes\LogViewer** (`config/log-viewer.php`) — provides a browser-based admin UI for browsing the same log files.
+The application uses Laravel's built-in logging facade backed by **Monolog**. There is no custom logger wrapper or framework — code calls `Log::info()` / `error()` / `warning()` / `debug()` / `notice()` directly (or `$this->info()`/`$this->warn()` on console commands). A third-party UI, **Opcodes\LogViewer**, is installed to browse log files from the browser under `admin/log-viewer`, gated behind auth.
 
-## Configuration & Sinks
+## Key files and packages
 
-`config/logging.php` defines:
+- `config/logging.php` — defines channels and the default stack.
+- `config/log-viewer.php` — configures the Opcodes Log Viewer package (`route_path => 'admin/log-viewer'`, `require_auth_in_production => true`).
+- `storage/logs/laravel.log` — primary file sink for the `single` channel.
+- Console commands under `app/Console/Commands/*` use `$this->info()` / `$this->warn()` / `$this->error()` for human-readable CLI output.
 
-- **Default channel**: `stack` (controlled by `LOG_CHANNEL`).
-- **Stack channel**: fans out to channels listed in `LOG_STACK`, defaulting to `single,slack`.
-- **`single` channel**: writes to `storage_path('logs/laravel.log')` at `LOG_LEVEL` (default `debug`), with placeholder replacement enabled.
-- **`daily` channel**: same file path as `single`, rotated after `LOG_DAILY_DAYS` (default 14).
-- **`slack` channel**: sends `critical`-level messages to `SLACK_WEBHOOK_URL`; username/emoji are configurable.
-- **`papertrail` channel**: Monolog `SyslogUdpHandler` targeting `PAPERTRAIL_URL:PORT` with `PsrLogMessageProcessor`.
-- **`stderr` channel**: `StreamHandler` on `php://stderr`, also using `PsrLogMessageProcessor` and an optional `LOG_STDERR_FORMATTER`.
-- **`syslog` / `errorlog` / `null` / `emergency`** fallback channels.
-- Deprecation logging is routed to `null` by default (`LOG_DEPRECATIONS_CHANNEL=null`, `LOG_DEPRECATIONS_TRACE=false`).
+## Architecture and conventions
 
-The stack's `ignore_exceptions => true` ensures that a failing sink does not break request handling.
+### Channel configuration (`config/logging.php`)
 
-## Usage Conventions
+- Default channel: `stack` (a Monolog handler stack).
+- The stack composes channels via `LOG_STACK` env var, which defaults to `single,slack` — every log goes to both a file and Slack.
+- Available channels:
+  - `single`: writes to `storage_path('logs/laravel.log')` at level `debug` (env `LOG_LEVEL`).
+  - `daily`: same path, rotated after `LOG_DAILY_DAYS` (default 14).
+  - `slack`: sends messages at `critical` level (env `LOG_SLACK_LEVEL`) to `SLACK_WEBHOOK_URL`; username emoji come from `LOG_SLACK_USERNAME` / `LOG_SLACK_EMOJI`.
+  - `papertrail`: Monolog `SyslogUdpHandler` configured via `PAPERTRAIL_URL` / `PAPERTRAIL_PORT`.
+  - `stderr`: `StreamHandler` writing to `php://stderr` with optional `LOG_STDERR_FORMATTER`.
+  - `syslog`, `errorlog`, `null` as fallbacks.
+- Deprecations are disabled (`deprecations.channel => null`).
+- All file-based channels set `replace_placeholders => true` so Laravel string placeholders are expanded before being sent to Monolog.
+- Both `papertrail` and `stderr` attach `Monolog\Processor\PsrLogMessageProcessor` to normalize PSR-3 context into structured fields.
 
-Across the codebase, logging is done exclusively via `Log::info()` / `Log::warning()` / `Log::error()` from `Illuminate\Support\Facades\Log`. There are no direct `Monolog\Logger` instantiations in application code. The observed patterns are:
+### Log levels
 
-- **Error context**: errors include `$e->getMessage()` concatenated into the message string; structured arrays are used sparingly (e.g. `[reason => $e->getMessage()]`, `['host' => ...]`).
-- **Warning level**: non-fatal failures such as skipped hero variants, unreadable policy settings, oEmbed resolution failures, and failed image deletions are logged at `warning`.
-- **Debug level**: URL-resolution tracing in `VideoSourceDetector`.
-- **Info level**: operational milestones like session pruning completion.
+- Application-level minimum level is controlled by `LOG_LEVEL` (defaults to `debug`).
+- Slack alerts are elevated to `critical` by default (`LOG_SLACK_LEVEL`).
+- Console command output uses standard Artisan helpers (`$this->info()`, `$this->warn()`, `$this->error()`) rather than the `Log` facade; these do not go through the Monolog channels but render to the terminal.
 
-No custom logger service or PSR-3 logger interface is injected; callers depend directly on the `Log` facade.
+### Structured fields
 
-## Structured Fields
+There is no custom formatter or processor in this repo. Structured fields rely on Monolog's default behavior plus the `PsrLogMessageProcessor` attached to the `papertrail` and `stderr` channels. Context arrays passed to `Log::info('message', $context)` become key/value pairs in the underlying Monolog record.
 
-Structured field usage is minimal and ad-hoc. Where present, it takes the form of associative arrays passed as the second argument to `Log::warning()` / `Log::error()`, e.g.:
+### Log viewer
 
-```php
-Log::warning('Discarding unreadable system overview cache entry', [
-    'cache_key' => $key,
-]);
-Log::error('Settings mail_mailer missing', ['host' => $settings['mail_host']]);
-```
+- Opcodes Log Viewer is enabled by default (`LOG_VIEWER_ENABLED=true`).
+- Route is `admin/log-viewer` and requires authentication in production (`require_auth_in_production => true`).
+- It scans `include_files` patterns (`*.log`, `**/*.log`, plus several OS-specific paths) and can be extended to aggregate external logs (Apache/Nginx/Postgres/etc.).
 
-There is no central schema for log fields, no dedicated `Context` class, and no monolog processor adding contextual metadata beyond the bundled `PsrLogMessageProcessor` applied to `papertrail` and `stderr` channels.
+### Conventions observed
 
-## Log Levels Strategy
+- Business logic does not import `Illuminate\Support\Facades\Log` explicitly in the files scanned; most call sites appear to rely on the global `Log` facade alias.
+- Console commands consistently use Artisan's `$this->info()` / `$this->warn()` / `$this->error()` helpers for user-facing output instead of `Log::info()`.
+- Error reporting in business code uses `Log::error()` (and occasionally `Log::warning()`); success/debug traces use `Log::info()` / `Log::debug()`.
+- No custom log levels beyond Monolog's built-in ones are defined.
+- No custom middleware, exception-to-log transformation, or audit logger is present in this repository (audit tables exist in migrations but are separate from the runtime logging pipeline).
 
-Levels are chosen descriptively rather than enforced by type-level rules:
-- `debug`: diagnostic traces (e.g. Facebook share URL resolution).
-- `info`: successful but noteworthy operations (session prune completion).
-- `warning`: recoverable problems (file deletion failure, unreadable config, oEmbed failure).
-- `error`: operation-ending failures (image/video processing exceptions, SMTP misconfiguration).
-- `critical` (via Slack): reserved for severe conditions sent to Slack.
+### Rules enforced by configuration
 
-## Routing & Viewing
-
-- Production logs land in `storage/logs/laravel.log` (or split per-day under `storage/logs/`).
-- Slack delivers `critical` alerts via webhook.
-- Optional Papertrail integration ships over UDP/TLS.
-- `Opcodes\LogViewer` is enabled by default (`LOG_VIEWER_ENABLED=true`) and exposed at route path `admin/log-viewer` under the `web` + `AuthorizeLogViewer` middleware. It reads the same `*.log` files and can aggregate additional paths (Apache/Nginx/PHP-FPM/Postgres/Redis/Supervisor) via `include_files`.
-- `require_auth_in_production = true` gates access.
-
-## Key Files
-
-- `config/logging.php` — channel definitions, sinks, processors.
-- `config/log-viewer.php` — Opcodes Log Viewer configuration.
-- `storage/logs/laravel.log` — primary log file.
-- Application call sites scattered across `app/Services/*`, `app/Actions/*`, `app/Livewire/*`, `app/Listeners/*`, `packages/ContentBlocks/src/Services/*` (29 files use `Log::`).
-
-## Rules Enforced by the Code
-
-- Default log channel is `stack` unless overridden by `LOG_CHANNEL`.
-- Default stack includes both `single` and `slack`; changing `LOG_STACK` rewrites the fan-out set.
-- Slack only emits at `critical` unless `LOG_SLACK_LEVEL` is changed.
-- Daily rotation defaults to 14 days via `LOG_DAILY_DAYS`.
-- Deprecation logs are suppressed by default (`LOG_DEPRECATIONS_CHANNEL=null`).
-- Log Viewer requires authentication in production (`require_auth_in_production = true`) and is mounted at `admin/log-viewer`.
+- Every log message is written to the channels listed in `LOG_STACK` (default `single,slack`) because `default => env('LOG_CHANNEL', 'stack')` selects the stack.
+- Slack notifications only fire at `critical` level unless overridden by `LOG_SLACK_LEVEL`.
+- File rotation defaults to 14 days when using the `daily` channel.
+- The Log Viewer UI is protected by its own `AuthorizeLogViewer` middleware and cannot be accessed without passing that authorization gate.

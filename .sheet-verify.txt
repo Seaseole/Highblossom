@@ -1,0 +1,41 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CinematicHeroTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe homepage keeps the classic hero until a slide exists[39m[90m                                                    [39m [90m1.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised stored style reads as the classic hero[39m[90m                                                      [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma configured slide renders its layers with one heading and the word hidden[39m[90m                                  [39m [90m1.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly the first slide is fetched with the html[39m[90m                                                               [39m [90m1.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a wide source encodes the missing widths and leaves the top slot alone[39m[90m                               [39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma source narrower than the ladder is never upscaled[39m[90m                                                         [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe generated widths are offered to the browser with explicit dimensions[39m[90m                                    [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a photograph leaves its derived widths behind[39m[90m                                                     [39m [90m1.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command rebuilds widths a deploy left behind[39m[90m                                                            [39m [90m0.78s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe command stays quiet when the homepage is not using the card[39m[90m                                             [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout that is a different shape is rejected on the field it belongs to[39m[90m                                   [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma cutout of the same shape is kept and resized without being cropped[39m[90m                                        [39m [90m0.97s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a photograph is refused rather than dropped silently[39m[90m                                        [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide without a description is refused[39m[90m                                                                    [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma seventh slide is refused[39m[90m                                                                                  [39m [90m0.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mderived paths come from the photograph never from the request[39m[90m                                               [39m [90m0.80s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe placeholder colour is only ever a hex triplet[39m[90m                                                           [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma real photograph yields a real placeholder colour[39m[90m                                                          [39m [90m0.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90man emptied repeater clears the deck and an absent one leaves it alone[39m[90m                                       [39m [90m0.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe carousel advances itself by default[39m[90m                                                                     [39m [90m1.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe autoplay switch reaches the markup[39m[90m                                                                      [39m [90m1.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe counter row is split into a number and a suffix[39m[90m                                                         [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mno counters are configured until an admin types them[39m[90m                                                        [39m [90m0.63s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma slide with no optional parts hides every one of them[39m[90m                                                      [39m [90m0.62s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe preview and progress controls appear once there is something to advance[39m[90m                                 [39m [90m1.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings screen offers the hero controls to an account that manages settings[39m[90m                            [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe button defaults are saved as plain settings[39m[90m                                                             [39m [90m0.26s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Settings\EnableRegistrationSettingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe settings form renders the registration toggle in the general tab[39m[90m                                        [39m [90m0.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe registration toggle is not in the environment tab[39m[90m                                                       [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe registration toggle is checked when the setting is on[39m[90m                                                   [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling the toggle persists a boolean[39m[90m                                                                      [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling the toggle closes registration[39m[90m                                                                    [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration is closed when the setting row is absent[39m[90m                                                       [39m [90m0.06s[39m  
+
+  [90mTests:[39m    [32;1m33 passed[39;22m[90m (118 assertions)[39m
+  [90mDuration:[39m [39m21.41s[39m
+

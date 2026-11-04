@@ -37,11 +37,38 @@
             ])
             ->values()
             ->all();
+
+        // The groups of the sheet, in the order the page reads them. Declared once here rather
+        // than inside the markup so the rail, the field count in the masthead and the hidden
+        // `tab` value the controller reads back all come from the same list.
+        $tabs = [
+            'general' => 'General',
+            'hours' => 'Hours',
+            'assets' => 'Branding',
+            'homepage' => 'Homepage',
+            'localization' => 'Locale',
+            'social' => 'Social',
+            'notifications' => 'Notifications',
+            'announcements' => 'Announcements',
+        ] + ($envConfig !== [] ? ['system_config' => 'System Config'] : []);
+
+        // Which group the server is about to paint. Every pane carries an inline `display: none`
+        // except this one, because Alpine's `x-show` only exists once Alpine boots — and a sheet
+        // that arrives blank and then reveals itself is where a 0.58 cumulative layout shift comes
+        // from. Deciding it here means the first frame is the finished frame, with or without JS.
+        // An unknown group falls back to the first one rather than painting nothing at all.
+        $requestedTab = (string) request()->query('tab', 'general');
+        $activeTab = array_key_exists($requestedTab, $tabs) ? $requestedTab : 'general';
+
+        // When the shop last set any of this. A real column on a real row, not a timer: the
+        // bench says what is on the table, so it also says when the table was last cleared.
+        $lastSetAt = \App\Models\CompanySetting::query()->max('updated_at');
+        $lastSet = filled($lastSetAt) ? \Carbon\Carbon::parse($lastSetAt) : null;
     @endphp
     <div
-        class="mx-auto max-w-5xl space-y-10 py-6 sm:py-10"
+        class="hb-sheet mx-auto max-w-[82rem] space-y-5 py-6 sm:py-8"
         x-data="{
-        tab: '{{ request()->query('tab', 'general') }}',
+        tab: '{{ $activeTab }}',
         whatsappNumbers: {{ \Illuminate\Support\Js::from($settings['whatsapp_additional_numbers'] ?? []) }},
         workingHours: {{ \Illuminate\Support\Js::from($settings['working_hours'] ?? []) }},
         announcements: {{ \Illuminate\Support\Js::from($settings['announcements'] ?? []) }},
@@ -55,10 +82,22 @@
         heroDrag: null,
         heroPreview: '{{ $settings['hero_image'] ? media_url($settings['hero_image']) : null }}',
         init() {
+            // The group you are in belongs in the browser tab, not only in the page: this is one
+            // URL with nine groups, and a stack of them in the history is otherwise
+            // indistinguishable. Written on load as well as on change, because a watcher only
+            // fires when something moves and the deep link already knows where you are.
+            const groupLabels = {{ \Illuminate\Support\Js::from($tabs) }};
+            const nameTab = (value) => {
+                document.title = (groupLabels[value] || 'General') + ' - Company Settings - {{ config('app.name', 'Laravel') }}';
+            };
+
+            nameTab(this.tab);
+
             this.$watch('tab', value => {
                 const url = new URL(window.location.href);
                 url.searchParams.set('tab', value);
                 window.history.replaceState({}, '', url.toString());
+                nameTab(value);
             });
         },
         addNumber() { this.whatsappNumbers.push({ label: '', number: '' }); },
@@ -118,441 +157,373 @@
         removeHeroStat(index) { this.heroStats.splice(index, 1); }
     }"
     >
-        <!-- Header -->
-        <div class="space-y-1">
-            <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Company Settings</h1>
-            <p class="text-gray-500 dark:text-gray-400">Manage your business information and dynamic variables.</p>
-        </div>
+        <header class="hb-sheet-head">
+            <div>
+                <h1 class="hb-sheet-title">Company Settings</h1>
+                <p class="hb-sheet-lede">
+                    What the shop is called, when it opens, how long a job holds a bay, and what the
+                    public homepage says about all of it. A value here is only an intention until the
+                    sheet is set, and one press sets the whole of it.
+                </p>
+            </div>
+
+            <dl class="hb-sheet-facts">
+                <div class="hb-sheet-fact">
+                    <dt>Last set</dt>
+                    <dd>
+                        <time
+                            class="hb-num"
+                            datetime="{{ $lastSet?->toIso8601String() }}"
+                            data-at="{{ $lastSet?->toIso8601String() }}"
+                            data-sheet-elapsed
+                        >{{ $lastSet?->format('j M Y') ?? 'not recorded' }}</time>
+                    </dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Groups</dt>
+                    <dd class="hb-num">{{ count($tabs) }}</dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Fields</dt>
+                    <dd class="hb-num" data-sheet-fields></dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Marks</dt>
+                    <dd class="hb-num" data-sheet-total>0</dd>
+                </div>
+            </dl>
+        </header>
 
         <form
             action="{{ route('admin.settings.update') }}"
             method="POST"
             enctype="multipart/form-data"
-            class="space-y-8"
+            data-sheet-form
         >
             @csrf
             @method('PUT')
             <input type="hidden" name="tab" :value="tab" />
 
-            <!-- Tabs Navigation -->
-            <div class="no-scrollbar flex gap-x-5 overflow-x-auto border-b border-gray-200 dark:border-white/10">
-                @foreach ([
-                    'general' => 'General',
-                    'hours' => 'Hours',
-                    'assets' => 'Branding',
-                    'homepage' => 'Homepage',
-                    'localization' => 'Locale',
-                    'social' => 'Social',
-                    'notifications' => 'Notifications',
-                    'announcements' => 'Announcements',
-                ] + ($envConfig !== [] ? ['system_config' => 'System Config'] : []) as $key => $label)
-                    <button
-                        type="button"
-                        @click="tab = '{{ $key }}'"
-                        :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
-                        class="shrink-0 whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors"
-                    >
-                        {{ $label }}
-                    </button>
-                @endforeach
-            </div>
+            <div class="hb-sheet-body">
+                <nav class="hb-index" aria-label="Settings groups">
+                    @foreach ($tabs as $key => $label)
+                        <button
+                            type="button"
+                            class="hb-index-item"
+                            data-sheet-index="{{ $key }}"
+                            @click="tab = '{{ $key }}'"
+                            :aria-current="tab === '{{ $key }}' ? 'true' : 'false'"
+                        >
+                            <span>{{ $label }}</span>
+                            <span class="hb-index-count hb-num" data-sheet-count></span>
+                            <span class="hb-index-mark hb-num" data-sheet-marks hidden></span>
+                        </button>
+                    @endforeach
+                </nav>
 
-            <!-- Tab Contents -->
-            <div class="space-y-8">
-                <!-- General Tab -->
+                <!-- Tab Contents -->
+                <div class="hb-panes">
+                {{-- General Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="general"
                     x-show="tab === 'general'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
+                    @if ($activeTab !== 'general') style="display: none" @endif
                 >
-                    <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">General Information</h3>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Name</label>
-                            <input
-                                type="text"
-                                name="company_name"
-                                value="{{ old('company_name', $settings['company_name']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Logo Text</label>
-                            <input
-                                type="text"
-                                name="logo_text"
-                                value="{{ old('logo_text', $settings['logo_text']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Email</label>
-                            <input
-                                type="email"
-                                name="primary_email"
-                                value="{{ old('primary_email', $settings['primary_email']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Phone</label>
-                            <input
-                                type="text"
-                                name="primary_phone"
-                                value="{{ old('primary_phone', $settings['primary_phone']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Phone</label>
-                            <input
-                                type="text"
-                                name="secondary_phone"
-                                value="{{ old('secondary_phone', $settings['secondary_phone']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                placeholder="+267 ..."
-                            />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Optional second line. Shown on the contact page and in the footer when filled in.
-                            </p>
-                            @error('secondary_phone')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="space-y-2 md:col-span-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Address</label>
-                            <textarea
-                                name="address"
-                                rows="3"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            >{{ old('address', $settings['address']) }}</textarea>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Google Maps API Key</label>
-                            <input
-                                type="text"
-                                name="google_maps_api_key"
-                                value="{{ old('google_maps_api_key', $settings['google_maps_api_key']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                placeholder="AIzaSy..."
-                            />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                This key is sent to every visitor's browser, so restrict it in Google Cloud to your
-                                site domains and the Maps JavaScript API only. Store server-only keys in
-                                <code>.env</code> instead.
-                            </p>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Map Directions Link</label>
-                            <input
-                                type="url"
-                                name="map_directions_link"
-                                value="{{ old('map_directions_link', $settings['map_directions_link']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                placeholder="https://maps.app.goo.gl/..."
-                            />
-                        </div>
-                        <div class="space-y-3 border-t border-gray-100 pt-6 md:col-span-2 dark:border-white/10">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Account Security</label>
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="space-y-1">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">Require verified email addresses</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        When on, users whose email is not verified are sent to the verification page before they can
-                                        access the admin panel or settings. Registration emails a verification link.
-                                    </p>
-                                </div>
-                                <label class="group relative inline-flex shrink-0 cursor-pointer items-center">
-                                    <input type="hidden" name="require_email_verification" value="0" />
-                                    <input
-                                        type="checkbox"
-                                        name="require_email_verification"
-                                        value="1"
-                                        {{ $settings['require_email_verification'] ? 'checked' : '' }}
-                                        class="peer sr-only"
-                                    />
-                                    <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                                    <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Enforce</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="space-y-1">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">Enable registration</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Allow new users to create an account from the site. When off, the register page and
-                                        sign-up links are hidden and direct visits to /register return Not Found.
-                                    </p>
-                                </div>
-                                <label class="group relative inline-flex shrink-0 cursor-pointer items-center">
-                                    <input type="hidden" name="enable_registration" value="0" />
-                                    <input
-                                        type="checkbox"
-                                        name="enable_registration"
-                                        value="1"
-                                        {{ $settings['enable_registration'] ? 'checked' : '' }}
-                                        class="peer sr-only"
-                                    />
-                                    <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                                    <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Allow</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center justify-between gap-4 border-t border-gray-100 pt-5 dark:border-white/10">
-                                <div class="space-y-1">
-                                    <label for="session_idle_timeout_minutes" class="text-sm text-gray-700 dark:text-gray-300">
-                                        Session idle timeout (minutes)
-                                    </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Close a signed-in session after this many minutes without activity, even while it is still
-                                        inside the {{ config('session.lifetime') }}-minute lifetime. Set to 0 to leave the lifetime in
-                                        charge. The hourly prune applies it, so an idle session can outlive this by up to an hour.
-                                    </p>
-                                    @error('session_idle_timeout_minutes')
-                                        <p class="text-xs text-red-500">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                    <x-sheet.block title="General Information" note="These are the words the shop is known by, and the numbers a customer dials.">
+                        <x-sheet.input
+                            label="Business Name"
+                            name="company_name"
+                            key="company_name"
+                            :value="old('company_name', $settings['company_name'])"
+                        />
+                        <x-sheet.input
+                            label="Logo Text"
+                            name="logo_text"
+                            key="logo_text"
+                            hint="Shown beside the mark in the header when there is no image, and in the tab title."
+                            :value="old('logo_text', $settings['logo_text'])"
+                        />
+                        <x-sheet.input
+                            label="Primary Email"
+                            name="primary_email"
+                            key="primary_email"
+                            type="email"
+                            :value="old('primary_email', $settings['primary_email'])"
+                        />
+                        <x-sheet.input
+                            label="Primary Phone"
+                            name="primary_phone"
+                            key="primary_phone"
+                            :value="old('primary_phone', $settings['primary_phone'])"
+                        />
+                        <x-sheet.input
+                            label="Secondary Phone"
+                            name="secondary_phone"
+                            key="secondary_phone"
+                            hint="Optional second line. Shown on the contact page and in the footer when filled in."
+                            placeholder="+267 ..."
+                            :value="old('secondary_phone', $settings['secondary_phone'])"
+                        />
+                        <x-sheet.textarea
+                            label="Business Address"
+                            name="address"
+                            key="address"
+                            :value="old('address', $settings['address'])"
+                        />
+                        <x-sheet.input
+                            label="Google Maps API Key"
+                            name="google_maps_api_key"
+                            key="google_maps_api_key"
+                            placeholder="AIzaSy..."
+                            hint="This key is sent to every visitor's browser, so restrict it in Google Cloud to your site domains and the Maps JavaScript API only. Store server-only keys in .env instead."
+                            :value="old('google_maps_api_key', $settings['google_maps_api_key'])"
+                        />
+                        <x-sheet.input
+                            label="Map Directions Link"
+                            name="map_directions_link"
+                            key="map_directions_link"
+                            type="url"
+                            placeholder="https://maps.app.goo.gl/..."
+                            :value="old('map_directions_link', $settings['map_directions_link'])"
+                        />
+                    </x-sheet.block>
+                    <x-sheet.block title="Account Security" note="Three switches that decide who gets an account, and for how long a session stays open.">
+                        <x-sheet.field
+                            label="Require verified email addresses"
+                            for="require_email_verification"
+                            key="require_email_verification"
+                            hint="When on, users whose email is not verified are sent to the verification page before they can access the admin panel or settings. Registration emails a verification link."
+                        >
+                            <label class="hb-switch">
+                                <input type="hidden" name="require_email_verification" value="0" />
                                 <input
-                                    type="number"
-                                    id="session_idle_timeout_minutes"
-                                    name="session_idle_timeout_minutes"
-                                    min="0"
-                                    max="4320"
-                                    step="1"
-                                    value="{{ old('session_idle_timeout_minutes', $settings['session_idle_timeout_minutes']) }}"
-                                    class="w-24 shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                    type="checkbox"
+                                    id="require_email_verification"
+                                    name="require_email_verification"
+                                    value="1"
+                                    {{ $settings['require_email_verification'] ? 'checked' : '' }}
                                 />
-                            </div>
-                            <div class="flex items-center justify-between gap-4 border-t border-gray-100 pt-5 dark:border-white/10">
-                                <div class="space-y-1">
-                                    <label for="admin_nav_layout" class="text-sm text-gray-700 dark:text-gray-300">
-                                        Default admin layout
-                                    </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Which navigation an account gets before anyone chooses for itself. Anyone who has
-                                        saved a layout on their own profile keeps that choice, and phones and tablets use
-                                        the slide-out menu either way — this only decides the wide screen.
-                                    </p>
-                                    @error('admin_nav_layout')
-                                        <p class="text-xs text-red-500">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                <select
-                                    id="admin_nav_layout"
-                                    name="admin_nav_layout"
-                                    class="w-40 shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                >
-                                    @foreach (\App\Enums\AdminNavLayout::options() as $layout)
-                                        <option
-                                            value="{{ $layout->value }}"
-                                            {{ old('admin_nav_layout', $settings['admin_nav_layout']) === $layout->value ? 'selected' : '' }}
-                                        >{{ $layout->label() }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                                <span class="hb-switch__track" aria-hidden="true"></span>
+                            </label>
+                        </x-sheet.field>
+
+                        <x-sheet.field
+                            label="Enable registration"
+                            for="enable_registration"
+                            key="enable_registration"
+                            hint="Allow new users to create an account from the site. When off, the register page and sign-up links are hidden and direct visits to /register return Not Found."
+                        >
+                            <label class="hb-switch">
+                                <input type="hidden" name="enable_registration" value="0" />
+                                <input
+                                    type="checkbox"
+                                    name="enable_registration"
+                                    value="1"
+                                    {{ $settings['enable_registration'] ? 'checked' : '' }}
+                                    id="enable_registration"
+                                />
+                                <span class="hb-switch__track" aria-hidden="true"></span>
+                            </label>
+                        </x-sheet.field>
+
+                        <x-sheet.field
+                            label="Session idle timeout (minutes)"
+                            for="session_idle_timeout_minutes"
+                            key="session_idle_timeout_minutes"
+                        >
+                            <x-slot:meta>
+                                <p class="hb-field__hint">
+                                    Close a signed-in session after this many minutes without activity, even while it is still
+                                    inside the {{ config('session.lifetime') }}-minute lifetime. Set to 0 to leave the lifetime in
+                                    charge. The hourly prune applies it, so an idle session can outlive this by up to an hour.
+                                </p>
+                            </x-slot:meta>
+                            <input
+                                type="number"
+                                id="session_idle_timeout_minutes"
+                                name="session_idle_timeout_minutes"
+                                min="0"
+                                max="4320"
+                                step="1"
+                                value="{{ old('session_idle_timeout_minutes', $settings['session_idle_timeout_minutes']) }}"
+                                class="hb-input hb-input--num"
+                            />
+                            @error('session_idle_timeout_minutes')
+                                <p class="hb-error">{{ $message }}</p>
+                            @enderror
+                        </x-sheet.field>
+
+                        <x-sheet.field
+                            label="Default admin layout"
+                            for="admin_nav_layout"
+                            key="admin_nav_layout"
+                        >
+                            <x-slot:meta>
+                                <p class="hb-field__hint">
+                                    Which navigation an account gets before anyone chooses for itself. Anyone who has
+                                    saved a layout on their own profile keeps that choice, and phones and tablets use
+                                    the slide-out menu either way — this only decides the wide screen.
+                                </p>
+                            </x-slot:meta>
+                            <select
+                                id="admin_nav_layout"
+                                name="admin_nav_layout"
+                                class="hb-select"
+                                style="max-width: 16rem"
+                            >
+                                @foreach (\App\Enums\AdminNavLayout::options() as $layout)
+                                    <option
+                                        value="{{ $layout->value }}"
+                                        {{ old('admin_nav_layout', $settings['admin_nav_layout']) === $layout->value ? 'selected' : '' }}
+                                    >{{ $layout->label() }}</option>
+                                @endforeach
+                            </select>
+                            @error('admin_nav_layout')
+                                <p class="hb-error">{{ $message }}</p>
+                            @enderror
+                        </x-sheet.field>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Business Hours Tab -->
+                {{-- Business Hours Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="hours"
                     x-show="tab === 'hours'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'hours') style="display: none" @endif
                 >
-                    <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Weekly Business Hours</h3>
-                    <div class="space-y-4">
-                        @php
-                            $days = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
-                        @endphp
-                        @foreach ($days as $key => $label)
-                            <div class="flex flex-col items-start gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-center sm:gap-4">
-                                <div class="sm:w-32">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</label>
-                                </div>
-                                <div class="flex items-center gap-2">
+                    @php
+                        $days = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
+                    @endphp
+
+                    <x-sheet.block title="Weekly Business Hours" note="The week the booking calendar is drawn from. A day with no hours has nothing to offer.">
+                        @foreach ($days as $key => $dayLabel)
+                            <x-sheet.field :label="$dayLabel" :key="'working_hours['.$key.']'">
+                                <div class="hb-cluster hb-cluster--hours">
                                     <x-ui.checkbox
                                         name="working_hours[{{ $key }}][is_closed]"
                                         value="1"
                                         :checked="($settings['working_hours'][$key]['is_closed'] ?? false)"
                                         label="Closed"
                                     />
-                                </div>
-                                <div class="grid w-full flex-1 grid-cols-2 gap-2 sm:w-auto sm:gap-4">
-                                    <input
-                                        type="time"
-                                        name="working_hours[{{ $key }}][open]"
-                                        value="{{ $settings['working_hours'][$key]['open'] ?? '' }}"
-                                        class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
-                                    />
-                                    <input
-                                        type="time"
-                                        name="working_hours[{{ $key }}][close]"
-                                        value="{{ $settings['working_hours'][$key]['close'] ?? '' }}"
-                                        class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/5"
-                                    />
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="mt-8 border-t border-gray-100 pt-6 dark:border-white/5">
-                        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Booking Rules</h3>
-                        <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">
-                            Customers are only offered slots on days that are open above. A day marked Closed shows no slots at all.
-                        </p>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="space-y-2">
-                                <label
-                                    for="booking_lead_time_hours"
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                                >Minimum Booking Notice (hours)</label>
-                                <input
-                                    type="number"
-                                    id="booking_lead_time_hours"
-                                    name="booking_lead_time_hours"
-                                    min="0"
-                                    max="24"
-                                    step="1"
-                                    value="{{ old('booking_lead_time_hours', $settings['booking_lead_time_hours']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    How far ahead of the current time a customer must book. Set to 0 to allow same-day booking up to closing.
-                                </p>
-                                @error('booking_lead_time_hours')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="space-y-2">
-                                <label
-                                    for="booking_slot_interval_minutes"
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                                >Slot Interval (minutes)</label>
-                                <input
-                                    type="number"
-                                    id="booking_slot_interval_minutes"
-                                    name="booking_slot_interval_minutes"
-                                    min="15"
-                                    max="240"
-                                    step="15"
-                                    value="{{ old('booking_slot_interval_minutes', $settings['booking_slot_interval_minutes']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    Gap between the start of one offered time and the next. A job must still finish by closing time.
-                                </p>
-                                @error('booking_slot_interval_minutes')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="space-y-2">
-                                <label
-                                    for="booking_capacity_workshop"
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                                >Workshop Bays</label>
-                                <input
-                                    type="number"
-                                    id="booking_capacity_workshop"
-                                    name="booking_capacity_workshop"
-                                    min="0"
-                                    max="20"
-                                    step="1"
-                                    value="{{ old('booking_capacity_workshop', $settings['booking_capacity_workshop']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    How many workshop jobs can overlap at once. Each staff absence you record removes one from this.
-                                </p>
-                                @error('booking_capacity_workshop')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="space-y-2">
-                                <label
-                                    for="booking_capacity_mobile"
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                                >Mobile Units</label>
-                                <input
-                                    type="number"
-                                    id="booking_capacity_mobile"
-                                    name="booking_capacity_mobile"
-                                    min="0"
-                                    max="20"
-                                    step="1"
-                                    value="{{ old('booking_capacity_mobile', $settings['booking_capacity_mobile']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    How many mobile fittings can run at the same time. Mobile and workshop pools are counted separately.
-                                </p>
-                                @error('booking_capacity_mobile')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mt-8 space-y-3">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Job Duration (minutes)</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                How long each service holds a bay or a van. This is what decides the last slot of the day.
-                            </p>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                @foreach (app(App\Services\Settings\SettingsManager::class)->getDefaults()['booking_service_durations'] ?? [] as $serviceKey => $defaultDuration)
-                                    <div class="space-y-2">
-                                        <label
-                                            for="booking_service_durations_{{ $serviceKey }}"
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                                        >{{ \Illuminate\Support\Str::headline((string) $serviceKey) }}</label>
+                                    <span class="hb-cluster__pair">
+                                        <span class="hb-cluster__unit">from</span>
                                         <input
-                                            type="number"
-                                            id="booking_service_durations_{{ $serviceKey }}"
-                                            name="booking_service_durations[{{ $serviceKey }}]"
-                                            min="15"
-                                            max="480"
-                                            step="15"
-                                            value="{{ old('booking_service_durations.'.$serviceKey, $settings['booking_service_durations'][$serviceKey] ?? $defaultDuration) }}"
-                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                            type="time"
+                                            name="working_hours[{{ $key }}][open]"
+                                            value="{{ $settings['working_hours'][$key]['open'] ?? '' }}"
+                                            aria-label="{{ $dayLabel }} opens"
+                                            class="hb-input hb-input--num"
                                         />
-                                        @error('booking_service_durations.'.$serviceKey)
-                                            <p class="text-xs text-red-500">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
+                                        <span class="hb-cluster__unit">to</span>
+                                        <input
+                                            type="time"
+                                            name="working_hours[{{ $key }}][close]"
+                                            value="{{ $settings['working_hours'][$key]['close'] ?? '' }}"
+                                            aria-label="{{ $dayLabel }} closes"
+                                            class="hb-input hb-input--num"
+                                        />
+                                    </span>
+                                </div>
+                            </x-sheet.field>
+                        @endforeach
+                    </x-sheet.block>
 
-                        <div class="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">Closed Dates</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    Public holidays and one-off closures. These override the weekly hours above.
-                                </p>
-                            </div>
+                    <x-sheet.block title="Booking Rules" note="Customers are only offered slots on days that are open above. A day marked Closed shows no slots at all.">
+                        <x-sheet.input
+                            label="Minimum Booking Notice (hours)"
+                            name="booking_lead_time_hours"
+                            key="booking_lead_time_hours"
+                            hint="How far ahead of the current time a customer must book. Set to 0 to allow same-day booking up to closing."
+                            type="number"
+                            min="0"
+                            max="24"
+                            step="1"
+                            measure="num"
+                            :value="old('booking_lead_time_hours', $settings['booking_lead_time_hours'])"
+                        />
+                        <x-sheet.input
+                            label="Slot Interval (minutes)"
+                            name="booking_slot_interval_minutes"
+                            key="booking_slot_interval_minutes"
+                            hint="Gap between the start of one offered time and the next. A job must still finish by closing time."
+                            type="number"
+                            min="15"
+                            max="240"
+                            step="15"
+                            measure="num"
+                            :value="old('booking_slot_interval_minutes', $settings['booking_slot_interval_minutes'])"
+                        />
+                        <x-sheet.input
+                            label="Workshop Bays"
+                            name="booking_capacity_workshop"
+                            key="booking_capacity_workshop"
+                            hint="How many workshop jobs can overlap at once. Each staff absence you record removes one from this."
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="1"
+                            measure="num"
+                            :value="old('booking_capacity_workshop', $settings['booking_capacity_workshop'])"
+                        />
+                        <x-sheet.input
+                            label="Mobile Units"
+                            name="booking_capacity_mobile"
+                            key="booking_capacity_mobile"
+                            hint="How many mobile fittings can run at the same time. Mobile and workshop pools are counted separately."
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="1"
+                            measure="num"
+                            :value="old('booking_capacity_mobile', $settings['booking_capacity_mobile'])"
+                        />
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Job Duration (minutes)" note="How long each service holds a bay or a van. This is what decides the last slot of the day.">
+                        @foreach (app(App\Services\Settings\SettingsManager::class)->getDefaults()['booking_service_durations'] ?? [] as $serviceKey => $defaultDuration)
+                            <x-sheet.input
+                                :label="\Illuminate\Support\Str::headline((string) $serviceKey)"
+                                :id="'booking_service_durations_'.$serviceKey"
+                                :name="'booking_service_durations['.$serviceKey.']'"
+                                :key="'booking_service_durations['.$serviceKey.']'"
+                                type="number"
+                                min="15"
+                                max="480"
+                                step="15"
+                                measure="num"
+                                :error="'booking_service_durations.'.$serviceKey"
+                                :value="old('booking_service_durations.'.$serviceKey, $settings['booking_service_durations'][$serviceKey] ?? $defaultDuration)"
+                            />
+                        @endforeach
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Closed Dates" foot="Public holidays and one-off closures. These override the weekly hours above.">
+                        <x-sheet.field label="Where they are kept" hint="Closures are dated records, not a value on this sheet, so they have their own page.">
                             <a
                                 href="{{ route('admin.bookings.closures.index') }}"
-                                class="inline-flex min-h-[40px] items-center rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-white"
-                            >
-                                Manage closed dates
-                            </a>
-                        </div>
-                    </div>
+                                class="hb-btn hb-btn--wide"
+                            >Manage closed dates</a>
+                        </x-sheet.field>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Branding Tab -->
+                {{-- Branding Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="assets"
                     x-show="tab === 'assets'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'assets') style="display: none" @endif
                     x-data="{
                         logoPreview: '{{ $settings['business_logo'] ? media_url($settings['business_logo']) : null }}',
                         faviconPreview: '{{ $settings['favicon'] ? media_url($settings['favicon']) : (file_exists(public_path('favicon.ico')) ? '/favicon.ico' : null) }}',
@@ -562,440 +533,466 @@
                         }
                      }"
                 >
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Branding</h3>
-                    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-                        <div class="space-y-4" x-data="{ removeLogo: false }">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Business Logo</label>
-                            <input type="hidden" name="remove_business_logo" :value="removeLogo ? 1 : 0" />
-                            <div
-                                class="relative flex min-h-[160px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
-                                @click="if (! removeLogo) $refs.logoInput.click();"
-                            >
-                                <template x-if="logoPreview && ! removeLogo">
-                                    <img :src="logoPreview" class="max-h-[140px] object-contain" />
-                                </template>
-                                <template x-if="! logoPreview || removeLogo">
-                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload logo</span>
-                                </template>
-                            </div>
-                            <input
-                                type="file"
-                                name="business_logo"
-                                x-ref="logoInput"
-                                class="hidden"
-                                accept="image/*"
-                                @change="
-                                    handleFileSelect($event, 'logoPreview');
-                                    removeLogo = false;
-                                "
-                            />
-                            <button
-                                type="button"
-                                @click="
-                                    removeLogo = true;
-                                    logoPreview = null;
-                                "
-                                x-show="logoPreview && ! removeLogo"
-                                class="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                </svg>
-                                Remove Logo
-                            </button>
-                        </div>
-                        <div class="space-y-4" x-data="{ removeFavicon: false }">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Favicon</label>
-                            <input type="hidden" name="remove_favicon" :value="removeFavicon ? 1 : 0" />
-                            <div
-                                class="relative flex min-h-[160px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
-                                @click="if (! removeFavicon) $refs.faviconInput.click();"
-                            >
-                                <template x-if="faviconPreview && ! removeFavicon">
-                                    <img :src="faviconPreview" class="max-h-[140px] object-contain" />
-                                </template>
-                                <template x-if="! faviconPreview || removeFavicon">
-                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload favicon</span>
-                                </template>
-                            </div>
-                            <input
-                                type="file"
-                                name="favicon"
-                                x-ref="faviconInput"
-                                class="hidden"
-                                accept="image/*"
-                                @change="
-                                    handleFileSelect($event, 'faviconPreview');
-                                    removeFavicon = false;
-                                "
-                            />
-                            <button
-                                type="button"
-                                @click="
-                                    removeFavicon = true;
-                                    faviconPreview = null;
-                                "
-                                x-show="faviconPreview && ! removeFavicon"
-                                class="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18 0.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                </svg>
-                                Remove Favicon
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    <x-sheet.block title="Branding" note="Two files the whole site is painted with. What is on the table is what every page is using right now.">
+                        <x-sheet.field
+                            label="Business Logo"
+                            key="business_logo"
+                            stack="true"
+                            hint="Used in the header, the sidebar, the invoice block and the structured data. A square file reads best at the small sizes."
+                        >
+                            <div x-data="{ removeLogo: false }" class="hb-asset">
+                                <div class="hb-asset__tile">
+                                    <div class="hb-asset__frame" :data-pending="removeLogo ? 'remove' : null">
+                                        <template x-if="logoPreview && ! removeLogo">
+                                            <img :src="logoPreview" alt="The logo the site is using now" class="max-h-full" />
+                                        </template>
+                                        <template x-if="! logoPreview || removeLogo">
+                                            <span class="hb-asset__word">No logo set</span>
+                                        </template>
+                                    </div>
 
-                <!-- Locale Tab -->
-                <div
-                    x-show="tab === 'localization'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
-                >
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Locale Settings</h3>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
-                            <input
-                                type="text"
-                                name="timezone"
-                                value="{{ old('timezone', $settings['timezone']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Currency Symbol</label>
-                            <input
-                                type="text"
-                                name="currency_symbol"
-                                value="{{ old('currency_symbol', $settings['currency_symbol']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Date Format</label>
-                            <select
-                                name="date_format"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            >
-                                @foreach (['d/m/Y', 'm/d/Y', 'Y-m-d', 'd.m.Y', 'j M Y', 'D, j M Y'] as $format)
-                                    <option
-                                        value="{{ $format }}"
-                                        {{ old('date_format', $settings['date_format']) === $format ? 'selected' : '' }}
-                                    >
-                                        {{ date($format) }} ({{ $format }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Format</label>
-                            <select
-                                name="time_format"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            >
-                                @foreach (['H:i', 'h:i A', 'H:i:s', 'h:i:s A'] as $format)
-                                    <option
-                                        value="{{ $format }}"
-                                        {{ old('time_format', $settings['time_format']) === $format ? 'selected' : '' }}
-                                    >
-                                        {{ date($format) }} ({{ $format }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Display</label>
-                            <select
-                                name="time_format_display"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                            >
-                                <option
-                                    value="12"
-                                    {{ old('time_format_display', $settings['time_format_display']) === '12' ? 'selected' : '' }}
-                                >
-                                    12-hour (AM/PM)
-                                </option>
-                                <option
-                                    value="24"
-                                    {{ old('time_format_display', $settings['time_format_display']) === '24' ? 'selected' : '' }}
-                                >
-                                    24-hour
-                                </option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Locale</label>
-                            <input
-                                type="text"
-                                name="locale"
-                                value="{{ old('locale', $settings['locale']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
-                                placeholder="en_GB"
-                            />
-                        </div>
-                    </div>
-                </div>
+                                    <input type="hidden" name="remove_business_logo" :value="removeLogo ? 1 : 0" />
 
-                <!-- Social Tab -->
-                <div
-                    x-show="tab === 'social'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
-                >
-                    <div class="space-y-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Social Links</h3>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</label>
-                                <input
-                                    type="url"
-                                    name="facebook_url"
-                                    value="{{ old('facebook_url', $settings['facebook_url']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none dark:border-white/10 dark:bg-white/5"
-                                />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Instagram</label>
-                                <input
-                                    type="url"
-                                    name="instagram_url"
-                                    value="{{ old('instagram_url', $settings['instagram_url']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none dark:border-white/10 dark:bg-white/5"
-                                />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">LinkedIn</label>
-                                <input
-                                    type="url"
-                                    name="linkedin_url"
-                                    value="{{ old('linkedin_url', $settings['linkedin_url']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none dark:border-white/10 dark:bg-white/5"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                                    <input
+                                        type="file"
+                                        name="business_logo"
+                                        x-ref="logoInput"
+                                        class="hidden"
+                                        accept="image/*"
+                                        @change="
+                                            handleFileSelect($event, 'logoPreview');
+                                            removeLogo = false;
+                                        "
+                                    />
 
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">WhatsApp Settings</h3>
-                            <button
-                                type="button"
-                                @click="addNumber()"
-                                class="text-sm font-medium text-gray-900 hover:underline dark:text-white"
-                            >
-                                + Add Additional Number
-                            </button>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default WhatsApp Number</label>
-                                <input
-                                    type="text"
-                                    name="whatsapp_number_default"
-                                    value="{{ old('whatsapp_number_default', $settings['whatsapp_number_default']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    placeholder="+267 ..."
-                                />
-                            </div>
-
-                            <div class="space-y-4">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional WhatsApp Numbers</label>
-                                <div class="grid gap-4">
-                                    <template x-for="(number, index) in whatsappNumbers" :key="index">
-                                        <div class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:gap-4">
-                                            <div class="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-                                                <div class="space-y-1">
-                                                    <input
-                                                        type="text"
-                                                        :name="`whatsapp_additional_numbers[${index}][label]`"
-                                                        x-model="number.label"
-                                                        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                                        placeholder="e.g. Sales, Support"
-                                                    />
-                                                </div>
-                                                <div class="space-y-1">
-                                                    <input
-                                                        type="text"
-                                                        :name="`whatsapp_additional_numbers[${index}][number]`"
-                                                        x-model="number.number"
-                                                        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                                        placeholder="+267 ..."
-                                                    />
-                                                </div>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                @click="removeNumber(index)"
-                                                class="inline-flex items-center justify-center gap-2 self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98] sm:self-auto sm:px-6"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </template>
+                                    <div class="hb-repeat-bar">
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="if (! removeLogo) $refs.logoInput.click();"
+                                        >
+                                            <span x-show="logoPreview && ! removeLogo">Replace logo</span>
+                                            <span x-cloak x-show="! logoPreview || removeLogo">Choose a logo</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="
+                                                removeLogo = true;
+                                                logoPreview = null;
+                                            "
+                                            x-show="logoPreview && ! removeLogo"
+                                        >
+                                            Remove logo
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </x-sheet.field>
+
+                        <x-sheet.field
+                            label="Favicon"
+                            key="favicon"
+                            stack="true"
+                            hint="The tab icon, and the image a phone puts on a home screen. Saving here regenerates the whole icon set."
+                        >
+                            <div x-data="{ removeFavicon: false }" class="hb-asset">
+                                <div class="hb-asset__tile">
+                                    <div class="hb-asset__frame" :data-pending="removeFavicon ? 'remove' : null">
+                                        <template x-if="faviconPreview && ! removeFavicon">
+                                            <img :src="faviconPreview" alt="The favicon the site is using now" class="max-h-full" />
+                                        </template>
+                                        <template x-if="! faviconPreview || removeFavicon">
+                                            <span class="hb-asset__word">No favicon set</span>
+                                        </template>
+                                    </div>
+
+                                    <input type="hidden" name="remove_favicon" :value="removeFavicon ? 1 : 0" />
+
+                                    <input
+                                        type="file"
+                                        name="favicon"
+                                        x-ref="faviconInput"
+                                        class="hidden"
+                                        accept="image/*"
+                                        @change="
+                                            handleFileSelect($event, 'faviconPreview');
+                                            removeFavicon = false;
+                                        "
+                                    />
+
+                                    <div class="hb-repeat-bar">
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="if (! removeFavicon) $refs.faviconInput.click();"
+                                        >
+                                            <span x-show="faviconPreview && ! removeFavicon">Replace favicon</span>
+                                            <span x-cloak x-show="! faviconPreview || removeFavicon">Choose a favicon</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="
+                                                removeFavicon = true;
+                                                faviconPreview = null;
+                                            "
+                                            x-show="faviconPreview && ! removeFavicon"
+                                        >
+                                            Remove favicon
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Notifications Tab -->
+                {{-- Locale Tab --}}
                 <div
-                    x-show="tab === 'notifications'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    class="hb-pane"
+                    data-sheet-pane="localization"
+                    x-show="tab === 'localization'"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'localization') style="display: none" @endif
                 >
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quote Notification Emails</label>
-                        <textarea
+                    <x-sheet.block title="Locale Settings" note="How a date, a time and a price are written everywhere the shop speaks, including the emails.">
+                        <x-sheet.input
+                            label="Timezone"
+                            name="timezone"
+                            key="timezone"
+                            hint="A name from the tz database, like Africa/Gaborone. This is what turns a stored UTC moment into the hour a customer sees."
+                            mono="true"
+                            :value="old('timezone', $settings['timezone'])"
+                        />
+                        <x-sheet.input
+                            label="Currency Symbol"
+                            name="currency_symbol"
+                            key="currency_symbol"
+                            mono="true"
+                            :value="old('currency_symbol', $settings['currency_symbol'])"
+                        />
+                        <x-sheet.select
+                            label="Date Format"
+                            name="date_format"
+                            key="date_format"
+                            :value="old('date_format', $settings['date_format'])"
+                            style="max-width: 22rem"
+                        >
+                            @foreach (['d/m/Y', 'm/d/Y', 'Y-m-d', 'd.m.Y', 'j M Y', 'D, j M Y'] as $format)
+                                <option
+                                    value="{{ $format }}"
+                                    {{ old('date_format', $settings['date_format']) === $format ? 'selected' : '' }}
+                                >
+                                    {{ date($format) }} ({{ $format }})
+                                </option>
+                            @endforeach
+                        </x-sheet.select>
+
+                        <x-sheet.select
+                            label="Time Format"
+                            name="time_format"
+                            key="time_format"
+                            :value="old('time_format', $settings['time_format'])"
+                            style="max-width: 22rem"
+                        >
+                            @foreach (['H:i', 'h:i A', 'H:i:s', 'h:i:s A'] as $format)
+                                <option
+                                    value="{{ $format }}"
+                                    {{ old('time_format', $settings['time_format']) === $format ? 'selected' : '' }}
+                                >
+                                    {{ date($format) }} ({{ $format }})
+                                </option>
+                            @endforeach
+                        </x-sheet.select>
+
+                        <x-sheet.select
+                            label="Time Display"
+                            name="time_format_display"
+                            key="time_format_display"
+                            :value="old('time_format_display', $settings['time_format_display'])"
+                            style="max-width: 22rem"
+                        >
+                            <option
+                                value="12"
+                                {{ old('time_format_display', $settings['time_format_display']) === '12' ? 'selected' : '' }}
+                            >
+                                12-hour (AM/PM)
+                            </option>
+                            <option
+                                value="24"
+                                {{ old('time_format_display', $settings['time_format_display']) === '24' ? 'selected' : '' }}
+                            >
+                                24-hour
+                            </option>
+                        </x-sheet.select>
+
+                        <x-sheet.input
+                            label="Locale"
+                            name="locale"
+                            key="locale"
+                            mono="true"
+                            placeholder="en_GB"
+                            :value="old('locale', $settings['locale'])"
+                        />
+                    </x-sheet.block>
+                </div>
+
+                {{-- Social Tab --}}
+                <div
+                    class="hb-pane"
+                    data-sheet-pane="social"
+                    x-show="tab === 'social'"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    @if ($activeTab !== 'social') style="display: none" @endif
+                >
+                    <x-sheet.block title="Social Links" note="An address left empty is a row nobody can click. The footer and the contact page both read these.">
+                        <x-sheet.input
+                            label="Facebook"
+                            name="facebook_url"
+                            key="facebook_url"
+                            type="url"
+                            placeholder="https://facebook.com/..."
+                            :value="old('facebook_url', $settings['facebook_url'])"
+                        />
+                        <x-sheet.input
+                            label="Instagram"
+                            name="instagram_url"
+                            key="instagram_url"
+                            type="url"
+                            placeholder="https://instagram.com/..."
+                            :value="old('instagram_url', $settings['instagram_url'])"
+                        />
+                        <x-sheet.input
+                            label="LinkedIn"
+                            name="linkedin_url"
+                            key="linkedin_url"
+                            type="url"
+                            placeholder="https://linkedin.com/company/..."
+                            :value="old('linkedin_url', $settings['linkedin_url'])"
+                        />
+                    </x-sheet.block>
+
+                    <x-sheet.block title="WhatsApp Settings" note="The number a quote request and the floating chat button both open.">
+                        <x-sheet.input
+                            label="Default WhatsApp Number"
+                            name="whatsapp_number_default"
+                            key="whatsapp_number_default"
+                            hint="In international format. Spaces and dashes are stripped before the link is built."
+                            placeholder="+267 ..."
+                            mono="true"
+                            :value="old('whatsapp_number_default', $settings['whatsapp_number_default'])"
+                        />
+
+                        <x-sheet.field
+                            label="Additional WhatsApp Numbers"
+                            key="whatsapp_additional_numbers"
+                            stack="true"
+                            hint="Each one is added to the list a customer is offered. Their order is the order they are shown in."
+                        >
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(number, index) in whatsappNumbers" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Name">
+                                                <input
+                                                    type="text"
+                                                    :name="`whatsapp_additional_numbers[${index}][label]`"
+                                                    x-model="number.label"
+                                                    aria-label="Additional number name"
+                                                    class="hb-input"
+                                                    placeholder="e.g. Sales, Support"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Number">
+                                                <input
+                                                    type="text"
+                                                    :name="`whatsapp_additional_numbers[${index}][number]`"
+                                                    x-model="number.number"
+                                                    aria-label="Additional number"
+                                                    class="hb-input hb-input--mono"
+                                                    placeholder="+267 ..."
+                                                />
+                                            </x-sheet.field>
+
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeNumber(index)"
+                                                >
+                                                    Remove this number
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="whatsappNumbers.length === 0">
+                                    No additional numbers. Only the default line is offered.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="addNumber()">
+                                        Add another number
+                                    </button>
+                                </div>
+                            </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
+                </div>
+
+                {{-- Notifications Tab --}}
+                <div
+                    class="hb-pane"
+                    data-sheet-pane="notifications"
+                    x-show="tab === 'notifications'"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    @if ($activeTab !== 'notifications') style="display: none" @endif
+                >
+                    <x-sheet.block title="Notifications" note="Who hears about a quote request the moment it lands.">
+                        <x-sheet.textarea
+                            label="Quote Notification Emails"
                             name="quote_notification_emails"
-                            rows="3"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                        >{{ (string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '') }}</textarea>
-                    </div>
+                            key="quote_notification_emails"
+                            hint="One address per line, or separated by commas. Each one is sent the full request."
+                            :value="(string) old('quote_notification_emails', $settings['quote_notification_emails'] ?? '')"
+                        />
+                    </x-sheet.block>
                 </div>
 
                 <!-- Homepage Tab -->
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="homepage"
                     x-show="tab === 'homepage'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-10 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'homepage') style="display: none" @endif
                 >
-                    <div class="space-y-1">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Homepage Content</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Every heading, number and band on the public homepage. A section with no content hides itself.
-                        </p>
-                    </div>
+                    <x-sheet.block title="Homepage Content" note="Every heading, number and band on the public homepage. A section with no content hides itself.">
+                        <x-sheet.input
+                            label="Tagline"
+                            name="home_tagline"
+                            key="home_tagline"
+                            hint="Used as the page title and the hero heading."
+                            :value="old('home_tagline', $settings['home_tagline'])"
+                        />
+                        <x-sheet.input
+                            label="Years Of Experience"
+                            name="home_years_experience"
+                            key="home_years_experience"
+                            hint="Shown in the hero badge. Leave blank to hide the badge."
+                            placeholder="20+"
+                            :value="old('home_years_experience', $settings['home_years_experience'])"
+                        />
 
-                    {{-- Hero --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero</h4>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Tagline</label>
-                                <input
-                                    type="text"
-                                    name="home_tagline"
-                                    value="{{ old('home_tagline', $settings['home_tagline']) }}"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Used as the page title and the hero heading.</p>
+                        <x-sheet.field
+                            label="Hero Image"
+                            key="hero_image"
+                            stack="true"
+                            hint="Cropped to 1920×1080 and served as WebP. Without one, the hero shows its dark gradient backdrop."
+                        >
+                            <div x-data="{ removeHero: false }" class="hb-asset">
+                                <div class="hb-asset__tile">
+                                    <div class="hb-asset__frame" :data-pending="removeHero ? 'remove' : null">
+                                        <template x-if="heroPreview && ! removeHero">
+                                            <img :src="heroPreview" alt="The banner the homepage is using now" />
+                                        </template>
+                                        <template x-if="! heroPreview || removeHero">
+                                            <span class="hb-asset__word">No banner set</span>
+                                        </template>
+                                    </div>
+
+                                    <input type="hidden" name="remove_hero_image" :value="removeHero ? 1 : 0" />
+
+                                    <input
+                                        type="file"
+                                        name="hero_image"
+                                        x-ref="heroInput"
+                                        class="hidden"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        @change="
+                                            if ($event.target.files[0]) heroPreview = URL.createObjectURL($event.target.files[0]);
+                                            removeHero = false;
+                                        "
+                                    />
+
+                                    <div class="hb-repeat-bar">
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="if (! removeHero) $refs.heroInput.click();"
+                                        >
+                                            <span x-show="heroPreview && ! removeHero">Replace banner</span>
+                                            <span x-cloak x-show="! heroPreview || removeHero">Click to upload a hero banner</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="hb-btn"
+                                            @click="removeHero = true; heroPreview = null;"
+                                            x-show="heroPreview && ! removeHero"
+                                        >
+                                            Remove Hero Image
+                                        </button>
+                                    </div>
+
+                                    @error('hero_image')
+                                        <p class="hb-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Years Of Experience</label>
-                                <input
-                                    type="text"
-                                    name="home_years_experience"
-                                    value="{{ old('home_years_experience', $settings['home_years_experience']) }}"
-                                    placeholder="20+"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Shown in the hero badge. Leave blank to hide the badge.</p>
-                            </div>
-                        </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                        <div class="space-y-4" x-data="{ removeHero: false }">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Hero Image</label>
-                            <input type="hidden" name="remove_hero_image" :value="removeHero ? 1 : 0" />
-                            <div
-                                class="relative flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 transition-all hover:border-gray-900 dark:border-white/10 dark:bg-white/5 dark:hover:border-white"
-                                @click="if (! removeHero) $refs.heroInput.click();"
-                            >
-                                <template x-if="heroPreview && ! removeHero">
-                                    <img :src="heroPreview" class="max-h-[220px] w-full object-cover" />
-                                </template>
-                                <template x-if="! heroPreview || removeHero">
-                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Click to upload a hero banner</span>
-                                </template>
-                            </div>
-                            <input
-                                type="file"
-                                name="hero_image"
-                                x-ref="heroInput"
-                                class="hidden"
-                                accept="image/jpeg,image/png,image/webp"
-                                @change="
-                                    if ($event.target.files[0]) heroPreview = URL.createObjectURL($event.target.files[0]);
-                                    removeHero = false;
-                                "
-                            />
-                            <button
-                                type="button"
-                                @click="removeHero = true; heroPreview = null;"
-                                x-show="heroPreview && ! removeHero"
-                                class="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98]"
-                            >
-                                Remove Hero Image
-                            </button>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Cropped to 1920×1080 and served as WebP. Without one, the hero shows its dark gradient backdrop.</p>
-                            @error('hero_image')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    {{-- Cinematic hero: the layered card, its slides and its counters. --}}
+                    @php
+                        // A rejected row is named with its position, because "the background
+                        // field is required" means nothing on a screen holding six of them.
+                        // The cutout complaint is not listed here — it belongs on the row it
+                        // is about, and it is already rendered there.
+                        $heroRowErrors = [];
 
-                        {{-- Cinematic hero: the layered card, its slides and its counters. --}}
-                        @php
-                            // A rejected row is named with its position, because "the background
-                            // field is required" means nothing on a screen holding six of them.
-                            // The cutout complaint is not listed here — it belongs on the row it
-                            // is about, and it is already rendered there.
-                            $heroRowErrors = [];
+                        foreach ($errors->getMessages() as $key => $messages) {
+                            if (preg_match('/^home_hero_(slides|stats)\.(\d+)\.(?!cutout)\w+$/', (string) $key, $matched) === 1) {
+                                $label = $matched[1] === 'slides' ? 'Slide' : 'Counter';
 
-                            foreach ($errors->getMessages() as $key => $messages) {
-                                if (preg_match('/^home_hero_(slides|stats)\.(\d+)\.(?!cutout)\w+$/', (string) $key, $matched) === 1) {
-                                    $label = $matched[1] === 'slides' ? 'Slide' : 'Counter';
-
-                                    foreach ($messages as $message) {
-                                        $heroRowErrors[] = $label.' '.((int) $matched[2] + 1).': '.$message;
-                                    }
+                                foreach ($messages as $message) {
+                                    $heroRowErrors[] = $label.' '.((int) $matched[2] + 1).': '.$message;
                                 }
                             }
-                        @endphp
+                        }
+                    @endphp
 
-                        <div class="space-y-8 rounded-2xl border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-white/10 dark:bg-white/5">
-                            {{-- The marker that tells the server this screen owns the hero. Removing
-                                 the last slide leaves no inputs behind, and "no inputs" would
-                                 otherwise read as "this form never mentioned slides". --}}
-                            <input type="hidden" name="hero_settings_submitted" value="1" />
+                    <x-sheet.block title="Hero Layout" note="Which hero the homepage opens with. Cinematic only takes effect once at least one slide has a photograph.">
+                        {{-- The marker that tells the server this screen owns the hero. Removing
+                             the last slide leaves no inputs behind, and "no inputs" would
+                             otherwise read as "this form never mentioned slides". --}}
+                        <input type="hidden" name="hero_settings_submitted" value="1" />
 
-                            <div class="space-y-1">
-                                <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero Layout</h5>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Which hero the homepage opens with. Cinematic only takes effect once at least one slide has a photograph.
-                                </p>
-                            </div>
-
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <x-sheet.field
+                            label="Hero style"
+                            key="home_hero_style"
+                            hint="Classic draws the hero the site has always had. Cinematic replaces the contents of the page header only, and only while a slide holds a photograph."
+                            stack="true"
+                        >
+                            <div class="hb-samples">
                                 @foreach (\App\Enums\HeroStyle::options() as $style)
-                                    <label class="relative cursor-pointer">
+                                    <label class="hb-sample">
                                         <input
                                             type="radio"
                                             name="home_hero_style"
                                             value="{{ $style->value }}"
                                             x-model="heroStyle"
-                                            class="peer sr-only"
                                         />
-                                        <div class="flex h-full flex-col gap-4 rounded-xl border-2 border-gray-200 p-4 transition-all peer-checked:border-gray-900 peer-checked:bg-white dark:border-white/10 dark:peer-checked:border-white dark:peer-checked:bg-white/10">
+                                        <span class="hb-sample__face">
                                             <span class="block w-full text-gray-300 dark:text-white/20" aria-hidden="true">
                                                 @if ($style === \App\Enums\HeroStyle::Cinematic)
                                                     {{-- A card with a word behind a subject and a bar
@@ -1018,466 +1015,675 @@
                                                     </svg>
                                                 @endif
                                             </span>
-                                            <span>
-                                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $style->label() }}</span>
-                                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $style->description() }}</span>
-                                            </span>
-                                        </div>
+                                            <span class="hb-sample__word">{{ $style->label() }}</span>
+                                            <span class="hb-sample__sub">{{ $style->description() }}</span>
+                                        </span>
                                     </label>
                                 @endforeach
                             </div>
 
                             @error('home_hero_style')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
+                                <p class="hb-error">{{ $message }}</p>
                             @enderror
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                            <div x-show="heroStyle === 'cinematic'" class="space-y-10 border-t border-gray-200 pt-8 dark:border-white/10">
-                                {{-- Slides --}}
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div>
-                                            <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Slides</h5>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Up to six, played in the order they are listed. Drag a slide, or use the arrows.</p>
-                                        </div>
-                                        <button type="button" @click="addHeroSlide()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Slide</button>
-                                    </div>
+                    <x-sheet.block
+                        title="Hero Slides"
+                        note="Up to six, played in the order they are listed. Drag a slide by the handle at its foot, or move it with the arrows."
+                        x-show="heroStyle === 'cinematic'"
+                    >
+                        <x-sheet.field label="Slides" stack="true">
+                            <div class="hb-repeat" @image-selected.window="onHeroImage($event.detail)">
+                                @foreach ($heroRowErrors as $message)
+                                    <p class="hb-error">{{ $message }}</p>
+                                @endforeach
 
-                                    <p x-show="heroSlides.length === 0" class="rounded-xl border border-dashed border-gray-300 p-6 text-center text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">
-                                        No slides yet. Add one and pick a photograph — everything else on a slide is optional.
-                                    </p>
-
-                                    @foreach ($heroRowErrors as $message)
-                                        <p class="text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
-                                    @endforeach
-
-                                    <div class="space-y-4" @image-selected.window="onHeroImage($event.detail)">
-                                        <template x-for="(slide, index) in heroSlides" :key="slide.key">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(slide, index) in heroSlides" :key="slide.key">
+                                        <li
+                                            class="hb-repeat-item"
+                                            data-sheet-order
+                                            @dragover.prevent
+                                            @drop.prevent="dropHeroSlide(index)"
+                                        >
+                                            {{-- Live preview: the same three layers the homepage stacks, at
+                                                 thumbnail size, so the word can be judged against the photo
+                                                 before anyone saves. The number the row plays at is printed
+                                                 by the list's own counter, not by a typed index. --}}
                                             <div
-                                                class="grid grid-cols-1 gap-4 rounded-2xl border bg-white p-4 sm:p-6 dark:bg-white/5"
+                                                class="relative aspect-[16/9] overflow-hidden rounded-xl border bg-gray-900"
                                                 :class="heroDrag === index ? 'border-gray-900 dark:border-white' : 'border-gray-100 dark:border-white/5'"
-                                                @dragover.prevent
-                                                @drop.prevent="dropHeroSlide(index)"
                                             >
-                                                <div class="space-y-3">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="cursor-grab text-gray-400 select-none" draggable="true" title="Drag to reorder" @dragstart="heroDrag = index" @dragend="heroDrag = null" aria-hidden="true">⠿</span>
-                                                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-[10px] font-bold text-white dark:bg-white dark:text-gray-900" x-text="index + 1">1</span>
-                                                    </div>
-
-                                                    {{-- Live preview: the same three layers the homepage stacks, at
-                                                         thumbnail size, so the word can be judged against the photo
-                                                         before anyone saves. --}}
-                                                    <div class="relative aspect-[16/9] overflow-hidden rounded-xl bg-gray-900">
-                                                        <template x-if="slide.backgroundUrl">
-                                                            <img :src="slide.backgroundUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
-                                                        </template>
-                                                        <template x-if="slide.word">
-                                                            <span class="absolute inset-0 flex items-center justify-center text-3xl font-extrabold tracking-tight text-white/30 uppercase" x-text="slide.word"></span>
-                                                        </template>
-                                                        <template x-if="slide.cutoutUrl">
-                                                            <img :src="slide.cutoutUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
-                                                        </template>
-                                                        <template x-if="slide.headline">
-                                                            <p class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-2 text-xs font-semibold text-white" x-text="slide.headline"></p>
-                                                        </template>
-                                                    </div>
-
-                                                    <div class="flex items-center gap-2">
-                                                        <button type="button" @click="moveHeroSlide(index, -1)" :disabled="index === 0" class="rounded-lg border border-gray-200 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/10" aria-label="Move this slide earlier">↑</button>
-                                                        <button type="button" @click="moveHeroSlide(index, 1)" :disabled="index === heroSlides.length - 1" class="rounded-lg border border-gray-200 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/10" aria-label="Move this slide later">↓</button>
-                                                        <button type="button" @click="removeHeroSlide(index)" class="ml-auto rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600">Delete</button>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex-1 space-y-4">
-                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Display Word</label>
-                                                            <input type="text" :name="`home_hero_slides[${index}][word]`" x-model="slide.word" maxlength="24" placeholder="GLASS" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Painted behind the subject. Leave blank for no word.</p>
-                                                        </div>
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Headline</label>
-                                                            <input type="text" :name="`home_hero_slides[${index}][headline]`" x-model="slide.headline" maxlength="80" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">This becomes the page heading on that slide. Blank uses the site tagline.</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="space-y-1.5">
-                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Tagline</label>
-                                                        <input type="text" :name="`home_hero_slides[${index}][tagline]`" x-model="slide.tagline" maxlength="160" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                    </div>
-
-                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Photograph</label>
-                                                            <input type="hidden" :name="`home_hero_slides[${index}][background]`" x-model="slide.background" />
-                                                            <button type="button" @click="pickHeroImage(index, 'background')" class="flex w-full items-center justify-between rounded-xl border border-dashed border-gray-300 px-4 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:border-white">
-                                                                <span x-text="slide.background ? 'Change photograph' : 'Choose a photograph'">Choose a photograph</span>
-                                                                <span class="text-gray-400">Media Library</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Foreground Cutout</label>
-                                                            <input type="hidden" :name="`home_hero_slides[${index}][cutout]`" x-model="slide.cutout" />
-                                                            <button type="button" @click="pickHeroImage(index, 'cutout')" class="flex w-full items-center justify-between rounded-xl border border-dashed border-gray-300 px-4 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:border-white">
-                                                                <span x-text="slide.cutout ? 'Change cutout' : 'Choose a foreground cutout'">Choose a foreground cutout</span>
-                                                                <span class="text-gray-400">Media Library</span>
-                                                            </button>
-                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">The subject with its background erased, exported at the same pixel size as the photograph.</p>
-                                                            <p x-show="slide.cutoutError" x-text="slide.cutoutError" class="text-[10px] font-medium text-red-600 dark:text-red-400"></p>
-                                                            <button type="button" x-show="slide.cutout" @click="slide.cutout = ''; slide.cutoutUrl = ''; slide.cutoutError = ''" class="text-[10px] font-medium text-gray-500 underline hover:text-red-500 dark:text-gray-400">Remove the cutout</button>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="space-y-1.5">
-                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Photo Description</label>
-                                                        <input type="text" :name="`home_hero_slides[${index}][alt]`" x-model="slide.alt" maxlength="160" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Read out instead of the photograph. Required, because the photograph carries meaning.</p>
-                                                    </div>
-
-                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Button Label</label>
-                                                            <input type="text" :name="`home_hero_slides[${index}][button_label]`" x-model="slide.buttonLabel" maxlength="40" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                        </div>
-                                                        <div class="space-y-1.5">
-                                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Button Link</label>
-                                                            <input type="text" :name="`home_hero_slides[${index}][button_url]`" x-model="slide.buttonUrl" maxlength="500" placeholder="/quote" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <template x-if="slide.backgroundUrl">
+                                                    <img :src="slide.backgroundUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
+                                                </template>
+                                                <template x-if="slide.word">
+                                                    <span class="absolute inset-0 flex items-center justify-center text-3xl font-extrabold tracking-tight text-white/30 uppercase" x-text="slide.word"></span>
+                                                </template>
+                                                <template x-if="slide.cutoutUrl">
+                                                    <img :src="slide.cutoutUrl" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
+                                                </template>
+                                                <template x-if="slide.headline">
+                                                    <p class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-2 text-xs font-semibold text-white" x-text="slide.headline"></p>
+                                                </template>
                                             </div>
-                                        </template>
-                                    </div>
-                                </div>
 
-                                {{-- Counters --}}
-                                <div class="space-y-4 border-t border-gray-200 pt-8 dark:border-white/10">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div>
-                                            <h5 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Hero Counters</h5>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Up to three, bottom-left of the card. A number counts up from zero on the first view; anything else is shown exactly as typed.</p>
-                                        </div>
-                                        <button type="button" @click="addHeroStat()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Counter</button>
-                                    </div>
+                                            <x-sheet.field label="Word" hint="Painted behind the subject. Leave blank for no word.">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][word]`"
+                                                    x-model="slide.word"
+                                                    aria-label="Slide word"
+                                                    class="hb-input"
+                                                    maxlength="24"
+                                                    placeholder="GLASS"
+                                                />
+                                            </x-sheet.field>
 
-                                    <p x-show="heroStats.length === 0" class="rounded-xl border border-dashed border-gray-300 p-4 text-center text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">
-                                        No counters. The hero simply shows no numbers — nothing here is invented.
-                                    </p>
+                                            <x-sheet.field label="Headline" hint="This becomes the page heading on that slide. Blank uses the site tagline.">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][headline]`"
+                                                    x-model="slide.headline"
+                                                    aria-label="Slide headline"
+                                                    class="hb-input"
+                                                    maxlength="80"
+                                                />
+                                            </x-sheet.field>
 
-                                    <div class="space-y-4">
-                                        <template x-for="(stat, index) in heroStats" :key="stat.key">
-                                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                                <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-                                                    <div class="space-y-1.5">
-                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Label</label>
-                                                        <input type="text" :name="`home_hero_stats[${index}][label]`" x-model="stat.label" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                    </div>
-                                                    <div class="space-y-1.5">
-                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Value</label>
-                                                        <input type="text" :name="`home_hero_stats[${index}][value]`" x-model="stat.value" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                    </div>
-                                                    <div class="space-y-1.5">
-                                                        <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Suffix</label>
-                                                        <input type="text" :name="`home_hero_stats[${index}][suffix]`" x-model="stat.suffix" placeholder="+" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                                    </div>
+                                            <x-sheet.field label="Tagline">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][tagline]`"
+                                                    x-model="slide.tagline"
+                                                    aria-label="Slide tagline"
+                                                    class="hb-input"
+                                                    maxlength="160"
+                                                />
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Photograph" hint="Chosen from the media library. A slide without one is refused on save.">
+                                                <div class="hb-cluster">
+                                                    <input type="hidden" :name="`home_hero_slides[${index}][background]`" x-model="slide.background" />
+                                                    <button
+                                                        type="button"
+                                                        class="hb-btn"
+                                                        aria-label="Choose a photograph for this slide from the media library"
+                                                        @click="pickHeroImage(index, 'background')"
+                                                    >
+                                                        <span x-text="slide.background ? 'Change photograph' : 'Choose a photograph'">Choose a photograph</span>
+                                                    </button>
                                                 </div>
-                                                <button type="button" @click="removeHeroStat(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Foreground cutout" hint="The subject with its background erased, exported at the same pixel size as the photograph.">
+                                                <div class="hb-cluster">
+                                                    <input type="hidden" :name="`home_hero_slides[${index}][cutout]`" x-model="slide.cutout" />
+                                                    <button
+                                                        type="button"
+                                                        class="hb-btn"
+                                                        aria-label="Choose a foreground cutout for this slide from the media library"
+                                                        @click="pickHeroImage(index, 'cutout')"
+                                                    >
+                                                        <span x-text="slide.cutout ? 'Change cutout' : 'Choose a foreground cutout'">Choose a foreground cutout</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        class="hb-btn"
+                                                        x-show="slide.cutout"
+                                                        @click="slide.cutout = ''; slide.cutoutUrl = ''; slide.cutoutError = ''"
+                                                    >
+                                                        Remove the cutout
+                                                    </button>
+                                                </div>
+
+                                                <p x-show="slide.cutoutError" x-text="slide.cutoutError" class="hb-error"></p>
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Photo description" hint="Read out instead of the photograph. Required, because the photograph carries meaning.">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][alt]`"
+                                                    x-model="slide.alt"
+                                                    aria-label="Slide photo description"
+                                                    class="hb-input"
+                                                    maxlength="160"
+                                                />
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Button label">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][button_label]`"
+                                                    x-model="slide.buttonLabel"
+                                                    aria-label="Slide button label"
+                                                    class="hb-input"
+                                                    maxlength="40"
+                                                />
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Button link">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_slides[${index}][button_url]`"
+                                                    x-model="slide.buttonUrl"
+                                                    aria-label="Slide button link"
+                                                    class="hb-input hb-input--mono"
+                                                    maxlength="500"
+                                                    placeholder="/quote"
+                                                />
+                                            </x-sheet.field>
+
+                                            <div class="hb-repeat-bar">
+                                                <span
+                                                    class="cursor-grab select-none"
+                                                    draggable="true"
+                                                    title="Drag to reorder"
+                                                    aria-hidden="true"
+                                                    @dragstart="heroDrag = index"
+                                                    @dragend="heroDrag = null"
+                                                >⠿</span>
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn"
+                                                    aria-label="Move this slide earlier"
+                                                    :disabled="index === 0"
+                                                    @click="moveHeroSlide(index, -1)"
+                                                >↑</button>
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn"
+                                                    aria-label="Move this slide later"
+                                                    :disabled="index === heroSlides.length - 1"
+                                                    @click="moveHeroSlide(index, 1)"
+                                                >↓</button>
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeHeroSlide(index)"
+                                                >
+                                                    Remove this slide
+                                                </button>
                                             </div>
-                                        </template>
-                                    </div>
-                                </div>
+                                        </li>
+                                    </template>
+                                </ul>
 
-                                {{-- Defaults and behaviour --}}
-                                <div class="space-y-6 border-t border-gray-200 pt-8 dark:border-white/10">
-                                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                        <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default Button Label</label>
-                                            <input
-                                                type="text"
-                                                name="home_hero_button_label"
-                                                value="{{ old('home_hero_button_label', $settings['home_hero_button_label'] ?? '') }}"
-                                                placeholder="{{ __('site.home.hero_get_quote') }}"
-                                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            />
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Used by any slide that does not name its own button.</p>
-                                        </div>
-                                        <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Default Button Link</label>
-                                            <input
-                                                type="text"
-                                                name="home_hero_button_url"
-                                                value="{{ old('home_hero_button_url', $settings['home_hero_button_url'] ?? '') }}"
-                                                placeholder="/quote"
-                                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            />
-                                        </div>
-                                    </div>
+                                <p class="hb-repeat__empty" x-show="heroSlides.length === 0">
+                                    No slides yet. Add one and pick a photograph — everything else on a slide is optional.
+                                </p>
 
-                                    <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Advance slides automatically</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Every seven seconds, pausing on hover, on focus and on a hidden tab. Switched off, the visitor drives — and anyone who has reduced motion set in their system never sees it move at all.</p>
-                                        </div>
-                                        <label class="group inline-flex shrink-0 cursor-pointer items-center">
-                                            <input type="checkbox" name="home_hero_autoplay" value="1" {{ old('home_hero_autoplay', $settings['home_hero_autoplay'] ?? true) ? 'checked' : '' }} class="peer sr-only" />
-                                            <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                                            <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Autoplay</span>
-                                        </label>
-                                    </div>
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="addHeroSlide()">Add another slide</button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                    {{-- Fact tiles --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Fact Tiles</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Up to four. Replaces the rating counters until real reviews back them.</p>
-                            </div>
-                            <button
-                                type="button"
-                                @click="factTiles.length < 4 && addFactTile()"
-                                class="text-sm font-medium text-gray-900 hover:underline dark:text-white"
-                            >
-                                + Add Tile
-                            </button>
-                        </div>
+                    <x-sheet.block
+                        title="Hero Counters"
+                        note="Up to three, bottom-left of the card. A number counts up from zero on the first view; anything else is shown exactly as typed."
+                        x-show="heroStyle === 'cinematic'"
+                    >
+                        <x-sheet.field label="Counters" stack="true">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(stat, index) in heroStats" :key="stat.key">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Label">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_stats[${index}][label]`"
+                                                    x-model="stat.label"
+                                                    aria-label="Counter label"
+                                                    class="hb-input"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Value">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_stats[${index}][value]`"
+                                                    x-model="stat.value"
+                                                    aria-label="Counter value"
+                                                    class="hb-input hb-input--mono"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Suffix">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_hero_stats[${index}][suffix]`"
+                                                    x-model="stat.suffix"
+                                                    aria-label="Counter suffix"
+                                                    class="hb-input hb-input--mono"
+                                                    placeholder="+"
+                                                />
+                                            </x-sheet.field>
 
-                        <div class="space-y-4">
-                            <template x-for="(tile, index) in factTiles" :key="index">
-                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                    <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-                                        <div class="space-y-1.5">
-                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Label</label>
-                                            <input type="text" :name="`home_fact_tiles[${index}][label]`" x-model="tile.label" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                        </div>
-                                        <div class="space-y-1.5">
-                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Value</label>
-                                            <input type="text" :name="`home_fact_tiles[${index}][value]`" x-model="tile.value" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                        </div>
-                                        <div class="space-y-1.5">
-                                            <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Suffix</label>
-                                            <input type="text" :name="`home_fact_tiles[${index}][suffix]`" x-model="tile.suffix" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="removeFactTile(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeHeroStat(index)"
+                                                >
+                                                    Remove this counter
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="heroStats.length === 0">
+                                    No counters. The hero simply shows no numbers — nothing here is invented.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="addHeroStat()">Add another counter</button>
                                 </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    {{-- Warranty --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Warranty Band</h4>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Heading</label>
-                            <input
-                                type="text"
-                                name="home_warranty_heading"
-                                value="{{ old('home_warranty_heading', $settings['home_warranty_heading']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea
-                                name="home_warranty_text"
-                                rows="3"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            >{{ old('home_warranty_text', $settings['home_warranty_text']) }}</textarea>
-                        </div>
-
-                        <div class="space-y-4 border-t border-gray-100 pt-6 dark:border-white/10">
-                            <div class="flex items-center justify-between">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Up to three highlight cards.</p>
-                                <button type="button" @click="warrantyHighlights.length < 3 && addHighlight()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Highlight</button>
                             </div>
-                            <template x-for="(highlight, index) in warrantyHighlights" :key="index">
-                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                    <div class="flex-1 space-y-3">
-                                        <input type="text" :name="`home_warranty_highlights[${index}][title]`" x-model="highlight.title" placeholder="Title" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                        <textarea :name="`home_warranty_highlights[${index}][text]`" x-model="highlight.text" rows="2" placeholder="One-line benefit" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
-                                    </div>
-                                    <button type="button" @click="removeHighlight(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                    {{-- Urgency band --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <div class="space-y-1">
-                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Urgency Band</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Sits between services and the process steps, with call and WhatsApp buttons.</p>
-                            </div>
-                            <label class="group relative inline-flex cursor-pointer items-center">
-                                <input type="checkbox" name="home_urgency_enabled" value="1" {{ $settings['home_urgency_enabled'] ? 'checked' : '' }} class="peer sr-only" />
-                                <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                                <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase group-hover:text-gray-900 dark:group-hover:text-white">Active</span>
+                    <x-sheet.block
+                        title="Hero Defaults"
+                        note="The button a slide falls back to, and whether the deck advances by itself."
+                        x-show="heroStyle === 'cinematic'"
+                    >
+                        <x-sheet.input
+                            label="Default Button Label"
+                            name="home_hero_button_label"
+                            key="home_hero_button_label"
+                            hint="Used by any slide that does not name its own button."
+                            :placeholder="__('site.home.hero_get_quote')"
+                            :value="old('home_hero_button_label', $settings['home_hero_button_label'] ?? '')"
+                        />
+                        <x-sheet.input
+                            label="Default Button Link"
+                            name="home_hero_button_url"
+                            key="home_hero_button_url"
+                            placeholder="/quote"
+                            :value="old('home_hero_button_url', $settings['home_hero_button_url'] ?? '')"
+                        />
+                        <x-sheet.field
+                            label="Advance slides automatically"
+                            for="home_hero_autoplay"
+                            key="home_hero_autoplay"
+                            hint="Every seven seconds, pausing on hover, on focus and on a hidden tab. Switched off, the visitor drives — and anyone who has reduced motion set in their system never sees it move at all."
+                        >
+                            <label class="hb-switch">
+                                <input
+                                    type="checkbox"
+                                    id="home_hero_autoplay"
+                                    name="home_hero_autoplay"
+                                    value="1"
+                                    {{ old('home_hero_autoplay', $settings['home_hero_autoplay'] ?? true) ? 'checked' : '' }}
+                                />
+                                <span class="hb-switch__track" aria-hidden="true"></span>
                             </label>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
-                            <input
-                                type="text"
-                                name="home_urgency_text"
-                                value="{{ old('home_urgency_text', $settings['home_urgency_text']) }}"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
-                    </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                    {{-- Call to action bands --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Call-To-Action Bands</h4>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Repeated Band Heading</label>
-                                <input type="text" name="home_cta_heading" value="{{ old('home_cta_heading', $settings['home_cta_heading']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Final CTA Heading</label>
-                                <input type="text" name="home_final_cta_heading" value="{{ old('home_final_cta_heading', $settings['home_final_cta_heading']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Repeated Band Text</label>
-                                <textarea name="home_cta_text" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_cta_text', $settings['home_cta_text']) }}</textarea>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Final CTA Text</label>
-                                <textarea name="home_final_cta_text" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_final_cta_text', $settings['home_final_cta_text']) }}</textarea>
-                            </div>
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">WhatsApp Pre-Filled Message</label>
-                                <input type="text" name="home_whatsapp_message" value="{{ old('home_whatsapp_message', $settings['home_whatsapp_message']) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white" />
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Attached to every WhatsApp link on the site, including the bubble and the mobile bar.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <x-sheet.block title="Fact Tiles" note="Up to four. Replaces the rating counters until real reviews back them.">
+                        <x-sheet.field label="Tiles" stack="true" hint="A tile is a claim and the number that backs it. The order here is the order the band reads in.">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(tile, index) in factTiles" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Label">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_fact_tiles[${index}][label]`"
+                                                    x-model="tile.label"
+                                                    aria-label="Fact tile label"
+                                                    class="hb-input"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Value">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_fact_tiles[${index}][value]`"
+                                                    x-model="tile.value"
+                                                    aria-label="Fact tile value"
+                                                    class="hb-input hb-input--mono"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Suffix">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_fact_tiles[${index}][suffix]`"
+                                                    x-model="tile.suffix"
+                                                    aria-label="Fact tile suffix"
+                                                    class="hb-input hb-input--mono"
+                                                />
+                                            </x-sheet.field>
 
-                    {{-- Where we fit --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Where We Fit</h4>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Service Area</label>
-                                <textarea name="home_service_area" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_service_area', $settings['home_service_area']) }}</textarea>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Mobile Coverage</label>
-                                <textarea name="home_mobile_coverage" rows="3" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white">{{ old('home_mobile_coverage', $settings['home_mobile_coverage']) }}</textarea>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">The workshop address and directions link come from General and Social settings.</p>
-                            </div>
-                        </div>
-                    </div>
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeFactTile(index)"
+                                                >
+                                                    Remove this tile
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
 
-                    {{-- Process steps --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Process Steps</h4>
-                            <button type="button" @click="processSteps.length < 4 && addStep()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Step</button>
-                        </div>
-                        <template x-for="(step, index) in processSteps" :key="index">
-                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                <div class="flex-1 space-y-3">
-                                    <input type="text" :name="`home_process_steps[${index}][title]`" x-model="step.title" placeholder="Title" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                    <textarea :name="`home_process_steps[${index}][text]`" x-model="step.text" rows="2" placeholder="Description" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
+                                <p class="hb-repeat__empty" x-show="factTiles.length === 0">
+                                    No fact tiles. The homepage shows no numbers of its own.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="factTiles.length < 4 && addFactTile()">
+                                        Add another tile
+                                    </button>
                                 </div>
-                                <button type="button" @click="removeStep(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
                             </div>
-                        </template>
-                    </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                    {{-- FAQs --}}
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Frequently Asked Questions</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Rendered as accordions and emitted as FAQPage structured data.</p>
-                            </div>
-                            <button type="button" @click="faqs.length < 8 && addFaq()" class="text-sm font-medium text-gray-900 hover:underline dark:text-white">+ Add Question</button>
-                        </div>
-                        <template x-for="(faq, index) in faqs" :key="index">
-                            <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                <div class="flex-1 space-y-3">
-                                    <input type="text" :name="`home_faqs[${index}][question]`" x-model="faq.question" placeholder="Question" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5" />
-                                    <textarea :name="`home_faqs[${index}][answer]`" x-model="faq.answer" rows="3" placeholder="Answer" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5"></textarea>
+                    <x-sheet.block title="Warranty Band" note="The band that says what a job is covered by, and the three cards that hold it up.">
+                        <x-sheet.input
+                            label="Heading"
+                            name="home_warranty_heading"
+                            key="home_warranty_heading"
+                            :value="old('home_warranty_heading', $settings['home_warranty_heading'])"
+                        />
+                        <x-sheet.textarea
+                            label="Description"
+                            name="home_warranty_text"
+                            key="home_warranty_text"
+                            :value="old('home_warranty_text', $settings['home_warranty_text'])"
+                        />
+                        <x-sheet.field label="Highlight cards" stack="true" hint="Up to three highlight cards.">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(highlight, index) in warrantyHighlights" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Title">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_warranty_highlights[${index}][title]`"
+                                                    x-model="highlight.title"
+                                                    aria-label="Highlight title"
+                                                    class="hb-input"
+                                                    placeholder="Title"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Benefit">
+                                                <textarea
+                                                    :name="`home_warranty_highlights[${index}][text]`"
+                                                    x-model="highlight.text"
+                                                    aria-label="Highlight benefit"
+                                                    rows="2"
+                                                    class="hb-textarea"
+                                                    placeholder="One-line benefit"
+                                                ></textarea>
+                                            </x-sheet.field>
+
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeHighlight(index)"
+                                                >
+                                                    Remove this highlight
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="warrantyHighlights.length === 0">
+                                    No highlight cards. The band states its heading and its sentence only.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="warrantyHighlights.length < 3 && addHighlight()">
+                                        Add another highlight
+                                    </button>
                                 </div>
-                                <button type="button" @click="removeFaq(index)" class="self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white hover:bg-red-600 sm:self-auto sm:px-6">Delete</button>
                             </div>
-                        </template>
-                        @error('home_faqs.*.answer')
-                            <p class="text-xs text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Urgency Band" note="Sits between services and the process steps, with call and WhatsApp buttons.">
+                        <x-sheet.field label="Show the band" for="home_urgency_enabled" key="home_urgency_enabled">
+                            <label class="hb-switch">
+                                <input
+                                    type="checkbox"
+                                    id="home_urgency_enabled"
+                                    name="home_urgency_enabled"
+                                    value="1"
+                                    {{ $settings['home_urgency_enabled'] ? 'checked' : '' }}
+                                />
+                                <span class="hb-switch__track" aria-hidden="true"></span>
+                            </label>
+                        </x-sheet.field>
+                        <x-sheet.input
+                            label="Message"
+                            name="home_urgency_text"
+                            key="home_urgency_text"
+                            :value="old('home_urgency_text', $settings['home_urgency_text'])"
+                        />
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Call-To-Action Bands" note="The two bands the page closes with, and the message a WhatsApp link arrives carrying.">
+                        <x-sheet.input
+                            label="Repeated Band Heading"
+                            name="home_cta_heading"
+                            key="home_cta_heading"
+                            :value="old('home_cta_heading', $settings['home_cta_heading'])"
+                        />
+                        <x-sheet.input
+                            label="Final CTA Heading"
+                            name="home_final_cta_heading"
+                            key="home_final_cta_heading"
+                            :value="old('home_final_cta_heading', $settings['home_final_cta_heading'])"
+                        />
+                        <x-sheet.textarea
+                            label="Repeated Band Text"
+                            name="home_cta_text"
+                            key="home_cta_text"
+                            :value="old('home_cta_text', $settings['home_cta_text'])"
+                        />
+                        <x-sheet.textarea
+                            label="Final CTA Text"
+                            name="home_final_cta_text"
+                            key="home_final_cta_text"
+                            :value="old('home_final_cta_text', $settings['home_final_cta_text'])"
+                        />
+                        <x-sheet.input
+                            label="WhatsApp Pre-Filled Message"
+                            name="home_whatsapp_message"
+                            key="home_whatsapp_message"
+                            hint="Attached to every WhatsApp link on the site, including the bubble and the mobile bar."
+                            :value="old('home_whatsapp_message', $settings['home_whatsapp_message'])"
+                        />
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Where We Fit" note="The two places the shop reaches. The workshop address and its directions link come from the General group.">
+                        <x-sheet.textarea
+                            label="Service Area"
+                            name="home_service_area"
+                            key="home_service_area"
+                            :value="old('home_service_area', $settings['home_service_area'])"
+                        />
+                        <x-sheet.textarea
+                            label="Mobile Coverage"
+                            name="home_mobile_coverage"
+                            key="home_mobile_coverage"
+                            hint="The workshop address and directions link come from General and Social settings."
+                            :value="old('home_mobile_coverage', $settings['home_mobile_coverage'])"
+                        />
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Process Steps" note="Up to four. The page numbers them in the order they are listed here.">
+                        <x-sheet.field label="Steps" stack="true">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(step, index) in processSteps" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Title">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_process_steps[${index}][title]`"
+                                                    x-model="step.title"
+                                                    aria-label="Step title"
+                                                    class="hb-input"
+                                                    placeholder="Title"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Description">
+                                                <textarea
+                                                    :name="`home_process_steps[${index}][text]`"
+                                                    x-model="step.text"
+                                                    aria-label="Step description"
+                                                    rows="2"
+                                                    class="hb-textarea"
+                                                    placeholder="Description"
+                                                ></textarea>
+                                            </x-sheet.field>
+
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeStep(index)"
+                                                >
+                                                    Remove this step
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="processSteps.length === 0">
+                                    No steps. The page leaves out the process band.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="processSteps.length < 4 && addStep()">
+                                        Add another step
+                                    </button>
+                                </div>
+                            </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
+
+                    <x-sheet.block title="Frequently Asked Questions" note="Rendered as accordions and emitted as FAQPage structured data. Up to eight.">
+                        <x-sheet.field label="Questions" stack="true">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(faq, index) in faqs" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Question">
+                                                <input
+                                                    type="text"
+                                                    :name="`home_faqs[${index}][question]`"
+                                                    x-model="faq.question"
+                                                    aria-label="Question"
+                                                    class="hb-input"
+                                                    placeholder="Question"
+                                                />
+                                            </x-sheet.field>
+                                            <x-sheet.field label="Answer">
+                                                <textarea
+                                                    :name="`home_faqs[${index}][answer]`"
+                                                    x-model="faq.answer"
+                                                    aria-label="Answer"
+                                                    rows="3"
+                                                    class="hb-textarea"
+                                                    placeholder="Answer"
+                                                ></textarea>
+                                            </x-sheet.field>
+
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeFaq(index)"
+                                                >
+                                                    Remove this question
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="faqs.length === 0">
+                                    No questions. The page shows no accordion, and no FAQ data is emitted.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="faqs.length < 8 && addFaq()">
+                                        Add another question
+                                    </button>
+                                </div>
+
+                                @error('home_faqs.*.answer')
+                                    <p class="hb-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Announcements Tab -->
+                {{-- Announcements Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="announcements"
                     x-show="tab === 'announcements'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'announcements') style="display: none" @endif
                 >
-                    <div class="flex items-center justify-between">
-                        <div class="space-y-1">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Announcements</h3>
-                            <p class="text-sm text-gray-500">Manage the scrolling marquee messages.</p>
-                        </div>
-                        <label class="group relative inline-flex cursor-pointer items-center">
-                            <input
-                                type="checkbox"
-                                name="announcement_active"
-                                value="1"
-                                {{ $settings['announcement_active'] ? 'checked' : '' }}
-                                class="peer sr-only"
-                            />
-                            <div class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-gray-900 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-white/10 dark:peer-checked:bg-white dark:after:bg-gray-400"></div>
-                            <span class="ml-3 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors group-hover:text-gray-900 dark:group-hover:text-white">Active</span>
-                        </label>
-                    </div>
+                    <x-sheet.block title="Announcements" note="Manage the scrolling marquee messages. A message nobody can finish reading is a message that should not be here.">
+                        <x-sheet.field
+                            label="Show the marquee"
+                            for="announcement_active"
+                            key="announcement_active"
+                            hint="The band is drawn while this is on and at least one message has not expired."
+                        >
+                            <label class="hb-switch">
+                                <input
+                                    type="checkbox"
+                                    id="announcement_active"
+                                    name="announcement_active"
+                                    value="1"
+                                    {{ $settings['announcement_active'] ? 'checked' : '' }}
+                                />
+                                <span class="hb-switch__track" aria-hidden="true"></span>
+                            </label>
+                        </x-sheet.field>
+                    </x-sheet.block>
 
-                    <div class="space-y-6 border-t border-gray-100 pt-8 dark:border-white/10">
-                        <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-bold tracking-widest text-gray-400 uppercase">Marquee Content</h4>
-                            <button
-                                type="button"
-                                @click="addAnnouncement()"
-                                class="text-sm font-medium text-gray-900 hover:underline dark:text-white"
-                            >
-                                + Add Message
-                            </button>
-                        </div>
-
-                        <div class="space-y-4">
-                            <template x-for="(announcement, index) in announcements" :key="index">
-                                <div class="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5 sm:flex-row sm:items-start sm:p-6">
-                                    <div class="flex-1 space-y-4">
-                                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                            <div class="space-y-1.5">
-                                                <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Message Text</label>
+                    <x-sheet.block title="Marquee Content" note="One message per row, scrolled in the order they are listed here.">
+                        <x-sheet.field label="Messages" stack="true">
+                            <div class="hb-repeat">
+                                <ul class="hb-repeat-list" data-sheet-list>
+                                    <template x-for="(announcement, index) in announcements" :key="index">
+                                        <li class="hb-repeat-item">
+                                            <x-sheet.field label="Message text">
                                                 <input
                                                     type="text"
                                                     :name="`announcements[${index}][text]`"
                                                     x-model="announcement.text"
-                                                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                                    aria-label="Announcement message text"
+                                                    class="hb-input"
                                                     placeholder="Type message..."
                                                 />
-                                            </div>
-                                            <div class="space-y-1.5">
-                                                <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Destination</label>
-                                                <div class="space-y-2">
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Destination" hint="A page of the site, or a link you type. Left on No link, the message is only ever read.">
+                                                <div class="hb-cluster">
                                                     <select
                                                         :name="`announcements[${index}][link]`"
                                                         x-model="announcement.link"
-                                                        class="admin-select w-full rounded-xl border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:focus:ring-[var(--color-admin-accent)]"
+                                                        aria-label="Announcement destination"
+                                                        class="hb-select"
                                                     >
                                                         <option value="">No Link</option>
                                                         <optgroup label="System Routes">
@@ -1500,88 +1706,110 @@
                                                         type="text"
                                                         x-show="announcement.link === 'custom' || (! [{{ implode(',', array_map(fn($r) => "'$r'", array_keys($availableRoutes))) }}].includes(announcement.link) && announcement.link !== '' && announcement.link !== 'custom')"
                                                         x-model="announcement.link"
-                                                        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                                        aria-label="Custom announcement link"
+                                                        class="hb-input hb-input--mono"
                                                         placeholder="Enter URL (e.g. https://...)"
                                                     />
                                                 </div>
-                                            </div>
-                                            <div class="space-y-1.5 md:col-span-2">
-                                                <label class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Active Until</label>
+                                            </x-sheet.field>
+
+                                            <x-sheet.field label="Active until" hint="Leave blank to never expire. The message hides automatically after this date and time.">
                                                 <input
                                                     type="datetime-local"
                                                     :name="`announcements[${index}][expires_at]`"
                                                     x-model="announcement.expires_at"
-                                                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-[var(--color-admin-accent)]"
+                                                    aria-label="Announcement expiry date and time"
+                                                    class="hb-input hb-input--mono"
                                                 />
-                                                <p class="text-[11px] text-gray-400">Leave blank to never expire. The message hides automatically after this date &amp; time.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        @click="removeAnnouncement(index)"
-                                        class="inline-flex items-center justify-center gap-2 self-end rounded-full bg-red-500 px-4 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-red-600 active:scale-[0.98] sm:self-auto sm:px-6"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
+                                            </x-sheet.field>
 
-                                        Delete
+                                            <div class="hb-repeat-bar">
+                                                <button
+                                                    type="button"
+                                                    class="hb-btn hb-repeat-bar__push"
+                                                    @click="removeAnnouncement(index)"
+                                                >
+                                                    Remove this announcement
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <p class="hb-repeat__empty" x-show="announcements.length === 0">
+                                    No messages. The marquee has nothing to scroll.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    <button type="button" class="hb-btn" @click="addAnnouncement()">
+                                        Add another message
                                     </button>
                                 </div>
-                            </template>
-                        </div>
-                    </div>
+                            </div>
+                        </x-sheet.field>
+                    </x-sheet.block>
                 </div>
 
                 @if ($envConfig !== [])
-                <!-- System Config Tab -->
+                    {{-- System Config Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="system_config"
                     x-show="tab === 'system_config'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]"
-                    style="display: none"
+                    @if ($activeTab !== 'system_config') style="display: none" @endif
                 >
-                    <div class="mb-6 space-y-1">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Config</h3>
-                        <p class="text-sm text-gray-500">
-                            Allowlisted environment variables. Secret values are never shown here.
-                        </p>
-                    </div>
-
-                    <div class="space-y-4">
+                    <x-sheet.block
+                        title="System Config"
+                        note="Allowlisted environment variables. Secret values are never shown here, and nothing outside this list is offered for editing. A value is read-only until you click it, and a save writes to the environment file rather than to a settings row."
+                    >
                         @foreach ($envConfig as $key => $value)
-                            <div class="space-y-2" x-data="{ editing: false }">
-                                <label class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">{{ $key }}</label>
+                            <x-sheet.field
+                                :label="$key"
+                                for="env_{{ $key }}"
+                                x-data="{ editing: false }"
+                            >
                                 <input
                                     type="text"
+                                    id="env_{{ $key }}"
                                     name="env[{{ $key }}]"
                                     value="{{ old('env.'.$key, $value) }}"
                                     :readonly="! editing"
                                     @click="editing = true"
                                     @click.away="editing = false"
-                                    :class="editing
-                                        ? 'bg-white dark:bg-white/5 border-gray-900 dark:border-white focus:ring-1 focus:ring-gray-900 dark:focus:ring-white'
-                                        : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 cursor-pointer text-gray-500'"
-                                    class="w-full rounded-xl border px-4 py-2.5 text-sm transition-all outline-none"
+                                    class="hb-input"
                                 />
-                            </div>
+                            </x-sheet.field>
                         @endforeach
-                    </div>
+                    </x-sheet.block>
                 </div>
                 @endif
+                </div>
+            </div>
 
-                <div class="border-t border-gray-100 pt-6 dark:border-white/10">
+            <div class="hb-foot" data-sheet-foot @if (session('success')) data-just-set @endif>
+                <p class="hb-foot__count" data-sheet-count>Nothing marked. Everything on this sheet is set.</p>
+                <div class="hb-foot__actions">
+                    <span class="hb-foot__live" data-sheet-live aria-live="polite" role="status"></span>
                     <button
-                        type="submit"
-                        class="rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                    >
-                        Save All Changes
-                    </button>
+                        type="button"
+                        class="hb-btn"
+                        data-sheet-filter
+                        aria-pressed="false"
+                        data-on-word="Showing marks only"
+                        data-off-word="Show only marks"
+                    ><span data-sheet-filter-word>Show only marks</span></button>
+                    <x-sheet.commit label="Save All Changes" data-sheet-save />
                 </div>
             </div>
         </form>
+
+        <footer class="hb-colophon">
+            <p>Written to <span class="hb-mono">company_settings</span>. A save clears the settings cache, so what you set here is what the site serves on the next request.</p>
+            <p><a class="hb-link hb-link--utility" href="{{ url('/') }}">The homepage</a> shows the Hero, Homepage, Locale and Announcements groups.</p>
+            <p><a class="hb-link hb-link--utility" href="{{ url('/contact') }}">The contact page</a> shows the General and Social groups.</p>
+        </footer>
     </div>
 </x-layouts::admin>

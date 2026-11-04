@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div class="relative w-full sm:max-w-xs">
+            <div class="relative w-full min-w-0 sm:max-w-md">
                 <x-ui.icon name="magnifying-glass" size="xs" class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 <input
                     type="text"

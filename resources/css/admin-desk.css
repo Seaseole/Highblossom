@@ -1,0 +1,2176 @@
+/* ============================================================
+   THE DAY DESK — /dashboard and /admin/system-overview
+   ------------------------------------------------------------
+   A scoped layer. Nothing in this file repoints a `--color-*`, `--ui-*` or
+   `--admin-*` token, so no other page in the shell changes.
+
+   `.hb-sheet` — the scoring bench, /admin/settings and /admin/profile — is added
+   to the two palette blocks below and to the `[hidden]` guard at the end, and to
+   nothing else. It borrows the desk's colours, its mono rule and the `dash`
+   container name, so one page of the panel never disagrees with another about
+   what a hairline or a measured number looks like. Every component the bench
+   owns is in ./admin-sheet.css.
+
+   Two traps in this bundle, both honoured below:
+   1. admin.css is unlayered, so a `display` declared here outranks `hidden` and
+      every `sm:` utility. Only this layer's own elements are ever given a
+      display, and `[hidden]` is put back in its rights at the end of the file.
+   2. The content area is a scroller whose width changes when the sidebar
+      collapses without the viewport changing at all. So the desk asks its own
+      container, never the window: `@container`, mobile-first, and the stacked
+      form is the one a browser without container queries still gets.
+   ============================================================ */
+
+/* Geist and Geist Mono, self-hosted for the admin bundle.
+
+   The shell used to ask Google for both, which put a render-blocking
+   cross-origin stylesheet in front of the first paint of every admin page and
+   asked for a third family (Cabinet Grotesk) that Google does not host, so the
+   request only ever cost time. The two files above the fold are preloaded in
+   the layout's head. */
+@font-face {
+    font-family: "Geist";
+    src: url("/fonts/geist-400-normal.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist";
+    src: url("/fonts/geist-500-normal.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist";
+    src: url("/fonts/geist-600-normal.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    src: url("/fonts/geist-mono-400-normal.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    src: url("/fonts/geist-mono-500-normal.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    src: url("/fonts/geist-mono-600-normal.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+.hb-dash,
+.hb-desk,
+.hb-sheet {
+    /* ground is what the shell already paints; panel is a face on it. */
+    --dash-ground: #ffffff;
+    --dash-panel: #ffffff;
+    /* set is a filled track, a hover, a retired span. */
+    --dash-set: #f2f3f5;
+    /* muted is the only servant allowed to carry copy; faint is never text. */
+    --dash-ink: #111827;
+    --dash-ink-deep: #000000;
+    --dash-muted: #5b6170;
+    --dash-faint: #9ca3af;
+    /* This desk is drawn with rules, not shadows. */
+    --dash-line: rgba(17, 24, 39, 0.11);
+    --dash-line-strong: rgba(17, 24, 39, 0.27);
+    /* cut is rationed to three claims: fitting now, the now line, focus. */
+    --dash-cut: #dc2626;
+    --dash-cut-ink: #ffffff;
+    --dash-wait: #b45309;
+    --dash-wait-soft: rgba(180, 83, 9, 0.10);
+    --dash-done: #047857;
+    --dash-done-soft: rgba(4, 120, 87, 0.09);
+    --dash-info: #0369a1;
+    --dash-off: #6b7280;
+    /* The lane column, and how tall a lane reads. */
+    --dash-side: 10.5rem;
+    --dash-track-h: 3.1rem;
+    /* One ease, the one the auth screens already use. */
+    --dash-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dash-fast: 160ms;
+    --dash-base: 220ms;
+    --dash-settle: 340ms;
+
+    container: dash / inline-size;
+    color: var(--dash-ink);
+    font-family: var(--font-sans);
+}
+
+.dark .hb-dash,
+.dark .hb-desk,
+.dark .hb-sheet {
+    --dash-ground: #0a0a0f;
+    --dash-panel: #121218;
+    --dash-set: #16161d;
+    --dash-ink: #fafafa;
+    --dash-ink-deep: #ffffff;
+    --dash-muted: #a1a1aa;
+    --dash-faint: #71717a;
+    --dash-line: rgba(255, 255, 255, 0.09);
+    --dash-line-strong: rgba(255, 255, 255, 0.21);
+    --dash-wait: #fbbf24;
+    --dash-wait-soft: rgba(251, 191, 36, 0.13);
+    --dash-done: #34d399;
+    --dash-done-soft: rgba(52, 211, 153, 0.12);
+    --dash-info: #38bdf8;
+    --dash-off: #a1a1aa;
+}
+
+/* --- type roles --------------------------------------------------------- */
+
+.hb-h1 {
+    margin: 0;
+    font-size: clamp(2rem, 1.55rem + 1.35vw, 2.75rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: var(--dash-ink);
+    text-wrap: balance;
+}
+
+.hb-h2 {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.016em;
+    color: var(--dash-ink);
+}
+
+.hb-subhead {
+    margin: 0 0 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-dayline {
+    margin: 0.5rem 0 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.008em;
+    color: var(--dash-ink);
+}
+
+.hb-lede {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--dash-muted);
+    max-width: 44ch;
+}
+
+.hb-hint {
+    margin: 0.3rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+    max-width: 64ch;
+}
+
+/* Everything measured is mono and tabular: times, durations, counts, deltas,
+   references. This is the rule the design system has stated since its first
+   version and which nothing on the page used to obey. */
+.hb-num,
+.hb-mono {
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.hb-muted {
+    color: var(--dash-muted);
+}
+
+.hb-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-sep {
+    color: var(--dash-faint);
+    padding-inline: 0.3em;
+}
+
+.hb-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: var(--dash-faint);
+    display: inline-block;
+    vertical-align: middle;
+    margin-inline: 0.45em;
+}
+
+.hb-unit {
+    color: var(--dash-muted);
+    margin-inline-start: 0.08em;
+}
+
+.hb-warn {
+    color: var(--dash-wait);
+    font-weight: 500;
+}
+
+/* --- panels ------------------------------------------------------------- */
+
+.hb-band,
+.hb-desk-card {
+    background: var(--dash-panel);
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    padding: 1.25rem;
+}
+
+.hb-dash > * + * {
+    margin-top: 1.5rem;
+}
+
+.hb-pair {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@container dash (min-width: 74rem) {
+    .hb-pair {
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        align-items: start;
+    }
+}
+
+.hb-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--dash-line);
+}
+
+.hb-head-text {
+    min-width: 0;
+}
+
+.hb-count {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--dash-ink);
+}
+
+/* --- masthead ----------------------------------------------------------- */
+
+.hb-mast {
+    display: grid;
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--dash-line-strong);
+}
+
+@container dash (min-width: 58rem) {
+    .hb-mast {
+        grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+        align-items: end;
+        gap: 2rem;
+    }
+}
+
+.hb-day {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    background: var(--dash-line);
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+@container dash (min-width: 58rem) {
+    .hb-day {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.hb-day-cell {
+    background: var(--dash-panel);
+    padding: 0.65rem 0.8rem;
+    margin: 0;
+}
+
+.hb-day-cell dt {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-day-cell dd {
+    margin: 0.3rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--dash-ink);
+}
+
+.hb-day-cell-clock dd {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.hb-clock {
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+}
+
+.hb-state {
+    color: var(--dash-muted);
+    font-weight: 400;
+}
+
+/* --- the rail ----------------------------------------------------------- */
+
+.hb-rail-wrap {
+    container: rail / inline-size;
+}
+
+.hb-daybar {
+    margin-bottom: 1rem;
+}
+
+.hb-daybar-track {
+    position: relative;
+    height: 8px;
+    background: var(--dash-set);
+    border: 1px solid var(--dash-line);
+    border-radius: 5px;
+}
+
+.hb-daybar-now {
+    position: absolute;
+    inset-block: -3px;
+    left: calc(var(--nowf, 0) * 100%);
+    width: 2px;
+    background: var(--dash-cut);
+    border-radius: 1px;
+}
+
+.hb-daybar-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 0.4rem 0 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+/* One grid: the scale is row 1, the lanes are row 2, and the now line is
+   placed across both, so it ends exactly where the day ends. No guesswork and
+   no magic offset that a taller lane would break. */
+.hb-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    position: relative;
+}
+
+.hb-scale {
+    grid-area: 1 / 1;
+    position: relative;
+    display: none;
+    height: 1.15rem;
+    margin-inline-start: var(--dash-side);
+    border-bottom: 1px solid var(--dash-line);
+}
+
+.hb-tick {
+    position: absolute;
+    bottom: 2px;
+    left: var(--at, 0%);
+    padding-inline-start: 6px;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.6875rem;
+    letter-spacing: -0.02em;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.hb-tick::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 1px;
+    height: 4px;
+    background: var(--dash-line-strong);
+}
+
+.hb-tick:last-child {
+    transform: translateX(-100%);
+    padding-inline-start: 0;
+    padding-inline-end: 6px;
+}
+
+.hb-tick:last-child::before {
+    left: auto;
+    right: 0;
+}
+
+.hb-lanes {
+    grid-area: 2 / 1;
+    list-style: none;
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.hb-lane {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.55rem 0;
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-lane:first-child {
+    border-top: 0;
+}
+
+.hb-lane-side {
+    min-width: 0;
+}
+
+.hb-lane-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--dash-ink);
+}
+
+.hb-lane-hint {
+    margin: 0.1rem 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    color: var(--dash-muted);
+}
+
+.hb-lane-meta {
+    margin: 0.35rem 0 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-track {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    min-height: var(--dash-track-h);
+}
+
+.hb-track-empty {
+    margin: 0;
+    padding: 0.7rem 0.75rem;
+    border: 1px dashed var(--dash-line-strong);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--dash-muted);
+}
+
+.hb-span {
+    position: relative;
+    /* Its own measure, so a chip that is narrower than a name can decide what it
+       can still say. */
+    container-type: inline-size;
+    display: block;
+    min-width: 1.75rem;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 6px;
+    background: var(--dash-panel);
+    color: var(--dash-ink);
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+        transform var(--dash-fast) var(--dash-ease),
+        background-color var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-span[aria-disabled="true"] {
+    cursor: default;
+}
+
+.hb-span-when {
+    display: block;
+    font-size: 0.6875rem;
+    white-space: nowrap;
+}
+
+.hb-span-when .hb-num {
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-span-who {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: var(--dash-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hb-span-service {
+    color: var(--dash-muted);
+}
+
+.hb-span-cap {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    color: var(--dash-muted);
+}
+
+.hb-plate {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--dash-ink);
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 3px;
+    padding: 0 0.25rem;
+}
+
+/* A state is never only a colour. Each one also carries its own edge, so the
+   rail reads the same in a screenshot, in greyscale, and to a screen reader
+   through the span's own label. */
+.hb-span--waiting {
+    border-style: dashed;
+    border-color: var(--dash-wait);
+}
+
+.hb-span--overdue {
+    border-color: var(--dash-wait);
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-wait-soft) 0 5px,
+        transparent 5px 10px
+    );
+}
+
+.hb-span--in_progress {
+    border-color: var(--dash-cut);
+    background: var(--dash-cut);
+    color: var(--dash-cut-ink);
+}
+
+.hb-span--completed {
+    border-color: var(--dash-done);
+    background: var(--dash-done-soft);
+}
+
+.hb-span--completed .hb-span-when .hb-num,
+.hb-span--completed .hb-span-who {
+    color: var(--dash-muted);
+}
+
+.hb-span--cancelled {
+    border-color: var(--dash-line);
+    background: var(--dash-set);
+    color: var(--dash-muted);
+    text-decoration: line-through;
+}
+
+.hb-legend {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+    margin: 0;
+    padding: 0;
+}
+
+.hb-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.hb-mark {
+    width: 14px;
+    height: 9px;
+    flex-shrink: 0;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 2px;
+    background: var(--dash-panel);
+}
+
+.hb-legend-item--waiting .hb-mark {
+    border-style: dashed;
+    border-color: var(--dash-wait);
+}
+
+.hb-legend-item--overdue .hb-mark {
+    border-color: var(--dash-wait);
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-wait-soft) 0 3px,
+        transparent 3px 6px
+    );
+}
+
+.hb-legend-item--in_progress .hb-mark {
+    border-color: var(--dash-cut);
+    background: var(--dash-cut);
+}
+
+.hb-legend-item--completed .hb-mark {
+    border-color: var(--dash-done);
+    background: var(--dash-done-soft);
+}
+
+.hb-rail-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--dash-line);
+    font-size: 0.75rem;
+}
+
+.hb-next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.hb-rail-counts {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+/* Wide form: the scale, a lane's label beside its own track, the spans placed
+   on the measure, and one line standing through the whole day. */
+@container rail (min-width: 44rem) {
+    .hb-daybar {
+        display: none;
+    }
+
+    .hb-scale,
+    .hb-now {
+        display: block;
+    }
+
+    .hb-lane {
+        grid-template-columns: var(--dash-side) minmax(0, 1fr);
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .hb-track {
+        display: block;
+        height: var(--dash-track-h);
+        background: var(--dash-set);
+        border-radius: 8px;
+    }
+
+    .hb-track::after {
+        content: "";
+        position: absolute;
+        inset-block: 4px;
+        left: 0;
+        width: 1px;
+        background: var(--dash-line-strong);
+    }
+
+    .hb-track-empty {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 0.85rem;
+        border: 0;
+        border-radius: 0;
+    }
+
+    .hb-span {
+        position: absolute;
+        inset-block: 0;
+        left: calc(var(--at, 0%) + 1px);
+        width: var(--span, 4%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-inline: 0.5rem;
+    }
+
+    .hb-span-cap {
+        display: none;
+        /* When it does appear, on hover or with motion off, it truncates rather
+           than cutting a word in half at the chip's edge. */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .hb-span-when .hb-muted {
+        display: none;
+    }
+}
+
+/* The line itself: a grid item laid over both rows, one pixel wide. */
+.hb-now {
+    grid-area: 1 / 1 / 3 / 2;
+    position: relative;
+    display: none;
+    pointer-events: none;
+}
+
+.hb-now-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--dash-side) + (100% - var(--dash-side)) * var(--nowf, 0));
+    width: 1px;
+    background: var(--dash-cut);
+}
+
+.hb-now-line::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: var(--dash-cut);
+}
+
+/* --- the queue ---------------------------------------------------------- */
+
+.hb-queue {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hb-queue-row + .hb-queue-row {
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-queue-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    margin-inline: -0.5rem;
+    padding: 0.65rem 0.5rem 0.65rem 0.75rem;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    transition:
+        background-color var(--dash-fast) var(--dash-ease),
+        box-shadow var(--dash-fast) var(--dash-ease);
+}
+
+.hb-queue-kind {
+    grid-column: 1;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-queue-title {
+    grid-column: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.011em;
+    color: var(--dash-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hb-queue-detail {
+    grid-column: 1;
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+.hb-queue-age {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    justify-self: end;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-queue-age .hb-num {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-queue-go {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    align-self: center;
+    justify-self: end;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-inline-start: 0.35rem;
+    border-inline-end: 1px solid var(--dash-faint);
+    border-block-end: 1px solid var(--dash-faint);
+    transform: rotate(-45deg);
+    transition:
+        transform var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-tone--late .hb-queue-age .hb-num,
+.hb-tone--late .hb-queue-kind {
+    color: var(--dash-wait);
+}
+
+.hb-tone--running .hb-queue-age .hb-num,
+.hb-tone--running .hb-queue-kind {
+    color: var(--dash-cut);
+}
+
+.hb-groups {
+    list-style: none;
+    display: grid;
+    gap: 0.15rem;
+    margin: 1rem 0 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-group {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-inline: -0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-group .hb-num {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-clear {
+    margin: 0;
+    padding: 0.85rem 0.9rem;
+    border-inline-start: 2px solid var(--dash-done);
+    background: var(--dash-done-soft);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-ink);
+}
+
+/* --- pipeline ----------------------------------------------------------- */
+
+.hb-stack {
+    display: flex;
+    gap: 2px;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--dash-set);
+}
+
+.hb-stack-seg {
+    width: var(--w, 0%);
+    background: var(--dash-off);
+}
+
+.hb-stack-seg--pending {
+    background: var(--dash-wait);
+}
+
+.hb-stack-seg--contacted {
+    background: var(--dash-info);
+}
+
+.hb-stack-seg--completed {
+    background: var(--dash-done);
+}
+
+.hb-stack-seg--cancelled {
+    background: var(--dash-faint);
+}
+
+.hb-figures {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0.85rem 0 0;
+    padding: 0;
+    background: var(--dash-line);
+    border: 1px solid var(--dash-line);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+@container dash (min-width: 34rem) {
+    .hb-figures {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.hb-figure-item {
+    margin: 0;
+    padding: 0;
+    background: var(--dash-panel);
+}
+
+.hb-figure {
+    display: block;
+    padding: 0.6rem 0.7rem;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-figure-value {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--dash-ink);
+}
+
+.hb-figure-item--pending .hb-figure-value {
+    color: var(--dash-wait);
+}
+
+.hb-figure-item--contacted .hb-figure-value {
+    color: var(--dash-info);
+}
+
+.hb-figure-item--completed .hb-figure-value {
+    color: var(--dash-done);
+}
+
+.hb-figure .hb-muted {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.6875rem;
+}
+
+.hb-arrivals {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-arrivals .hb-subhead {
+    letter-spacing: 0.06em;
+}
+
+.hb-arrivals-note {
+    margin: 0.15rem 0 0.7rem;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-arrivals-meta {
+    margin: 0.45rem 0 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+/* --- bars --------------------------------------------------------------- */
+
+.hb-bars {
+    list-style: none;
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 4px;
+    align-items: end;
+    /* The plot is the middle band. Its baseline is drawn by ::after at the foot
+       of that band, the weekday row sits in the padding below it, and the value
+       a bar carries sits in the padding above it — so a bar at 100% never has to
+       share its pixel with the label that names it. */
+    height: 8.6rem;
+    padding: 1.15rem 0 1.6rem;
+    margin: 0 0 0.5rem;
+}
+
+.hb-bars::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 1.6rem;
+    height: 1px;
+    background: var(--dash-line-strong);
+}
+
+.hb-bars--14 {
+    height: 6.4rem;
+    padding-top: 0;
+}
+
+.hb-bar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    margin: 0;
+}
+
+.hb-bar-fill {
+    display: block;
+    height: var(--h, 0%);
+    min-height: 0;
+    border-radius: 3px 3px 0 0;
+    background: var(--dash-ink);
+    opacity: 0.7;
+    transition:
+        opacity var(--dash-fast) var(--dash-ease),
+        transform var(--dash-fast) var(--dash-ease);
+}
+
+.hb-bars--14 .hb-bar-fill {
+    background: var(--dash-line-strong);
+    opacity: 1;
+}
+
+.hb-bar-foot {
+    position: absolute;
+    inset-inline: 0;
+    /* Below the baseline, in the band the list reserves for it. Anchored to the
+       bar itself it printed over the foot of every bar on the plot. */
+    bottom: -1.45rem;
+    text-align: center;
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.hb-bar-value {
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(var(--h, 0%) + 0.2rem);
+    text-align: center;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-bars--14 .hb-bar-value {
+    display: none;
+}
+
+.hb-bar--today .hb-bar-fill,
+.hb-bar-link:hover .hb-bar-fill {
+    background: var(--dash-cut);
+    opacity: 1;
+}
+
+.hb-bar--closed .hb-bar-fill {
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-line-strong) 0 3px,
+        transparent 3px 6px
+    );
+    opacity: 1;
+}
+
+.hb-bar-link {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.hb-flag {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--dash-cut);
+}
+
+.hb-flag--closed {
+    color: var(--dash-muted);
+}
+
+/* Seven columns across a phone is about 45 px each, and "CLOSED" is wider than
+   that. The hatch on the bar is the mark at that size, and the day's own link
+   says in words whether it is today or closed. */
+@container dash (max-width: 46rem) {
+    .hb-flag {
+        display: none;
+    }
+
+    .hb-bars {
+        height: 7.6rem;
+    }
+}
+
+/* --- ledger ------------------------------------------------------------- */
+
+.hb-ledger {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    background: var(--dash-line);
+    border: 1px solid var(--dash-line);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+@container dash (min-width: 48rem) {
+    .hb-ledger {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.hb-ledger-cell {
+    margin: 0;
+    padding: 0.7rem 0.8rem;
+    background: var(--dash-panel);
+}
+
+.hb-ledger-cell dt {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-ledger-cell dd {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0.3rem 0 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-ledger-value {
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--dash-ink);
+}
+
+.hb-ledger-delta {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.hb-trend--up {
+    color: var(--dash-done);
+}
+
+.hb-trend--down {
+    color: var(--dash-wait);
+}
+
+.hb-trend--flat {
+    color: var(--dash-muted);
+}
+
+/* --- distributions ------------------------------------------------------ */
+
+.hb-dist + .hb-dist {
+    margin-top: 0.85rem;
+}
+
+.hb-dist-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--dash-ink);
+}
+
+.hb-dist-figures {
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.hb-dist-figures .hb-num {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+    margin-inline-end: 0.3rem;
+}
+
+.hb-dist-track {
+    position: relative;
+    height: 6px;
+    margin-top: 0.4rem;
+    border-radius: 3px;
+    background: var(--dash-set);
+    overflow: hidden;
+}
+
+.hb-dist-fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: var(--w, 0%);
+    border-radius: 3px;
+    background: var(--dash-ink);
+    opacity: 0.5;
+}
+
+.hb-dist--unassigned .hb-dist-fill {
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-wait) 0 3px,
+        transparent 3px 6px
+    );
+    opacity: 1;
+}
+
+.hb-dist-total {
+    margin: 1.1rem 0 0;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--dash-line);
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+/* --- milestones --------------------------------------------------------- */
+
+.hb-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hb-milestone {
+    position: relative;
+    margin: 0;
+    padding: 0.7rem 0 0.7rem 1.15rem;
+}
+
+.hb-milestone + .hb-milestone {
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-milestone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: var(--dash-line);
+}
+
+.hb-milestone-mark {
+    position: absolute;
+    top: 1.1rem;
+    left: -3px;
+    width: 7px;
+    height: 1px;
+    background: var(--dash-line-strong);
+}
+
+.hb-milestone-when {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-milestone-when .hb-num {
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-milestone-what {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem;
+    margin: 0.2rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--dash-ink);
+}
+
+.hb-milestone-kind {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-milestone--started .hb-milestone-kind,
+.hb-milestone--completed .hb-milestone-kind,
+.hb-milestone--confirmed .hb-milestone-kind {
+    color: var(--dash-ink);
+}
+
+.hb-milestone--cancelled .hb-milestone-kind,
+.hb-milestone--rescheduled .hb-milestone-kind {
+    color: var(--dash-wait);
+}
+
+.hb-milestone-summary {
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+    max-width: 68ch;
+}
+
+.hb-milestone-actor {
+    margin: 0.25rem 0 0;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+/* --- colophon ----------------------------------------------------------- */
+
+.hb-colophon {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.25rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--dash-line-strong);
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-colophon p {
+    margin: 0;
+}
+
+/* --- links, focus, and the states that answer --------------------------- */
+
+.hb-link {
+    color: var(--dash-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--dash-line-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition:
+        color var(--dash-fast) var(--dash-ease),
+        text-decoration-color var(--dash-fast) var(--dash-ease),
+        text-decoration-thickness var(--dash-fast) var(--dash-ease);
+}
+
+.hb-link--utility {
+    color: var(--dash-muted);
+}
+
+.hb-dash :focus-visible,
+.hb-desk :focus-visible {
+    outline: 2px solid var(--dash-cut);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+@media (hover: hover) {
+    /* A span settles two pixels toward the reader and opens its measure. */
+    .hb-span:hover {
+        transform: translate3d(0, -2px, 0);
+        border-color: var(--dash-line-strong);
+        z-index: 2;
+    }
+
+    .hb-span--in_progress:hover {
+        border-color: var(--dash-cut);
+    }
+
+    .hb-span:hover .hb-span-cap {
+        display: block;
+    }
+
+    .hb-queue-link:hover,
+    .hb-group:hover,
+    .hb-figure:hover,
+    .hb-bar-link:hover {
+        background-color: var(--dash-set);
+    }
+
+    .hb-queue-link:hover .hb-queue-go,
+    .hb-group:hover .hb-queue-go {
+        border-color: var(--dash-ink);
+        transform: rotate(-45deg) translate3d(2px, 2px, 0);
+    }
+
+    .hb-bar-link:hover .hb-bar-fill {
+        opacity: 1;
+    }
+
+    .hb-link:hover {
+        color: var(--dash-cut);
+        text-decoration-color: var(--dash-cut);
+        text-decoration-thickness: 2px;
+    }
+
+    .hb-group:hover .hb-muted,
+    .hb-figure:hover .hb-muted {
+        color: var(--dash-ink);
+    }
+}
+
+.hb-span:active,
+.hb-queue-link:active,
+.hb-group:active,
+.hb-figure:active,
+.hb-bar-link:active {
+    background-color: var(--dash-set);
+    transform: scale(0.995);
+}
+
+/* --- the two clocks ----------------------------------------------------- */
+
+/* Nothing is hidden before the module says it may be: without the attribute
+   the page is already complete, and reduced motion never sets it. Both the desk
+   and the overview share one entrance, so a page turn between them is one
+   language rather than two. */
+.hb-dash[data-dash-ready] [data-dash-reveal]:not(.is-in),
+.hb-desk[data-dash-ready] [data-dash-reveal]:not(.is-in) {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+}
+
+.hb-dash[data-dash-ready] [data-dash-reveal],
+.hb-desk[data-dash-ready] [data-dash-reveal] {
+    transition:
+        opacity var(--dash-base) var(--dash-ease),
+        transform var(--dash-base) var(--dash-ease);
+}
+
+/* A span is laid along its own start edge, which is the rail's version of being
+   set into a frame. */
+.hb-dash[data-dash-ready] .hb-span {
+    transition-property: clip-path, transform, background-color, border-color, opacity;
+    transition-duration:
+        var(--dash-settle),
+        var(--dash-fast),
+        var(--dash-fast),
+        var(--dash-fast),
+        var(--dash-fast);
+}
+
+.hb-dash[data-dash-ready] .hb-span:not(.is-set) {
+    clip-path: inset(0 100% 0 0);
+}
+
+.hb-dash[data-dash-ready] .hb-span.is-set {
+    clip-path: inset(0 0 0 0);
+}
+
+.hb-desk-row .hb-dot {
+    width: 5px;
+    height: 5px;
+    margin-inline: 0;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hb-dash [data-dash-reveal],
+    .hb-dash .hb-span,
+    .hb-dash .hb-bar-fill,
+    .hb-dash .hb-dist-fill,
+    .hb-desk .hb-desk-card {
+        opacity: 1 !important;
+        transform: none !important;
+        clip-path: none !important;
+    }
+
+    .hb-dash .hb-span-cap {
+        display: block;
+    }
+}
+
+/* --- System Overview, in the same voice --------------------------------- */
+
+.hb-desk > * + * {
+    margin-top: 1.5rem;
+}
+
+.hb-desk-intro {
+    display: grid;
+    gap: 1rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--dash-line-strong);
+}
+
+@container dash (min-width: 58rem) {
+    .hb-desk-intro {
+        grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+        align-items: end;
+    }
+}
+
+.hb-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.hb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 8px;
+    background: var(--dash-panel);
+    color: var(--dash-ink);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition:
+        background-color var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease),
+        transform var(--dash-fast) var(--dash-ease);
+}
+
+.hb-btn--primary {
+    border-color: var(--dash-cut);
+    background: var(--dash-cut);
+    color: var(--dash-cut-ink);
+}
+
+.hb-btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+@media (hover: hover) {
+    /* Re-measure is the whole idea of this page, so it gets the page's own
+       motion verb rather than a tint: the field floods, the label inverts, and
+       the arrow turns through. The primary variant floods to the cut. */
+    .hb-btn > svg {
+        transition: transform 420ms var(--dash-ease);
+    }
+
+    .hb-btn:hover {
+        background-color: var(--dash-ink);
+        border-color: var(--dash-ink);
+        color: var(--dash-panel);
+    }
+
+    .hb-btn:hover > svg {
+        transform: rotate(180deg);
+    }
+
+    .hb-btn--primary:hover {
+        background-color: var(--dash-cut);
+        border-color: var(--dash-cut);
+        color: var(--dash-cut-ink);
+    }
+}
+
+.hb-btn:active {
+    transform: scale(0.985);
+}
+
+/* The calibration strip: one tick per section, placed in the order the page
+   reads, and each one a way to reach the section it marks. */
+.hb-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hb-strip-item {
+    margin: 0;
+}
+
+.hb-strip-link {
+    display: grid;
+    gap: 0.3rem;
+    justify-items: start;
+    padding: 0.25rem 0.1rem;
+    border-radius: 6px;
+    color: var(--dash-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-strip-tick {
+    width: 100%;
+    min-width: 2.25rem;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--dash-off);
+    opacity: 0.45;
+    transition:
+        height var(--dash-fast) var(--dash-ease),
+        opacity var(--dash-fast) var(--dash-ease);
+}
+
+.hb-strip-link--ok .hb-strip-tick {
+    background: var(--dash-done);
+    opacity: 0.5;
+}
+
+.hb-strip-link--info .hb-strip-tick {
+    background: var(--dash-off);
+    opacity: 0.55;
+}
+
+.hb-strip-link--warn .hb-strip-tick {
+    background: var(--dash-wait);
+    opacity: 0.9;
+    height: 26px;
+}
+
+.hb-strip-link--fail .hb-strip-tick {
+    background: var(--dash-cut);
+    opacity: 1;
+    height: 34px;
+}
+
+.hb-strip-link--pending .hb-strip-tick {
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-info) 0 3px,
+        transparent 3px 6px
+    );
+    opacity: 0.8;
+}
+
+@media (hover: hover) {
+    .hb-strip-link:hover {
+        color: var(--dash-ink);
+    }
+
+    .hb-strip-link:hover .hb-strip-tick {
+        opacity: 1;
+    }
+}
+
+.hb-strip-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0.6rem 0 0;
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+.hb-desk-grid {
+    display: grid;
+    gap: 1rem;
+    /* Cards keep their own height. Stretching a short card to meet a long one
+       buys a hole at the bottom of the short one, which reads as a bug. */
+    align-items: start;
+}
+
+@container dash (min-width: 62rem) {
+    /* Columns, not rows. These cards are independent measurements of different
+       lengths; a row grid always leaves a void beside whichever column ran out
+       first. Packed down two columns, the page ends where its content ends. */
+    .hb-desk-grid {
+        display: block;
+        columns: 2;
+        column-gap: 1rem;
+    }
+
+    .hb-desk-grid > * {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+}
+
+.hb-desk-card {
+    overflow: hidden;
+    padding: 0;
+}
+
+.hb-desk-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--dash-line);
+}
+
+.hb-desk-card__title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    color: var(--dash-ink);
+}
+
+.hb-desk-card__desc {
+    margin: 0.15rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--dash-muted);
+}
+
+.hb-desk-card__verdict {
+    display: grid;
+    gap: 0.25rem;
+    justify-items: end;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-desk-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--dash-line);
+    font-size: 0.75rem;
+    transition: background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-desk-card__head + .hb-desk-row {
+    border-top: 0;
+}
+
+.hb-desk-row dt {
+    color: var(--dash-muted);
+    min-width: 0;
+}
+
+.hb-desk-row dd {
+    margin: 0;
+    text-align: end;
+    color: var(--dash-ink);
+    min-width: 0;
+    word-break: break-word;
+}
+
+.hb-desk-row dd .hb-num {
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.hb-desk-row__hint {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--dash-muted);
+}
+
+.hb-desk-row--ok dd .hb-num {
+    color: var(--dash-done);
+}
+
+.hb-desk-row--warn dd .hb-num {
+    color: var(--dash-wait);
+}
+
+.hb-desk-row--fail dd .hb-num {
+    color: var(--dash-cut);
+}
+
+@media (hover: hover) {
+    .hb-desk-row:hover {
+        background-color: var(--dash-set);
+    }
+}
+
+.hb-desk-card__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--dash-line);
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    color: var(--dash-muted);
+}
+
+.hb-desk-card__foot .hb-num {
+    color: var(--dash-ink);
+    font-weight: 600;
+}
+
+.hb-btn--small {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.6875rem;
+}
+
+.hb-desk-pending {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+}
+
+.hb-desk-pending__line {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--dash-muted);
+}
+
+/* The verdict on a card, in a word with a mark beside it. */
+.hb-desk-card__verdict .hb-mark {
+    width: 10px;
+    height: 10px;
+    border-color: var(--dash-line-strong);
+    background: var(--dash-off);
+    opacity: 0.5;
+}
+
+.hb-desk-card__verdict--ok .hb-mark {
+    border-color: var(--dash-done);
+    background: var(--dash-done-soft);
+    opacity: 1;
+}
+
+.hb-desk-card__verdict--warn .hb-mark {
+    border-color: var(--dash-wait);
+    background: var(--dash-wait);
+    opacity: 1;
+}
+
+.hb-desk-card__verdict--fail .hb-mark {
+    border-color: var(--dash-cut);
+    background: var(--dash-cut);
+    opacity: 1;
+}
+
+.hb-desk-card__verdict--pending .hb-mark {
+    border-color: var(--dash-info);
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--dash-info) 0 3px,
+        transparent 3px 6px
+    );
+    opacity: 1;
+}
+
+/* A line's severity beside its value: a tick, not another colour to decode. */
+.hb-dot--ok {
+    background: var(--dash-done);
+}
+
+.hb-dot--warn {
+    background: var(--dash-wait);
+}
+
+.hb-dot--fail {
+    background: var(--dash-cut);
+}
+
+.hb-dot--info {
+    background: var(--dash-off);
+}
+
+.hb-dot--pending {
+    background: var(--dash-info);
+}
+
+.hb-notes {
+    padding: 1.1rem 1.25rem;
+}
+
+.hb-notes ul {
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+}
+
+.hb-notes li {
+    position: relative;
+    padding-inline-start: 1.3rem;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--dash-muted);
+}
+
+.hb-notes li::before {
+    content: "";
+    position: absolute;
+    top: 0.6rem;
+    inset-inline-start: 0;
+    width: 8px;
+    height: 1px;
+    background: var(--dash-line-strong);
+}
+
+.hb-notes code {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    color: var(--dash-ink);
+}
+
+/* The shell's skip link. Written here rather than as a stack of `sr-only` and
+   `focus:` utilities, because the utility version stayed 1x1 while focused in
+   this bundle: unlayered rules and the site's own `sr-only` both outrank it, so
+   the first stop on the page was focusable and invisible. */
+.admin-skip {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 60;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.admin-skip:focus {
+    width: auto;
+    height: auto;
+    clip-path: none;
+    overflow: visible;
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    background: #111827;
+    color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+}
+
+.dark .admin-skip:focus {
+    background: #fafafa;
+    color: #0a0a0f;
+    box-shadow: 0 0 0 2px #0a0a0f;
+}
+
+/* --- fixes found by the first QA pass ----------------------------------- */
+
+/* White on the cut red is 4.8:1; anything translucent over it is not. Every
+   word inside a running span is therefore pure white, including the plate,
+   which used to inherit the ink and the border of the panel it sat on. */
+.hb-span--in_progress,
+.hb-span--in_progress .hb-num,
+.hb-span--in_progress .hb-muted,
+.hb-span--in_progress .hb-span-who,
+.hb-span--in_progress .hb-span-service,
+.hb-span--in_progress .hb-span-cap,
+.hb-span--in_progress .hb-plate,
+.hb-span--in_progress .sr-only {
+    color: var(--dash-cut-ink);
+    opacity: 1;
+}
+
+.hb-span--in_progress .hb-plate {
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Tap targets. A span in the stacked form is a row you aim at, not a mark on a
+   scale, and every text link in the desk is a target a thumb has to hit. */
+.hb-span {
+    min-height: 2.75rem;
+}
+
+/* A chip about 150 px wide cannot say a name, a service and a duration. It keeps
+   the name, which is the thing a person recognises, and the hover caption still
+   carries the rest. */
+@container (max-width: 9.5rem) {
+    .hb-span-service {
+        display: none;
+    }
+}
+
+.hb-dash .hb-link,
+.hb-desk .hb-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+}
+
+/* The next job is a work link, so it answers in the verb rather than in colour. */
+@media (hover: hover) {
+    .hb-next .hb-link:hover {
+        transform: translate3d(3px, 0, 0);
+    }
+}
+
+.hb-next .hb-link {
+    transition:
+        transform var(--dash-fast) var(--dash-ease),
+        color var(--dash-fast) var(--dash-ease),
+        text-decoration-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-next .hb-link {
+    min-height: 2rem;
+    padding-block: 0.25rem;
+}
+
+/* A figure that happens to be a link is not an inline link in a sentence: an
+   underline sitting directly under a large numeral reads as a stray rule. The
+   cell still answers on hover and focus, where the underline belongs. */
+.hb-ledger-cell .hb-link {
+    text-decoration: none;
+}
+
+@media (hover: hover) {
+    .hb-ledger-cell .hb-link:hover {
+        text-decoration: underline;
+    }
+}
+
+.hb-ledger-cell .hb-link:focus-visible {
+    text-decoration: underline;
+}
+
+.hb-bar-link {
+    min-width: 1.5rem;
+}
+
+/* The minimap labels and the values that link somewhere are targets too, and
+   text bounds are not a hit area. */
+.hb-strip-link {
+    min-height: 1.75rem;
+}
+
+.hb-desk-row dd .hb-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+}
+
+/* One motion answer on the rail's group headings. They already change fill and
+   ink on hover; the chevron now leans with them, which is what makes the row
+   read as a control rather than a label. Scoped to the hover, and to nothing
+   else in the shell. */
+@media (hover: hover) {
+    .admin-nav-heading:hover > svg:last-child {
+        transform: translateY(2px);
+    }
+
+    /* Same argument for the bar's icon controls: search, the bell, fullscreen
+       and the rest answered a pointer with a shade of background and nothing
+       else. One pixel of lift is the smallest honest answer, and it is the same
+       answer the desk's own spans give. */
+    .admin-bar-btn,
+    .admin-bar-search,
+    .admin-bar-user {
+        transition:
+            transform var(--dash-fast) var(--dash-ease),
+            background-color var(--dash-fast) var(--dash-ease),
+            color var(--dash-fast) var(--dash-ease);
+    }
+
+    .admin-bar-btn:hover,
+    .admin-bar-search:hover,
+    .admin-bar-user:hover {
+        transform: translate3d(0, -1px, 0);
+    }
+
+    .admin-bar-btn:active,
+    .admin-bar-search:active,
+    .admin-bar-user:active {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+/* The search field's own label sits on a light ground at 4.39:1, just under AA.
+   Only this control is darkened: the nav label token is used across the shell,
+   and a dashboard pass does not get to move it. */
+.admin-bar-search > span {
+    color: #5b6170;
+}
+
+/* --- the layer's own guard --------------------------------------------- */
+
+/* `hidden` must still mean hidden inside a layer that is unlayered. */
+.hb-dash [hidden],
+.hb-desk [hidden],
+.hb-sheet [hidden] {
+    display: none !important;
+}

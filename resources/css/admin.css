@@ -1,3 +1,14 @@
+/* The day desk layer. Scoped to `.hb-dash` and `.hb-desk`, additive, and it
+   repoints no token above it — see the header of that file for the two traps it
+   is written around. */
+@import "./admin-desk.css";
+
+/* The scoring bench — /admin/settings and /admin/profile. A second scoped layer
+   in the same voice: it borrows the desk's palette rather than declaring one, so
+   a hairline and a measured number mean the same thing on every page of the
+   panel. Additive, and it repoints no token either. */
+@import "./admin-sheet.css";
+
 /* Premium Dark Theme Design System for Highblossom Admin */
 
 /* CSS Variables */

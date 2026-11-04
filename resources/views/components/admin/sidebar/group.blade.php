@@ -66,10 +66,18 @@
          silently does nothing if the expression ever throws — which would dump all 32 rows into
          an 80px column. x-show owns open/closed, so the two mechanisms stack instead of
          competing: Alpine removes display:none when a branch opens, and the class keeps it hidden
-         until the rail itself is widened. --}}
+         until the rail itself is widened.
+
+         The inline `display: none` below is what makes that hold on the FIRST frame. `x-show` is
+         inert until Alpine has run, so without it every branch body is painted expanded and then
+         snapped shut a beat later — a 452px column collapsing to 40px, which is the largest
+         cumulative layout shift anywhere in the panel. The server already knows the answer:
+         `$open` is the remembered choice if there is one and whether this branch holds the page
+         if there is not, which is exactly the rule `adminNavGroup` applies a moment later. --}}
     <div
         x-show="open"
         x-collapse.duration.200ms
+        @if (! $open) style="display: none" @endif
         class="{{ $hideOnRail }}"
     >
         <div class="admin-nav-tree space-y-1 pb-1">

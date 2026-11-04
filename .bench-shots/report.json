@@ -1,0 +1,182 @@
+{
+  "url": "https://highblossom.test/admin/settings?tab=general",
+  "errors": [],
+  "failed": [],
+  "desktop": {
+    "loadMs": 1658,
+    "loaderMs": null,
+    "settledMs": 3940,
+    "vitals": {
+      "lcpMs": 628,
+      "lcpElement": "p.hb-sheet-lede",
+      "cls": 0.105
+    },
+    "height": 1975,
+    "overflowX": false,
+    "offenders": [],
+    "h1": [
+      "Company Settings"
+    ],
+    "smallTargets": [
+      "Skip to content 1x1",
+      "The homepage 74x14",
+      "The contact page 87x14"
+    ],
+    "glHidden": [],
+    "title": "Company Settings - highblossom Pty Ltd",
+    "glOn": false,
+    "scrollFps": {
+      "fps": 59,
+      "worstFrameMs": 33
+    },
+    "idleMotion": false,
+    "idleAt": null
+  },
+  "mobile": {
+    "throttled": false,
+    "loadMs": 1875,
+    "loaderMs": null,
+    "settledMs": 3893,
+    "vitals": {
+      "lcpMs": 724,
+      "lcpElement": "p.hb-sheet-lede",
+      "cls": 0.02
+    },
+    "height": 2924,
+    "overflowX": false,
+    "offenders": [],
+    "h1": [
+      "Company Settings"
+    ],
+    "smallTargets": [
+      "Skip to content 1x1",
+      "The homepage 74x14",
+      "The contact page 87x14"
+    ],
+    "glHidden": [],
+    "title": "Company Settings - highblossom Pty Ltd",
+    "glOn": false,
+    "scrollFps": {
+      "fps": 61,
+      "worstFrameMs": 17
+    }
+  },
+  "files": [
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\d-00-firstpaint.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\d-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\d-02-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\d-03-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\k-01-focus.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\k-02-focus.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\k-03-focus.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\k-04-focus.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-01-rest.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-01-hover.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-02-rest.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-02-hover.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-03-rest.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-03-hover.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-04-rest.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\h-04-hover.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\m-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\m-02-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\m-03-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\r-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.bench-shots\\r-02-mid.png"
+  ],
+  "notes": [
+    "desktop FPS runs headless on a software GPU: treat it as a floor, not a measurement of real hardware",
+    "loadMs: ms from navigation to the load event, null if it had not fired after 30 s (desktop) or 60 s (phone); a heavy page takes long, while visitors see content at vitals.lcpMs. loaderMs: ms until the #loader ended, null when the page has none",
+    "settledMs: ms from navigation by which the first screen stopped changing, never before the fixed wait. null: still changing at the cap, either a long intro or continuous motion (a live shader, video); d-01-hero / m-01-hero tell which. reduced.moving: the screen was still changing 1.5 s after load with reduced motion on"
+  ],
+  "keyboard": {
+    "stops": [
+      "a \"Skip to content\"",
+      "a \"Highblossom Pty Ltd\"",
+      "button \"OVERVIEW\"",
+      "button \"BOOKINGS\"",
+      "button \"CONTENT\"",
+      "button \"BLOG\"",
+      "button \"TEAM & ACCESS\"",
+      "button \"MEDIA\"",
+      "button \"SYSTEM\"",
+      "a \"Settings\"",
+      "a \"Security\"",
+      "a \"SEO\""
+    ],
+    "skipLinkFirst": true,
+    "noVisibleFocus": [],
+    "invisibleFocus": [],
+    "stuck": false
+  },
+  "hover": {
+    "targets": [
+      {
+        "shot": "h-01",
+        "label": "button \"Overview\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-02",
+        "label": "button \"System\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-03",
+        "label": "button \"Collapse navigation\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-04",
+        "label": "button \"Search ⌘ Ctrl K\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "backgroundColor",
+          "transform"
+        ]
+      }
+    ],
+    "noHoverChange": [],
+    "colorOnly": [],
+    "covered": [],
+    "cursorFollower": false
+  },
+  "reduced": {
+    "hiddenText": 0,
+    "moving": false
+  },
+  "a11y": {
+    "violations": [],
+    "serious": 0,
+    "contrastNeedsReview": 0
+  }
+}

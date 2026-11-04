@@ -142,6 +142,9 @@ final class AdminSidebar
      */
     public static function remembered(Request $request): array
     {
+        // Read through the request, not $_COOKIE, because the cookie is on EncryptCookies'
+        // exception list in bootstrap/app.php — it is written by the browser, so an attempt to
+        // decrypt it would answer nothing and every branch would render open on the first frame.
         $decoded = json_decode((string) $request->cookie(self::REMEMBER_COOKIE), true);
 
         return is_array($decoded) ? $decoded : [];

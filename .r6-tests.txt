@@ -1,0 +1,44 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileSessionsTabTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sessions tab lists another device with a sign out action[39m[90m                                                [39m [90m1.85s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use is marked and has no sign out action[39m[90m                                                      [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user can sign out one of their own other devices[39m[90m                                                          [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user cannot sign out another users device[39m[90m                                                                 [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use cannot be signed out from the list[39m[90m                                                        [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out other devices spares the one in use[39m[90m                                                             [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosed sessions appear in the history list[39m[90m                                                                  [39m [90m0.25s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\TwoFactorSettingsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtwo factor setup can be completed with a valid code[39m[90m                                                         [39m [90m0.70s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfigured totp window allows previous slot codes[39m[90m                                                           [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcodes outside the totp window are rejected[39m[90m                                                                  [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcode separators are normalized before verification[39m[90m                                                          [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling twice does not rotate an existing secret[39m[90m                                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending setup can be cancelled[39m[90m                                                                              [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelling setup refuses to touch a confirmed configuration[39m[90m                                                 [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling two factor requires a recently confirmed password[39m[90m                                                  [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling two factor requires a recently confirmed password[39m[90m                                                 [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint marks the session as password confirmed[39m[90m                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint rejects a wrong password[39m[90m                                                          [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprofile page renders the enable two factor password modal[39m[90m                                                   [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrecovery codes flash does not break the alpine attribute after confirmation[39m[90m                                 [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge accepts a recovery code and replaces it[39m[90m                                                     [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge view offers a recovery code input[39m[90m                                                           [39m [90m0.16s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileDetailsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mprofile page displays summary and activity[39m[90m                                                                  [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mphone can be updated[39m[90m                                                                                        [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid phone is rejected[39m[90m                                                                                   [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar can be uploaded[39m[90m                                                                                      [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting avatar is replaced on upload[39m[90m                                                                       [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar is kept when no file is uploaded[39m[90m                                                                     [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows blog post counts and recent posts[39m[90m                                                            [39m [90m0.63s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows empty state without posts[39m[90m                                                                    [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposts index filters by author[39m[90m                                                                               [39m [90m0.47s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PasskeyDeletionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mpasskey can be deleted[39m[90m                                                                                      [39m [90m0.20s[39m  
+
+  [90mTests:[39m    [32;1m32 passed[39;22m[90m (118 assertions)[39m
+  [90mDuration:[39m [39m10.65s[39m
+

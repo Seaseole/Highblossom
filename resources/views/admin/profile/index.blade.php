@@ -1,54 +1,93 @@
-<x-layouts::admin title="Profile">
-    <div class="mx-auto max-w-4xl space-y-10 py-6 sm:py-10">
-        <!-- Header -->
-        <div class="space-y-1">
-            <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Profile Settings</h1>
-            <p class="text-gray-500 dark:text-gray-400">Manage your account settings and preferences.</p>
-        </div>
+@php
+    // Same rule as the settings sheet: the group the server paints is decided here, so the
+    // first frame is the finished frame and Alpine's `x-show` only has to hide the others.
+    // It has to sit above the layout tag, because Blade evaluates a component's opening
+    // attributes before it runs the slot body, and the title is one of them.
+    $profileTabs = [
+        'profile' => 'Profile',
+        'appearance' => 'Appearance',
+        'security' => 'Security',
+        'passkeys' => 'Passkeys',
+        'sessions' => 'Sessions',
+    ];
+    $requestedTab = (string) request()->query('tab', 'profile');
+    $activeTab = array_key_exists($requestedTab, $profileTabs) ? $requestedTab : 'profile';
+@endphp
 
-        <!-- Account Summary -->
-        <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
-                <div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 dark:bg-white/10">
+{{-- The group is in the served title, not only in `document.title` after Alpine runs.
+     Five URLs used to ship one title, so a deep link to the security pane arrived
+     labelled "Profile" to a crawler, to a screen reader reading the tab strip, and to
+     anybody looking at browser history. The runtime watcher writes the same string, so
+     there is no swap on first paint. --}}
+<x-layouts::admin :title="$profileTabs[$activeTab] . ' - My account'">
+    <div class="hb-sheet mx-auto max-w-[72rem] space-y-5 py-6 sm:py-8">
+        <header class="hb-sheet-head">
+            <div class="hb-id">
+                <div class="hb-id__mark">
                     @if ($user->avatar_url)
-                        <img src="{{ $user->avatar_url }}" alt="Avatar of {{ $user->name }}" class="h-full w-full object-cover" />
-                    @else
-                        <span class="text-2xl font-semibold text-gray-500 dark:text-gray-300">{{ $user->initials() }}</span>
+                        <img src="{{ $user->avatar_url }}" alt="Avatar of {{ $user->name }}" class="hb-id__img" />
                     @endif
+                    <span class="hb-id__initials">{{ $user->initials() }}</span>
                 </div>
-                <div class="min-w-0 flex-1 space-y-2">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $user->name }}</h2>
-                        @if ($user->email_verified_at)
-                            <span class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">Email verified</span>
-                        @else
-                            <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Email not verified</span>
+
+                <div class="hb-id__text">
+                    <h1 class="hb-sheet-title">{{ $user->name }}</h1>
+
+                    <p class="hb-id__line">
+                        <span class="hb-mono">{{ $user->email }}</span>
+                        @if ($user->phone)
+                            <span class="hb-sep" aria-hidden="true">·</span>
+                            <span class="hb-mono">{{ $user->phone }}</span>
                         @endif
-                    </div>
-                    <p class="truncate text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
-                    @if ($user->phone)
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->phone }}</p>
-                    @endif
-                    <div class="flex flex-wrap gap-1.5">
+                    </p>
+
+                    <p class="hb-id__roles">
                         @forelse ($user->roles as $role)
-                            <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $role->name }}</span>
+                            <span class="hb-plate">{{ $role->name }}</span>
                         @empty
-                            <span class="text-xs text-gray-400 dark:text-gray-500">No roles assigned</span>
+                            <span class="hb-muted">No roles assigned</span>
                         @endforelse
-                    </div>
-                </div>
-                <div class="space-y-1 text-xs text-gray-500 dark:text-gray-400 sm:pt-1 sm:text-right">
-                    <p>Member since {{ $user->created_at->format('M j, Y') }}</p>
-                    <p>Terms: {{ $user->terms_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</p>
-                    <p>Privacy: {{ $user->privacy_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</p>
+                    </p>
                 </div>
             </div>
-        </div>
+
+            <dl class="hb-sheet-facts">
+                <div class="hb-sheet-fact">
+                    <dt>Status</dt>
+                    <dd>
+                        @if ($user->email_verified_at)
+                            <span class="hb-id__state"><span class="hb-dot hb-dot--ok" aria-hidden="true"></span> Email verified</span>
+                        @else
+                            <span class="hb-id__state"><span class="hb-dot hb-dot--warn" aria-hidden="true"></span> Email not verified</span>
+                        @endif
+                    </dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Member since</dt>
+                    <dd>
+                        <time class="hb-num" datetime="{{ $user->created_at->toIso8601String() }}">
+                            {{ $user->created_at->format('M j, Y') }}
+                        </time>
+                    </dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Marks</dt>
+                    <dd class="hb-num" data-sheet-total>0</dd>
+                </div>
+                <div class="hb-sheet-fact">
+                    <dt>Consent</dt>
+                    <dd class="hb-id__consent">
+                        <span><span class="hb-label">Terms</span> {{ $user->terms_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</span>
+                        <span><span class="hb-label">Privacy</span> {{ $user->privacy_accepted_at?->format('M j, Y') ?? 'Not recorded' }}</span>
+                    </dd>
+                </div>
+            </dl>
+        </header>
 
         <div
             x-data="{ 
-            tab: '{{ request()->query('tab', 'profile') }}',
-            showDeleteModal: false,
+            tab: '{{ $activeTab }}',
+            showDeleteModal: {{ $errors->has('password') ? 'true' : 'false' }},
             showEnableModal: false,
             verifyingPassword: false,
             enablePasswordError: '',
@@ -58,10 +97,18 @@
             confirmCode: '',
 
             init() {
+                const groupLabels = {{ \Illuminate\Support\Js::from($profileTabs) }};
+                const nameTab = (value) => {
+                    document.title = (groupLabels[value] || 'Profile') + ' - My account - {{ config('app.name', 'Laravel') }}';
+                };
+
+                nameTab(this.tab);
+
                 this.$watch('tab', value => {
                     const url = new URL(window.location.href);
                     url.searchParams.set('tab', value);
                     window.history.replaceState({}, '', url.toString());
+                    nameTab(value);
                 });
 
                 if (this.recoveryCodes.length > 0) {
@@ -69,64 +116,101 @@
                 }
             },
 
-            showCodes() {
-                this.loadingCodes = true;
-                fetch('{{ route('admin.profile.two-factor.recovery-codes') }}', {
-                    headers: { 
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(async r => {
-                    if (! r.ok) {
-                        const data = await r.json().catch(() => ({}));
-                        throw new Error(data.message || 'Failed to fetch recovery codes');
-                    }
-                    return r.json();
-                })
-                .then(data => {
-                    if (data.recovery_codes && Array.isArray(data.recovery_codes)) {
-                        this.recoveryCodes = data.recovery_codes;
-                        this.showRecoveryCodesModal = true;
-                    }
-                })
-                .catch(e => {
-                    console.error('TFA Error:', e);
-                    alert(e.message);
-                })
-                .finally(() => this.loadingCodes = false);
+            /* The desk already has one place a message goes, and it does not stop the page: the
+               toaster. `alert()` was used here for both a failure and a success, which is a browser
+               dialog sitting over this design, dismissed by the same key as the sheet's own copy,
+               and on a phone it is a system panel nobody styled. */
+            notify(type, message) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type, message } }));
             },
 
-            regenerateCodes() {
-                if (! confirm('Regenerate recovery codes? Old ones will stop working.')) return;
-                
+            /* One clipboard answer for the two things on this sheet worth copying. The API can be
+               absent — a plain-http origin, an older browser, an embedded webview — and reaching for
+               `writeText` on undefined throws before a promise exists, which is a click that does
+               nothing and says nothing. A refusal after the promise is the milder case, and it was
+               the only one handled. */
+            copyText(text, label) {
+                if (! navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+                    this.notify('warning', 'This browser cannot copy for you. Select the text and copy by hand.');
+
+                    return;
+                }
+
+                navigator.clipboard.writeText(text).then(() => {
+                    this.notify('success', label);
+                }).catch(() => {
+                    this.notify('warning', 'The browser would not copy it. Select the text and copy by hand.');
+                });
+            },
+
+            /* One code path for both reads of the recovery codes: fetching them and regenerating
+               them differ only in the verb and in what has to be said afterwards. */
+            async postRecoveryCodes(url, method, headers) {
                 this.loadingCodes = true;
-                fetch('{{ route('admin.profile.two-factor.regenerate-recovery-codes') }}', {
-                    method: 'POST',
-                    headers: { 
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+
+                try {
+                    const response = await fetch(url, {
+                        method,
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            ...headers,
+                        },
+                    });
+
+                    const data = await response.json().catch(() => ({}));
+
+                    if (! response.ok) {
+                        throw new Error(data.message || 'The codes could not be read from the record.');
                     }
-                })
-                .then(async r => {
-                    if (! r.ok) {
-                        const data = await r.json().catch(() => ({}));
-                        throw new Error(data.message || 'Failed to regenerate codes');
+
+                    if (! Array.isArray(data.recovery_codes)) {
+                        throw new Error('The response carried no codes.');
                     }
-                    return r.json();
-                })
-                .then(data => {
-                    if (data.recovery_codes && Array.isArray(data.recovery_codes)) {
-                        this.recoveryCodes = data.recovery_codes;
-                        this.showRecoveryCodesModal = true;
-                    }
-                })
-                .catch(e => {
-                    console.error('TFA Error:', e);
-                    alert(e.message);
-                })
-                .finally(() => this.loadingCodes = false);
+
+                    this.recoveryCodes = data.recovery_codes;
+                    this.showRecoveryCodesModal = true;
+
+                    return true;
+                } catch (error) {
+                    this.notify('error', error.message);
+
+                    return false;
+                } finally {
+                    this.loadingCodes = false;
+                }
+            },
+
+            showCodes() {
+                this.postRecoveryCodes('{{ route('admin.profile.two-factor.recovery-codes') }}', 'GET', {});
+            },
+
+            async regenerateCodes() {
+                const proceed = await window.adminConfirm({
+                    title: 'Regenerate recovery codes',
+                    message: 'The codes you have now stop working the moment these are written, so anything '
+                        + 'you saved somewhere else will no longer open this account.',
+                    confirm: 'Regenerate',
+                    danger: true,
+                });
+
+                if (! proceed) {
+                    return;
+                }
+
+                await this.postRecoveryCodes('{{ route('admin.profile.two-factor.regenerate-recovery-codes') }}', 'POST', {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                });
+            },
+
+            copyRecoveryCodes() {
+                /* One code per line, which is the shape a password manager wants. The separator is
+                   spelled out rather than escaped because this lives inside an HTML attribute, where
+                   a backslash has already passed through Blade once. */
+                this.copyText(
+                    this.recoveryCodes.join(String.fromCharCode(10)),
+                    this.recoveryCodes.length + ' codes copied.'
+                );
             },
 
             submitEnablePassword() {
@@ -157,248 +241,226 @@
                 .catch(e => {
                     this.enablePasswordError = e.message;
                     this.verifyingPassword = false;
+
+                    /* The sentence is read by the dialog, so the caret has to go back to the box it
+                       is about. A disabled input could not hold it. */
+                    this.$nextTick(() => this.$refs.enable2faPassword.focus());
                 });
             }
         }"
         >
-            <!-- Tabs Navigation -->
-            <div class="no-scrollbar mb-8 flex gap-x-5 overflow-x-auto border-b border-gray-200 dark:border-white/10">
-                @foreach (['profile' => 'Profile', 'appearance' => 'Appearance', 'security' => 'Security', 'passkeys' => 'Passkeys', 'sessions' => 'Sessions'] as $key => $label)
-                    <button
-                        type="button"
-                        @click="tab = '{{ $key }}'"
-                        :class="tab === '{{ $key }}' ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
-                        class="shrink-0 whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors"
-                    >
-                        {{ $label }}
-                    </button>
-                @endforeach
-            </div>
+            <div class="hb-sheet-body">
+                <nav class="hb-index" aria-label="Profile groups">
+                    @foreach ($profileTabs as $key => $label)
+                        <button
+                            type="button"
+                            class="hb-index-item"
+                            data-sheet-index="{{ $key }}"
+                            @click="tab = '{{ $key }}'"
+                            :aria-current="tab === '{{ $key }}' ? 'true' : 'false'"
+                        >
+                            <span>{{ $label }}</span>
+                            <span class="hb-index-count hb-num" data-sheet-count></span>
+                            <span class="hb-index-mark hb-num" data-sheet-marks hidden></span>
+                        </button>
+                    @endforeach
+                </nav>
 
-            <!-- Tab Contents -->
-            <div class="space-y-8">
-                <!-- Profile Tab -->
+                <!-- Tab Contents -->
+                <div class="hb-panes">
+                {{-- Profile Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="profile"
                     x-show="tab === 'profile'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8"
+                    @if ($activeTab !== 'profile') style="display: none" @endif
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                        <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h3>
-                        <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                            @csrf
-                            @method('PUT')
+                    <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" data-sheet-form>
+                        @csrf
+                        @method('PUT')
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value="{{ $user->name }}"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        value="{{ old('username', $user->username) }}"
-                                        autocomplete="username"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                    @error('username')
-                                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-                                    @enderror
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ \App\Support\Username::formatHint() }}. You can sign in with this or your email address.
-                                    </p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value="{{ $user->email }}"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value="{{ $user->phone }}"
-                                        placeholder="+1 555 000 1234"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                    />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar</label>
-                                    <input
-                                        type="file"
-                                        name="avatar"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm transition-all outline-none file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:file:bg-white dark:file:text-gray-900 dark:focus:ring-white"
-                                    />
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">JPG, PNG or WebP, up to 2 MB. Leave empty to keep the current avatar.</p>
-                                </div>
+                        <x-sheet.block title="Profile Information" note="Your own name, the address a reset link goes to, and the number a fitter can call.">
+                            <x-sheet.input
+                                label="Name"
+                                name="name"
+                                key="users.name"
+                                :value="$user->name"
+                            />
+                            <x-sheet.input
+                                label="Username"
+                                name="username"
+                                key="users.username"
+                                autocomplete="username"
+                                :hint="\App\Support\Username::formatHint().'. You can sign in with this or your email address.'"
+                                :value="old('username', $user->username)"
+                            />
+                            <x-sheet.input
+                                label="Email"
+                                name="email"
+                                key="users.email"
+                                type="email"
+                                :value="$user->email"
+                            />
+                            <x-sheet.input
+                                label="Phone"
+                                name="phone"
+                                key="users.phone"
+                                type="tel"
+                                placeholder="+1 555 000 1234"
+                                :value="$user->phone"
+                            />
+                            <x-sheet.input
+                                label="Avatar"
+                                name="avatar"
+                                key="users.avatar"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                hint="JPG, PNG or WebP, up to 2 MB. Leave empty to keep the current avatar."
+                            />
+                        </x-sheet.block>
+
+                        <div class="hb-foot" data-sheet-foot @if (session('success')) data-just-set @endif>
+                            <p class="hb-foot__count" data-sheet-count>Nothing marked. Everything on this sheet is set.</p>
+
+                            <div class="hb-foot__actions">
+                                {{-- No "show only marks" here. This sheet has five fields on screen at a
+                                     time; filtering to the changed ones would hide four to save nothing.
+                                     The settings sheet has a hundred and five, where it is the whole
+                                     point. --}}
+                                <span class="hb-foot__live" data-sheet-live aria-live="polite" role="status"></span>
+                                <x-sheet.commit label="Save Profile" />
                             </div>
+                        </div>
+                    </form>
 
-                            <div class="pt-4">
-                                <button
-                                    type="submit"
-                                    class="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                                >
-                                    Save Profile
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Activity -->
-                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                        <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Activity</h3>
-
-                        <dl class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <x-sheet.block title="Activity" note="What this account has done in the shop, counted from the records themselves.">
+                        <dl class="hb-ledger">
                             @foreach ([
                                 'Bookings' => $user->bookings_count,
                                 'Milestones logged' => $user->booking_events_count,
                                 'Inspection notes' => $user->inspection_notes_count,
                                 'Blog posts' => $user->posts_count,
                             ] as $label => $count)
-                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ $label }}</dt>
-                                    <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ $count }}</dd>
+                                <div class="hb-ledger-cell">
+                                    <dt>{{ $label }}</dt>
+                                    <dd><span class="hb-ledger-value hb-num">{{ $count }}</span></dd>
                                 </div>
                             @endforeach
                         </dl>
+                    </x-sheet.block>
 
-                        <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Recent bookings</h4>
+                    <x-sheet.block title="Recent bookings">
                         @if ($recentBookings->isEmpty())
-                            <p class="text-sm text-gray-500 dark:text-gray-400">No bookings linked to this account yet.</p>
+                            <p class="hb-repeat__empty">No bookings linked to this account yet.</p>
                         @else
-                            <ul class="divide-y divide-gray-100 dark:divide-white/5">
+                            <ul class="hb-list">
                                 @foreach ($recentBookings as $booking)
-                                    <li class="flex items-center justify-between gap-4 py-3 text-sm">
-                                        <div class="min-w-0">
-                                            <p class="truncate font-medium text-gray-900 dark:text-white">{{ $booking->client_name }}</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <li class="hb-list__row">
+                                        <span class="hb-list__main">
+                                            <span class="hb-list__title">{{ $booking->client_name }}</span>
+                                            <time class="hb-list__when hb-num" datetime="{{ ($booking->scheduled_at ?? $booking->created_at)->toIso8601String() }}">
                                                 {{ $booking->scheduled_at?->format('M j, Y H:i') ?? $booking->created_at->format('M j, Y') }}
-                                            </p>
-                                        </div>
-                                        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                                            {{ $booking->status }}
+                                            </time>
                                         </span>
+                                        <span class="hb-list__end"><span class="hb-plate">{{ $booking->status }}</span></span>
                                     </li>
                                 @endforeach
                             </ul>
                         @endif
+                    </x-sheet.block>
 
-                        <div class="mb-2 mt-8 flex items-center justify-between gap-4">
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Recent blog posts</h4>
-                            <a href="{{ route('admin.posts.index', ['user' => $user->id]) }}" class="text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">View all</a>
-                        </div>
+                    <x-sheet.block title="Recent blog posts">
+                        <x-slot:head>
+                            <a href="{{ route('admin.posts.index', ['user' => $user->id]) }}" class="hb-link hb-link--utility">View all</a>
+                        </x-slot:head>
+
                         @if ($recentPosts->isEmpty())
-                            <p class="text-sm text-gray-500 dark:text-gray-400">No blog posts yet.</p>
+                            <p class="hb-repeat__empty">No blog posts yet.</p>
                         @else
-                            <ul class="divide-y divide-gray-100 dark:divide-white/5">
+                            <ul class="hb-list">
                                 @foreach ($recentPosts as $post)
-                                    <li class="flex items-center justify-between gap-4 py-3 text-sm">
-                                        <div class="min-w-0">
-                                            <a href="{{ route('admin.posts.edit', $post) }}" class="block truncate font-medium text-gray-900 hover:underline dark:text-white">
-                                                {{ $post->title }}
-                                            </a>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <li class="hb-list__row">
+                                        <span class="hb-list__main">
+                                            <a href="{{ route('admin.posts.edit', $post) }}" class="hb-list__title">{{ $post->title }}</a>
+                                            <time class="hb-list__when hb-num" datetime="{{ ($post->published_at ?? $post->created_at)->toIso8601String() }}">
                                                 {{ ($post->published_at ?? $post->created_at)->format('M j, Y') }}
-                                            </p>
-                                        </div>
-                                        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                                            {{ $post->status }}
+                                            </time>
                                         </span>
+                                        <span class="hb-list__end"><span class="hb-plate">{{ $post->status }}</span></span>
                                     </li>
                                 @endforeach
                             </ul>
                         @endif
-                    </div>
+                    </x-sheet.block>
 
-                    <!-- Delete Account -->
-                    <div class="rounded-3xl border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/10 sm:p-6 md:p-8">
-                        <h3 class="mb-2 text-lg font-semibold text-red-700 dark:text-red-400">Delete Account</h3>
-                        <p class="mb-6 max-w-lg text-sm text-red-600/80 dark:text-red-400/70">
-                            Once your account is deleted, all of its resources and data will be permanently deleted.
-                            Please enter your password to confirm you would like to permanently delete your account.
-                        </p>
+                    <x-sheet.block title="Delete Account" id="delete-account" note="Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.">
+                        <x-slot:head>
+                            <span class="hb-plate">irreversible</span>
+                        </x-slot:head>
+
                         <button
                             type="button"
                             @click="showDeleteModal = true"
-                            class="rounded-full bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-red-700 active:scale-[0.98]"
+                            class="hb-btn hb-btn--danger"
                         >
-                            Delete Account
+                            Delete account and everything on it
                         </button>
-                    </div>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Appearance Tab -->
+                {{-- Appearance Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="appearance"
                     x-show="tab === 'appearance'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8"
-                    style="display: none"
+                    @if ($activeTab !== 'appearance') style="display: none" @endif
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                        <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Appearance Settings</h3>
-                        <form action="{{ route('admin.profile.appearance.update') }}" method="POST" class="space-y-6">
-                            @csrf
-                            @method('PUT')
+                    <form action="{{ route('admin.profile.appearance.update') }}" data-sheet-form>
+                        @csrf
+                        @method('PUT')
 
-                            <div class="space-y-4">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Theme Preference</label>
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    @foreach (['light' => 'Light', 'dark' => 'Dark', 'auto' => 'Auto'] as $value => $label)
-                                        <label class="relative cursor-pointer">
+                        <x-sheet.block title="Appearance Settings" note="Two choices about how the panel looks at you. Neither changes what you can reach.">
+                            <x-sheet.field label="Theme Preference" key="users.theme" stack="true">
+                                <div class="hb-samples">
+                                    @foreach (['light' => ['Light', 'White faces, ink text'], 'dark' => ['Dark', 'The black the shop is photographed in'], 'auto' => ['Auto', 'Follows this device, day or night']] as $value => [$themeLabel, $themeSub])
+                                        <label class="hb-sample" data-face="{{ $value }}">
                                             <input
                                                 type="radio"
                                                 name="theme"
                                                 value="{{ $value }}"
-                                                {{ $user->theme?->value === $value || ($value === 'auto' && !$user->theme?->value) ? 'checked' : '' }}
-                                                class="peer sr-only"
+                                                {{ $user->theme?->value === $value || ($value === 'auto' && ! $user->theme?->value) ? 'checked' : '' }}
                                             />
-                                            <div class="rounded-xl border-2 border-gray-100 p-4 transition-all peer-checked:border-gray-900 peer-checked:bg-gray-50 dark:border-white/5 dark:peer-checked:border-white dark:peer-checked:bg-white/5">
-                                                <div class="text-center text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {{ $label }}
-                                                </div>
-                                            </div>
+                                            <span class="hb-sample__face">
+                                                <span class="hb-sample__bars" aria-hidden="true">
+                                                    <span class="hb-sample__bar"></span>
+                                                    <span class="hb-sample__bar"></span>
+                                                </span>
+                                            </span>
+                                            <span class="hb-sample__word">{{ $themeLabel }}</span>
+                                            <span class="hb-sample__sub">{{ $themeSub }}</span>
                                         </label>
                                     @endforeach
                                 </div>
-                            </div>
+                            </x-sheet.field>
 
                             {{-- Desktop navigation, chosen the same way and saved by the same
                                  button. The two diagrams are the whole argument for putting a
                                  control here at all: a person can see which shape they are
                                  picking before the panel rearranges itself. --}}
-                            <div class="space-y-4 border-t border-gray-100 pt-6 dark:border-white/10">
-                                <div class="space-y-1">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Desktop navigation
-                                    </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Which holds the menu on a wide screen. Phones and tablets use the
-                                        slide-out menu either way, so this is a desk preference and not a
-                                        change to what you can reach.
-                                    </p>
-                                    @error('admin_nav_layout')
-                                        <p class="text-xs text-red-500">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <x-sheet.field
+                                label="Desktop navigation"
+                                key="users.admin_nav_layout"
+                                error="admin_nav_layout"
+                                stack="true"
+                                hint="Which holds the menu on a wide screen. Phones and tablets use the slide-out menu either way, so this is a desk preference and not a change to what you can reach."
+                            >
+                                <div class="hb-samples">
                                     @foreach (\App\Enums\AdminNavLayout::options() as $layout)
                                         @php
                                             // Old input wins after a rejected submit, or the form would
@@ -408,16 +470,15 @@
                                             $current = old('admin_nav_layout', \App\Support\AdminNav::for($user)->value);
                                         @endphp
 
-                                        <label class="relative cursor-pointer">
+                                        <label class="hb-sample" data-face="nav">
                                             <input
                                                 type="radio"
                                                 name="admin_nav_layout"
                                                 value="{{ $layout->value }}"
                                                 {{ $current === $layout->value ? 'checked' : '' }}
-                                                class="peer sr-only"
                                             />
-                                            <div class="flex h-full flex-col gap-4 rounded-xl border-2 border-gray-100 p-4 transition-all peer-checked:border-gray-900 peer-checked:bg-gray-50 dark:border-white/5 dark:peer-checked:border-white dark:peer-checked:bg-white/5">
-                                                <span class="block w-full text-gray-200 dark:text-white/15" aria-hidden="true">
+                                            <span class="hb-sample__face hb-sample__face--diagram">
+                                                <span class="hb-sample__diagram" aria-hidden="true">
                                                     @if ($layout === \App\Enums\AdminNavLayout::Sidebar)
                                                         {{-- A rail down the left edge, a bar across the top,
                                                              and content as lines beside both. --}}
@@ -447,487 +508,742 @@
                                                         </svg>
                                                     @endif
                                                 </span>
+                                            </span>
 
-                                                <span class="block">
-                                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $layout->label() }}
-                                                    </span>
-                                                    <span class="mt-1 block text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                                                        {{ $layout->description() }}
-                                                    </span>
-                                                </span>
-                                            </div>
+                                            <span class="hb-sample__word">{{ $layout->label() }}</span>
+                                            <span class="hb-sample__sub">{{ $layout->description() }}</span>
                                         </label>
                                     @endforeach
                                 </div>
-                            </div>
+                            </x-sheet.field>
+                        </x-sheet.block>
 
-                            <div class="pt-4">
-                                <button
-                                    type="submit"
-                                    class="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                                >
-                                    Save Appearance
-                                </button>
+                        <div class="hb-foot" data-sheet-foot @if (session('success')) data-just-set @endif>
+                            <p class="hb-foot__count" data-sheet-count>Nothing marked. Everything on this sheet is set.</p>
+
+                            <div class="hb-foot__actions">
+                                <x-sheet.commit label="Save Appearance" />
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- Security Tab -->
+
+                {{-- Security Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="security"
                     x-show="tab === 'security'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-8"
-                    style="display: none"
+                    @if ($activeTab !== 'security') style="display: none" @endif
                 >
-                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                        <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Update Password</h3>
-                        <form
-                            action="{{ route('admin.profile.password.update') }}"
-                            method="POST"
-                            class="space-y-6"
-                            x-data="{
-                                generatePassword() {
-                                    const length = 16;
-                                    const charset =
-                                        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
-                                    let retVal = '';
-                                    for (let i = 0; i < length; ++i) {
-                                        retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+                    <form
+                        action="{{ route('admin.profile.password.update') }}"
+                        method="POST"
+                        data-sheet-form
+                        x-data="{
+                            /* A password this box is about to hand to the shop has to come from the
+                               CSPRNG. `Math.random()` is not one: it is a predictable generator, and
+                               the button says Generate Secure beside a field whose whole job is the
+                               account's key. A byte is only used when it falls inside the largest
+                               multiple of the charset size, so no character is likelier than any
+                               other and nothing here leans on `%` of a biased draw. */
+                            generatePassword() {
+                                const length = 16;
+                                const charset =
+                                    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
+                                const limit = Math.floor(256 / charset.length) * charset.length;
+                                const byte = new Uint8Array(1);
+                                let retVal = '';
+
+                                while (retVal.length < length) {
+                                    window.crypto.getRandomValues(byte);
+
+                                    if (byte[0] < limit) {
+                                        retVal += charset.charAt(byte[0] % charset.length);
                                     }
-                                    $refs.passwordInput.value = retVal;
-                                    $refs.passwordConfirmInput.value = retVal;
-                                },
-                                showPassword: false,
-                                showConfirmPassword: false,
-                            }"
+                                }
+
+                                const apply = (ref) => {
+                                    ref.value = retVal;
+
+                                    /* The policy list under the box listens for `input`, and a value
+                                       written by hand fires nothing. Without this the checklist goes
+                                       on describing the empty box that was there a moment ago, next to
+                                       a hint that says it ticks as you type. */
+                                    ref.dispatchEvent(new Event('input', { bubbles: true }));
+                                };
+
+                                apply($refs.passwordInput);
+                                apply($refs.passwordConfirmInput);
+                            },
+                            showPassword: false,
+                            showConfirmPassword: false,
+                        }"
+                    >
+                        @csrf
+                        @method('PUT')
+
+                        <x-sheet.block
+                            title="Update Password"
+                            note="Changes the password this account signs in with, and nothing else. The rules a new one has to clear are written on the security page, not on this form."
                         >
-                            @csrf
-                            @method('PUT')
+                            <x-sheet.input
+                                label="Current Password"
+                                name="current_password"
+                                type="password"
+                                autocomplete="current-password"
+                            />
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                            {{-- The two boxes that carry the reveal toggle stay raw: an Alpine
+                                 `:type` binding cannot live on a component tag, and the checklist
+                                 below finds this box by `document.getElementById('password')`. --}}
+                            <x-sheet.field
+                                label="New Password"
+                                key="users.password"
+                                for="password"
+                                error="password"
+                                stack="true"
+                                hint="The list under the box is the policy the shop enforces, and it ticks as you type. Generate Secure fills both boxes with a random one."
+                            >
+                                <div class="relative hb-inline">
                                     <input
-                                        type="password"
-                                        name="current_password"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
+                                        :type="showPassword ? 'text' : 'password'"
+                                        id="password"
+                                        name="password"
+                                        x-ref="passwordInput"
+                                        autocomplete="new-password"
+                                        class="hb-input"
+                                        passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
+                                        @if ($errors->has('password')) aria-invalid="true" aria-describedby="password-error" @endif
                                     />
+                                    <button
+                                        type="button"
+                                        @click="showPassword = ! showPassword"
+                                        aria-controls="password"
+                                        :aria-expanded="showPassword ? 'true' : 'false'"
+                                        :aria-label="showPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
+                                        class="hb-btn hb-btn--reveal"
+                                    >
+                                        <svg x-show="! showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <div></div>
-                                <div class="space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <label for="password" class="text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
-                                        <button
-                                            type="button"
-                                            @click="generatePassword()"
-                                            class="text-xs text-blue-600 hover:underline dark:text-blue-400"
-                                        >
-                                            Generate Secure
-                                        </button>
-                                    </div>
-                                    <div class="relative">
-                                        <input
-                                            :type="showPassword ? 'text' : 'password'"
-                                            id="password"
-                                            name="password"
-                                            x-ref="passwordInput"
-                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
-                                        />
-                                        <button
-                                            type="button"
-                                            @click="showPassword = ! showPassword"
-                                            aria-controls="password"
-                                            :aria-expanded="showPassword ? 'true' : 'false'"
-                                            :aria-label="showPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-5 text-[#A1A1AA] transition-colors hover:text-[#71717A] focus:text-[#71717A] focus:outline-none"
-                                        >
-                                            <svg x-show="! showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <x-ui.password-rules input="password" />
+
+                                <div class="hb-cluster">
+                                    <button
+                                        type="button"
+                                        @click="generatePassword()"
+                                        class="hb-btn hb-btn--small"
+                                    >
+                                        Generate Secure
+                                    </button>
                                 </div>
-                                <div class="space-y-2">
-                                    <label for="password_confirmation" class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
-                                    <div class="relative">
-                                        <input
-                                            :type="showConfirmPassword ? 'text' : 'password'"
-                                            id="password_confirmation"
-                                            name="password_confirmation"
-                                            x-ref="passwordConfirmInput"
-                                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-14 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                                            passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
-                                        />
-                                        <button
-                                            type="button"
-                                            @click="showConfirmPassword = ! showConfirmPassword"
-                                            aria-controls="password_confirmation"
-                                            :aria-expanded="showConfirmPassword ? 'true' : 'false'"
-                                            :aria-label="showConfirmPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-5 text-[#A1A1AA] transition-colors hover:text-[#71717A] focus:text-[#71717A] focus:outline-none"
-                                        >
-                                            <svg x-show="! showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
-                                            </svg>
-                                        </button>
-                                    </div>
+
+                                <x-ui.password-rules input="password" />
+                            </x-sheet.field>
+
+                            <x-sheet.field
+                                label="Confirm Password"
+                                for="password_confirmation"
+                                stack="true"
+                                hint="Type the new one twice. The two boxes are compared before anything is written, which is the only reason this row exists."
+                            >
+                                <div class="relative hb-inline">
+                                    <input
+                                        :type="showConfirmPassword ? 'text' : 'password'"
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        x-ref="passwordConfirmInput"
+                                        autocomplete="new-password"
+                                        class="hb-input"
+                                        passwordrules="{{ \Illuminate\Validation\Rules\Password::default()->toPasswordRulesString() }}"
+                                    />
+                                    <button
+                                        type="button"
+                                        @click="showConfirmPassword = ! showConfirmPassword"
+                                        aria-controls="password_confirmation"
+                                        :aria-expanded="showConfirmPassword ? 'true' : 'false'"
+                                        :aria-label="showConfirmPassword ? '{{ __('auth.login.hide_password') }}' : '{{ __('auth.login.show_password') }}'"
+                                        class="hb-btn hb-btn--reveal"
+                                    >
+                                        <svg x-show="! showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.77 9.77 0 012.804-3.704M15.48 15.48l2.58 2.58M12 9a3 3 0 013 3m-3-3a3 3 0 00-3 3m0 0a3 3 0 013-3m0 0l-2.58-2.58M21 21l-9-9m0 0L3 3" />
+                                        </svg>
+                                    </button>
                                 </div>
+                            </x-sheet.field>
+                        </x-sheet.block>
+
+                        <div class="hb-foot" data-sheet-foot @if (session('success')) data-just-set @endif>
+                            <p class="hb-foot__count" data-sheet-count>Nothing marked. Everything on this sheet is set.</p>
+
+                            <div class="hb-foot__actions">
+                                <x-sheet.commit label="Update Password" />
                             </div>
+                        </div>
+                    </form>
 
-                            <div class="pt-4">
-                                <button
-                                    type="submit"
-                                    class="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                                >
-                                    Update Password
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- TFA Component -->
-                    <div class="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0A0A0F]">
-                        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                            Two-Factor Authentication
-                        </h3>
-                        <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-                            Secure your account with an extra layer of protection.
-                        </p>
-
+                    <x-sheet.block
+                        title="Two-Factor Authentication"
+                        note="One more thing to bring to a sign-in besides the password. It changes this account only, and it asks at every door the account can be used at."
+                    >
                         @if (! $user->two_factor_secret)
-                            {{-- Step 1: Enable (password confirmed through the modal) --}}
+                            {{-- Step 1: Enable. The modal submits this form through
+                                 `this.$refs.enable2faForm.submit()` once its fetch has
+                                 verified the password, so it stays a plain POST and stays
+                                 hidden. It commits on its own, so it gets no marks and no
+                                 foot. --}}
                             <form action="{{ route('admin.profile.two-factor.enable') }}" method="POST" x-ref="enable2faForm" class="hidden">
                                 @csrf
                             </form>
-                            <button
-                                type="button"
-                                @click="showEnableModal = true; $nextTick(() => $refs.enable2faPassword.focus())"
-                                class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                            >
-                                Enable Two-Factor
-                            </button>
-                        @elseif ($user->two_factor_secret && ! $user->two_factor_confirmed_at)
-                            {{-- Step 2: Setup (Unconfirmed) --}}
-                            <div class="space-y-6">
-                                <div class="inline-block max-w-full rounded-xl border border-gray-100 bg-gray-50 p-4 [&>svg]:mx-auto [&>svg]:block [&>svg]:h-auto [&>svg]:max-w-[220px] dark:border-white/5 dark:bg-white/5">
-                                    {!! $qrCodeSvg !!}
-                                </div>
 
-                                <p class="text-sm text-gray-600 dark:text-gray-300">
-                                    Scan this QR code with your authenticator app.
+                            <div class="hb-state">
+                                <p class="hb-state__head">
+                                    <span class="hb-state__dot" aria-hidden="true"></span>
+                                    <span class="hb-state__word">Two-factor authentication is off.</span>
                                 </p>
 
-                                <form
-                                    action="{{ route('admin.profile.two-factor.confirm') }}"
-                                    method="POST"
-                                    class="space-y-4"
-                                >
-                                    @csrf
-                                    <input
-                                        type="text"
-                                        name="code"
-                                        required
-                                        inputmode="numeric"
-                                        autocomplete="one-time-code"
-                                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-white/5"
-                                        placeholder="Enter authentication code"
-                                    />
-                                    @error('code')
-                                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-                                    @enderror
-                                    <div class="flex flex-wrap items-center gap-4">
+                                <p class="hb-state__body">
+                                    Signing in asks for the password alone. Turn it on and every sign-in
+                                    wants a six-digit code as well. The secret only reaches your record
+                                    once you have confirmed a code from the app.
+                                </p>
+
+                                <div class="hb-repeat-bar">
+                                    {{-- Focus is the dialog's job now; asking for it from here was a
+                                         race with x-show that usually lost. --}}
+                                    <button
+                                        type="button"
+                                        @click="showEnableModal = true"
+                                        class="hb-btn hb-btn--primary"
+                                    >
+                                        Enable Two-Factor
+                                    </button>
+                                </div>
+                            </div>
+                        @elseif ($user->two_factor_secret && ! $user->two_factor_confirmed_at)
+                            {{-- Step 2: Setup (Unconfirmed). A secret exists and is not live, which
+                                 is what the amber dot is for. The plate keeps a white face in both
+                                 themes because an inverted QR does not scan.
+
+                                 The code and the thing it comes from are two halves of one job, so
+                                 they are set side by side: nobody should have to hold a phone in one
+                                 hand and scroll for the box in the other. --}}
+                            <div class="hb-setup">
+                                {{-- The state is a sentence about the whole job, not about the left
+                                   half of it. It spans both columns so the two panes underneath are
+                                   plainly the two halves of one thing. --}}
+                                <div class="hb-state hb-state--warn hb-setup__state">
+                                    <p class="hb-state__head">
+                                        <span class="hb-state__dot" aria-hidden="true"></span>
+                                        <span class="hb-state__word">Waiting for the first code.</span>
+                                    </p>
+
+                                    <p class="hb-state__body">
+                                        The secret is on this record but not yet live. Nothing about
+                                        signing in changes until six digits come back from the app.
+                                    </p>
+                                </div>
+
+                                <div class="hb-setup__pane">
+                                    <div class="hb-setup__qr">
+                                        <div class="hb-asset__frame hb-qr">{!! $qrCodeSvg !!}</div>
+                                        <p class="hb-setup__say">Scan this QR code with your authenticator app.</p>
+                                    </div>
+
+                                    @if ($manualSetup)
+                                        {{-- The typed half of the same key. Every authenticator takes
+                                             an account and a key by hand, and a person setting this up
+                                             on the machine they sign in from has no camera pointed at
+                                             its own screen. --}}
+                                        <div x-data="{ showKey: false }">
+                                            <button
+                                                type="button"
+                                                @click="showKey = ! showKey"
+                                                :aria-expanded="showKey ? 'true' : 'false'"
+                                                aria-controls="two-factor-manual-key"
+                                                class="hb-btn hb-btn--small"
+                                            >
+                                                <span x-show="! showKey">Cannot scan it? Type the key</span>
+                                                <span x-cloak x-show="showKey">Hide the key</span>
+                                            </button>
+
+                                            <dl
+                                                id="two-factor-manual-key"
+                                                class="hb-manual-key"
+                                                x-show="showKey"
+                                                x-cloak
+                                            >
+                                                <div>
+                                                    <dt>Account</dt>
+                                                    <dd class="hb-mono">{{ $manualSetup['account'] }}</dd>
+                                                </div>
+
+                                                <div>
+                                                    <dt>Issuer</dt>
+                                                    <dd>{{ $manualSetup['issuer'] }}</dd>
+                                                </div>
+
+                                                <div>
+                                                    <dt>Key</dt>
+                                                    <dd>
+                                                        <span class="hb-mono" data-secret="{{ $manualSetup['secret'] }}">{{ $manualSetup['secret'] }}</span>
+
+                                                        <button
+                                                            type="button"
+                                                            @click="copyText($el.previousElementSibling.dataset.secret, 'Setup key copied.')"
+                                                            class="hb-btn hb-btn--small"
+                                                        >
+                                                            Copy key
+                                                        </button>
+                                                    </dd>
+                                                </div>
+
+                                                <p class="hb-manual-key__say">
+                                                    Time-based, six digits, SHA-1, thirty seconds. Those are
+                                                    Fortify's defaults, and every mainstream app already uses them.
+                                                </p>
+                                            </dl>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="hb-setup__pane">
+                                    <form
+                                        id="two-factor-confirm-form"
+                                        action="{{ route('admin.profile.two-factor.confirm') }}"
+                                        method="POST"
+                                    >
+                                        @csrf
+
+                                        <x-sheet.input
+                                            label="Authentication code"
+                                            name="code"
+                                            key="users.two_factor_confirmed_at"
+                                            error="code"
+                                            mono="true"
+                                            inputmode="numeric"
+                                            autocomplete="one-time-code"
+                                            placeholder="Enter authentication code"
+                                            hint="The six digits the app shows right now. Not the key above, and not a code that has just rolled past."
+                                            required
+                                        />
+                                    </form>
+
+                                    {{-- `data-confirm` is the whole ask: admin.js catches the submit,
+                                         puts the question through the desk's own panel, and lets the
+                                         form go only once it is answered. An inline
+                                         `onsubmit="return confirm(...)"` used to do this, which froze
+                                         the page mid-scroll for a question about a QR code. --}}
+                                    <form
+                                        id="two-factor-cancel-form"
+                                        action="{{ route('admin.profile.two-factor.cancel') }}"
+                                        method="POST"
+                                        data-confirm="Cancelling throws away the key this QR code and the typed one were built from. Nothing about signing in changes, and you can start again whenever you like."
+                                        data-confirm-title="Cancel two-factor setup"
+                                        data-confirm-yes="Discard the key"
+                                        data-confirm-danger="1"
+                                    >
+                                        @csrf
+                                    </form>
+
+                                    {{-- One bar for the answers to the question the pane is asking,
+                                         and the milder of the two destructive controls gets its own
+                                         band below a rule that says why. The forms stay separate
+                                         elements because they post to different endpoints with
+                                         different CSRF tokens and one of them carries the delegated
+                                         ask; `form=` is what lets the buttons sit where they read
+                                         best instead of where the markup happens to put them. --}}
+                                    <div class="hb-repeat-bar">
                                         <button
                                             type="submit"
-                                            class="rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white dark:bg-white dark:text-gray-900"
+                                            form="two-factor-confirm-form"
+                                            class="hb-btn hb-btn--primary"
                                         >
                                             Confirm
                                         </button>
                                     </div>
-                                </form>
-                                <form action="{{ route('admin.profile.two-factor.cancel') }}" method="POST" onsubmit="return confirm('Cancel two-factor setup? The QR code will be discarded.')">
-                                    @csrf
-                                    <button
-                                        type="submit"
-                                        class="text-sm text-gray-500 underline-offset-4 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-200"
-                                    >
-                                        Cancel setup
-                                    </button>
-                                </form>
+
+                                    <div class="hb-repeat-bar hb-repeat-bar--split">
+                                        <button
+                                            type="submit"
+                                            form="two-factor-cancel-form"
+                                            class="hb-btn hb-btn--danger"
+                                        >
+                                            Cancel setup
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         @else
-                            {{-- Step 3: Confirmed --}}
-                            <div class="space-y-4">
-                                <div class="flex items-center gap-2 font-medium text-emerald-600 dark:text-emerald-400">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                                    <span>Two-factor authentication is enabled.</span>
-                                </div>
+                            {{-- Step 3: Confirmed. --}}
+                            <div class="hb-state hb-state--ok">
+                                <p class="hb-state__head">
+                                    <span class="hb-state__dot" aria-hidden="true"></span>
+                                    <span class="hb-state__word">Two-factor authentication is enabled.</span>
+                                </p>
 
-                                <div class="flex flex-wrap gap-4 pt-2">
+                                <p class="hb-state__body">
+                                    Signing in now needs the code from your app as well as the password.
+                                    The codes below are the way back in when that device is gone.
+                                </p>
+
+                                <div class="hb-repeat-bar">
                                     <button
                                         type="button"
                                         @click="showCodes()"
                                         :disabled="loadingCodes"
-                                        class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                                        :aria-busy="loadingCodes ? 'true' : 'false'"
+                                        class="hb-btn"
                                     >
                                         <span x-show="! loadingCodes">Show Recovery Codes</span>
-                                        <span x-show="loadingCodes">Loading...</span>
+                                        <span x-cloak x-show="loadingCodes">Loading...</span>
                                     </button>
 
                                     <button
                                         type="button"
                                         @click="regenerateCodes()"
                                         :disabled="loadingCodes"
-                                        class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                                        :aria-busy="loadingCodes ? 'true' : 'false'"
+                                        class="hb-btn"
                                     >
                                         Regenerate Recovery Codes
                                     </button>
+                                </div>
 
-                                    <form action="{{ route('admin.profile.two-factor.disable') }}" method="POST">
+                                {{-- The one control here that cannot be undone by pressing another
+                                     button afterwards, so it does not sit in the row with the two
+                                     that can. Its own band, its own rule, and the words that say
+                                     why it is on its own. --}}
+                                <div class="hb-repeat-bar hb-repeat-bar--split">
+                                    <form
+                                        action="{{ route('admin.profile.two-factor.disable') }}"
+                                        method="POST"
+                                        data-confirm="Switching two-factor off means the next sign-in wants only the password, on every device, until you set it up again."
+                                        data-confirm-title="Disable two-factor authentication"
+                                        data-confirm-yes="Switch it off"
+                                        data-confirm-danger="1"
+                                    >
                                         @csrf
-                                        <button
-                                            type="submit"
-                                            class="rounded-full bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition-all hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400"
-                                        >
-                                            Disable TFA
-                                        </button>
+                                        <button type="submit" class="hb-btn hb-btn--danger">Disable TFA</button>
                                     </form>
                                 </div>
                             </div>
                         @endif
-                    </div>
+                    </x-sheet.block>
                 </div>
 
-                <!-- Passkeys Tab -->
+                {{-- Passkeys Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="passkeys"
                     x-show="tab === 'passkeys'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6"
-                    style="display: none"
+                    @if ($activeTab !== 'passkeys') style="display: none" @endif
                 >
+                    {{-- The island brings its own block, head and sentence, so the pane gives it
+                         no frame of its own — a card inside a card would put two headings on one
+                         subject. --}}
                     @livewire('passkeys')
                 </div>
 
-                <!-- Sessions Tab -->
+                {{-- Sessions Tab --}}
                 <div
+                    class="hb-pane"
+                    data-sheet-pane="sessions"
                     x-show="tab === 'sessions'"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-6"
-                    style="display: none"
+                    @if ($activeTab !== 'sessions') style="display: none" @endif
                 >
+                    {{-- The partial already carries two titled blocks of its own, each with a
+                         sentence about what it holds. Wrapping them in a third would put a card
+                         inside a card and give the pane two headings where it has one subject. --}}
                     @include('admin.profile.sessions-tab')
+                </div>
                 </div>
             </div>
 
-            <!-- Enable Two-Factor Password Modal -->
+            {{-- Enable Two-Factor Password Modal.
+                 `x-dialog` owns what an overlay owes the page: Tab stays inside it, Escape and the
+                 backdrop put the flag back, the desk's scroller stops behind it, and focus lands on
+                 the box and returns to the button that asked. Before that was one `x-show`, and the
+                 only one of those four it did was the hiding. --}}
             <div
+                class="hb-modal"
+                x-cloak
                 x-show="showEnableModal"
-                x-transition:enter="transition-opacity ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition-opacity ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm dark:bg-black/60"
-                style="display: none"
-                @keydown.escape.window="showEnableModal = false"
+                x-transition:enter="hb-x-enter"
+                x-transition:enter-start="hb-x-enter-from"
+                x-transition:enter-end="hb-x-enter-to"
+                x-transition:leave="hb-x-leave"
+                x-transition:leave-start="hb-x-leave-from"
+                x-transition:leave-end="hb-x-leave-to"
             >
                 <div
+                    class="hb-modal__panel"
+                    x-dialog="showEnableModal"
                     x-show="showEnableModal"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="enable-2fa-title"
+                    aria-describedby="enable-2fa-lede"
+                    x-transition:enter="hb-x-enter"
+                    x-transition:enter-start="hb-x-enter-from"
+                    x-transition:enter-end="hb-x-enter-to"
+                    x-transition:leave="hb-x-leave"
+                    x-transition:leave-start="hb-x-leave-from"
+                    x-transition:leave-end="hb-x-leave-to"
+                    @click.outside="showEnableModal = false"
                 >
-                    <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Confirm Password</h3>
-                    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-                        For your security, enter your password to enable two-factor authentication for this account.
+                    <h3 id="enable-2fa-title" class="hb-modal__title">Confirm your password</h3>
+
+                    <p id="enable-2fa-lede" class="hb-modal__body">
+                        For your security, this asks for the password again rather than trusting the
+                        session you are already in. Turning two-factor on means every sign-in wants a
+                        six-digit code from an app as well as the password, and the app is being given
+                        the key to your account.
                     </p>
 
-                    <form @submit.prevent="submitEnablePassword()" class="space-y-4">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                            <input
-                                type="password"
-                                x-ref="enable2faPassword"
-                                name="password"
-                                autocomplete="current-password"
-                                :disabled="verifyingPassword"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                            <p x-show="enablePasswordError" x-text="enablePasswordError" class="text-xs text-red-600 dark:text-red-400"></p>
-                        </div>
+                    <form @submit.prevent="submitEnablePassword()" class="hb-modal__form">
+                        <label class="hb-field__label" for="two_factor_enable_password">Password</label>
 
-                        <div class="flex gap-4 pt-4">
+                        {{-- Read-only rather than disabled while it works: a disabled box drops
+                             focus, and a refused password has to say so somewhere the caret can
+                             go back to. --}}
+                        <input
+                            type="password"
+                            id="two_factor_enable_password"
+                            x-ref="enable2faPassword"
+                            data-dialog-initial
+                            name="password"
+                            autocomplete="current-password"
+                            :read-only="verifyingPassword"
+                            :aria-invalid="enablePasswordError ? 'true' : 'false'"
+                            :aria-describedby="enablePasswordError ? 'enable-2fa-error' : 'enable-2fa-lede'"
+                            class="hb-input"
+                        />
+
+                        <p
+                            id="enable-2fa-error"
+                            x-show="enablePasswordError"
+                            x-cloak
+                            x-text="enablePasswordError"
+                            role="alert"
+                            class="hb-error"
+                        ></p>
+
+                        <div class="hb-modal__foot">
                             <button
                                 type="button"
                                 @click="showEnableModal = false"
                                 :disabled="verifyingPassword"
-                                class="flex-1 rounded-full bg-gray-100 px-4 py-2.5 font-medium text-gray-700 transition-all hover:bg-gray-200 disabled:opacity-50 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                                class="hb-btn"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 :disabled="verifyingPassword"
-                                class="flex-1 rounded-full bg-gray-900 px-4 py-2.5 font-medium text-white transition-all hover:bg-gray-800 disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                                class="hb-btn hb-btn--primary"
                             >
                                 <span x-show="! verifyingPassword">Verify</span>
-                                <span x-show="verifyingPassword">Verifying...</span>
+                                <span x-cloak x-show="verifyingPassword">Verifying...</span>
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Delete Account Modal -->
+            {{-- Delete Account. This one used to be the only overlay on the page that was not a
+                 dialog: no `x-dialog`, no `role`, no label, so Escape did nothing, Tab walked out
+                 into the sheet behind it, the desk kept scrolling under the backdrop, and the caret
+                 never arrived in the box. The other two had all of that. Now all three do.
+
+                 It also reopens itself when the password is refused. The form is a plain POST, so a
+                 wrong answer comes back as a redirect, and a modal whose flag lives only in Alpine
+                 came back *closed* with one red sentence somewhere on a page of forty fields. The
+                 `password` key is safe to read here: the password update writes `current_password`,
+                 and the two-factor check answers as JSON and never reaches the session bag. --}}
             <div
+                class="hb-modal"
+                x-cloak
                 x-show="showDeleteModal"
-                x-transition:enter="transition-opacity ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition-opacity ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm dark:bg-black/60"
-                style="display: none"
+                x-transition:enter="hb-x-enter"
+                x-transition:enter-start="hb-x-enter-from"
+                x-transition:enter-end="hb-x-enter-to"
+                x-transition:leave="hb-x-leave"
+                x-transition:leave-start="hb-x-leave-from"
+                x-transition:leave-end="hb-x-leave-to"
             >
                 <div
+                    class="hb-modal__panel"
+                    x-dialog="showDeleteModal"
                     x-show="showDeleteModal"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-account-title"
+                    aria-describedby="delete-account-lede"
+                    x-transition:enter="hb-x-enter"
+                    x-transition:enter-start="hb-x-enter-from"
+                    x-transition:enter-end="hb-x-enter-to"
+                    x-transition:leave="hb-x-leave"
+                    x-transition:leave-start="hb-x-leave-from"
+                    x-transition:leave-end="hb-x-leave-to"
+                    @click.outside="showDeleteModal = false"
                 >
-                    <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Delete Account</h3>
-                    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-                        Are you sure you want to delete your account? All of your data will be permanently removed. This
-                        action cannot be undone.
+                    <h3 id="delete-account-title" class="hb-modal__title">Delete this account</h3>
+
+                    <p id="delete-account-lede" class="hb-modal__body">
+                        Your staff record is removed and you are signed out on every device. There is
+                        no undo and no grace period: the only way back is for another Super Admin to
+                        create the account again, and it will not be this one.
                     </p>
 
-                    <form action="{{ route('admin.profile.destroy') }}" method="POST" class="space-y-4">
+                    <form action="{{ route('admin.profile.destroy') }}" method="POST" class="hb-modal__form">
                         @csrf
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
-                            />
-                        </div>
+                        {{-- `admin.profile.destroy` is registered as a DELETE route. This form posted
+                             POST with no `@method`, so every answer to this dialog was a 405 and the
+                             account was never deleted, from either side. The two session forms on the
+                             Sessions pane already carry the override; this one was missed. --}}
+                        @method('DELETE')
 
-                        <div class="flex gap-4 pt-4">
+                        <label class="hb-field__label" for="delete_account_password">Password</label>
+
+                        <input
+                            type="password"
+                            id="delete_account_password"
+                            name="password"
+                            autocomplete="current-password"
+                            data-dialog-initial
+                            @if ($errors->has('password')) aria-invalid="true" aria-describedby="delete-account-error" @endif
+                            class="hb-input"
+                        />
+
+                        @error('password')
+                            <p id="delete-account-error" class="hb-error" role="alert">{{ $message }}</p>
+                        @enderror
+
+                        <div class="hb-modal__foot">
                             <button
                                 type="button"
                                 @click="showDeleteModal = false"
-                                class="flex-1 rounded-full bg-gray-100 px-4 py-2.5 font-medium text-gray-700 transition-all hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                                class="hb-btn"
                             >
-                                Cancel
+                                Keep the account
                             </button>
                             <button
                                 type="submit"
-                                class="flex-1 rounded-full bg-red-600 px-4 py-2.5 font-medium text-white transition-all hover:bg-red-700"
+                                class="hb-btn hb-btn--danger"
                             >
-                                Delete Account
+                                Delete it
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Recovery Codes Modal -->
+            {{-- Recovery Codes. The X and the footer used to both be named "Close", so the first
+                 thing a screen reader read out was a duplicate, and the caret landed on the X
+                 rather than on the one control worth pressing here. The X is now named for what it
+                 closes, the footer says Done, and Copy takes focus. --}}
             <div
+                class="hb-modal"
+                x-cloak
                 x-show="showRecoveryCodesModal"
-                x-transition:enter="transition-opacity ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition-opacity ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm dark:bg-black/60"
-                style="display: none"
-                @keydown.escape.window="showRecoveryCodesModal = false"
+                x-transition:enter="hb-x-enter"
+                x-transition:enter-start="hb-x-enter-from"
+                x-transition:enter-end="hb-x-enter-to"
+                x-transition:leave="hb-x-leave"
+                x-transition:leave-start="hb-x-leave-from"
+                x-transition:leave-end="hb-x-leave-to"
             >
                 <div
+                    class="hb-modal__panel hb-modal__panel--wide"
+                    x-dialog="showRecoveryCodesModal"
                     x-show="showRecoveryCodesModal"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#0A0A0F]"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="recovery-codes-title"
+                    aria-describedby="recovery-codes-lede"
+                    x-transition:enter="hb-x-enter"
+                    x-transition:enter-start="hb-x-enter-from"
+                    x-transition:enter-end="hb-x-enter-to"
+                    x-transition:leave="hb-x-leave"
+                    x-transition:leave-start="hb-x-leave-from"
+                    x-transition:leave-end="hb-x-leave-to"
+                    @click.outside="showRecoveryCodesModal = false"
                 >
-                    <div class="mb-6 flex items-center justify-between">
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Recovery Codes</h3>
+                    <div class="hb-modal__head">
+                        <h3 id="recovery-codes-title" class="hb-modal__title">Recovery codes</h3>
+
                         <button
+                            type="button"
                             @click="showRecoveryCodesModal = false"
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                            aria-label="Close recovery codes"
+                            class="hb-modal__x"
                         >
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
-                    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-                        Store these recovery codes in a secure password manager. They can be used to recover access to
-                        your account if your two-factor authentication device is lost.
+                    <p id="recovery-codes-lede" class="hb-modal__body">
+                        Each one is used once, by itself, when the device is gone. Copy them whole into
+                        a password manager rather than photographing the screen. They stay the same
+                        until you regenerate them, so this dialog can be opened again from the
+                        Security group at any time.
                     </p>
 
-                    <div class="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                        <template x-for="code in recoveryCodes" :key="code">
-                            <div
-                                class="rounded-lg border border-gray-100 bg-white py-2 text-center font-mono text-sm text-gray-900 dark:border-white/5 dark:bg-[#16161D] dark:text-gray-100"
-                                x-text="code"
-                            ></div>
+                    <ol class="hb-codes hb-modal__codes">
+                        <template x-for="(code, index) in recoveryCodes" :key="code">
+                            <li class="hb-code">
+                                <span class="hb-code__n" aria-hidden="true" x-text="String(index + 1).padStart(2, '0')"></span>
+                                <span x-text="code"></span>
+                            </li>
                         </template>
-                    </div>
+                    </ol>
 
-                    <div class="flex gap-4">
+                    <div class="hb-modal__foot">
                         <button
                             type="button"
-                            @click="
-                                const text = recoveryCodes.join('\n');
-                                navigator.clipboard.writeText(text).then(() => alert('Copied!'));
-                            "
-                            class="flex-1 rounded-full bg-gray-100 px-4 py-2.5 font-medium text-gray-900 transition-all hover:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                            @click="copyRecoveryCodes()"
+                            data-dialog-initial
+                            class="hb-btn hb-btn--primary"
                         >
-                            Copy
+                            Copy all
                         </button>
                         <button
                             type="button"
                             @click="showRecoveryCodesModal = false"
-                            class="flex-1 rounded-full bg-gray-900 px-4 py-2.5 font-medium text-white transition-all hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                            class="hb-btn"
                         >
-                            Close
+                            Done
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <footer class="hb-colophon">
+            <p>These are your own settings. The company-wide ones live on <a class="hb-link hb-link--utility" href="{{ route('admin.settings.index') }}">Company Settings</a>.</p>
+            <p>Password rules are set by <a class="hb-link hb-link--utility" href="{{ route('admin.password-policy.index') }}">the security page</a>, not here.</p>
+        </footer>
     </div>
 </x-layouts::admin>

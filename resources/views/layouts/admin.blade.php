@@ -22,18 +22,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <title>
-        {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
-    </title>
+    {{-- A crawler has no business in here: every page behind a sign-in, and the
+         public sitemap already lists what it should be reading. Stated rather
+         than left to the default. --}}
+    <meta name="robots" content="noindex, nofollow" />
+    {{-- One line, because a title written across three is served with the newlines and the
+         indentation inside it. Browsers trim it for the tab strip, but history, a screen reader
+         reading the name, and anything that compares two pages' titles all see the whitespace. --}}
+    <title>{{ filled($title ?? null) ? $title.' - '.config('app.name', 'Laravel') : config('app.name', 'Laravel') }}</title>
     @include('partials.favicons')
 
-    <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600;700&display=swap"
-        rel="stylesheet"
-    />
+    {{-- Fonts: self-hosted, declared in admin-desk.css, and the two faces the
+         first screen needs are preloaded here. The shell used to load them from
+         Google, which put a blocking cross-origin request in front of every
+         admin paint and asked for Cabinet Grotesk, a family Google does not host
+         (the request answered 400, so the display face never arrived anyway). --}}
+    <link rel="preload" href="/fonts/geist-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/geist-mono-500-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     {{-- Safe area insets for notched mobile devices --}}
     <style>
@@ -153,6 +158,11 @@
     {{-- The row is viewport-tall rather than content-tall: with a min-height here the flex
          line grows with the page, the sidebar's lg:h-full resolves against the whole
          document instead of the screen, and the window becomes the scroll area. --}}
+    {{-- First stop on the page, before the rail: the shell's own scroller is
+         `main.admin-main`, not the window, so a skip link that points at nothing
+         would be a decoration. The desk is long enough to be worth skipping. --}}
+    <a href="#admin-content" class="admin-skip">Skip to content</a>
+
     <div class="flex h-dvh">
         {{-- Persisted so a wire:navigate between admin pages swaps the content and leaves the
              rail standing. It is plain Blade rather than a Livewire component for the same
@@ -173,7 +183,7 @@
             @endpersist
 
             <!-- Main Content -->
-            <main class="admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F]">
+            <main id="admin-content" class="admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F]">
                 <div class="p-4 sm:p-8">
                     @if ($errors->any())
                         <div
@@ -206,6 +216,10 @@
 
     {{-- Global Toaster --}}
     <x-ui.toaster />
+
+    {{-- One confirmation surface for the whole desk, driven by the `adminConfirm` store so a sheet
+         root, a Livewire island and a plain POST form all ask the same question the same way. --}}
+    <x-admin.confirm-dialog />
 
     {{-- The shell publishes what it can reach, in one blob: the destinations, the words each row
          answers to, the counts beside them, the row that owns this page, and the three URLs the

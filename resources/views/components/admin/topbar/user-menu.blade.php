@@ -37,13 +37,12 @@
         :aria-expanded="open.toString()"
         aria-haspopup="menu"
         aria-controls="account-menu"
-        aria-label="Account menu"
         class="admin-bar-user"
     >
         <x-user-avatar :user="$user" size="sm" />
 
         <span class="hidden min-w-0 flex-1 text-left lg:block">
-            <span class="block truncate">{{ $user?->name ?? 'Guest' }}</span>
+            <span class="block truncate">{{ $user?->name ?? 'Guest' }}<span class="sr-only">, account menu</span></span>
         </span>
 
         {{-- The rotation lives on a plain span rather than on the icon component: :class is a

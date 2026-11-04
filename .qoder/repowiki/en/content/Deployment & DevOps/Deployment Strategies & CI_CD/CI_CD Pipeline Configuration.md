@@ -4,9 +4,17 @@
 **Referenced Files in This Document**
 - [lint.yml](file://.github/workflows/lint.yml)
 - [composer.json](file://composer.json)
+- [composer.lock](file://composer.lock)
 - [pint.json](file://pint.json)
 - [package.json](file://package.json)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Added guidance for handling `composer.lock` content-hash changes and vendor tree reinstallation.
+- Updated the dependency installation section to explain when `composer install` must be run after pulling lockfile updates.
+- Added a dedicated lockfile change workflow section with practical examples.
+- Extended troubleshooting guidance to cover stale vendor trees, Composer cache invalidation, and CI failures caused by outdated local dependency trees.
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -14,7 +22,7 @@
 3. [Core Components](#core-components)
 4. [Architecture Overview](#architecture-overview)
 5. [Detailed Component Analysis](#detailed-component-analysis)
-6. [Dependency Analysis](#dependency-analysis)
+6. [Dependency Lock Management](#dependency-lock-management)
 7. [Performance Considerations](#performance-considerations)
 8. [Troubleshooting Guide](#troubleshooting-guide)
 9. [Conclusion](#conclusion)
@@ -26,13 +34,14 @@ This document explains the Highblossom application’s continuous integration an
 The repository is a Laravel + Livewire application that uses Composer for PHP dependencies, Pint for PHP code formatting, Vite for frontend assets, and PHPUnit for unit and integration tests. The current automated quality check runs only through a dedicated linter workflow.
 
 ## Project Structure
-The CI/CD-related configuration is primarily located under `.github/workflows`, while build and tooling commands live in `composer.json` and `package.json`. Code style rules for Pint are defined in `pint.json`.
+The CI/CD-related configuration is primarily located under `.github/workflows`, while build and tooling commands live in `composer.json` and `package.json`. Code style rules for Pint are defined in `pint.json`. The `composer.lock` file pins the exact resolved dependency graph used by the project.
 
 ```mermaid
 graph TB
   subgraph "Repository"
     GH[".github/workflows/lint.yml"]
     COMPOSER["composer.json"]
+    LOCK["composer.lock"]
     PINT["pint.json"]
     NPM["package.json"]
   end
@@ -47,24 +56,29 @@ graph TB
   GH --> CHECKOUT --> SETUP_PHP --> DEPS --> LINT
   LINT --> COMPOSER
   LINT --> PINT
+  DEPS --> COMPOSER
+  DEPS --> LOCK
   DEPS --> NPM
 ```
 
 **Diagram sources**
 - [lint.yml:1-50](file://.github/workflows/lint.yml#L1-L50)
-- [composer.json:80-115](file://composer.json#L80-L115)
+- [composer.json:1-138](file://composer.json#L1-L138)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
 - [pint.json:1-22](file://pint.json#L1-L22)
 - [package.json:1-35](file://package.json#L1-L35)
 
 **Section sources**
 - [lint.yml:1-50](file://.github/workflows/lint.yml#L1-L50)
 - [composer.json:1-138](file://composer.json#L1-L138)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
 - [pint.json:1-22](file://pint.json#L1-L22)
 - [package.json:1-35](file://package.json#L1-L35)
 
 ## Core Components
 - GitHub Actions workflow: `.github/workflows/lint.yml` defines the linter job, branch triggers, environment usage, and step sequence.
 - PHP tooling: `composer.json` contains scripts for dependency installation, Pint execution, test orchestration, and development tasks.
+- Dependency lock: `composer.lock` records the locked dependency graph and its content hash.
 - Code style configuration: `pint.json` configures Pint presets and PHPDoc rules.
 - Frontend tooling: `package.json` defines Vite build and development scripts used by the application.
 
@@ -72,12 +86,13 @@ Key responsibilities:
 - Branch-based triggering for push and pull request events.
 - PHP 8.4 runtime provisioning.
 - Conditional authentication for private Composer repositories using repository secrets.
-- Installation of PHP and Node.js dependencies.
+- Installation of PHP and Node.js dependencies against a locked dependency graph.
 - Running Pint in parallel mode as a quality gate.
 
 **Section sources**
 - [lint.yml:1-50](file://.github/workflows/lint.yml#L1-L50)
-- [composer.json:80-115](file://composer.json#L80-L115)
+- [composer.json:1-138](file://composer.json#L1-L138)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
 - [pint.json:1-22](file://pint.json#L1-L22)
 - [package.json:1-35](file://package.json#L1-L35)
 
@@ -96,7 +111,7 @@ sequenceDiagram
   Runner->>Actions: Checkout repository
   Runner->>Actions: Setup PHP 8.4
   Runner->>Actions: Configure private Composer credentials
-  Runner->>Composer: Install PHP dependencies
+  Runner->>Composer: Install PHP dependencies from composer.lock
   Runner->>NPM: Install Node.js dependencies
   Runner->>Actions: Run Pint linting
   Actions-->>GitHub: Job status result
@@ -257,35 +272,38 @@ Example concepts:
 **Section sources**
 - [lint.yml:3-16](file://.github/workflows/lint.yml#L3-L16)
 
-## Dependency Analysis
-The CI pipeline depends on:
-- GitHub Actions infrastructure.
-- PHP 8.4 runtime provided by the PHP setup action.
-- Composer-managed PHP packages.
-- npm-managed frontend packages.
-- Repository secrets for private Composer authentication.
-- The `Testing` GitHub environment for scoped variables and secrets.
+## Dependency Lock Management
+The `composer.lock` file locks the exact dependency graph used by the application. Its `content-hash` value identifies the resolved dependency state. When this hash changes, the pinned dependency set has changed, and the `vendor` directory must be reinstalled to match the new lockfile.
+
+In this repository, the dependency lock was updated to version 13.39.0, reflected by a changed `composer.lock` content-hash. After pulling this lockfile change, developers and CI runners should reinstall dependencies rather than assuming the existing `vendor` tree is valid.
+
+Recommended operational rules:
+- Treat a changed `composer.lock` content-hash as a signal that `composer install` or `composer update` must be executed.
+- Do not reuse a stale `vendor` directory across lockfile updates.
+- Prefer `composer install --no-scripts` in CI to install exactly what is locked without running post-install hooks unnecessarily.
+- Run `composer update` only when changing version constraints in `composer.json`; otherwise, prefer committing an updated `composer.lock` generated by `composer update --lock` or equivalent tooling.
+- Reinstall dependencies whenever CI reports missing classes, autoload errors, or unexpected behavior after a lockfile update.
 
 ```mermaid
-graph LR
-  GH["GitHub Actions"] --> PHP["PHP 8.4"]
-  GH --> NPM["Node.js and npm"]
-  GH --> Secrets["Repository Secrets"]
-  GH --> Env["GitHub Environment: Testing"]
-  PHP --> Composer["composer.json scripts"]
-  NPM --> PackageJSON["package.json scripts"]
-  Secrets --> Flux["Flux UI Composer Authentication"]
+flowchart TD
+  Start["Pull Changes"] --> CheckLock{"composer.lock content-hash changed?"}
+  CheckLock -->|Yes| Reinstall["Run composer install or composer update"]
+  CheckLock -->|No| Validate["Validate existing vendor tree"]
+  Reinstall --> Validate
+  Validate --> Continue["Continue linting, testing, or deployment"]
 ```
 
 **Diagram sources**
-- [lint.yml:1-50](file://.github/workflows/lint.yml#L1-L50)
-- [composer.json:1-138](file://composer.json#L1-L138)
-- [package.json:1-35](file://package.json#L1-L35)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
+- [composer.json:1-23](file://composer.json#L1-L23)
+- [lint.yml:20-45](file://.github/workflows/lint.yml#L20-L45)
+
+**Updated** Added explicit guidance for handling Composer lockfile content-hash changes and vendor tree reinstallation.
 
 **Section sources**
-- [lint.yml:1-50](file://.github/workflows/lint.yml#L1-L50)
-- [composer.json:1-138](file://composer.json#L1-L138)
-- [package.json:1-35](file://package.json#L1-L35)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
+- [composer.json:1-23](file://composer.json#L1-L23)
+- [lint.yml:20-45](file://.github/workflows/lint.yml#L20-L45)
 
 ## Performance Considerations
 - Prefer `composer install --no-scripts` in CI, as already implemented, to avoid unnecessary post-install hooks.
@@ -294,6 +312,7 @@ graph LR
 - Separate linting, testing, and building into parallel jobs where possible.
 - Use matrix strategies for testing across multiple PHP or Node.js versions if required.
 - Cache compiled assets separately from dependencies to minimize rebuild costs.
+- Invalidate Composer caches only when the `composer.lock` content-hash changes or when dependency resolution problems occur.
 
 [No sources needed since this section provides general guidance]
 
@@ -323,12 +342,24 @@ Common issues and resolutions:
   - Run migrations before executing tests.
   - Seed test data only when required by integration tests.
 
+- Vendor tree becomes stale after `composer.lock` content-hash changes:
+  - Delete or ignore the existing `vendor` directory and run `composer install` again.
+  - In CI, rely on the workflow’s `composer install` step, which reinstalls dependencies against the committed lockfile.
+  - If Composer cache corruption is suspected, clear Composer cache and retry the install.
+  - Avoid sharing cached `vendor` directories across lockfile updates unless the cache key includes the lockfile content-hash.
+
+- CI fails after updating dependencies:
+  - Verify whether `composer.json` version constraints were changed; if so, regenerate `composer.lock` intentionally.
+  - Compare the `composer.lock` content-hash between branches to identify when the dependency graph changed.
+  - Run `composer validate` and inspect Composer audit output for vulnerable or incompatible packages.
+
 **Section sources**
 - [lint.yml:18-45](file://.github/workflows/lint.yml#L18-L45)
 - [composer.json:88-101](file://composer.json#L88-L101)
+- [composer.lock:1-20](file://composer.lock#L1-L20)
 
 ## Conclusion
-The Highblossom application currently has a focused linter workflow that enforces PHP code style using Pint on push and pull request events for selected branches. It installs Composer and npm dependencies, authenticates to a private Composer repository using secrets, and runs Pint in parallel. Extending this pipeline requires adding jobs for unit and integration testing, asset building, security scanning, and deployment automation. The recommended approach is to preserve the existing linter job, introduce separate jobs for testing and building, and use GitHub environments and secrets to manage sensitive configuration safely.
+The Highblossom application currently has a focused linter workflow that enforces PHP code style using Pint on push and pull request events for selected branches. It installs Composer and npm dependencies, authenticates to a private Composer repository using secrets, and runs Pint in parallel. Because the dependency lock has been updated to version 13.39.0, the `composer.lock` content-hash has changed, and the `vendor` directory must be reinstalled after pulling the lockfile update. Extending this pipeline requires adding jobs for unit and integration testing, asset building, security scanning, and deployment automation. The recommended approach is to preserve the existing linter job, introduce separate jobs for testing and building, manage Composer lockfile changes carefully, and use GitHub environments and secrets to manage sensitive configuration safely.
 
 [No sources needed since this section summarizes without analyzing specific files]
 
@@ -393,10 +424,28 @@ Publishing artifacts:
 - Restrict artifact retention policies.
 - Avoid uploading large binary files unnecessarily.
 
+### Managing Composer Lockfile Updates in CI
+Recommended practices:
+- Always commit updated `composer.lock` files when dependency versions change.
+- Treat a changed `composer.lock` content-hash as a breaking change for cached dependency trees.
+- Avoid relying on shared `vendor` directories across lockfile updates.
+- In CI, keep the existing `composer install` step; it reinstalls dependencies against the committed lockfile.
+- Add a lint or validation step that warns contributors when `composer.json` changes without a corresponding `composer.lock` update.
+
+```mermaid
+flowchart TD
+  PR["Pull Request"] --> DetectLock["Detect composer.lock change"]
+  DetectLock -->|Changed| RequireReinstall["Require full composer install"]
+  DetectLock -->|Unchanged| ValidateTree["Validate existing vendor tree"]
+  RequireReinstall --> RunPipeline["Run lint, tests, and build"]
+  ValidateTree --> RunPipeline
+```
+
 ### Example Workflow Extensions
 Conceptual additions you can implement in a new workflow file:
 - A `ci-full` workflow that orchestrates linting, testing, building, security scanning, and deployment.
 - A `deploy` workflow that runs only on protected branches and requires manual approval.
 - A `nightly` scheduled workflow for long-running tests and security audits.
+- A lockfile-aware validation job that detects `composer.lock` content-hash changes and forces dependency reinstallation.
 
 [No sources needed since this section provides conceptual guidance]

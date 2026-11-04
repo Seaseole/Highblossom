@@ -186,6 +186,29 @@ final class ProfileService
         return $builder->build()->getString();
     }
 
+    /**
+     * The same key the QR code carries, in the form a person can type.
+     *
+     * A QR is the fast path, not the only path. Somebody setting this up on the machine they are
+     * signing in from has no second camera, and several authenticators ask for an account and a
+     * key rather than offering to scan. Refusing to print the secret left that person with a
+     * picture they could not use and no way to finish, which is worse than not starting.
+     *
+     * @return array{secret: string, account: string, issuer: string}|null
+     */
+    public function getTwoFactorManualSetup(User $user): ?array
+    {
+        if (! Features::canManageTwoFactorAuthentication() || ! $user->two_factor_secret) {
+            return null;
+        }
+
+        return [
+            'secret' => decrypt($user->two_factor_secret),
+            'account' => (string) $user->email,
+            'issuer' => (string) config('app.name', 'Laravel'),
+        ];
+    }
+
     public function regenerateRecoveryCodes(User $user): void
     {
         $user->forceFill([

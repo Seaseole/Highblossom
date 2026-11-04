@@ -130,4 +130,13 @@ interface AvailabilityServiceInterface
      * @param DateTimeInterface $moment The moment to format
      */
     public function formatTime(\DateTimeInterface $moment): string;
+
+    /**
+     * Opening and closing times for a day, or null when the business is closed on it.
+     *
+     * @param DateTimeInterface $date The day to read
+     *
+     * @return array{open: string, close: string}|null
+     */
+    public function openHoursOn(\DateTimeInterface $date): ?array;
 }

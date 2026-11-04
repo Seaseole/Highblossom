@@ -1,0 +1,655 @@
+{
+  "log": [
+    {
+      "security-on": {
+        "url": "/admin/profile?tab=security",
+        "title": "Security - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "axe:security-on": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "overlay": {
+        "label": "recovery-codes",
+        "focusedBefore": {
+          "tag": "button",
+          "id": "",
+          "inPanel": true,
+          "w": 37,
+          "h": 28,
+          "outline": "2px",
+          "boxShadow": "rgba(220, 38, 38, 0.12) 0px 0px 0px 4px, rgba(220, 38, 38, 0.22) 0px 0px 0px 2px"
+        },
+        "panel": {
+          "role": "dialog",
+          "ariaModal": "true",
+          "labelledby": "recovery-codes-title",
+          "describedby": "recovery-codes-lede",
+          "hasXDialog": true,
+          "w": 544,
+          "h": 323,
+          "top": 289,
+          "bottom": 611,
+          "viewportH": 900,
+          "padding": "20px",
+          "radius": "10px",
+          "bg": "rgb(255, 255, 255)",
+          "border": "rgba(17, 24, 39, 0.27)",
+          "shadow": "none",
+          "overflowY": "auto",
+          "backdropBg": "rgba(10, 10, 15, 0.62)",
+          "backdropZ": "60",
+          "transition": "all / 0s / ease",
+          "focusables": [
+            "Close",
+            "Copy",
+            "Close"
+          ]
+        },
+        "afterEscape": {
+          "stillOpen": false,
+          "focusBackOn": "Skip to content\nHighblossom Pty Ltd\nOVER"
+        },
+        "scrollBefore": {
+          "top": 464,
+          "tag": "admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F] is-scroll-locked"
+        }
+      }
+    },
+    {
+      "axe:modal-recovery": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "overlay": {
+        "label": "adminConfirm (disable tfa)",
+        "focusedBefore": {
+          "tag": "button",
+          "id": "",
+          "inPanel": true,
+          "w": 67,
+          "h": 34,
+          "outline": "3px",
+          "boxShadow": "rgba(220, 38, 38, 0.12) 0px 0px 0px 4px, rgba(220, 38, 38, 0.22) 0px 0px 0px 2px"
+        },
+        "panel": {
+          "role": "alertdialog",
+          "ariaModal": "true",
+          "labelledby": "admin-confirm-title",
+          "describedby": "admin-confirm-lede",
+          "hasXDialog": true,
+          "w": 544,
+          "h": 184,
+          "top": 358,
+          "bottom": 542,
+          "viewportH": 900,
+          "padding": "20px",
+          "radius": "10px",
+          "bg": "rgba(0, 0, 0, 0)",
+          "border": "oklch(0.21 0.034 264.665)",
+          "shadow": "none",
+          "overflowY": "visible",
+          "backdropBg": "rgba(10, 10, 15, 0.62)",
+          "backdropZ": "60",
+          "transition": "all / 0s / ease",
+          "focusables": [
+            "Cancel",
+            "Switch it off"
+          ]
+        },
+        "afterEscape": {
+          "stillOpen": false,
+          "focusBackOn": "Skip to content\nHighblossom Pty Ltd\nOVER"
+        },
+        "scrollBefore": {
+          "top": 0,
+          "tag": "admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F] is-scroll-locked"
+        }
+      }
+    },
+    {
+      "axe:modal-adminconfirm": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "passkeys": {
+        "url": "/admin/profile?tab=passkeys",
+        "title": "Passkeys - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "axe:passkeys": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "passkeys-adding": {
+        "url": "/admin/profile?tab=passkeys",
+        "title": "Passkeys - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "axe:passkeys-adding": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "axe:passkeys-renaming": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "overlay": {
+        "label": "adminConfirm (remove passkey)",
+        "focusedBefore": {
+          "tag": "button",
+          "id": "",
+          "inPanel": true,
+          "w": 67,
+          "h": 34,
+          "outline": "3px",
+          "boxShadow": "rgba(220, 38, 38, 0.12) 0px 0px 0px 4px, rgba(220, 38, 38, 0.22) 0px 0px 0px 2px"
+        },
+        "panel": {
+          "role": "alertdialog",
+          "ariaModal": "true",
+          "labelledby": "admin-confirm-title",
+          "describedby": "admin-confirm-lede",
+          "hasXDialog": true,
+          "w": 544,
+          "h": 184,
+          "top": 358,
+          "bottom": 542,
+          "viewportH": 900,
+          "padding": "20px",
+          "radius": "10px",
+          "bg": "rgba(0, 0, 0, 0)",
+          "border": "oklch(0.21 0.034 264.665)",
+          "shadow": "none",
+          "overflowY": "visible",
+          "backdropBg": "rgba(10, 10, 15, 0.62)",
+          "backdropZ": "60",
+          "transition": "all / 0s / ease",
+          "focusables": [
+            "Cancel",
+            "Remove passkey"
+          ]
+        },
+        "afterEscape": {
+          "stillOpen": false,
+          "focusBackOn": "passkey-rename-990001"
+        },
+        "scrollBefore": {
+          "top": 0,
+          "tag": "admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F] is-scroll-locked"
+        }
+      }
+    },
+    {
+      "sessions": {
+        "url": "/admin/profile?tab=sessions",
+        "title": "Sessions - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "axe:sessions": [
+        {
+          "id": "image-redundant-alt",
+          "impact": "minor",
+          "n": 1,
+          "first": "Fix all of the following: Element contains <img> element with alt text that duplicates existing text"
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "n": 1,
+          "first": "Fix any of the following: Some page content is not contained by landmarks"
+        }
+      ]
+    },
+    {
+      "overlay": {
+        "label": "adminConfirm (sessions)",
+        "focusedBefore": {
+          "tag": "button",
+          "id": "",
+          "inPanel": true,
+          "w": 67,
+          "h": 34,
+          "outline": "3px",
+          "boxShadow": "rgba(220, 38, 38, 0.12) 0px 0px 0px 4px, rgba(220, 38, 38, 0.22) 0px 0px 0px 2px"
+        },
+        "panel": {
+          "role": "alertdialog",
+          "ariaModal": "true",
+          "labelledby": "admin-confirm-title",
+          "describedby": "admin-confirm-lede",
+          "hasXDialog": true,
+          "w": 544,
+          "h": 184,
+          "top": 358,
+          "bottom": 542,
+          "viewportH": 900,
+          "padding": "20px",
+          "radius": "10px",
+          "bg": "rgba(0, 0, 0, 0)",
+          "border": "oklch(0.21 0.034 264.665)",
+          "shadow": "none",
+          "overflowY": "visible",
+          "backdropBg": "rgba(10, 10, 15, 0.62)",
+          "backdropZ": "60",
+          "transition": "all / 0s / ease",
+          "focusables": [
+            "Cancel",
+            "Sign them out"
+          ]
+        },
+        "afterEscape": {
+          "stillOpen": false,
+          "focusBackOn": "Skip to content\nHighblossom Pty Ltd\nOVER"
+        },
+        "scrollBefore": {
+          "top": 613,
+          "tag": "admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F] is-scroll-locked"
+        }
+      }
+    },
+    {
+      "overlay": "delete account button not found on tab=profile"
+    },
+    {
+      "mobile-security": {
+        "url": "/admin/profile?tab=security",
+        "title": "Security - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "mobile-security-overflow": 0
+    },
+    {
+      "axe:mobile-security": []
+    },
+    {
+      "mobile-passkeys": {
+        "url": "/admin/profile?tab=passkeys",
+        "title": "Passkeys - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "mobile-passkeys-overflow": 0
+    },
+    {
+      "axe:mobile-passkeys": []
+    },
+    {
+      "mobile-sessions": {
+        "url": "/admin/profile?tab=sessions",
+        "title": "Sessions - My account - highblossom Pty Ltd",
+        "h1": 1,
+        "overflowX": false,
+        "overflowPx": 0,
+        "smallTargets": [
+          {
+            "tag": "a",
+            "label": "Skip to content",
+            "h": 1,
+            "w": 1
+          }
+        ],
+        "heads": [
+          "H2 Search the admin panel",
+          "H2 Create",
+          "H1 Desk QA",
+          "H2 Profile Information",
+          "H2 Activity",
+          "H2 Recent bookings",
+          "H2 Recent blog posts",
+          "H2 Delete Account",
+          "H2 Appearance Settings",
+          "H2 Update Password",
+          "H2 Two-Factor Authentication",
+          "H2 Passkeys",
+          "H2 Active devices",
+          "H2 Previously active",
+          "H3 Confirm your password",
+          "H3 Delete Account",
+          "H3 Recovery codes",
+          "H3 ",
+          "H2 Media Library",
+          "H3 Upload images"
+        ],
+        "bodyFont": "Geist, ui-sans-serif, system-ui, sans-serif"
+      }
+    },
+    {
+      "mobile-sessions-overflow": 0
+    },
+    {
+      "axe:mobile-sessions": []
+    },
+    {
+      "overlay": {
+        "label": "mobile recovery-codes",
+        "focusedBefore": {
+          "tag": "button",
+          "id": "",
+          "inPanel": true,
+          "w": 37,
+          "h": 28,
+          "outline": "2px",
+          "boxShadow": "rgba(220, 38, 38, 0.12) 0px 0px 0px 4px, rgba(220, 38, 38, 0.22) 0px 0px 0px 2px"
+        },
+        "panel": {
+          "role": "dialog",
+          "ariaModal": "true",
+          "labelledby": "recovery-codes-title",
+          "describedby": "recovery-codes-lede",
+          "hasXDialog": true,
+          "w": 358,
+          "h": 444,
+          "top": 200,
+          "bottom": 644,
+          "viewportH": 844,
+          "padding": "20px",
+          "radius": "10px",
+          "bg": "rgb(255, 255, 255)",
+          "border": "rgba(17, 24, 39, 0.27)",
+          "shadow": "none",
+          "overflowY": "auto",
+          "backdropBg": "rgba(10, 10, 15, 0.62)",
+          "backdropZ": "60",
+          "transition": "all / 0s / ease",
+          "focusables": [
+            "Close",
+            "Copy",
+            "Close"
+          ]
+        },
+        "afterEscape": {
+          "stillOpen": false,
+          "focusBackOn": "Skip to content\n\nCurrent page\n\n3\n3 waiti"
+        },
+        "scrollBefore": {
+          "top": 0,
+          "tag": "admin-main min-h-0 flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0F] is-scroll-locked"
+        }
+      }
+    }
+  ],
+  "errors": []
+}

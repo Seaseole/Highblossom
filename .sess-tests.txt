@@ -1,0 +1,44 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileSessionsTabTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sessions tab lists another device with a sign out action[39m[90m                                                [39m [90m3.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use is marked and has no sign out action[39m[90m                                                      [39m [90m0.76s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user can sign out one of their own other devices[39m[90m                                                          [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user cannot sign out another users device[39m[90m                                                                 [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use cannot be signed out from the list[39m[90m                                                        [39m [90m0.96s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out other devices spares the one in use[39m[90m                                                             [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosed sessions appear in the history list[39m[90m                                                                  [39m [90m0.46s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileDetailsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mprofile page displays summary and activity[39m[90m                                                                  [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90mphone can be updated[39m[90m                                                                                        [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid phone is rejected[39m[90m                                                                                   [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar can be uploaded[39m[90m                                                                                      [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting avatar is replaced on upload[39m[90m                                                                       [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar is kept when no file is uploaded[39m[90m                                                                     [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows blog post counts and recent posts[39m[90m                                                            [39m [90m0.81s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows empty state without posts[39m[90m                                                                    [39m [90m0.75s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposts index filters by author[39m[90m                                                                               [39m [90m0.88s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\UserSessionTrackingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin records the session id the user was actually issued[39m[90m                                                   [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin stores the parsed device and method[39m[90m                                                                   [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mremembered login is flagged[39m[90m                                                                                 [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma session recovered from the remember cookie is flagged as a remembered device[39m[90m                              [39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma request that reuses a recorded session does not open a second row[39m[90m                                         [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity is written once the touch throttle window has passed[39m[90m                                               [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma new ip address is recorded immediately[39m[90m                                                                    [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma session idle past the framework lifetime is no longer active[39m[90m                                              [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe logout event listener closes the matching ledger row[39m[90m                                                    [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma logout only closes the signing out sessions row[39m[90m                                                           [39m [90m0.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosing one session leaves the same users other devices alone[39m[90m                                               [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrevoking other sessions spares the exempt session[39m[90m                                                           [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mchanging a password revokes the users other sessions[39m[90m                                                        [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword change revocation can be switched off[39m[90m                                                              [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune closes sessions the framework let lapse[39m[90m                                                               [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprune drops history older than the retention window[39m[90m                                                         [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe prune command reports what it removed[39m[90m                                                                   [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe prune command rejects a non positive retention window[39m[90m                                                   [39m [90m0.08s[39m  
+
+  [90mTests:[39m    [32;1m34 passed[39;22m[90m (116 assertions)[39m
+  [90mDuration:[39m [39m16.17s[39m
+

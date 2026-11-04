@@ -1,0 +1,197 @@
+{
+  "url": "https://highblossom.test/admin/profile?tab=appearance",
+  "errors": [],
+  "failed": [],
+  "desktop": {
+    "loadMs": 1682,
+    "loaderMs": null,
+    "settledMs": 3940,
+    "vitals": {
+      "lcpMs": 1000,
+      "lcpElement": "p.hb-field__hint",
+      "cls": 0.001
+    },
+    "height": 952,
+    "overflowX": false,
+    "offenders": [],
+    "h1": [
+      "Desk QA"
+    ],
+    "smallTargets": [
+      "Skip to content 1x1"
+    ],
+    "glHidden": [],
+    "title": "Appearance - My account - highblossom Pty Ltd",
+    "glOn": false,
+    "scrollFps": {
+      "fps": 60,
+      "worstFrameMs": 17
+    },
+    "idleMotion": false,
+    "idleAt": null
+  },
+  "mobile": {
+    "throttled": true,
+    "loadMs": 12809,
+    "loaderMs": null,
+    "settledMs": 15150,
+    "vitals": {
+      "lcpMs": 11132,
+      "lcpElement": "p.hb-block__note",
+      "cls": 0.001
+    },
+    "height": 1475,
+    "overflowX": false,
+    "offenders": [],
+    "h1": [
+      "Desk QA"
+    ],
+    "smallTargets": [
+      "Skip to content 1x1"
+    ],
+    "glHidden": [],
+    "title": "Appearance - My account - highblossom Pty Ltd",
+    "glOn": false,
+    "scrollFps": {
+      "fps": 61,
+      "worstFrameMs": 17
+    }
+  },
+  "files": [
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-00-firstpaint.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-02-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-03-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-04-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\d-05-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\k-01-focus.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\k-02-focus.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\k-03-focus.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\k-04-focus.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-01-rest.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-01-hover.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-02-rest.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-02-hover.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-03-rest.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-03-hover.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-04-rest.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-04-hover.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-05-rest.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\h-05-hover.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\m-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\m-02-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\m-03-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\m-04-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\m-05-scroll.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\r-01-hero.png",
+    "C:\\laragon\\www\\highblossom\\.aww-shots\\profile-appearance\\r-02-mid.png"
+  ],
+  "notes": [
+    "desktop FPS runs headless on a software GPU: treat it as a floor, not a measurement of real hardware",
+    "mobile runs at 4x CPU slowdown on slow 4G: mobile.vitals and mobile.scrollFps are the numbers that count",
+    "loadMs: ms from navigation to the load event, null if it had not fired after 30 s (desktop) or 60 s (phone); a heavy page takes long, while visitors see content at vitals.lcpMs. loaderMs: ms until the #loader ended, null when the page has none",
+    "settledMs: ms from navigation by which the first screen stopped changing, never before the fixed wait. null: still changing at the cap, either a long intro or continuous motion (a live shader, video); d-01-hero / m-01-hero tell which. reduced.moving: the screen was still changing 1.5 s after load with reduced motion on"
+  ],
+  "keyboard": {
+    "stops": [
+      "a \"Skip to content\"",
+      "a \"Highblossom Pty Ltd\"",
+      "button \"OVERVIEW\"",
+      "button \"BOOKINGS\"",
+      "button \"CONTENT\"",
+      "button \"BLOG\"",
+      "button \"TEAM & ACCESS\"",
+      "button \"MEDIA\"",
+      "button \"SYSTEM\"",
+      "button \"Collapse navigation\""
+    ],
+    "skipLinkFirst": true,
+    "noVisibleFocus": [],
+    "invisibleFocus": [],
+    "stuck": false
+  },
+  "hover": {
+    "targets": [
+      {
+        "shot": "h-01",
+        "label": "button \"Overview\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-02",
+        "label": "button \"Collapse navigation\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-03",
+        "label": "button \"Search ⌘ Ctrl K\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "backgroundColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-04",
+        "label": "button \"3 waiting\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      },
+      {
+        "shot": "h-05",
+        "label": "button \"Enter full screen\"",
+        "interactive": true,
+        "primary": true,
+        "react": "moves",
+        "changed": [
+          "color",
+          "backgroundColor",
+          "borderColor",
+          "textDecorationColor",
+          "transform"
+        ]
+      }
+    ],
+    "noHoverChange": [],
+    "colorOnly": [],
+    "covered": [],
+    "cursorFollower": false
+  },
+  "reduced": {
+    "hiddenText": 0,
+    "moving": false
+  },
+  "a11y": {
+    "violations": [],
+    "serious": 0,
+    "contrastNeedsReview": 0
+  }
+}

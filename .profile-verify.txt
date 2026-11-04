@@ -1,0 +1,81 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileDetailsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mprofile page displays summary and activity[39m[90m                                                                  [39m [90m1.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mphone can be updated[39m[90m                                                                                        [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid phone is rejected[39m[90m                                                                                   [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar can be uploaded[39m[90m                                                                                      [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting avatar is replaced on upload[39m[90m                                                                       [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90mavatar is kept when no file is uploaded[39m[90m                                                                     [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows blog post counts and recent posts[39m[90m                                                            [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mactivity shows empty state without posts[39m[90m                                                                    [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mposts index filters by author[39m[90m                                                                               [39m [90m0.21s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileSessionsTabTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sessions tab lists another device with a sign out action[39m[90m                                                [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use is marked and has no sign out action[39m[90m                                                      [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user can sign out one of their own other devices[39m[90m                                                          [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user cannot sign out another users device[39m[90m                                                                 [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use cannot be signed out from the list[39m[90m                                                        [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out other devices spares the one in use[39m[90m                                                             [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosed sessions appear in the history list[39m[90m                                                                  [39m [90m0.23s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\TwoFactorSettingsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtwo factor setup can be completed with a valid code[39m[90m                                                         [39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfigured totp window allows previous slot codes[39m[90m                                                           [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcodes outside the totp window are rejected[39m[90m                                                                  [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcode separators are normalized before verification[39m[90m                                                          [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling twice does not rotate an existing secret[39m[90m                                                           [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending setup can be cancelled[39m[90m                                                                              [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelling setup refuses to touch a confirmed configuration[39m[90m                                                 [39m [90m0.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90menabling two factor requires a recently confirmed password[39m[90m                                                  [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdisabling two factor requires a recently confirmed password[39m[90m                                                 [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint marks the session as password confirmed[39m[90m                                           [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconfirm password endpoint rejects a wrong password[39m[90m                                                          [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprofile page renders the enable two factor password modal[39m[90m                                                   [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrecovery codes flash does not break the alpine attribute after confirmation[39m[90m                                 [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge accepts a recovery code and replaces it[39m[90m                                                     [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin challenge view offers a recovery code input[39m[90m                                                           [39m [90m0.13s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\UsernameSignInTest[39m
+  [32;1m✓[39;22m[90m [39m[90ma username signs in[39m[90m                                                                                         [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma username signs in whatever the casing typed[39m[90m                                                               [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90man email address still signs in[39m[90m                                                                             [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma wrong password is answered identically for both identifiers[39m[90m                                               [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown identifier gets the same answer as a wrong password[39m[90m                                              [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mswitching between the two identifiers does not dodge the throttle[39m[90m                                           [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma password hashed under older bcrypt options still signs in[39m[90m                                                 [39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma reset can be requested with a username[39m[90m                                                                    [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unknown reset identifier is answered like a known one[39m[90m                                                    [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma username can be changed on the profile and is stored lowercase[39m[90m                                            [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma taken or reserved username is rejected on the profile[39m[90m                                                     [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe admin security page saves a policy the forms then use[39m[90m                                                   [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe guard rails reject a policy that is too weak or too long[39m[90m                                                [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90msaving a policy records who changed what[39m[90m                                                                    [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe security page is closed to a user without the permission[39m[90m                                                [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe login screen labels the field for both identifiers[39m[90m                                                      [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe security page renders the controls and the live policy[39m[90m                                                  [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe admin user forms carry the username field and the live checklist[39m[90m                                        [39m [90m0.69s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe profile and password pages render the checklist once per form[39m[90m                                           [39m [90m0.45s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminNavLayoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90man account that has never chosen follows the site default[39m[90m                                                   [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar is what a nobody chose account gets when no default is stored[39m[90m                                   [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe account choice beats the site default[39m[90m                                                                   [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90man unrecognised site default falls back instead of resolving to nothing[39m[90m                                     [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bar stores the choice on the account without a navigation[39m[90m                                               [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint refuses a layout that does not exist and changes nothing[39m[90m                                       [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe endpoint is only reachable by someone who can reach the panel[39m[90m                                           [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance form saves the layout alongside the theme[39m[90m                                                    [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe appearance tab ticks the effective layout not the raw column[39m[90m                                            [39m [90m0.88s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe settings page offers the default and persists what is chosen[39m[90m                                            [39m [90m0.80s[39m  
+  [32;1m✓[39;22m[90m [39m[90mboth layouts print the same permitted rows and no others[39m[90m                                                    [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mevery branch labels itself with the group name the menu declared[39m[90m                                            [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe shell publishes the urls the bar controls post to[39m[90m                                                       [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe top bar shell still mints no duplicate ids[39m[90m                                                              [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe choice survives a fresh request from a different session[39m[90m                                                [39m [90m0.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe bars rows carry the attributes and drawing its controls read[39m[90m                                            [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma lit row is answered by the store alone[39m[90m                                                                    [39m [90m0.52s[39m  
+
+  [90mTests:[39m    [32;1m67 passed[39;22m[90m (423 assertions)[39m
+  [90mDuration:[39m [39m22.09s[39m
+

@@ -9,13 +9,15 @@
         default => $session->end_reason?->label() ?? 'Ended',
     };
 
+    /* A state is a shape and a word, never a colour. `current` carries a rule as
+       well as a tint because it is the one row a person is standing in. */
     $tone = match (true) {
-        $isCurrent => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        $active => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        default => 'bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400',
+        $isCurrent => 'hb-tag hb-tag--current',
+        $active => 'hb-tag hb-tag--active',
+        default => 'hb-tag hb-tag--ended',
     };
 @endphp
 
-<span {{ $attributes->merge(['class' => "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {$tone}"]) }}>
-    {{ $label }}
+<span {{ $attributes->merge(['class' => $tone]) }}>
+    <span class="hb-tag__dot" aria-hidden="true"></span>{{ $label }}
 </span>

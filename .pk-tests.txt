@@ -1,0 +1,30 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PasskeyDeletionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mpasskey can be deleted[39m[90m                                                                                      [39m [90m2.54s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PasskeyLoginRecoveryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin page renders the recovery panels[39m[90m                                                                      [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90munrecognized passkey is reported as a recoverable reason[39m[90m                                                    [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired challenge is reported instead of an unknown passkey[39m[90m                                                 [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mknown credential rejected by the assertion is reported as a failure[39m[90m                                         [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreenrol banner shows once and can be dismissed[39m[90m                                                              [39m [90m0.13s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProfileSessionsTabTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sessions tab lists another device with a sign out action[39m[90m                                                [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use is marked and has no sign out action[39m[90m                                                      [39m [90m0.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user can sign out one of their own other devices[39m[90m                                                          [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma user cannot sign out another users device[39m[90m                                                                 [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe device in use cannot be signed out from the list[39m[90m                                                        [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigning out other devices spares the one in use[39m[90m                                                             [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclosed sessions appear in the history list[39m[90m                                                                  [39m [90m0.36s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\SidebarAvatarTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar falls back to initials without an avatar[39m[90m                                                        [39m [90m0.75s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe sidebar shows the picture after a profile upload[39m[90m                                                        [39m [90m1.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe initials stay in the markup behind the picture[39m[90m                                                          [39m [90m0.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma replacement upload removes the file it supersedes[39m[90m                                                         [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90man avatar file that fails to store leaves the old one in place[39m[90m                                              [39m [90m0.51s[39m  
+
+  [90mTests:[39m    [32;1m18 passed[39;22m[90m (67 assertions)[39m
+  [90mDuration:[39m [39m10.99s[39m
+

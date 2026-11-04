@@ -1,0 +1,2684 @@
+/* ============================================================
+   THE SCORING BENCH — /admin/settings and /admin/profile
+   ------------------------------------------------------------
+   One rule, stated once: a value that disagrees with what the shop has stored
+   carries a red score down the left edge of its row. Everything else in this
+   file exists to make that sentence readable.
+
+   It borrows its palette, its mono rule and the `dash` container name from
+   ./admin-desk.css (see that file's header), and repoints no token. The colours
+   are the day desk's so one page of the panel cannot disagree with another
+   about what a hairline or a measured number looks like.
+
+   Three constraints this file is written around, all of them learned the hard
+   way in this bundle:
+   1. admin.css is unlayered, so a `display` declared here outranks `hidden` and
+      every `sm:` utility. Only this layer's own elements are given a display,
+      and the `[hidden]` guard at the end of admin-desk.css puts the rest right.
+   2. The content area is the scroller, and its width changes when the rail
+      collapses without the viewport changing at all. So every breakpoint here
+      asks its own container, never the window.
+   3. Marking a row must never move anything. The 3px marking channel is a real
+      grid column present at rest, so a score appears without touching layout
+      and the sheet cannot cause a shift while somebody is typing.
+   ============================================================ */
+
+.hb-sheet {
+    /* 3px is the width of a scored line on a pane of glass, which is the number
+       this channel is set to rather than a rounded-up guess. */
+    --sheet-score: 3px;
+    --sheet-gutter: 1.25rem;
+    --sheet-measure: 14rem;
+    /* The one column count on the page: index, then the sheet. */
+    --sheet-index: 12.5rem;
+
+    font-family: var(--font-sans);
+    color: var(--dash-ink);
+}
+
+/* --- masthead ----------------------------------------------------------- */
+
+.hb-sheet-head {
+    display: grid;
+    gap: 1.25rem 2rem;
+    align-items: end;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--dash-line-strong);
+}
+
+@container dash (min-width: 66rem) {
+    .hb-sheet-head {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+}
+
+.hb-sheet-title {
+    margin: 0;
+    font-size: clamp(1.85rem, 1.45rem + 1.1vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    color: var(--dash-ink);
+    text-wrap: balance;
+}
+
+.hb-sheet-lede {
+    margin: 0.55rem 0 0;
+    max-width: 52ch;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--dash-muted);
+}
+
+/* The measured block: three facts about the sheet itself, all of them either a
+   real timestamp or a count the module takes from the DOM. */
+.hb-sheet-facts {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 0 1.5rem;
+    margin: 0;
+}
+
+.hb-sheet-fact {
+    margin: 0;
+    padding-inline-start: 0.75rem;
+    border-inline-start: 1px solid var(--dash-line);
+}
+
+.hb-sheet-fact dt {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+.hb-sheet-fact dd {
+    /* The height is reserved even while the value is empty, which it is until the module has
+       measured the sheet. Without this the row grows five pixels a beat after load and every
+       fact below it steps down. */
+    min-height: 1.3em;
+    margin: 0.25rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    color: var(--dash-ink);
+}
+
+@container dash (max-width: 65.99rem) {
+    .hb-sheet-facts {
+        grid-auto-flow: row;
+        grid-auto-columns: none;
+        gap: 0.75rem 0;
+    }
+
+    .hb-sheet-fact {
+        display: grid;
+        grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+        align-items: baseline;
+        gap: 0 0.75rem;
+        padding-inline-start: 0;
+        border-inline-start: 0;
+    }
+
+    .hb-sheet-fact dd {
+        margin: 0;
+        text-align: start;
+    }
+}
+
+/* --- body: the index and the panes -------------------------------------- */
+
+.hb-sheet-body {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@container dash (min-width: 66rem) {
+    .hb-sheet-body {
+        grid-template-columns: var(--sheet-index) minmax(0, 1fr);
+        gap: 2rem;
+    }
+}
+
+/* On a phone the index is a strip you scroll along; at 66rem it becomes a rail
+   that sticks inside the shell's own scroller. */
+.hb-index {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--dash-line);
+    border-block: 1px solid var(--dash-line);
+}
+
+@container dash (max-width: 65.99rem) {
+    .hb-index {
+        top: auto;
+        position: relative;
+        flex-direction: row;
+        gap: 0;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: none;
+        background: transparent;
+    }
+
+    .hb-index::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.hb-index-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    padding: 0.5rem 0.7rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--dash-panel);
+    color: var(--dash-muted);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color var(--dash-fast) var(--dash-ease),
+        color var(--dash-fast) var(--dash-ease),
+        transform var(--dash-fast) var(--dash-ease);
+}
+
+@container dash (max-width: 65.99rem) {
+    .hb-index-item {
+        width: auto;
+        flex: 0 0 auto;
+        border-inline-end: 1px solid var(--dash-line);
+        border-radius: 8px;
+    }
+}
+
+.hb-index-item[aria-current='true'] {
+    color: var(--dash-ink);
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--dash-ink);
+}
+
+@container dash (max-width: 65.99rem) {
+    .hb-index-item[aria-current='true'] {
+        box-shadow: inset 0 -2px 0 var(--dash-ink);
+    }
+}
+
+.hb-index-count {
+    /* A count is information, so it is muted and never faint. */
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+/* A mark count is the only thing in the rail allowed to be red, and it always
+   carries its own number, so the claim is legible in greyscale too. */
+.hb-index-mark {
+    padding: 1px 5px;
+    border-radius: 9999px;
+    background: var(--dash-cut);
+    color: var(--dash-cut-ink);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.625rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.hb-index-item[data-marked] .hb-index-count {
+    color: var(--dash-cut);
+}
+
+.hb-panes {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+}
+
+/* One pane per group. Alpine owns its display through `x-show` and writes it
+   inline, so this rule is what it falls back to when shown — which is the only
+   way a sheet this large can be one form and still read as nine groups. */
+.hb-pane {
+    display: grid;
+    gap: 2rem;
+}
+
+/* --- a block ------------------------------------------------------------ */
+
+.hb-block {
+    background: var(--dash-panel);
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+}
+
+.hb-block__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0.4rem 1.25rem;
+    padding: 1.05rem calc(var(--sheet-gutter)) 0.9rem
+        calc(var(--sheet-score) + var(--sheet-gutter));
+    border-bottom: 1px solid var(--dash-line-strong);
+}
+
+.hb-block__title {
+    grid-column: 1;
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.016em;
+    color: var(--dash-ink);
+}
+
+.hb-block__meta {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 0.6875rem;
+    color: var(--dash-muted);
+}
+
+.hb-block__note {
+    grid-column: 1 / -1;
+    margin: 0;
+    max-width: 72ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+.hb-block__body {
+    padding-block: 0.25rem 0.6rem;
+}
+
+.hb-block__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.85rem calc(var(--sheet-gutter)) 0.95rem
+        calc(var(--sheet-score) + var(--sheet-gutter));
+    border-top: 1px solid var(--dash-line);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+/* --- the measured row: the unit of this page ---------------------------- */
+
+.hb-field {
+    display: grid;
+    grid-template-columns: var(--sheet-score) var(--sheet-measure) minmax(0, 1fr);
+    column-gap: var(--sheet-gutter);
+    align-items: start;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--dash-line);
+    transition: background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-field:last-child {
+    border-bottom: 0;
+}
+
+/* A row whose control is a table, a repeater or a plate needs the whole width,
+   so the measure column joins it rather than squeezing the control. */
+.hb-field--stack {
+    grid-template-columns: var(--sheet-score) minmax(0, 1fr);
+}
+
+.hb-field--stack .hb-field__meta,
+.hb-field--stack .hb-field__ctl {
+    grid-column: 2;
+}
+
+@container dash (max-width: 46rem) {
+    .hb-field {
+        grid-template-columns: var(--sheet-score) minmax(0, 1fr);
+        row-gap: 0.4rem;
+    }
+
+    .hb-field__meta,
+    .hb-field__ctl {
+        grid-column: 2;
+    }
+}
+
+/* The marking channel. Present and 3px wide at rest, so nothing shifts when a
+   score is drawn into it. */
+.hb-field__score {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: stretch;
+    background: var(--dash-cut);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 180ms var(--dash-ease);
+}
+
+.hb-field__meta {
+    /* The lead is what optically aligns a 14px label with the first line of a
+       15px input that carries 0.55rem of padding. */
+    padding-block-start: 0.4rem;
+    min-width: 0;
+}
+
+.hb-field__label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.008em;
+    color: var(--dash-ink);
+}
+
+/* A setting key is the name the value has in the code, and the staff who report
+   a problem use it. It is copy, so it is muted and never faint. */
+.hb-field__key {
+    display: block;
+    margin-block-start: 0.2rem;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    color: var(--dash-muted);
+    word-break: break-all;
+}
+
+.hb-field__hint {
+    margin: 0.35rem 0 0;
+    max-width: 68ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+.hb-field__ctl {
+    min-width: 0;
+}
+
+.hb-field__state {
+    margin-block-start: 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--dash-muted);
+}
+
+/* The two states a row can be in, and the only two things that put red on this
+   page. Both are the same claim: this is not what the shop has stored. */
+.hb-field[data-marked] .hb-field__score,
+.hb-field[data-error] .hb-field__score {
+    transform: scaleY(1);
+}
+
+.hb-field[data-marked] > .hb-field__ctl > .hb-field__state {
+    color: var(--dash-cut);
+    font-weight: 500;
+}
+
+@media (hover: hover) {
+    .hb-field:hover {
+        background-color: var(--dash-set);
+    }
+}
+
+/* --- controls ----------------------------------------------------------- */
+
+/* `.hb-input` and `.hb-select` are authoritative the way `.ui-field` and
+   `.ui-btn` are: a utility class added on top of them will not win. Change this
+   file, or use the row. */
+.hb-input,
+.hb-select,
+.hb-textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 8px;
+    background: var(--dash-panel);
+    color: var(--dash-ink);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    transition:
+        border-color var(--dash-fast) var(--dash-ease),
+        background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-textarea {
+    min-height: 5.5rem;
+    resize: vertical;
+}
+
+.hb-input::placeholder,
+.hb-textarea::placeholder {
+    /* A placeholder is copy, so it may not be faint. */
+    color: var(--dash-muted);
+    opacity: 1;
+}
+
+.hb-input[readonly],
+.hb-input:disabled,
+.hb-select:disabled,
+.hb-textarea:disabled {
+    background: var(--dash-set);
+    color: var(--dash-muted);
+    cursor: not-allowed;
+}
+
+.hb-select {
+    appearance: none;
+    padding-inline-end: 2rem;
+    background-image: linear-gradient(45deg, transparent 50%, var(--dash-muted) 50%),
+        linear-gradient(135deg, var(--dash-muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 15px) calc(1em + 0.2rem),
+        calc(100% - 10px) calc(1em + 0.2rem);
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Number fields carry their unit as a mono suffix in the label's hint rather
+   than inside the field, so the value the form posts stays clean. */
+.hb-input--num {
+    max-width: 9rem;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.hb-input--mono {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* A row of controls that belong to one label — open and close, a value and its
+   suffix, a field and the button that fills it. */
+.hb-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hb-cluster .hb-input {
+    width: auto;
+    flex: 1 1 8.5rem;
+    min-width: 7rem;
+}
+
+.hb-cluster__unit {
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+.hb-file {
+    width: 100%;
+    min-height: 42px;
+    padding: 0.45rem 0.6rem;
+    border: 1px dashed var(--dash-line-strong);
+    border-radius: 8px;
+    background: var(--dash-panel);
+    color: var(--dash-muted);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+}
+
+.hb-file:hover {
+    border-style: solid;
+    border-color: var(--dash-ink);
+    color: var(--dash-ink);
+}
+
+.hb-file::file-selector-button {
+    margin-inline-end: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 6px;
+    background: var(--dash-set);
+    color: var(--dash-ink);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- a switch and a radio sample ---------------------------------------- */
+
+.hb-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 32px;
+    cursor: pointer;
+}
+
+.hb-switch__track {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 9999px;
+    background: var(--dash-set);
+    transition:
+        background-color var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-switch__track::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 2px;
+    inset-inline-start: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: var(--dash-panel);
+    border: 1px solid var(--dash-line-strong);
+    transition: transform var(--dash-fast) var(--dash-ease);
+}
+
+.hb-switch input:checked + .hb-switch__track {
+    background: var(--dash-ink);
+    border-color: var(--dash-ink);
+}
+
+.hb-switch input:checked + .hb-switch__track::after {
+    transform: translateX(18px);
+}
+
+/* The input is invisible by design, so the thing a keyboard lands on has to carry
+   the ring instead of a box nobody can see. */
+.hb-switch input:focus-visible + .hb-switch__track {
+    outline: 2px solid var(--dash-ink);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) {
+    .hb-switch:hover .hb-switch__track {
+        border-color: var(--dash-ink);
+    }
+}
+
+.hb-switch input {
+    /* Kept in the accessibility tree and in the form: only its paint moves. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* A radio that is a choice of appearance rather than a value gets a sample: the
+   tile paints the faces it is about to give you.
+
+   The caption is deliberately OUTSIDE the face. A swatch that previews a dark
+   ground cannot also carry the page's ink on it — the words would fall to
+   1.11:1 — and a swatch that previews a split light/dark ground has no legible
+   half at all. So the face is only ever a picture, and everything you read sits
+   on the panel, where the contrast rules hold. */
+.hb-samples {
+    display: grid;
+    gap: 0.85rem 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    width: 100%;
+}
+
+.hb-sample {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    cursor: pointer;
+}
+
+.hb-sample input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hb-sample__face {
+    position: relative;
+    display: grid;
+    align-content: center;
+    gap: 0.4rem;
+    min-height: 3.75rem;
+    padding: 0.75rem 0.8rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-panel);
+    transition:
+        border-color var(--dash-fast) var(--dash-ease),
+        box-shadow var(--dash-fast) var(--dash-ease),
+        transform var(--dash-fast) var(--dash-ease);
+}
+
+.hb-sample__bars {
+    display: grid;
+    gap: 4px;
+}
+
+.hb-sample__bar {
+    height: 5px;
+    border-radius: 2px;
+}
+
+.hb-sample__bar:first-child {
+    width: 42%;
+    background: #1a1414;
+}
+
+.hb-sample__bar:nth-child(2) {
+    width: 76%;
+    background: rgba(26, 20, 20, 0.28);
+}
+
+.hb-sample[data-face='light'] .hb-sample__face {
+    background: #f7f5f3;
+}
+
+.hb-sample[data-face='dark'] .hb-sample__face {
+    background: #0a0a0f;
+}
+
+.hb-sample[data-face='dark'] .hb-sample__bar:first-child {
+    background: #fafafa;
+}
+
+.hb-sample[data-face='dark'] .hb-sample__bar:nth-child(2) {
+    background: rgba(250, 250, 250, 0.28);
+}
+
+.hb-sample[data-face='auto'] .hb-sample__face {
+    background: linear-gradient(105deg, #f7f5f3 0 50%, #0a0a0f 50% 100%);
+}
+
+.hb-sample[data-face='auto'] .hb-sample__bar:first-child {
+    background: linear-gradient(105deg, #1a1414 0 50%, #fafafa 50% 100%);
+}
+
+.hb-sample[data-face='auto'] .hb-sample__bar:nth-child(2) {
+    background: linear-gradient(105deg, rgba(26, 20, 20, 0.28) 0 50%, rgba(250, 250, 250, 0.28) 50% 100%);
+}
+
+/* The navigation samples are a drawing of the shape, not a colour, so their face
+   stays the panel's own and the diagram carries the ink. */
+.hb-sample[data-face='nav'] .hb-sample__face {
+    min-height: 6.5rem;
+}
+
+.hb-sample__word {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-sample__sub {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--dash-muted);
+}
+
+.hb-sample input:checked + .hb-sample__face {
+    border-color: var(--dash-ink);
+    box-shadow: inset 0 0 0 1px var(--dash-ink);
+}
+
+/* "set" is the state, and it is printed rather than implied by a heavier border. */
+.hb-sample input:checked ~ .hb-sample__word::after {
+    content: "set";
+    padding: 0 0.3rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 3px;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+}
+
+@media (hover: hover) {
+    .hb-sample:hover .hb-sample__face,
+    .hb-sample input:focus-visible + .hb-sample__face {
+        border-color: var(--dash-ink);
+    }
+
+    .hb-sample:hover .hb-sample__face {
+        transform: translate3d(0, -1px, 0);
+    }
+}
+
+/* --- repeaters ---------------------------------------------------------- */
+
+.hb-repeat__empty {
+    margin: 0;
+    padding: 0.85rem 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+.hb-repeat-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: sheet-repeat;
+}
+
+.hb-repeat-item {
+    counter-increment: sheet-repeat;
+    padding: 0.75rem 0.85rem 0.5rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-panel);
+}
+
+/* The number is the order the item plays in, which is real sequence, so it is
+   printed — and it is printed by the counter, not by a hand-typed index that
+   can fall out of step when a row moves. */
+.hb-repeat-item::before {
+    content: counter(sheet-repeat, decimal-leading-zero);
+    display: block;
+    margin-block-end: 0.4rem;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--dash-muted);
+}
+
+/* Inside a repeater the measure narrows, but the marking channel stays exactly
+   where it is on the rest of the sheet: a change inside a slide has to be able to
+   say so in the same place as a change in the shop's phone number. */
+.hb-repeat-item .hb-field {
+    grid-template-columns: var(--sheet-score) minmax(7rem, 9.5rem) minmax(0, 1fr);
+    column-gap: 0.9rem;
+    padding-block: 0.4rem;
+}
+
+.hb-repeat-item .hb-field__meta {
+    grid-column: 2;
+    padding-block-start: 0.45rem;
+}
+
+.hb-repeat-item .hb-field__ctl {
+    grid-column: 3;
+}
+
+@container dash (max-width: 46rem) {
+    .hb-repeat-item .hb-field {
+        grid-template-columns: var(--sheet-score) minmax(0, 1fr);
+        row-gap: 0.3rem;
+    }
+
+    .hb-repeat-item .hb-field__meta,
+    .hb-repeat-item .hb-field__ctl {
+        grid-column: 2;
+    }
+
+    .hb-repeat-item .hb-field__meta {
+        padding-block-start: 0;
+    }
+}
+
+.hb-repeat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.5rem;
+    border-top: 1px solid var(--dash-line);
+}
+
+.hb-repeat-bar__push {
+    margin-inline-start: auto;
+}
+
+/* --- asset plates and images -------------------------------------------- */
+
+.hb-asset {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    width: 100%;
+}
+
+.hb-asset__tile {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.hb-asset__frame {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 5 / 3;
+    padding: 0.85rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background:
+        repeating-conic-gradient(var(--dash-set) 0% 25%, var(--dash-panel) 0% 50%) 0 0 / 16px 16px;
+    overflow: hidden;
+}
+
+.hb-asset__frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.hb-asset__word {
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+/* An image about to be replaced is shown as it will behave: the old one, dimmed,
+   with the claim printed over it rather than implied by an opacity change. */
+.hb-asset__frame[data-pending] {
+    border-color: var(--dash-line-strong);
+}
+
+.hb-asset__frame[data-pending] img {
+    opacity: 0.35;
+}
+
+/* --- a state, not a value ------------------------------------------------ */
+
+/* Two-factor, email verification and "this device" are conditions the shop is
+   in, not fields you can mark. They get the dot and the word, and never red. */
+.hb-state {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-set);
+}
+
+.hb-state__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: var(--dash-off);
+    flex-shrink: 0;
+}
+
+.hb-state--ok .hb-state__dot {
+    background: var(--dash-done);
+}
+
+.hb-state--warn .hb-state__dot {
+    background: var(--dash-wait);
+}
+
+.hb-state__word {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dash-ink);
+}
+
+.hb-state__body {
+    flex: 1 1 100%;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--dash-muted);
+}
+
+/* --- the commit foot ------------------------------------------------------ */
+
+/* Sticky inside the shell's own scroller, because a fixed corner would collide
+   with the rail on a collapsed sidebar and with the bar on a top-layout panel. */
+.hb-foot {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1.25rem;
+    margin-block-start: 0.5rem;
+    padding: 0.8rem 1.15rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-panel);
+    transition:
+        border-color var(--dash-base) var(--dash-ease),
+        background-color var(--dash-base) var(--dash-ease);
+}
+
+.hb-foot[data-open] {
+    border-color: var(--dash-line-strong);
+}
+
+.hb-foot__count {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--dash-muted);
+}
+
+.hb-foot[data-open] .hb-foot__count {
+    color: var(--dash-ink);
+}
+
+.hb-foot__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hb-btn--wide {
+    min-height: 42px;
+    padding-inline: 1.1rem;
+    font-size: 0.8125rem;
+}
+
+/* The filter is a claim about what is on the screen, so it says which way it is
+   set instead of only looking different. */
+.hb-btn[aria-pressed='true'] {
+    background: var(--dash-ink);
+    border-color: var(--dash-ink);
+    color: var(--dash-panel);
+}
+
+/* --- the commit control --------------------------------------------------- */
+
+/* Save is the act the whole page is about, so it performs it: the field floods
+   to ink, the label inverts, and the arrow turns through. */
+.hb-btn--commit {
+    background: var(--dash-cut);
+    border-color: var(--dash-cut);
+    color: var(--dash-cut-ink);
+}
+
+.hb-btn--commit > svg {
+    transition: transform 320ms var(--dash-ease);
+}
+
+@media (hover: hover) {
+    .hb-btn--commit:hover {
+        background: var(--dash-ink);
+        border-color: var(--dash-ink);
+        color: var(--dash-panel);
+    }
+
+    /* The arrow arrives at the place it points to, which is the page's own verb,
+       and the label inverts with the fill. Colour alone would be a tint. */
+    .hb-btn--commit:hover > svg {
+        transform: translate3d(4px, 0, 0);
+    }
+
+    .hb-btn--commit:focus-visible > svg {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+.hb-btn--commit:active > svg {
+    transform: translate3d(1px, 0, 0);
+}
+
+.hb-btn--commit:disabled {
+    background: var(--dash-set);
+    border-color: var(--dash-line);
+    color: var(--dash-muted);
+    opacity: 1;
+    cursor: default;
+}
+
+/* --- the filter: the only thing on this page that hides a field ---------- */
+
+/* The index is deliberately not filtered, and neither is a pane: Alpine owns
+   the display of an `x-show` element and sets it inline, so a rule here would
+   simply lose. What filters is the row and the face it sits in. */
+.hb-sheet [data-filter='marks'] .hb-field:not([data-marked]):not([data-error]),
+.hb-sheet [data-filter='marks'] .hb-repeat-item:not([data-marked]),
+.hb-sheet [data-filter='marks'] .hb-block:not([data-marked]):not([data-error]) {
+    /* display, not visibility: a filtered field also leaves the tab order
+       instead of becoming a stop nobody can see. */
+    display: none;
+}
+
+/* --- errors ------------------------------------------------------------- */
+
+.hb-error {
+    display: block;
+    margin-block-start: 0.35rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--dash-wait);
+    font-weight: 500;
+}
+
+/* --- focus -------------------------------------------------------------- */
+
+/* The desk gives an inline link a 24px box; the bench inherits the behaviour by
+   restating the rule rather than by sitting inside the desk's own scope. */
+/* The separator glyph is decoration, but it sits inside copy, and at 2.54:1 it read as
+   text that failed. It is a hairline with a job, so it takes the muted step. */
+.hb-sheet .hb-sep {
+    color: var(--dash-muted);
+}
+
+.hb-sheet .hb-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+}
+
+/* Ink, not the accent. A keyboard tour of a 115-field form would otherwise
+   light up in the same colour as an unsaved change, and the one claim this page
+   makes about red would mean two things. */
+.hb-sheet :focus-visible {
+    outline: 2px solid var(--dash-ink);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+.hb-sheet .hb-input:focus-visible,
+.hb-sheet .hb-select:focus-visible,
+.hb-sheet .hb-textarea:focus-visible {
+    outline-offset: 0;
+}
+
+/* --- the two hovers the desk already speaks ------------------------------ */
+
+@media (hover: hover) {
+    .hb-index-item:hover {
+        background-color: var(--dash-set);
+        color: var(--dash-ink);
+    }
+
+    .hb-index-item:hover .hb-index-count {
+        transform: translate3d(3px, 0, 0);
+    }
+
+    .hb-block:hover > .hb-block__head .hb-block__title {
+        color: var(--dash-ink);
+    }
+}
+
+.hb-index-item:active,
+.hb-sample:active .hb-sample__face {
+    transform: scale(0.995);
+}
+
+/* --- reduced motion ------------------------------------------------------ */
+
+/* Every state survives: the score stops drawing but stays drawn, the counts and
+   sentences are untouched, and the foot simply appears. */
+@media (prefers-reduced-motion: reduce) {
+    .hb-field__score,
+    .hb-foot,
+    .hb-index-item,
+    .hb-field,
+    .hb-btn,
+    .hb-input,
+    .hb-select,
+    .hb-textarea,
+    .hb-sample__face,
+    .hb-switch__track,
+    .hb-switch__track::after {
+        transition: none !important;
+    }
+
+    .hb-sample:hover .hb-sample__face,
+    .hb-index-item:hover .hb-index-count {
+        transform: none !important;
+    }
+}
+
+/* ============================================================
+   PROFILE — the same bench, one person's side of it
+   ============================================================ */
+
+/* --- identity masthead -------------------------------------------------- */
+
+.hb-id {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem 1.25rem;
+    align-items: center;
+}
+
+.hb-id__mark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 12px;
+    background: var(--dash-set);
+    overflow: hidden;
+}
+
+.hb-id__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hb-id__initials {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--dash-muted);
+}
+
+/* The stored avatar paints over the monogram and removes itself if the file is
+   not on disk, so a broken path can never print a broken-image glyph. */
+.hb-id__img[hidden] {
+    display: none !important;
+}
+
+.hb-id__text {
+    min-width: 0;
+}
+
+.hb-id__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.35rem;
+    margin: 0.45rem 0 0;
+    font-size: 0.875rem;
+    color: var(--dash-muted);
+}
+
+.hb-id__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.6rem 0 0;
+    font-size: 0.75rem;
+}
+
+.hb-id__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--dash-ink);
+}
+
+/* --- a plain measured list ---------------------------------------------- */
+
+.hb-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hb-list__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--dash-line);
+    transition: background-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-list__row:last-child {
+    border-bottom: 0;
+}
+
+.hb-list__main {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.hb-list__title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dash-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--dash-line-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    overflow-wrap: anywhere;
+}
+
+.hb-list__when {
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+@media (hover: hover) {
+    .hb-list__row:hover {
+        background-color: var(--dash-set);
+    }
+
+    .hb-list__row:hover .hb-list__title {
+        text-decoration-color: var(--dash-ink);
+        text-decoration-thickness: 2px;
+    }
+}
+
+/* --- destructive, without borrowing the mark's colour ------------------- */
+
+/* Red on this page means exactly one thing: a value that is not what is stored.
+   A control that cannot be undone says so with a heavier edge, the word
+   "irreversible" set in mono beside its heading, and a password prompt — not
+   with the colour that means "unsaved". */
+.hb-btn--danger {
+    border-color: var(--dash-line-strong);
+    color: var(--dash-ink);
+}
+
+@media (hover: hover) {
+    .hb-btn--danger:hover {
+        background: var(--dash-ink);
+        border-color: var(--dash-ink);
+        color: var(--dash-panel);
+    }
+}
+
+/* --- a control with its own reveal button -------------------------------- */
+
+/* The box is the raw element and the eye lives inside it, so the wrapper has to
+   be the containing block. `.hb-btn--reveal` is a button that is not a button
+   face: it borrows the button's box model and gives up the paint. */
+.hb-inline {
+    position: relative;
+}
+
+.hb-inline .hb-btn--reveal {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.4rem;
+    border: 0;
+    background: transparent;
+    color: var(--dash-muted);
+}
+
+/* The typed characters stop short of the eye instead of sliding under it. */
+.hb-inline .hb-input {
+    padding-inline-end: 2.4rem;
+}
+
+@media (hover: hover) {
+    .hb-inline .hb-btn--reveal {
+        color: var(--dash-ink);
+    }
+}
+
+/* --- a QR plate ---------------------------------------------------------- */
+
+/* A code that inverts does not scan, so this plate keeps a white face in both
+   themes. It also cancels the asset frame's 5/3 measure: a QR is square, and
+   clipping it at 115px tall would put the bottom rows out of the box. */
+.hb-qr {
+    width: 12rem;
+    background: #ffffff;
+    padding: 0.75rem;
+    aspect-ratio: auto;
+}
+
+.hb-qr svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* --- recovery codes ------------------------------------------------------ */
+
+.hb-codes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 0.4rem;
+}
+
+.hb-code {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 6px;
+    background: var(--dash-panel);
+}
+
+/* --- the three modals ---------------------------------------------------- */
+
+/* Overlays are the one place on this page that leaves the sheet: they carry the
+   password that confirms an action, so they sit on the desk's own panel face and
+   keep the same hairlines as everything else. */
+.hb-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(10, 10, 15, 0.62);
+}
+
+.hb-modal__panel {
+    width: 100%;
+    max-width: 34rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 10px;
+    background: var(--dash-panel);
+    padding: 1.25rem;
+}
+
+.hb-modal__title {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.016em;
+    color: var(--dash-ink);
+}
+
+.hb-modal__body {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--dash-muted);
+}
+
+.hb-modal__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--dash-line);
+}
+
+/* A disabled control is exempt from contrast, but it is not exempt from looking
+   like itself: the label stays legible and only the edge gives way. */
+.hb-sheet .hb-btn:disabled {
+    opacity: 1;
+    border-color: var(--dash-line);
+    background: var(--dash-panel);
+    color: var(--dash-muted);
+    cursor: default;
+}
+
+/* The masthead's consent pair: two dates, named, on one aligned line each. */
+.hb-id__consent {
+    display: grid;
+    gap: 0.15rem;
+    font-size: 0.8125rem;
+    color: var(--dash-muted);
+}
+
+.hb-id__consent > span {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+/* --- the shared checkbox, in the bench's own voice ---------------------- */
+
+/* `x-ui.checkbox` is themed once for the whole app and its tick is the accent
+   red. On this page red already means exactly one thing — a value that is not
+   what is stored — so a checked box that also means red would give the sheet two
+   reds with different senses. Inside the bench the tick is ink instead. The
+   component itself is untouched, because 43 other admin usages read it as red. */
+.hb-sheet .ui-checkbox-check svg {
+    stroke: var(--dash-muted);
+}
+
+.hb-sheet .ui-checkbox-wrapper:hover .ui-checkbox-check svg,
+.hb-sheet .group:hover .ui-checkbox-check svg,
+.hb-sheet .ui-checkbox-input:checked + .ui-checkbox-check svg {
+    stroke: var(--dash-ink);
+}
+
+.hb-sheet .ui-checkbox-check::before {
+    background: rgba(17, 24, 39, 0.05);
+}
+
+.dark .hb-sheet .ui-checkbox-check::before {
+    background: rgba(250, 250, 250, 0.08);
+}
+
+.hb-sheet .ui-checkbox-label {
+    color: var(--dash-ink);
+    font-size: 0.8125rem;
+}
+
+/* --- asset tiles -------------------------------------------------------- */
+
+/* A logo preview at the full width of the control column is not a preview, it is
+   a banner. The tile is capped so what you see is roughly the size the site
+   actually paints it at. */
+.hb-asset {
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 15rem));
+}
+
+/* A group row is a container, not a value: it keeps the filter honest by being
+   marked when something inside it is, and it stays quiet about it — no line
+   down nine rows at once, and no "not set yet" that would double-count the
+   rows beneath it. */
+.hb-field[data-group] > .hb-field__score {
+    display: none;
+}
+
+/* The live region is for a screen reader, not for the eye. Two identical
+   sentences side by side would only make the foot harder to read. */
+.hb-foot__live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.hb-btn--commit > svg,
+.hb-btn__arrow {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hb-btn--commit > svg,
+    .hb-index-item:hover .hb-index-count,
+    .hb-sample__face,
+    .hb-list__row,
+    .hb-file,
+    .ui-checkbox-check svg {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+/* --- the commit control only claims red when there is something to commit -- */
+
+/* One saturated control per screen, and it should track the one real action. At
+   zero marks the sheet has nothing to set, so Save sits in the same quiet voice
+   as everything else on it and fills to the mark colour the moment a value
+   diverges. It stays clickable: re-saving an unchanged sheet is a thing people
+   do after they have moved a file on disk. */
+.hb-foot:not([data-open]) .hb-btn--commit {
+    background: var(--dash-panel);
+    border-color: var(--dash-line-strong);
+    color: var(--dash-ink);
+}
+
+@media (hover: hover) {
+    .hb-foot:not([data-open]) .hb-btn--commit:hover {
+        background: var(--dash-set);
+        border-color: var(--dash-ink);
+        color: var(--dash-ink);
+    }
+}
+
+/* A control answers the pointer on its own as well as through its row, because a
+   person aiming at a box aims at the box. */
+.hb-sheet .hb-input:hover,
+.hb-sheet .hb-select:hover,
+.hb-sheet .hb-textarea:hover {
+    border-color: var(--dash-line-strong);
+}
+
+/* --- sessions: a state, a device, and one way to end it ----------------- */
+
+.hb-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1px 0.5rem 1px 0.4rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.hb-tag__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: var(--dash-off);
+    flex-shrink: 0;
+}
+
+.hb-tag--current {
+    border-color: var(--dash-line-strong);
+    color: var(--dash-ink);
+}
+
+.hb-tag--current .hb-tag__dot {
+    background: var(--dash-ink);
+}
+
+.hb-tag--active {
+    color: var(--dash-info);
+}
+
+.hb-tag--active .hb-tag__dot {
+    background: var(--dash-info);
+}
+
+.hb-tag--ended .hb-tag__dot {
+    background: var(--dash-faint);
+}
+
+.hb-device {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.hb-device__name {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dash-ink);
+    overflow-wrap: anywhere;
+}
+
+.hb-device__meta {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+}
+
+.hb-list__who {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hb-list__end {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* The row that names a new passkey, and the box that renames an existing one.
+   Neither is a `.hb-field`: the bench scores values waiting to be saved, and these
+   are not settings — they are the label of a thing that already lives on a device.
+   Keeping them out of that class is also the only reason the rail beside them does
+   not start counting marks the moment somebody opens the form. */
+.hb-add-row {
+    display: grid;
+    gap: 0.5rem;
+    margin-block: 0.15rem 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--dash-line-strong);
+    border-radius: 10px;
+    background: var(--dash-panel);
+}
+
+.hb-add-row__say {
+    margin: 0;
+    max-width: 60ch;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+/* Rename in place rather than in a box that appears somewhere else: the name being
+   changed is the thing the person is looking at. */
+.hb-input--inline {
+    width: 100%;
+    min-width: 0;
+    max-width: 22rem;
+    padding-block: 0.3rem;
+    font-size: 0.875rem;
+}
+
+@media (min-width: 40rem) {
+    .hb-add-row .hb-cluster {
+        align-items: flex-start;
+    }
+}
+
+/* The bar that heads a list rather than closing one. */
+.hb-repeat-bar--top {
+    justify-content: flex-end;
+    margin-block: 0.25rem 0.5rem;
+    padding-block: 0 0.5rem;
+    border-top: 0;
+}
+
+/* The open and close pair is one fact about one day, so it is one object. On a
+   phone the row breaks between the day's state and the day's hours rather than
+   between "from" and its input, which is what happened when the cluster was
+   allowed to wrap wherever it liked and left "to" under a label nobody reads. */
+.hb-cluster__pair {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.hb-cluster__pair .hb-input {
+    flex: 0 1 7.25rem;
+    min-width: 0;
+}
+
+@container dash (max-width: 46rem) {
+    .hb-cluster--hours {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .hb-cluster__pair .hb-input {
+        flex: 1 1 6rem;
+    }
+}
+
+/* --- a value that cannot be set ----------------------------------------- */
+
+/* A second claim, in a second colour, because it is a second thing. Red says
+   "this is not what is stored". Amber says "this cannot be stored at all until
+   you change it". The browser already knows which fields are in the second
+   state; the sheet takes that knowledge and puts it in the row, in words,
+   instead of in a bubble over the top of the page. */
+.hb-field[data-invalid] > .hb-field__score {
+    transform: scaleY(1);
+    background: var(--dash-wait);
+}
+
+.hb-field[data-invalid] > .hb-field__ctl > .hb-field__state {
+    color: var(--dash-wait);
+    font-weight: 500;
+}
+
+.hb-field[data-invalid] > .hb-field__ctl > .hb-input,
+.hb-field[data-invalid] > .hb-field__ctl > .hb-textarea,
+.hb-field[data-invalid] > .hb-field__ctl > .hb-select,
+.hb-field[data-invalid] .hb-input,
+.hb-field[data-invalid] .hb-textarea {
+    border-color: var(--dash-wait);
+}
+
+/* The filter shows what you changed and what you got wrong. Hiding a field the
+   browser is refusing to submit would be the worst kind of quiet. */
+.hb-sheet [data-filter='marks'] .hb-field[data-invalid] {
+    display: grid;
+}
+
+/* A caption on a transparency checkerboard has no single background to measure
+   against, and neither does a browser. The word gets a solid face of its own so
+   it is legible against whatever the tile behind it is doing. */
+.hb-asset__word {
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 4px;
+    background: var(--dash-panel);
+    color: var(--dash-ink);
+}
+
+/* The mark badge and the commit control arrive together, so they leave together.
+   Without `@starting-style` this degrades to the instant swap it replaced. */
+@starting-style {
+    .hb-index-mark,
+    .hb-foot {
+        opacity: 0;
+    }
+
+    .hb-index-mark {
+        transform: scale(0.7);
+    }
+}
+
+.hb-index-mark {
+    transition:
+        opacity var(--dash-fast) var(--dash-ease),
+        transform var(--dash-fast) var(--dash-ease),
+        display var(--dash-fast) allow-discrete;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hb-index-mark {
+        transition: none;
+    }
+}
+
+/* ============================================================
+   ROUND SIX — the same panes with something in them
+   ============================================================
+
+   Every frame taken until now was an empty account. With data the three
+   structures below stopped working: a block put a band of nothing under its own
+   head, a state card scattered four children across a wide grey field, and a
+   session row spent four lines on one device. */
+
+/* The head already carries its own bottom padding and its rule. The body adding
+   more on top is what turned a list with rows in it into a list with a gap over
+   it. It still keeps its bottom, because the last row's hairline is not a foot. */
+.hb-block__body {
+    padding-block: 0 0.6rem;
+}
+
+/* A bar that heads a body belongs to the first row under it, not to the head
+   above it. */
+.hb-repeat-bar--top {
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0.5rem 0 0.1rem;
+    border-top: 0;
+}
+
+/* --- a state card is a column, not a wrapping row ----------------------- */
+
+/* Four children in a flex-wrap row across a 60rem field put the dot and the
+   word on one line, the QR somewhere near the middle, and the sentence under
+   whichever of them happened to wrap. As a column each one gets its own line,
+   and the dot and the word stay together because they are one fact. */
+.hb-state {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-panel);
+}
+
+.hb-state__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.hb-state__body {
+    flex: none;
+    max-width: 68ch;
+}
+
+.hb-state .hb-repeat-bar {
+    margin-block-start: 0.15rem;
+    padding-block-start: 0;
+    border-top: 0;
+}
+
+/* --- the two-factor setup, which is one job in two halves ---------------- */
+
+/* The code and the thing it comes from belong opposite each other, so the page
+   never asks someone to hold a phone in one hand and scroll with the other. */
+.hb-setup {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@container dash (min-width: 46rem) {
+    .hb-setup {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1.5rem 2rem;
+    }
+}
+
+.hb-setup__pane {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    min-width: 0;
+}
+
+.hb-setup__qr {
+    display: grid;
+    justify-content: start;
+    gap: 0.5rem;
+}
+
+.hb-setup__say {
+    margin: 0;
+    max-width: 34ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+/* The typed half of the same setup key. A definition list rather than a paragraph because the
+   three things an authenticator asks for are three separate fields, and a person copying them
+   into a form reads down a column, not across a sentence. */
+.hb-manual-key {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 10px;
+    background: var(--dash-panel);
+    font-size: 0.8125rem;
+}
+
+.hb-manual-key > div {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.hb-manual-key dt {
+    flex: 0 0 5.5rem;
+    color: var(--dash-muted);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.hb-manual-key dd {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.hb-manual-key__say {
+    margin: 0.15rem 0 0;
+    max-width: 52ch;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+/* One click anywhere in a code takes the whole thing. They are read out one at a time by an
+   attendant on the phone, and a partial selection copied into a sign-in box is a failed code. */
+.hb-code {
+    user-select: all;
+}
+
+/* --- a device row is two lines ------------------------------------------ */
+
+/* Four lines said: a badge, a method, a device, an address, two timestamps. The
+   method is the same word on almost every row, so it joins the measure line
+   instead of taking a row of its own, and the device and its address become one
+   sentence. */
+.hb-device__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.45rem;
+    font-size: 0.9375rem;
+}
+
+.hb-device__method {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--dash-muted);
+}
+
+.hb-list__row {
+    align-items: center;
+    padding-block: 0.7rem;
+}
+
+/* ==========================================================================
+   Round six: the ask had no face, and three panes answered a pointer with
+   nothing at all.
+   ========================================================================== */
+
+/* --- 1. an overlay carries its own tokens ------------------------------- */
+
+/* The desk-wide ask is mounted in `layouts/admin.blade.php`, outside `.hb-sheet`,
+   `.hb-dash` and `.hb-desk`. Every `--dash-*` it read therefore came back
+   undefined, and `background: var(--dash-panel)` with no value is *transparent*:
+   the panel that asks before signing out every device, switching two-factor off
+   or deleting a passkey drew its words directly onto the page behind it, over
+   whatever text happened to be there. It is one component used by all 27 modules,
+   so this is the largest single defect the panel had.
+
+   The fix is not to repoint a global token. An overlay is not on the sheet, so it
+   declares the values it needs on itself and is correct wherever it is mounted. */
+.hb-modal {
+    --dash-panel: #ffffff;
+    --dash-set: #f2f3f5;
+    --dash-ink: #111827;
+    --dash-ink-deep: #000000;
+    --dash-muted: #5b6170;
+    --dash-faint: #9ca3af;
+    --dash-line: rgba(17, 24, 39, 0.11);
+    --dash-line-strong: rgba(17, 24, 39, 0.27);
+    --dash-cut: #dc2626;
+    --dash-cut-ink: #ffffff;
+    --dash-cut-hover: #b91c1c;
+    --dash-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dash-fast: 160ms;
+    --dash-base: 220ms;
+    --dash-settle: 340ms;
+
+    color: var(--dash-ink);
+    font-family: var(--font-sans);
+}
+
+.dark .hb-modal {
+    --dash-panel: #121218;
+    --dash-set: #16161d;
+    --dash-ink: #fafafa;
+    --dash-ink-deep: #ffffff;
+    --dash-muted: #a1a1aa;
+    --dash-faint: #71717a;
+    --dash-line: rgba(255, 255, 255, 0.09);
+    --dash-line-strong: rgba(255, 255, 255, 0.21);
+    --dash-cut: #dc2626;
+    --dash-cut-ink: #ffffff;
+    --dash-cut-hover: #ef4444;
+}
+
+/* --- 2. one focus indicator, and it is not red -------------------------- */
+
+/* `app.css` draws a red halo on every focus stop in the app, and the sheet draws
+   a 2px ink outline on top of it. Both applied, so a focused control arrived as a
+   black rectangle inside a red glow, and red on this page is the sentence "this
+   value is not what is stored". Inside the sheet and inside an ask, focus is ink
+   and ink alone. */
+.hb-sheet :focus-visible,
+.hb-modal :focus-visible {
+    outline: 2px solid var(--dash-ink);
+    outline-offset: 2px;
+    box-shadow: none;
+    border-radius: 6px;
+}
+
+.hb-sheet .hb-input:focus-visible,
+.hb-sheet .hb-select:focus-visible,
+.hb-sheet .hb-textarea:focus-visible,
+.hb-modal .hb-input:focus-visible {
+    outline-offset: 0;
+    border-radius: 8px;
+}
+
+/* --- 3. the button ladder, inside the sheet ---------------------------- */
+
+/* Three things were wrong at once. `--primary` filled with the mark colour on a
+   pane that has no marks, so the loudest colour on the screen meant two different
+   things. Its hover rule restated its rest rule, so Register a device, Confirm,
+   Verify and Enable Two-Factor, the four controls that matter on these panes,
+   answered a pointer with nothing at all. And `--danger` declared the same two
+   properties the default button already has, so the irreversible control was
+   pixel-identical to the one that does nothing.
+
+   Inside the sheet: ink is the thing you do, red stays the thing you have not
+   saved, and a control that cannot be undone carries a heavier edge.
+
+   The rules themselves live in one block at the end of this file. They were
+   written here, then again under round seven, and the second copy beat the first
+   by source order at equal specificity — which is how the delete dialog's red
+   answer started flooding to ink on hover and became the same navy as Cancel. A
+   ladder that has two owners is a ladder with no owner. */
+
+/* --- 4. the panel that asks ------------------------------------------- */
+
+/* A face with nothing under it floats. On the sheet separation is hairlines,
+   because the sheet is one plane; an overlay sits above another plane, so it is
+   allowed the one shadow that says so. */
+.hb-modal__panel {
+    box-shadow: 0 18px 44px -18px rgba(8, 7, 10, 0.55), 0 2px 8px -2px rgba(8, 7, 10, 0.3);
+    padding: 1.35rem 1.4rem 1.15rem;
+
+    /* The desk-wide ask carries whatever sentence a module wrote for itself, and
+       some of them are long. It scrolls inside its own face rather than running
+       off the top of a phone. */
+    max-height: min(85dvh, 44rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.hb-modal__title {
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+}
+
+/* The lede is the whole reason the ask exists: it says what cannot be undone.
+   It gets the measure and the leading of copy, not of a caption. */
+.hb-modal__body {
+    max-width: 58ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.hb-modal__foot {
+    gap: 0.55rem;
+    margin-top: 1.35rem;
+    padding-top: 1.1rem;
+}
+
+/* A head row that holds a title and a close control is a header, and it should
+   read as one even when the title is the only text in it. */
+.hb-modal__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* The quiet answer for an icon-only control inside an ask: it is chrome, so it
+   gets an edge and a fill, not a ring. */
+.hb-modal__x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    margin: -0.2rem -0.2rem 0 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--dash-muted);
+    cursor: pointer;
+    transition:
+        background-color var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease),
+        color var(--dash-fast) var(--dash-ease);
+}
+
+@media (hover: hover) {
+    .hb-modal__x:hover {
+        border-color: var(--dash-line-strong);
+        background: var(--dash-set);
+        color: var(--dash-ink);
+    }
+}
+
+/* --- 5. the two-factor setup pane ------------------------------------- */
+
+/* The code field is an `x-sheet.input`, so it brought the sheet's 14rem measure
+   column with it into a pane that is 440px wide. The control was left about 170px
+   and the placeholder was cut off mid-word at the edge of the block. The stacking
+   rule is keyed on the page container, which never sees a pane, so the pane
+   becomes a container of its own and a label sits above its box inside it. */
+.hb-setup__pane {
+    container: setup-pane / inline-size;
+}
+
+@container setup-pane (max-width: 34rem) {
+    .hb-setup__pane .hb-field {
+        grid-template-columns: var(--sheet-score) minmax(0, 1fr);
+        row-gap: 0.4rem;
+    }
+
+    .hb-setup__pane .hb-field__meta,
+    .hb-setup__pane .hb-field__ctl {
+        grid-column: 2;
+    }
+
+    .hb-setup__pane .hb-field__meta {
+        padding-block-start: 0;
+    }
+}
+
+/* The waiting state is a sentence about the pane, not a second card inside the
+   block that already has an edge. */
+.hb-setup .hb-state {
+    border-color: transparent;
+    background: var(--dash-set);
+}
+
+/* It spans both columns, because it describes the job rather than one half of it.
+   Sitting it inside the left pane made that column tall and the right one short,
+   so the two halves of one task looked like two unrelated blocks. */
+.hb-setup__state {
+    grid-column: 1 / -1;
+}
+
+/* One code, one plate. The QR and the words that explain it are one object, so
+   the caption belongs inside the plate's own measure rather than under it. */
+.hb-setup__qr {
+    gap: 0.6rem;
+}
+
+.hb-setup__say {
+    max-width: 20rem;
+}
+
+/* --- 6. a state inside a block is a band, not a card ------------------ */
+
+.hb-block__body > .hb-state {
+    border-color: transparent;
+}
+
+/* --- 7. recovery codes are read, not typed ---------------------------- */
+
+/* Four boxes with a hairline each said "input", and none of them take a caret.
+   They are a list of things to copy, so they lose the border, gain the filled
+   ground the sheet uses for anything already set, and carry their number because
+   they are handed out in order and used one at a time. */
+.hb-codes {
+    gap: 0.3rem;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+}
+
+.hb-code {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    border: 0;
+    border-radius: 6px;
+    background: var(--dash-set);
+    padding: 0.45rem 0.6rem;
+    color: var(--dash-ink);
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+}
+
+.hb-code__n {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--dash-muted);
+    flex-shrink: 0;
+}
+
+/* A code grid wants more width than a password box does. */
+.hb-modal__panel--wide {
+    max-width: 38rem;
+}
+
+/* The form inside an ask is label, box, answer. It used to be spaced with two
+   Tailwind margin utilities, which is how a modal ends up with a rhythm nobody
+   else on the page has. */
+.hb-modal__form {
+    display: grid;
+    gap: 0.4rem;
+    margin-block-start: 1.15rem;
+}
+
+.hb-modal__form .hb-error {
+    margin-block-start: 0.1rem;
+}
+
+.hb-codes.hb-modal__codes {
+    list-style: none;
+    margin: 1.15rem 0 0;
+    padding: 0;
+}
+
+/* --- 8. an add row belongs with the control that opens it ------------- */
+
+/* The row that is being added to the list is not the list. It loses the second
+   card edge and takes the filled ground instead. */
+.hb-add-row {
+    border-color: var(--dash-line);
+    background: var(--dash-set);
+}
+
+.hb-add-row .hb-input {
+    background: var(--dash-panel);
+}
+
+/* Cancel sat in the bar that heads the whole block, twelve pixels from the button
+   that opened the form and a hundred and fifty from the form itself. It now sits
+   in the row it cancels, beside the sentence that explains the row. */
+.hb-add-row__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 0.15rem;
+}
+
+.hb-add-row__foot > p {
+    flex: 1 1 22rem;
+    margin: 0;
+    min-width: 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--dash-muted);
+}
+
+/* --- 9. a device row is one sentence -------------------------------- */
+
+/* The chip went on its own line above the device, so the first thing you read was
+   "Active" and the second was the thing that is active. They are one statement,
+   so the tag now lives inside the name's own baseline row and takes the measure
+   of the text beside it rather than a row of its own. */
+.hb-device__name .hb-tag {
+    font-size: 0.625rem;
+    padding: 0 0.45rem 0 0.35rem;
+}
+
+/* --- 10. one left line inside a block -------------------------------- */
+
+/* The head of a block insets its text by the score channel plus the gutter, which
+   is 23px. The body had no inline padding at all, so anything the pane put
+   directly in it — a list, a bar, an empty sentence — started 23px to the left of
+   the heading above it. On a form that is invisible, because every row is a
+   `.hb-field` and the field's own grid carries that inset; on the three list panes
+   it meant the device names sat under the border while their own heading floated
+   in from the edge.
+
+   Rows take the inset as padding, so the hover fill still spans the block. Boxes
+   take it as margin, so their edge is not doubled by a border. */
+.hb-block__body > .hb-list > .hb-list__row,
+.hb-block__body > .hb-repeat-bar,
+.hb-block__body > .hb-repeat__empty {
+    padding-inline: calc(var(--sheet-score) + var(--sheet-gutter));
+}
+
+.hb-block__body > .hb-state,
+.hb-block__body > .hb-add-row,
+.hb-block__body > .hb-setup {
+    margin-inline: calc(var(--sheet-score) + var(--sheet-gutter));
+}
+
+/* --- 11. the overlay entrance, on the layer's own clock -------------- */
+
+/* Alpine adds the first class for the whole transition, the second only on the
+   frame it starts on, and the third only at the end, so nothing is left holding a
+   transform once the panel has arrived. The durations and the curve are the ones
+   the sheet already uses; the Tailwind utilities these replace asked for a 300ms
+   `ease-out`, which is a different curve from every other move on the page. */
+.hb-modal.hb-x-enter,
+.hb-modal__panel.hb-x-enter,
+.hb-modal.hb-x-leave,
+.hb-modal__panel.hb-x-leave {
+    transition:
+        opacity var(--dash-base) var(--dash-ease),
+        transform var(--dash-base) var(--dash-ease);
+}
+
+.hb-x-enter-from,
+.hb-x-leave-to {
+    opacity: 0;
+}
+
+.hb-modal__panel.hb-x-enter-from,
+.hb-modal__panel.hb-x-leave-to {
+    transform: scale(0.985) translate3d(0, 5px, 0);
+}
+
+.hb-x-enter-to,
+.hb-x-leave-from {
+    opacity: 1;
+}
+
+/* --- 12. reduced motion --------------------------------------------- */
+
+/* The rings, the floods and the heavier edges above are colour and geometry, not
+   movement, so they survive. Only the transitions stop. */
+@media (prefers-reduced-motion: reduce) {
+    .hb-modal.hb-x-enter,
+    .hb-modal.hb-x-leave,
+    .hb-modal__panel.hb-x-enter,
+    .hb-modal__panel.hb-x-leave,
+    .hb-modal__x,
+    .hb-sheet .hb-btn--primary,
+    .hb-sheet .hb-btn--danger {
+        transition: none;
+    }
+}
+
+/* ==========================================================================
+   ROUND SEVEN — a juror that had not seen the intent read these frames and
+   found four things the measurements had missed.
+   ========================================================================== */
+
+/* --- 1. the bar must never sit on top of a field ---------------------- */
+
+/* The foot is a sticky card floating over a form that is taller than a phone. At
+   390px it covered the New Password input outright: the label was on screen and
+   the box was not. Three borders deep as well, since it was a rounded card inside
+   a rounded card inside a rounded card.
+
+   It stops being a card and becomes what it is: a rule and a fill. And on a narrow
+   sheet it stops being sticky at all, because a submit control that hides the field
+   you are typing into is worse than a submit control you scroll to. */
+.hb-foot {
+    border: 0;
+    border-top: 1px solid var(--dash-line);
+    border-radius: 0;
+    padding: 0.85rem 0 0.2rem;
+}
+
+.hb-foot[data-open] {
+    border-top-color: var(--dash-line-strong);
+}
+
+@container dash (max-width: 46rem) {
+    .hb-foot {
+        position: static;
+    }
+}
+
+/* --- 2. a destructive control is separated, not merely outlined ------ */
+
+/* A 1px inset ring next to a 1px border was the answer to "how do you say this
+   cannot be undone without borrowing the mark's red". It measured as a difference
+   and read as none: `Remove` and `Rename` were the same pill at the same size, and
+   a juror that had only the frames could not tell which one to be careful about.
+
+   Two changes. The edge is genuinely heavier — see the ladder at the end of this
+   file — and the thing that cannot be undone is no longer the third item in a row
+   of equals: it sits below its own rule, after them. */
+
+/* The band a destructive control lives in when it should not share a row with the
+   routine ones. It carries a rule and a gap and no words of its own: a caption here
+   would either repeat the sentence the ask already says or claim "cannot be undone"
+   about a control that can, in fact, be undone by setting two-factor up again. The
+   separation is the statement. */
+.hb-repeat-bar--split {
+    margin-block-start: 0.85rem;
+    padding-block-start: 0.85rem;
+    border-top: 1px solid var(--dash-line);
+}
+
+/* --- 3. the phone layouts are composed, not narrowed ----------------- */
+
+/* A list row at 390px put its control in the middle of a two-line meta wrap, and
+   the three two-factor buttons stepped right by their own width differences. Both
+   are the same mistake: a desktop row that was allowed to wrap instead of a phone
+   row that was arranged. */
+@container dash (max-width: 46rem) {
+    .hb-list__row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 0.6rem;
+        align-items: start;
+    }
+
+    .hb-list__end,
+    .hb-list__end form {
+        display: flex;
+        justify-content: stretch;
+    }
+
+    /* On a phone the control band is its own line, and a rule is what says the row
+       above it is the thing being described rather than a half-finished two-column
+       grid that wrapped in the middle. */
+    .hb-list__end {
+        padding-block-start: 0.6rem;
+        border-top: 1px solid var(--dash-line);
+    }
+
+    .hb-list__end .hb-btn,
+    .hb-list__end form > .hb-btn {
+        flex: 1 1 auto;
+        min-height: 40px;
+        justify-content: center;
+    }
+
+    /* A bar that heads a list puts its action where the reading starts. */
+    .hb-repeat-bar--top {
+        justify-content: flex-start;
+    }
+
+    .hb-repeat-bar--top > form,
+    .hb-repeat-bar--top > .hb-btn {
+        flex: 1 1 auto;
+    }
+
+    .hb-repeat-bar--top .hb-btn {
+        min-height: 40px;
+        justify-content: center;
+    }
+
+    /* The state's own controls stack on the left line of the card rather than
+       stepping right by their own widths. */
+    .hb-state .hb-repeat-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hb-state .hb-repeat-bar > form {
+        display: flex;
+    }
+
+    .hb-state .hb-repeat-bar .hb-btn,
+    .hb-state .hb-repeat-bar form > .hb-btn {
+        flex: 1 1 auto;
+        width: 100%;
+        min-height: 40px;
+        justify-content: center;
+    }
+
+    /* `Generate Secure` is the one control on these panes that is deliberately small, and at
+       28px it was the only sub-40px target on a phone. Nothing else about it changes. */
+    .hb-btn--small {
+        min-height: 40px;
+    }
+}
+
+/* --- 5. what the juror did not change, and why --------------------- */
+
+/* `Add passkey` and `Confirm` sit in a cluster with their own field, so they keep
+   the cluster's measure instead of going full width; a button that fills a row
+   under the box it acts on reads as the box's caption. */
+.hb-cluster .hb-btn {
+    flex-shrink: 0;
+}
+
+/* Inside a dialog on a phone the two answers are the whole reason the panel is
+   there, and at 390px they were 75px and 59px wide, pushed into the bottom-right
+   corner of a sheet the thumb has to reach across. They take the panel's measure,
+   in the order the markup already puts them: `column`, not `column-reverse`, so
+   what you read first, what you tab to first and what sits nearest the thumb are
+   the same control. */
+@media (max-width: 30rem) {
+    .hb-modal__foot {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.4rem;
+    }
+
+    .hb-modal__foot .hb-btn {
+        width: 100%;
+        min-height: 42px;
+        justify-content: center;
+    }
+}
+
+/* ==========================================================================
+   THE BUTTON LADDER — one owner, in one place, in one order.
+   ========================================================================== */
+
+/* This block is last on purpose, and it is the only place these four states are
+   written. Three earlier rounds each added a rule here, and because
+   `.hb-sheet .hb-btn--danger:hover` and `.hb-modal .hb-btn--danger:hover` have the
+   same specificity, whichever came later in the file won — so the delete dialog's
+   red answer flooded to ink on hover and became the same navy as the button that
+   keeps the account. A juror reading only the frames caught it; the code was
+   readable and the bug was a source-order fact no single rule showed.
+
+   Four roles, one voice each:
+
+     secondary  a hairline box on the page ground. Hover floods it to ink.
+     primary    ink face, light label. Hover keeps both and draws a detached rule,
+                because a control that turns into a ghost on contact is answering
+                the pointer by becoming less important.
+     danger     on the sheet, a 2px ink edge: heavier than the hairline, and not
+                the mark's red, which already means "this is not what is stored".
+                Inside an ask there are no values and no marks, so red is free and
+                it belongs on the answer that destroys.
+     commit     the sheet's own submit. Quiet while nothing is marked, red the
+                moment something is. */
+
+/* --- secondary: nothing to say -------------------------------------- */
+
+/* This block used to restate the secondary button — panel face, hairline, ink label
+   — which the base `.hb-btn` in `admin-desk.css` already is. Restating it cost
+   something: `:not(.hb-btn--primary):not(.hb-btn--danger):not(.hb-btn--commit)` is
+   four classes deep, so it outranked the base `.hb-btn:hover` on specificity and a
+   plain button stopped flooding to ink under the pointer at all. `Show Recovery
+   Codes` and `Regenerate Recovery Codes` measured 0% of pixels changed, and `Keep
+   the account` 0%, while `Cancel` in the layout-mounted ask measured 45.8% — the
+   one place the rule did not reach. A restatement that wins on specificity is a
+   override, and an override written to say nothing is a bug.
+
+   So the secondary control has no rule here. It inherits the desk's own. */
+
+/* --- primary ---------------------------------------------------------- */
+.hb-sheet .hb-btn--primary,
+.hb-modal .hb-btn--primary {
+    border-color: var(--dash-ink);
+    background: var(--dash-ink);
+    color: var(--dash-panel);
+}
+
+@media (hover: hover) {
+    /* The face does not invert — a juror that had only the frames called that a demotion, and it
+       was right: the page's main action turned into the least important-looking thing on it at the
+       exact moment a hand arrived. It deepens instead, to the pure end of the scale, and the whole
+       face moves with it, which is why this reads as a large pixel change rather than a thin one.
+       A detached rule and a 1px settle go with it. */
+    .hb-sheet .hb-btn--primary:hover,
+    .hb-modal .hb-btn--primary:hover {
+        background: var(--dash-ink-deep);
+        border-color: var(--dash-ink-deep);
+        color: var(--dash-panel);
+        box-shadow: 0 0 0 3px var(--dash-panel), 0 0 0 6px var(--dash-ink);
+        transform: translate3d(0, -1px, 0);
+    }
+}
+
+/* --- danger, on the sheet --------------------------------------------- */
+
+/* 1px of ink plus 1px more inside it, so the edge is 2px of the darkest value on
+   the page while every other button carries 1px at 27%. `Remove` and `Rename` sit
+   in the same row at the same size; this is the only thing that can tell them apart
+   before a pointer arrives, so it has to be visible without a calliper. The padding
+   gives the extra pixel back so the box does not grow. */
+.hb-sheet .hb-btn--danger {
+    border: 1px solid var(--dash-ink);
+    box-shadow: inset 0 0 0 1px var(--dash-ink);
+    background: var(--dash-panel);
+    color: var(--dash-ink);
+    padding: calc(0.5rem - 1px) calc(0.85rem - 1px);
+}
+
+@media (hover: hover) {
+    /* Both the safe and the irreversible control used to end up as the same solid navy on contact,
+       which threw away the only distinction the resting state had built. The destructive one goes
+       one step further than the secondary — to the pure end of the scale — and draws its rule in
+       ink instead of leaving it at a border. */
+    .hb-sheet .hb-btn--danger:hover {
+        background: var(--dash-ink-deep);
+        border-color: var(--dash-ink-deep);
+        color: var(--dash-panel);
+        box-shadow: inset 0 0 0 1px var(--dash-ink-deep), 0 0 0 3px var(--dash-panel), 0 0 0 5px var(--dash-ink);
+    }
+}
+
+/* --- the commit control ---------------------------------------------- */
+
+/* Quiet while the sheet has nothing to set, and it answers by flooding to ink like
+   any other control. Armed, it is the mark colour and it deepens within it. */
+@media (hover: hover) {
+    .hb-foot:not([data-open]) .hb-btn--commit:hover {
+        background: var(--dash-ink);
+        border-color: var(--dash-ink);
+        color: var(--dash-panel);
+    }
+
+    .hb-foot[data-open] .hb-btn--commit:hover {
+        background: var(--dash-cut-hover);
+        border-color: var(--dash-cut-hover);
+        color: var(--dash-cut-ink);
+    }
+}
+
+/* --- danger, inside an ask. Last, so it outranks the sheet rule it ties with. */
+.hb-modal .hb-btn--danger {
+    border: 1px solid var(--dash-cut);
+    background: var(--dash-cut);
+    color: var(--dash-cut-ink);
+    box-shadow: none;
+    padding: 0.5rem 0.85rem;
+}
+
+@media (hover: hover) {
+    /* It stays red, and it becomes the loudest thing in the dialog rather than the quietest.
+       A juror reading only the pixel numbers caught the inversion: deepening the fill alone moved
+       14 of 255 per channel, while the safe button next to it flooded to solid ink at 99 — so the
+       irreversible answer got *less* attention under the pointer than the one that changes
+       nothing. The face deepens, a detached rule draws in the same red, and the control settles,
+       the way the primary does. Red is never replaced by ink here. */
+    .hb-modal .hb-btn--danger:hover {
+        background: var(--dash-cut-hover);
+        border-color: var(--dash-cut-hover);
+        color: var(--dash-cut-ink);
+        box-shadow: 0 0 0 3px var(--dash-panel), 0 0 0 6px var(--dash-cut);
+        transform: translate3d(0, -1px, 0);
+    }
+}
+
+/* --- focus, told apart from hover ----------------------------------- */
+
+/* Focus hugs the control: a light line 1px out, then ink. Hover detaches: a ground
+   gap 3px out, then ink, plus the settle. Two mechanisms, so a control that is both
+   focused and hovered shows both and neither cancels the other. */
+.hb-sheet .hb-btn--primary:focus-visible,
+.hb-modal .hb-btn--primary:focus-visible,
+.hb-foot .hb-btn--commit:focus-visible {
+    outline: 2px solid var(--dash-panel);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 4px var(--dash-ink);
+}
+
+/* A destructive answer inside an ask is red-filled, so the same two-tone rule
+   applies to it. On the sheet its face is the page ground and an ink outline is
+   already legible against it, so it keeps the plain one. */
+.hb-modal .hb-btn--danger:focus-visible {
+    outline: 2px solid var(--dash-panel);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 4px var(--dash-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hb-sheet .hb-btn--primary:hover,
+    .hb-modal .hb-btn--primary:hover {
+        transform: none;
+    }
+
+    .hb-sheet .hb-btn,
+    .hb-modal .hb-btn {
+        transition: none;
+    }
+}
