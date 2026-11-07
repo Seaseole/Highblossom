@@ -217,6 +217,16 @@
             color: var(--hero-on-muted);
         }
 
+        /* Both hero variants name the three audiences above the fold. */
+        .hb-hero-audience {
+            margin-top: .5rem;
+            max-width: 34rem;
+            font-size: 14px;
+            line-height: 20px;
+            color: var(--hero-on);
+            text-wrap: pretty;
+        }
+
         .hb-hero-actions {
             display: flex;
             flex-wrap: wrap;
@@ -569,6 +579,8 @@
                 @if ($hasTagline)
                     <p class="hb-hero-tagline" x-text="current.tagline" :hidden="! current.tagline">{{ $firstTagline }}</p>
                 @endif
+
+                <p class="hb-hero-audience">{{ __('site.home.hero_audience_line') }}</p>
 
                 <div class="hb-hero-actions">
                     <a href="{{ $firstUrl }}" class="hb-hero-cta" :href="current.buttonUrl" wire:navigate>

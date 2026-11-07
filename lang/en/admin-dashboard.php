@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Dashboard',
-    'welcome' => 'Today, measured against the hours the shop actually keeps.',
+    'welcome' => 'Welcome back, :name! Today, measured against the hours the shop actually keeps.',
 
     // Masthead: the day as a measured block
     'day_in_progress' => 'In the day',

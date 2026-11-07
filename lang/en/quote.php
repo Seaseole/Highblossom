@@ -6,6 +6,18 @@ return [
     'title' => 'Request a Quote',
     'description' => 'Tell us about your vehicle and glass needs. We\'ll respond within 24 hours with detailed pricing.',
 
+    // Audience routes from the homepage cards
+    'audience' => [
+        'driver' => ['hint' => 'Drivers: tell us about the chip or crack, add a photo, and we will confirm whether it can be repaired.'],
+        'fleet' => ['hint' => 'Fleet account: tell us how many vehicles you run and we will set up one account and one invoice.'],
+        'machinery' => ['hint' => 'Machinery: send the make, model and the cab panel that is broken so we can cut and fit it at your site.'],
+    ],
+
+    // Booking belongs inside the quote flow, never beside it in the navigation
+    'booking_title' => 'Already have a price?',
+    'booking_text' => 'Once your quote is in hand, choose the fitting time that suits you here.',
+    'booking_cta' => 'Book a fitting time',
+
     // Form sections
     'your_information' => 'Your Information',
     'your_info_description' => 'How we can contact you',

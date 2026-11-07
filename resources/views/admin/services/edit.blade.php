@@ -10,7 +10,7 @@
                     ← Back to Services
                 </a>
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Edit Service</h1>
-                <p class="text-gray-500 dark:text-gray-400">Modify the architectural service details.</p>
+                <p class="text-gray-500 dark:text-gray-400">Modify the automotive glass service details.</p>
             </div>
         </div>
 

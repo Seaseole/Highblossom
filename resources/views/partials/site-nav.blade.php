@@ -216,8 +216,9 @@
             >
                 Blog
             </a>
+            {{-- One primary action in the navigation. Booking lives inside the
+                 quote flow, so it never competes with Get a Quote here. --}}
             <a href="{{ route('quote') }}" wire:navigate.hover class="btn-premium min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.get_quote') }} </a>
-            <a href="{{ route('bookings.create') }}" wire:navigate.hover class="btn-glass min-h-[44px] px-5 py-2.5 text-sm"> {{ __('site.book_appointment') }} </a>
         </div>
 
         {{-- Right Side Actions --}}
@@ -419,14 +420,6 @@
                 class="mt-2 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-site-accent px-6 text-base font-bold text-white transition-all hover:bg-site-accent-hover active:scale-[0.98]"
             >
                 {{ __('site.get_quote') }}
-            </a>
-            <a
-                href="{{ route('bookings.create') }}"
-                onclick="closeMobileMenu()"
-                wire:navigate
-                class="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-site-line-strong bg-site-fill px-6 text-base font-bold text-site-text transition-all hover:border-site-accent/40 hover:bg-site-accent-soft active:scale-[0.98]"
-            >
-                {{ __('site.book_appointment') }}
             </a>
             @if ($contact->hasPhone() || $contact->hasWhatsapp())
                 <div class="flex gap-3">

@@ -10,6 +10,11 @@
                     {{ __('quote.title') }}
                 </h1>
                 <p class="text-lg leading-relaxed text-site-muted">{{ __('quote.description') }}</p>
+                @if (filled($quoteAudience ?? null))
+                    <p class="mt-4 text-sm font-semibold text-site-link">
+                        {{ __('quote.audience.'.$quoteAudience.'.hint') }}
+                    </p>
+                @endif
             </div>
         </div>
     </section>
@@ -464,6 +469,30 @@
                                     <span class="text-sm text-site-muted">{{ __('quote.benefit_4') }}</span>
                                 </li>
                             </ul>
+                        </div>
+
+                        {{-- Appointment booking lives here, inside the quote flow, so the
+                             navigation can carry one primary action only. --}}
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="font-headline mb-3 text-lg font-bold text-site-text">
+                                {{ __('quote.booking_title') }}
+                            </h3>
+                            <p class="mb-4 text-sm text-site-muted">{{ __('quote.booking_text') }}</p>
+                            <a
+                                href="{{ route('bookings.create') }}"
+                                wire:navigate
+                                class="btn-glass inline-flex min-h-[44px] items-center px-5 py-3 text-sm"
+                            >
+                                <span>{{ __('quote.booking_cta') }}</span>
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    ></path>
+                                </svg>
+                            </a>
                         </div>
 
                         <!-- Contact Card -->

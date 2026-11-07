@@ -1,4 +1,53 @@
-<x-layouts::site title="Highblossom | Precision Automotive Glass">
+<x-layouts::site title="Highblossom | Auto Glass For Drivers, Fleets And Machinery In Gaborone">
+    {{-- Page scoped motion for the two new sections. Nothing here touches the
+         shared design tokens, and noscript keeps both sections fully readable. --}}
+    <style>
+        [data-home-reveal] {
+            opacity: 0;
+            transform: translateY(32px);
+            transition:
+                opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        [data-home-reveal].is-revealed {
+            opacity: 1;
+            transform: none;
+        }
+
+        .hb-tagline {
+            max-width: 680px;
+        }
+
+        .hb-tagline-word {
+            display: inline-block;
+            opacity: 0.3;
+            transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .hb-tagline-word.is-on {
+            opacity: 1;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            [data-home-reveal],
+            .hb-tagline-word {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+    </style>
+    <noscript>
+        <style>
+            [data-home-reveal],
+            .hb-tagline-word {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        </style>
+    </noscript>
+
     <!-- Hero Section - Cinematic Dark -->
     <header id="page-hero" class="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-site">
         <style>
@@ -178,6 +227,10 @@
     {{-- Proof strip: real counters where records back them, admin fact tiles elsewhere. --}}
     <x-site.fact-tiles :stats="$homeStats" :tiles="$factTiles" />
 
+    {{-- Three audiences, three entry points, three sets of proof. High on the
+         page so the answer to "who is this for" is visible, not implied. --}}
+    <x-site.audience-cards />
+
     <!-- Services Preview Section -->
     <section id="services" class="bg-site py-24 lg:py-32">
         <div class="mx-auto max-w-[1400px] px-6 lg:px-8">
@@ -332,6 +385,9 @@
         <x-site.cta-band :heading="$homeCtaHeading" :text="$homeCtaText" />
     @endif
 
+    {{-- The tagline moment sits in the mid page argument, separate from the hero. --}}
+    <x-site.tagline-reveal />
+
     {{-- Partner logos only render when at least one real logo exists. --}}
     <x-site.partner-strip :partners="$partners" />
 
@@ -407,21 +463,9 @@
                         class="mb-6"
                     />
 
-                    <a
-                        href="{{ route('bookings.create') }}"
-                        wire:navigate
-                        class="btn-glass inline-flex min-h-[44px] items-center px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg"
-                    >
-                        <span>{{ __('site.book_appointment') }}</span>
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            ></path>
-                        </svg>
-                    </a>
+                    <p class="text-sm text-site-muted">
+                        {{ __('site.home.hero_proof_line') }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -522,18 +566,33 @@
                 title.style.cssText =
                     'display: inline-block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity, filter; width: 100%;';
 
-                // Split text into individual characters for per-character animation
-                const characters = Array.from(text);
+                // Animate per character, but keep each word in one unbreakable
+                // inline block. Without the word wrapper the browser wraps at
+                // any character boundary and splits words across lines.
                 const units = [];
 
-                characters.forEach((char, index) => {
-                    const unit = document.createElement('span');
-                    unit.className = 'text-animation-unit';
-                    unit.textContent = char;
-                    unit.style.cssText =
-                        'display: inline-block; backface-visibility: hidden; will-change: transform, opacity, filter; white-space: pre; transform-origin: 50% 55%;';
-                    title.appendChild(unit);
-                    units.push(unit);
+                text.split(/(\s+)/).forEach((chunk) => {
+                    if (chunk === '') return;
+
+                    if (/^\s+$/.test(chunk)) {
+                        title.appendChild(document.createTextNode(chunk));
+                        return;
+                    }
+
+                    const word = document.createElement('span');
+                    word.style.cssText = 'display: inline-block; white-space: nowrap;';
+
+                    Array.from(chunk).forEach((char) => {
+                        const unit = document.createElement('span');
+                        unit.className = 'text-animation-unit';
+                        unit.textContent = char;
+                        unit.style.cssText =
+                            'display: inline-block; backface-visibility: hidden; will-change: transform, opacity, filter; white-space: pre; transform-origin: 50% 55%;';
+                        word.appendChild(unit);
+                        units.push(unit);
+                    });
+
+                    title.appendChild(word);
                 });
 
                 return { title, units };
@@ -842,6 +901,91 @@
                 window.__stickyBarTeardownBound = true;
                 window.addEventListener('pagehide', () => window.__stickyBarCleanup?.());
                 document.addEventListener('livewire:navigate', () => window.__stickyBarCleanup?.());
+            }
+        })();
+    </script>
+
+    {{-- Section entrances and the word by word tagline reveal. Both are bound
+         once per page view and disposed of on wire:navigate, like the other
+         homepage scripts. --}}
+    <script>
+        (function () {
+            'use strict';
+
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const tagline = document.getElementById('tagline');
+            const words = tagline ? Array.from(tagline.querySelectorAll('[data-tagline-word]')) : [];
+            const reveals = Array.from(document.querySelectorAll('[data-home-reveal]'));
+            let revealObserver = null;
+            let onScroll = null;
+
+            // Each section rises once as it enters the viewport, never replaying.
+            if (reveals.length) {
+                if (reduce || !('IntersectionObserver' in window)) {
+                    reveals.forEach((element) => element.classList.add('is-revealed'));
+                } else {
+                    revealObserver = new IntersectionObserver(
+                        (entries) => {
+                            entries.forEach((entry) => {
+                                if (!entry.isIntersecting) return;
+                                entry.target.classList.add('is-revealed');
+                                revealObserver.unobserve(entry.target);
+                            });
+                        },
+                        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+                    );
+                    reveals.forEach((element) => revealObserver.observe(element));
+                }
+            }
+
+            // Words wake in reading order as the section crosses the trigger line.
+            // Scroll work is throttled through requestAnimationFrame, never per frame.
+            if (words.length) {
+                if (reduce) {
+                    words.forEach((word) => word.classList.add('is-on'));
+                } else {
+                    let ticking = false;
+                    let lastCount = -1;
+
+                    const update = () => {
+                        ticking = false;
+                        const rect = tagline.getBoundingClientRect();
+                        const trigger = window.innerHeight * 0.78;
+                        const span = Math.max(rect.height, 1);
+                        const progress = Math.min(1, Math.max(0, (trigger - rect.top) / span));
+                        const count = Math.round(progress * words.length);
+                        if (count === lastCount) return;
+                        for (let i = Math.max(lastCount + 1, 0); i < count && i < words.length; i += 1) {
+                            words[i].classList.add('is-on');
+                        }
+                        lastCount = count;
+                    };
+
+                    onScroll = () => {
+                        if (!ticking) {
+                            ticking = true;
+                            requestAnimationFrame(update);
+                        }
+                    };
+
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('resize', onScroll, { passive: true });
+                    update();
+                }
+            }
+
+            window.__homeVisualCleanup = function cleanup() {
+                revealObserver?.disconnect();
+                if (onScroll) {
+                    window.removeEventListener('scroll', onScroll);
+                    window.removeEventListener('resize', onScroll);
+                }
+            };
+
+            if (!window.__homeVisualTeardownBound) {
+                window.__homeVisualTeardownBound = true;
+                window.addEventListener('pagehide', () => window.__homeVisualCleanup?.());
+                document.addEventListener('livewire:navigate', () => window.__homeVisualCleanup?.());
             }
         })();
     </script>

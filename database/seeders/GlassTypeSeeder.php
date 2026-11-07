@@ -11,7 +11,8 @@ class GlassTypeSeeder extends Seeder
     {
         $glassTypes = [
             ['name' => 'Acrylic', 'slug' => 'acrylic', 'sort_order' => 1],
-            ['name' => 'Aluminium', 'slug' => 'aluminium', 'sort_order' => 2],
+            // Aluminium framing is not part of the automotive offer: kept for old quotes.
+            ['name' => 'Aluminium', 'slug' => 'aluminium', 'sort_order' => 2, 'is_active' => false],
             ['name' => 'Bilston', 'slug' => 'bilston', 'sort_order' => 3],
             ['name' => 'Brown', 'slug' => 'brown', 'sort_order' => 4],
             ['name' => 'Dome', 'slug' => 'dome', 'sort_order' => 5],

@@ -62,20 +62,30 @@
 
         {{-- Subhead --}}
         <p
-            class="animate-fade-up mx-auto mb-8 max-w-2xl text-base leading-relaxed text-site-text sm:mb-10 sm:text-lg md:text-xl"
+            class="animate-fade-up mx-auto mb-4 max-w-[680px] text-base leading-relaxed text-site-text sm:text-lg md:text-xl"
             style="animation-delay: 200ms"
         >
             {{ __('site.home.hero_subheadline') }}
         </p>
 
-        {{-- CTAs --}}
+        {{-- The three audiences are named above the fold, not left for a later
+             section to imply. This line stays static while the headline animates. --}}
+        <p
+            class="animate-fade-up mx-auto mb-8 max-w-[680px] text-sm font-medium text-site-text sm:text-base"
+            style="animation-delay: 250ms"
+        >
+            {{ __('site.home.hero_audience_line') }}
+        </p>
+
+        {{-- One primary action. Call and WhatsApp stay as plain urgent text links
+             so they never compete with the quote button. --}}
         <div
-            class="animate-fade-up flex flex-col items-center justify-center gap-4 sm:flex-row"
+            class="animate-fade-up flex flex-col items-center justify-center gap-4"
             style="animation-delay: 300ms"
         >
             <a href="{{ route('quote') }}" wire:navigate class="btn-premium-md glow-red-subtle">
                 <span>{{ __('site.home.hero_get_quote') }}</span>
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -84,13 +94,31 @@
                     ></path>
                 </svg>
             </a>
-            <a
-                href="{{ route('gallery') }}"
-                wire:navigate
-                class="btn-glass px-8 py-4 text-lg"
-            >
-                <span>{{ __('site.home.hero_view_work') }}</span>
-            </a>
+
+            <p class="text-sm text-site-muted">{{ __('site.home.hero_proof_line') }}</p>
+
+            @if ($contact->hasPhone() || $contact->hasWhatsapp())
+                <p class="text-sm text-site-muted">
+                    {{ __('site.home.hero_urgent_prefix') }}
+                    @if ($contact->hasPhone())
+                        <a
+                            href="{{ $contact->telHref($contact->primaryPhone) }}"
+                            class="font-semibold text-site-link underline underline-offset-4 transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
+                        >{{ __('site.home.hero_urgent_call') }}</a>
+                    @endif
+                    @if ($contact->hasPhone() && $contact->hasWhatsapp())
+                        <span> or </span>
+                    @endif
+                    @if ($contact->hasWhatsapp())
+                        <a
+                            href="{{ $contact->whatsappHref() }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-semibold text-site-link underline underline-offset-4 transition-colors hover:text-site-text focus:outline-none focus-visible:ring-2 focus-visible:ring-site-accent/60"
+                        >{{ __('site.home.hero_urgent_whatsapp') }}</a>
+                    @endif
+                </p>
+            @endif
         </div>
     </div>
 </div>

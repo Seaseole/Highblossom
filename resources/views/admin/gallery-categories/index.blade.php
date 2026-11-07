@@ -5,7 +5,7 @@
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Gallery Categories</h1>
                 <p class="text-gray-500 dark:text-gray-400">
-                    Organize architectural showcases by project type or structural category.
+                    Organize gallery images by vehicle type or job type.
                 </p>
             </div>
             <a

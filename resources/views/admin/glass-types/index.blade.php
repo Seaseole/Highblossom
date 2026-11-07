@@ -4,7 +4,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Glass Types</h1>
-                <p class="text-gray-500 dark:text-gray-400">Manage the specialized architectural glass variants.</p>
+                <p class="text-gray-500 dark:text-gray-400">Manage the glass variants used in automotive work.</p>
             </div>
 
             <a

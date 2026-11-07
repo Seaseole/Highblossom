@@ -130,8 +130,8 @@ final class SettingsManager
             'home_urgency_text' => 'Cracked windscreen? Same-day mobile fitting.',
             'home_cta_heading' => 'Get your free quote today',
             'home_cta_text' => 'Tell us the vehicle, the glass and where you are parked. We will come back with a firm price and the next available fitting slot.',
-            'home_final_cta_heading' => 'Ready for Crystal Clear Vision?',
-            'home_final_cta_text' => 'Get a free quote today. Our team is ready to help with all your automotive glass needs.',
+            'home_final_cta_heading' => 'Your glass fixed where you are parked',
+            'home_final_cta_text' => 'Tell us the vehicle, the glass and where you are parked. We will come back with a firm price and the next available fitting slot, backed by a lifetime workmanship warranty.',
             'home_service_area' => 'Gaborone, Gabane, Molepolole, Lobatse and the surrounding Kweneng and South East districts.',
             'home_mobile_coverage' => 'Mobile units cover Greater Gaborone, or visit our Gaborone West Industrial workshop.',
             'home_whatsapp_message' => 'I would like a quote for automotive glass work.',
@@ -156,6 +156,22 @@ final class SettingsManager
                 [
                     'question' => 'What does the warranty cover?',
                     'answer' => 'Our workmanship warranty runs for as long as you own the vehicle and covers leaks, wind noise, bond failure and ADAS calibration faults. Glass itself carries the manufacturer warranty, typically against defects in materials and fit.',
+                ],
+                [
+                    'question' => 'Can I open a fleet account?',
+                    'answer' => 'Yes. One account covers every vehicle and one invoice covers the work. Tell us the fleet size in your quote request and we will set up the account, agree priority fitting slots and keep high demand glass in stock.',
+                ],
+                [
+                    'question' => 'What do you need to quote heavy machinery glass?',
+                    'answer' => 'Send the machine make, model and which cab panel is damaged, with a photo if you have one. We cut toughened or polycarbonate panels to size and fit at the mine, site or yard so the machine keeps working.',
+                ],
+                [
+                    'question' => 'Do you fit at my home or workplace?',
+                    'answer' => 'Yes. Our mobile fitting vans cover Greater Gaborone, or you can visit our Gaborone West Industrial workshop. Mobile fitting the same day is part of the service.',
+                ],
+                [
+                    'question' => 'How quickly will I hear back after requesting a quote?',
+                    'answer' => 'We reply within 24 hours with a firm price. If the damage is urgent, call or send a WhatsApp message and we will arrange the next available fitting slot straight away.',
                 ],
             ],
         ];

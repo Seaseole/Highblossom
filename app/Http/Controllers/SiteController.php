@@ -119,13 +119,22 @@ class SiteController extends Controller
     }
 
     /**
-     * Display the Quote request page.
+     * Display the Quote request page, optionally framed for one audience route.
+     *
+     * The homepage audience cards link here with a short audience key so the
+     * form can state what the visitor came to ask for. Anything outside the
+     * whitelist is treated as a plain quote request.
      *
      * @return View
      */
-    public function quote()
+    public function quote(Request $request)
     {
-        return view('site.quote', $this->siteService->getQuotePageData());
+        $audience = $request->query('audience');
+        $quoteAudience = is_string($audience) && in_array($audience, ['driver', 'fleet', 'machinery'], true)
+            ? $audience
+            : null;
+
+        return view('site.quote', $this->siteService->getQuotePageData() + ['quoteAudience' => $quoteAudience]);
     }
 
     /**

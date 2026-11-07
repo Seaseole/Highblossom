@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Create Gallery Item</h1>
-                <p class="text-gray-500 dark:text-gray-400">Add a new masterpiece to the architectural showcase.</p>
+                <p class="text-gray-500 dark:text-gray-400">Add a new photograph to the gallery.</p>
             </div>
             <a
                 href="{{ route('admin.gallery.index') }}"

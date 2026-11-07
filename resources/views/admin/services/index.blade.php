@@ -7,7 +7,7 @@
                     {{ __('admin-services.title') }}
                 </h1>
                 <p class="text-gray-500 dark:text-gray-400">
-                    Manage the architectural glass and aluminum services showcased on the platform.
+                    Manage the automotive glass services showcased on the platform.
                 </p>
             </div>
 

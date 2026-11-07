@@ -5,7 +5,7 @@
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Gallery</h1>
                 <p class="text-gray-500 dark:text-gray-400">
-                    Manage your showcase of architectural glass and aluminum installations.
+                    Manage your showcase of completed automotive glass work.
                 </p>
             </div>
 

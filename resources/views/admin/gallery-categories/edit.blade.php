@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Edit Category</h1>
-                <p class="text-gray-500 dark:text-gray-400">Modify the architectural category details.</p>
+                <p class="text-gray-500 dark:text-gray-400">Modify the gallery category details.</p>
             </div>
             <a
                 href="{{ route('admin.gallery-categories.index') }}"

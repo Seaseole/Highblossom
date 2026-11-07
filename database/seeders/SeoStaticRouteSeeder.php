@@ -13,8 +13,8 @@ class SeoStaticRouteSeeder extends Seeder
         $routes = [
             [
                 'route_name' => 'home',
-                'meta_title' => 'Highblossom PTY LTD | Precision Automotive Glass',
-                'meta_description' => 'Premium automotive glass solutions and heavy machinery glazing for Gaborone\'s most discerning vehicle owners and commercial fleets. 20+ years of experience.',
+                'meta_title' => 'Auto Glass For Drivers, Fleets And Machinery In Gaborone',
+                'meta_description' => 'Windscreen repair, replacement and mobile fitting in Gaborone, plus ADAS calibration and heavy machinery glazing. For drivers, fleets and plant operators. Get a free quote.',
                 'og_type' => 'website',
                 'priority' => 1.0,
                 'changefreq' => 'weekly',

@@ -105,7 +105,7 @@ class ServiceSeeder extends Seeder
                 'title' => 'Glass Tinting & Solar Film',
                 'slug' => 'glass-tinting-solar-film',
                 'short_description' => 'Safety-rated tint and heat-rejection film for vehicles and buildings.',
-                'full_description' => 'Solar control films reject heat and UV while meeting legal light-transmission limits. We fit dyed, carbon and ceramic grades to cabins, shopfronts and office glass.',
+                'full_description' => 'Solar control films reject heat and UV while meeting legal light-transmission limits. We fit dyed, carbon and ceramic grades to vehicle cabins.',
                 'features' => ['Heat and UV rejection grades', 'Compliant light transmission', 'Bubble-free professional fit'],
                 'is_active' => true,
                 'sort_order' => 11,
@@ -192,14 +192,15 @@ class ServiceSeeder extends Seeder
                 'is_active' => true,
                 'sort_order' => 20,
             ],
-            // Commercial and architectural glazing
+            // Architectural glazing is not a service line (see PRODUCT.md). These
+            // records stay for historical quotes but are never active on the site.
             [
                 'title' => 'Shopfront & Storefront Glazing',
                 'slug' => 'shopfront-storefront-glazing',
                 'short_description' => 'Retail storefronts, glass doors and display windows.',
                 'full_description' => 'Retail glazing is supplied and fitted in toughened or laminated safety glass, in framed and frameless systems, including automatic and manual glass doors.',
                 'features' => ['Framed and frameless systems', 'Toughened safety glass', 'Security grades available'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 21,
             ],
             [
@@ -208,7 +209,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Internal glazing, meeting-room walls and privacy screens.',
                 'full_description' => 'Single and double-glazed internal partitions divide office space while keeping light through. Frosted banding and acoustic seals are specified per room.',
                 'features' => ['Acoustic seals to spec', 'Frosted privacy banding', 'On-site survey and measure'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 22,
             ],
             [
@@ -217,7 +218,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Frameless screens, mirrors and safety glass fit-out.',
                 'full_description' => 'Frameless shower screens in 6mm or 8mm toughened glass, with soft-coat options that resist scale, plus vanity mirrors and bath screens.',
                 'features' => ['6mm and 8mm toughened', 'Soft-coat anti-scale glass', 'Hinge and seal servicing'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 23,
             ],
             [
@@ -226,7 +227,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Toughened balustrade glass for balconies and stairwells.',
                 'full_description' => 'Laminated toughened balustrade panels are installed on spigots, structural channels or with stainless handrails, with load and fixing details confirmed on site.',
                 'features' => ['Spigot and channel mounts', 'Structural silicone beads', 'Certified safety laminates'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 24,
             ],
             [
@@ -235,7 +236,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Insulated glass units for noise and climate control.',
                 'full_description' => 'Sealed double-glazed units cut heat gain and street noise for offices and residences, with cavity and pane thickness tuned to the requirement.',
                 'features' => ['Sealed insulated units', 'Acoustic cavity options', 'Thermal break frames'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 25,
             ],
             [
@@ -244,7 +245,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Cut, bevelled and safety-backed mirrors at any size.',
                 'full_description' => 'Silvered and low-copper mirror glass is cut to size, edge-polished or bevelled, and fixed to walls, cabinets or as feature panels.',
                 'features' => ['Bevelled and polished edges', 'Safety-backed glass', 'Wall and cabinet fixing'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 26,
             ],
             [
@@ -253,7 +254,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'In-house tempering and lamination from your drawings.',
                 'full_description' => 'Float glass is cut, edgeworked, drilled and then toughened or laminated in-house, with safety marks applied to each processed pane.',
                 'features' => ['CNC cut and edgework', 'Drilled and notched to order', 'Safety marking on every pane'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 27,
             ],
             [
@@ -262,7 +263,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Sandblast, shot-blast and decorative patterns for branding.',
                 'full_description' => 'Acid-etched and blasted finishes create privacy and branded graphics on partitions, doors and reception walls, from sample boards up to full sheets.',
                 'features' => ['Custom brand graphics', 'Sample packs for approval', 'Full-sheet blasting'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 28,
             ],
             [
@@ -271,7 +272,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Single panes cut, polished and drilled while you wait.',
                 'full_description' => 'Straight-line cutting, edge polishing and hole drilling for table tops, shelf glass, picture glazing and replacement panes brought in by customers.',
                 'features' => ['Straight-line cutting', 'Polished and flat edges', 'Hole and notch drilling'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 29,
             ],
             [
@@ -280,7 +281,7 @@ class ServiceSeeder extends Seeder
                 'short_description' => 'Rapid glazing after break-ins, storms and vandalism.',
                 'full_description' => 'Damaged shopfronts and windows are made secure the same day with temporary board-up or a like-for-like glass replacement, with photographs captured for the insurance claim.',
                 'features' => ['Same-day securing', 'Temporary and permanent fixes', 'Insurance-ready photos'],
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 30,
             ],
             // Programmes and after-sales

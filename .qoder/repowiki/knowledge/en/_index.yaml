@@ -1,9 +1,9 @@
 # 知识卡导出索引文件
 schema_version: 1
 locale: en
-commit: e4df6172f8237a7ebfcd48925222a6513665d440
+commit: ea703dfe5836d9f7b000867a2fe5111949fe15b2
 branch: main
-exported_at: "2026-11-02T07:49:10Z"
+exported_at: "2026-11-06T05:57:33Z"
 modules:
     root:
         dir_name: Laravel Livewire Starter Kit — Project Root

@@ -18,7 +18,8 @@ class ServiceTypeSeeder extends Seeder
             ['name' => 'Tinting & Solar Film', 'slug' => 'tinting-solar-film', 'sort_order' => 6],
             ['name' => 'Emergency Board-Up', 'slug' => 'emergency-board-up', 'sort_order' => 7],
             ['name' => 'Fleet Glass Programme', 'slug' => 'fleet-glass-programme', 'sort_order' => 8],
-            ['name' => 'Architectural Glazing', 'slug' => 'architectural-glazing', 'sort_order' => 9],
+            // Architectural glazing is not a service line: kept for old quotes, never offered.
+            ['name' => 'Architectural Glazing', 'slug' => 'architectural-glazing', 'sort_order' => 9, 'is_active' => false],
             ['name' => 'Mirror Reglass', 'slug' => 'mirror-reglass', 'sort_order' => 10],
             ['name' => 'Headlight Lens Restoration', 'slug' => 'headlight-lens-restoration', 'sort_order' => 11],
             ['name' => 'Insurance Claim Assessment', 'slug' => 'insurance-claim-assessment', 'sort_order' => 12],

@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <h1 class="font-headline text-3xl font-semibold text-gray-900 dark:text-white">Create Glass Type</h1>
-                <p class="text-gray-500 dark:text-gray-400">Define a new architectural glass variant for the system.</p>
+                <p class="text-gray-500 dark:text-gray-400">Define a new glass variant for the system.</p>
             </div>
             <a
                 href="{{ route('admin.glass-types.index') }}"

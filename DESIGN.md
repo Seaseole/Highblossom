@@ -1,15 +1,17 @@
 ---
 name: Highblossom
-description: Premium architectural glass and aluminum solutions.
+description: Automotive glass services in Gaborone for drivers, fleets and heavy machinery operators.
 register: product
 ---
 
 # Highblossom Design System
 
 ## Overview
-Highblossom is a premium architectural glass and aluminum provider. The design system reflects the precision, durability, and high-end nature of the products. It balances industrial brutalist utility with a premium dark aesthetic.
+Highblossom provides automotive glass services in Gaborone: windscreen repair and replacement, mobile fitting, ADAS calibration and glazing for heavy machinery. The design system reflects the precision, durability, and high-end nature of fitted glass. It balances industrial brutalist utility with a premium dark aesthetic.
 
-**Creative North Star:** "Architectural Precision as a Digital Interface"
+Architectural glass and aluminium is **not** a service line. It has no place in the offer, the three audiences or the public entry points; the related service records and admin options are inactive. See `PRODUCT.md` for the offer and its audiences.
+
+**Creative North Star:** "Precision Fitting as a Digital Interface"
 
 **Key Characteristics:**
 - High contrast and deep levels of black
@@ -36,7 +38,7 @@ The palette is dominated by deep neutrals with high-energy red accents to indica
 ## Typography
 
 ### Hierarchy
-- **Headline Font:** Cabinet Grotesk. A bold, architectural sans-serif used for high-impact titles and navigation.
+- **Headline Font:** Cabinet Grotesk. A bold display sans-serif used for high-impact titles and navigation.
 - **Body Font:** Geist. A clean, mono-influenced sans-serif optimized for data density and readability.
 
 - **H1 (Large Display)** (Cabinet Grotesk, weight 700, size 2.25rem): Primary page titles.
@@ -72,7 +74,7 @@ Premium containers mimicking the physical glass products.
 ## Do's and Don'ts
 
 ### Do
-- Use high-quality architectural photography.
+- Use high-quality photography of completed automotive glass work.
 - Maintain consistent 1px borders for grid structure.
 - Use Geist Mono for numerical data or codes.
 - Apply `backdrop-blur` to all floating panels.
@@ -81,7 +83,7 @@ Premium containers mimicking the physical glass products.
 - Use soft, generic shadows on cards.
 - Apply gradients to text or headings.
 - Use more than one accent color per view.
-- Use fluid typography that breaks architectural alignment.
+- Use fluid typography that breaks the grid alignment.
 
 ---
 

@@ -14,7 +14,7 @@
              ============================================================ --}}
         <header class="hb-mast" data-dash-reveal>
             <div class="hb-mast-text">
-                <h1 class="hb-h1">{{ __('admin-dashboard.title') }}</h1>
+                <h1 class="hb-h1">{{ __('admin-dashboard.title')  }}</h1>
                 <p class="hb-dayline">
                     <time datetime="{{ $day['iso'] }}">{{ $day['label'] }}</time>
                     <span class="hb-sep" aria-hidden="true">·</span>
@@ -27,7 +27,7 @@
                             data-label-after="{{ $day['label_after'] }}"
                         @endif
                     >{{ $day['state_label'] }}</span>                </p>
-                <p class="hb-lede">{{ __('admin-dashboard.welcome') }}</p>
+                <p class="hb-lede">{{ __('admin-dashboard.welcome', ['name' => explode(' ', auth()->user()->name)[0]]) }}</p>
             </div>
 
             <dl class="hb-day">
