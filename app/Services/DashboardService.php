@@ -58,6 +58,7 @@ final class DashboardService
     public function __construct(
         private readonly AvailabilityServiceInterface $availability,
         private readonly SettingsManager $settings,
+        private readonly NudgeService $nudges,
     ) {}
 
     /**
@@ -77,6 +78,7 @@ final class DashboardService
             'day' => $day,
             'rail' => $rail,
             'attention' => $this->attention(),
+            'nudges' => config('ai.enabled') ? $this->nudges->visible() : collect(),
             'pipeline' => $this->pipeline($today),
             'week' => $this->week($today, $now),
             'mix' => $this->mix($today),

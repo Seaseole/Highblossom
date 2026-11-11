@@ -13,6 +13,9 @@ return [
         'robots_duration' => 3600, // 1 hour
     ],
 
+    // Legacy placeholder: no application code reads this block. AI-assisted
+    // authoring settings live in config/ai.php, which is the single source of
+    // truth for the feature flag, credentials, limits and prompt caps.
     'ai' => [
         'model' => env('SEO_AI_MODEL', 'gpt-4o-mini'),
         'temperature' => 0.7,

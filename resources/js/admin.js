@@ -700,14 +700,17 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
-    // Quick-add modal for the post editor's category and tag chips. The created option
-    // is cloned from an inert <template> and ticked, so the post form keeps its unsaved
-    // state and the page never navigates.
+    // Quick-add dialogs for the post editor's category and tag chips. There are two
+    // (category gains a description field) but they share this one state so the chip
+    // contract stays identical: the created option is cloned from an inert <template>
+    // and ticked, keeping the post form's unsaved values and never navigating away.
     window.Alpine.data('taxonomy', (routes) => ({
         kind: null,
         name: '',
+        description: '',
         errors: [],
         saving: false,
+        opener: null,
         routes: routes,
 
         get isOpen() {
@@ -721,12 +724,18 @@ document.addEventListener('alpine:init', () => {
         open(kind) {
             this.kind = kind;
             this.name = '';
+            this.description = '';
             this.errors = [];
+            this.opener = document.activeElement;
 
             this.$nextTick(() => {
                 lockAdminContentScroll(true);
 
-                if (this.$refs.input) this.$refs.input.focus();
+                // Each dialog owns its own input, so the focus cycle and the
+                // initial caret belong to the modal that was actually opened.
+                const input = this.$refs[kind === 'category' ? 'categoryInput' : 'tagInput'];
+
+                if (input) input.focus();
             });
         },
 
@@ -735,15 +744,24 @@ document.addEventListener('alpine:init', () => {
 
             this.kind = null;
             this.errors = [];
+            this.description = '';
             lockAdminContentScroll(false);
+
+            if (this.opener && typeof this.opener.focus === 'function') this.opener.focus();
+
+            this.opener = null;
         },
 
         // @alpinejs/focus is not installed, so x-trap is unavailable and the cycle is
-        // written by hand or focus would escape behind the overlay.
+        // written by hand or focus would escape behind the overlay. Two dialogs now
+        // share this state, so the active one is picked by kind rather than a single
+        // $refs.dialog that would silently resolve to whichever rendered last.
         trap(event) {
-            if (event.key !== 'Tab' || ! this.$refs.dialog) return;
+            const dialog = this.$refs[this.kind === 'category' ? 'categoryDialog' : 'tagDialog'];
 
-            const focusables = Array.from(this.$refs.dialog.querySelectorAll('input, button'))
+            if (event.key !== 'Tab' || ! dialog) return;
+
+            const focusables = Array.from(dialog.querySelectorAll('input, textarea, button'))
                 .filter((el) => ! el.disabled);
 
             if (! focusables.length) return;
@@ -767,6 +785,14 @@ document.addEventListener('alpine:init', () => {
             this.errors = [];
 
             try {
+                const payload = { name: this.name };
+
+                // Categories carry a description column; tags do not. Sending it
+                // only here keeps TagRequest's validated payload unchanged.
+                if (this.kind === 'category') {
+                    payload.description = this.description.trim() || null;
+                }
+
                 const response = await fetch(this.routes[this.kind], {
                     method: 'POST',
                     headers: {
@@ -774,7 +800,7 @@ document.addEventListener('alpine:init', () => {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
                     },
-                    body: JSON.stringify({ name: this.name }),
+                    body: JSON.stringify(payload),
                 });
 
                 const data = await response.json().catch(() => ({}));
@@ -3360,3 +3386,321 @@ function deskRefresh() {
 
 document.addEventListener('DOMContentLoaded', deskRefresh);
 document.addEventListener('livewire:navigated', () => window.setTimeout(deskRefresh, 0));
+
+// AI headline suggestions for the post editor. The draft is read back from the form
+// at click time instead of being mirrored into Alpine state, so old() repopulation,
+// the block builder and quick-added taxonomy chips all stay the source of truth.
+// `run` changes the x-for key on every request, forcing fresh DOM nodes so the
+// staggered reveal plays again even when two runs return the same number of titles.
+window.Alpine.data('titleSuggestions', (route) => ({
+    route: route,
+    titles: [],
+    message: '',
+    loading: false,
+    run: 0,
+
+    payload() {
+        const form = this.$el.closest('form');
+
+        if (! form) return null;
+
+        return {
+            title: form.querySelector('[name="title"]')?.value ?? '',
+            excerpt: form.querySelector('[name="excerpt"]')?.value ?? '',
+            content: form.querySelector('#content-input')?.value ?? '',
+            categories: Array.from(form.querySelectorAll('input[name="categories[]"]:checked')).map((input) => Number(input.value)),
+            tags: Array.from(form.querySelectorAll('input[name="tags[]"]:checked')).map((input) => Number(input.value)),
+        };
+    },
+
+    async suggest() {
+        if (this.loading) return;
+
+        const payload = this.payload();
+
+        if (! payload) {
+            this.message = 'The post form could not be read.';
+            return;
+        }
+
+        this.loading = true;
+        this.message = '';
+        this.titles = [];
+        this.run += 1;
+
+        try {
+            const response = await fetch(this.route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (! response.ok) {
+                this.message = data.message || 'Suggestions are unavailable right now.';
+                return;
+            }
+
+            this.titles = Array.isArray(data.titles) ? data.titles : [];
+
+            if (! this.titles.length) {
+                this.message = 'No suggestions came back. Try editing the draft and asking again.';
+            }
+        } catch (error) {
+            this.message = 'Network error — nothing was sent.';
+        } finally {
+            this.loading = false;
+        }
+    },
+
+    apply(title) {
+        const input = document.getElementById('title');
+
+        if (! input) return;
+
+        input.value = title;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+    },
+}));
+
+// AI username suggestions, shared by the staff create/edit forms and the profile.
+// Values are read from the surrounding form at click time; ignoreUserId lets an
+// edit page offer the account's own current name back without calling it taken.
+window.Alpine.data('usernameSuggestions', (route, ignoreUserId) => ({
+    route: route,
+    ignoreUserId: ignoreUserId,
+    usernames: [],
+    message: '',
+    loading: false,
+
+    payload() {
+        const form = this.$el.closest('form');
+
+        if (! form) return null;
+
+        // No count is sent: config/ai.php owns the batch size for both features,
+        // so operators change one number instead of a server default and a
+        // hard-coded client value that can silently disagree.
+        return {
+            name: form.querySelector('[name="name"]')?.value ?? '',
+            email: form.querySelector('[name="email"]')?.value ?? '',
+            ignore_user_id: this.ignoreUserId ?? null,
+        };
+    },
+
+    async suggest() {
+        if (this.loading) return;
+
+        const payload = this.payload();
+
+        if (! payload) {
+            this.message = 'The user form could not be read.';
+            return;
+        }
+
+        this.loading = true;
+        this.message = '';
+        this.usernames = [];
+
+        try {
+            const response = await fetch(this.route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (! response.ok) {
+                this.message = data.message || 'Suggestions are unavailable right now.';
+                return;
+            }
+
+            this.usernames = Array.isArray(data.usernames) ? data.usernames : [];
+
+            if (! this.usernames.length) {
+                this.message = 'No available usernames came back. Try a different name and ask again.';
+            }
+        } catch (error) {
+            this.message = 'Network error — nothing was sent.';
+        } finally {
+            this.loading = false;
+        }
+    },
+
+    apply(name) {
+        const input = this.$el.closest('form')?.querySelector('[name="username"]');
+
+        if (! input) return;
+
+        input.value = name;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+    },
+}));
+
+// AI copy suggestions shared by the post excerpt field, the SEO meta forms,
+// the block builder and the About Us form. Configuration arrives through data
+// attributes on the panel root so no JSON is echoed into Blade attributes;
+// form values are read at click time, exactly like titleSuggestions, so old()
+// repopulation stays the source of truth. In block mode the click handler
+// receives the live Alpine block object instead, and values are written back
+// to it (through CKEDITOR when the field is a rich-text editor).
+window.Alpine.data('copySuggestions', () => ({
+    route: '',
+    target: '',
+    resultKey: 'suggestions',
+    fields: [],
+    extra: {},
+    listLabel: 'Suggestions',
+    blockFields: [],
+    blockField: '',
+    editorId: '',
+    tone: '',
+    suggestions: [],
+    message: '',
+    loading: false,
+    run: 0,
+
+    init() {
+        const d = this.$el.dataset;
+
+        this.route = d.endpoint || '';
+        this.target = d.target || '';
+        this.resultKey = d.key || 'suggestions';
+        this.fields = (d.fields || '').split(',').map((field) => field.trim()).filter(Boolean);
+        this.listLabel = d.label || 'Suggestions';
+        this.blockFields = (d.blockFields || '').split(',').map((field) => field.trim()).filter(Boolean);
+        this.blockField = this.blockFields[0] || '';
+        this.editorId = d.editor || '';
+        this.tone = d.tone || '';
+        this.extra = {};
+
+        if (d.field) this.extra.field = d.field;
+        if (d.routeId) this.extra.route_id = Number(d.routeId);
+        if (d.routeName) this.extra.route_name = d.routeName;
+    },
+
+    payload(block) {
+        const form = this.$el.closest('form');
+
+        if (! form) return null;
+
+        if (block) {
+            return {
+                ...this.extra,
+                ...(this.tone ? { tone: this.tone } : {}),
+                block_type: block.type,
+                field: this.blockField,
+                title: form.querySelector('[name="title"]')?.value ?? '',
+                content: form.querySelector('#content-input')?.value ?? '',
+                current: String(block.attributes[this.blockField] ?? ''),
+            };
+        }
+
+        const payload = { ...this.extra };
+
+        if (this.tone) payload.tone = this.tone;
+
+        for (const name of this.fields) {
+            payload[name] = name === 'content'
+                ? (form.querySelector('#content-input')?.value ?? '')
+                : (form.querySelector('[name="' + name + '"]')?.value ?? '');
+        }
+
+        return payload;
+    },
+
+    async suggest(block = null) {
+        if (this.loading) return;
+
+        const payload = this.payload(block);
+
+        if (! payload) {
+            this.message = 'The form could not be read.';
+            return;
+        }
+
+        this.loading = true;
+        this.message = '';
+        this.suggestions = [];
+
+        try {
+            const response = await fetch(this.route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (! response.ok) {
+                this.message = data.message || 'Suggestions are unavailable right now.';
+                return;
+            }
+
+            this.suggestions = Array.isArray(data[this.resultKey]) ? data[this.resultKey] : [];
+            this.run++;
+
+            if (! this.suggestions.length) {
+                this.message = 'No suggestions came back. Try editing the form and asking again.';
+            }
+        } catch (error) {
+            this.message = 'Network error — nothing was sent.';
+        } finally {
+            this.loading = false;
+        }
+    },
+
+    // Suggestions are plain text; rich-text fields receive one escaped paragraph.
+    asHtml(value) {
+        const escaped = String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        return '<p>' + escaped + '</p>';
+    },
+
+    apply(value, block = null) {
+        if (block) {
+            const instance = window.CKEDITOR?.instances['paragraph-editor-' + block.id];
+
+            if (instance) {
+                instance.setData(this.asHtml(value));
+                block.attributes[this.blockField] = instance.getData();
+            } else {
+                block.attributes[this.blockField] = block.type === 'paragraph' ? this.asHtml(value) : value;
+            }
+
+            return;
+        }
+
+        const input = document.querySelector(this.target);
+
+        if (! input) return;
+
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+
+        const instance = this.editorId ? window.CKEDITOR?.instances[this.editorId] : null;
+
+        if (instance) {
+            instance.setData(this.asHtml(value));
+            input.value = instance.getData();
+        } else {
+            input.focus();
+        }
+    },
+}));

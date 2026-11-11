@@ -98,6 +98,16 @@
                         <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Appears as the clickable headline in search results. Used on pages without their own SEO title.</p>
+
+                    <x-admin.copy-suggestions
+                        endpoint="admin.seo.meta-suggestions"
+                        target="#meta_title"
+                        field="meta_title"
+                        :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                        label="Suggest meta titles with AI"
+                        busy-label="Weaving titles…"
+                        list-label="Suggested meta titles"
+                    />
                 </div>
 
                 {{-- Meta Description --}}
@@ -126,6 +136,16 @@
                         <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Appears below the title in search results. Optimal length: 120-160 characters.</p>
+
+                    <x-admin.copy-suggestions
+                        endpoint="admin.seo.meta-suggestions"
+                        target="#meta_description"
+                        field="meta_description"
+                        :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                        label="Suggest meta descriptions with AI"
+                        busy-label="Weaving descriptions…"
+                        list-label="Suggested meta descriptions"
+                    />
                 </div>
 
                 {{-- Meta Keywords --}}
@@ -152,7 +172,7 @@
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">Meta Image</label>
                     <div class="flex items-center gap-3">
-                        <label class="flex min-w-0 flex-1 cursor-pointer items-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-[#0A0A0F] dark:hover:bg-white/5">
+                        <label class="relative flex min-w-0 flex-1 cursor-pointer items-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-[#0A0A0F] dark:hover:bg-white/5">
                             <input type="file" name="meta_image" accept="image/jpeg,image/png,image/webp" class="sr-only" x-ref="imageInput" @change="pickImage($event)" />
                             <span class="truncate text-gray-500 dark:text-gray-400" x-text="displayImageName || 'No image selected'"></span>
                         </label>

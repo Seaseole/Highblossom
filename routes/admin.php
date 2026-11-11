@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AboutSuggestionController;
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\ApplicationVersionController;
+use App\Http\Controllers\Admin\BlockSuggestionController;
 use App\Http\Controllers\Admin\BookingClosureController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CacheController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExcerptSuggestionController;
 use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\GlassSubCategoryController;
@@ -17,6 +20,7 @@ use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\InspectionController;
 use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\NavLayoutController;
+use App\Http\Controllers\Admin\NudgeController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PasswordPolicyController;
 use App\Http\Controllers\Admin\PostController;
@@ -26,6 +30,7 @@ use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\SeoMetaSuggestionController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\SortOrderController;
@@ -35,7 +40,9 @@ use App\Http\Controllers\Admin\SystemOverviewController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ThemeController;
+use App\Http\Controllers\Admin\TitleSuggestionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UsernameSuggestionController;
 use App\Http\Controllers\Admin\UserSessionController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use Illuminate\Support\Facades\Route;
@@ -81,9 +88,19 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::get('versions/history', [ApplicationVersionController::class, 'history'])->middleware('can:manage versions')->name('versions.history');
     Route::post('versions', [ApplicationVersionController::class, 'store'])->middleware('can:manage versions')->name('versions.store');
 
+    // Shared by the staff create/edit forms and the profile username field. The
+    // group already requires authentication; ai.throttle caps the cost of a call.
+    Route::post('username-suggestions', UsernameSuggestionController::class)
+        ->middleware('ai.throttle')
+        ->name('username-suggestions');
+
     // About Us
     Route::get('about-us', [AboutUsController::class, 'edit'])->middleware('can:manage pages')->name('about-us.edit');
     Route::put('about-us', [AboutUsController::class, 'update'])->middleware('can:manage pages')->name('about-us.update');
+    // Same shape as the other AI endpoints: explicit click only, ai.throttle caps the cost.
+    Route::post('about-us/suggestions', AboutSuggestionController::class)
+        ->middleware(['can:manage pages', 'ai.throttle'])
+        ->name('about-us.suggestions');
 
     // Shared by every admin sort-order field. Reports only - the module's own
     // ability is checked in the controller and nothing here writes a row.
@@ -108,6 +125,19 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::get('posts', [PostController::class, 'index'])->middleware('can:view blog')->name('posts.index');
     Route::get('posts/create', [PostController::class, 'create'])->middleware('can:create blog')->name('posts.create');
     Route::post('posts', [PostController::class, 'store'])->middleware('can:create blog')->name('posts.store');
+    // Also ahead of the wildcard: a literal two-segment POST that must not be read
+    // as a post slug. Cost and draft-text exposure are capped by ai.throttle.
+    Route::post('posts/title-suggestions', TitleSuggestionController::class)
+        ->middleware(['can:create blog', 'ai.throttle'])
+        ->name('posts.title-suggestions');
+    // Same wildcard guard as the title route; ai.throttle caps the cost of a call.
+    Route::post('posts/excerpt-suggestions', ExcerptSuggestionController::class)
+        ->middleware(['can:create blog', 'ai.throttle'])
+        ->name('posts.excerpt-suggestions');
+    // Block-level copy for the builder; same wildcard guard and throttle as above.
+    Route::post('posts/block-suggestions', BlockSuggestionController::class)
+        ->middleware(['can:create blog', 'ai.throttle'])
+        ->name('posts.block-suggestions');
     // Registered before the {post} wildcard so "bulk-status" is not read as a slug.
     Route::put('posts/bulk-status', [PostController::class, 'bulkStatus'])->middleware('can:update blog')->name('posts.bulk-status');
     Route::patch('posts/{post}/status', [PostController::class, 'updateStatus'])->middleware('can:update blog')->name('posts.status');
@@ -195,6 +225,9 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     Route::delete('quotes/{quote}', [QuoteController::class, 'destroy'])->middleware('can:update bookings')->name('quotes.destroy');
 
     // SEO Management
+    Route::post('seo/meta-suggestions', SeoMetaSuggestionController::class)
+        ->middleware(['can:manage seo', 'ai.throttle'])
+        ->name('seo.meta-suggestions');
     Route::get('seo/settings', [SeoController::class, 'settings'])->middleware('can:manage seo')->name('seo.settings');
     Route::put('seo/settings', [SeoController::class, 'updateSettings'])->middleware('can:manage seo')->name('seo.settings.update');
     Route::get('seo/static-routes', [SeoController::class, 'index'])->middleware('can:manage seo')->name('seo.static-routes');
@@ -282,6 +315,11 @@ Route::middleware(['auth', 'consent.required', 'verified.if_required', 'can:acce
     // only reason it exists: each hit costs up to six LIKE queries, and the box re-queries as
     // you type.
     Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('search');
+
+    // Rule-based nudges. No route-level permission: each row carries the
+    // permission its action needs, re-checked in the controller.
+    Route::post('nudges/{nudge}/dismiss', [NudgeController::class, 'dismiss'])->name('nudges.dismiss');
+    Route::post('nudges/{nudge}/snooze', [NudgeController::class, 'snooze'])->name('nudges.snooze');
 
     Route::get('decompose', [DecomposerController::class, 'index'])->middleware('can:manage environment')->name('decompose');
 });

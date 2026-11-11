@@ -75,6 +75,17 @@
                             @error('body')
                                 <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
+
+                            <x-admin.copy-suggestions
+                                endpoint="admin.about-us.suggestions"
+                                target="#body-editor"
+                                field="body"
+                                editor="body-editor"
+                                :fields="['title', 'subtitle', 'body', 'mission', 'vision']"
+                                label="Suggest body with AI"
+                                busy-label="Weaving the page…"
+                                list-label="Suggested body text"
+                            />
                         </div>
 
                         <div
@@ -103,6 +114,17 @@
                             @error('mission')
                                 <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
+
+                            <x-admin.copy-suggestions
+                                endpoint="admin.about-us.suggestions"
+                                target="#mission-editor"
+                                field="mission"
+                                editor="mission-editor"
+                                :fields="['title', 'subtitle', 'body', 'mission', 'vision']"
+                                label="Suggest mission with AI"
+                                busy-label="Weaving the mission…"
+                                list-label="Suggested mission statements"
+                            />
                         </div>
 
                         <div
@@ -131,6 +153,17 @@
                             @error('vision')
                                 <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
+
+                            <x-admin.copy-suggestions
+                                endpoint="admin.about-us.suggestions"
+                                target="#vision-editor"
+                                field="vision"
+                                editor="vision-editor"
+                                :fields="['title', 'subtitle', 'body', 'mission', 'vision']"
+                                label="Suggest vision with AI"
+                                busy-label="Weaving the vision…"
+                                list-label="Suggested vision statements"
+                            />
                         </div>
                     </div>
                 </div>

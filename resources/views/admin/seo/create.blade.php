@@ -56,6 +56,17 @@
                                 <p class="text-admin-text-muted mt-1 text-xs">
                                     {{ strlen(old('meta_title', '')) }}/70 characters
                                 </p>
+
+                                <x-admin.copy-suggestions
+                                    endpoint="admin.seo.meta-suggestions"
+                                    target="#meta_title"
+                                    field="meta_title"
+                                    :seo-route-name="$route_name"
+                                    :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                                    label="Suggest meta titles with AI"
+                                    busy-label="Weaving titles…"
+                                    list-label="Suggested meta titles"
+                                />
                             </div>
 
                             <div>
@@ -89,6 +100,17 @@
                                 <p class="text-admin-text-muted mt-1 text-xs">
                                     {{ strlen(old('meta_description', '')) }}/300 characters
                                 </p>
+
+                                <x-admin.copy-suggestions
+                                    endpoint="admin.seo.meta-suggestions"
+                                    target="#meta_description"
+                                    field="meta_description"
+                                    :seo-route-name="$route_name"
+                                    :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                                    label="Suggest meta descriptions with AI"
+                                    busy-label="Weaving descriptions…"
+                                    list-label="Suggested meta descriptions"
+                                />
                             </div>
                         </div>
                     </div>

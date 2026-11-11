@@ -297,6 +297,7 @@
                                 :hint="\App\Support\Username::formatHint().'. You can sign in with this or your email address.'"
                                 :value="old('username', $user->username)"
                             />
+                            <x-admin.username-suggestions :ignore-user-id="$user->id" />
                             <x-sheet.input
                                 label="Email"
                                 name="email"

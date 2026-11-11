@@ -52,6 +52,7 @@ final class CategoryController
                 'id' => $category->getKey(),
                 'name' => $category->name,
                 'slug' => $category->slug,
+                'description' => $category->description,
             ], 201);
         }
 

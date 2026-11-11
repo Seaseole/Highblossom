@@ -31,3 +31,11 @@ Schedule::job(new WarmSystemOverviewProbe)
     ->twiceDaily(1, 13)
     ->name('system-overview-warm')
     ->withoutOverlapping();
+
+// Reconcile the rule-based nudge store. Hourly so a cleared signal disappears
+// within the hour; the command is a no-op while the AI flag is off.
+Schedule::command('nudges:scan')
+    ->hourly()
+    ->withoutOverlapping(10)
+    ->onOneServer()
+    ->appendOutputTo(storage_path('logs/nudges-scan.log'));

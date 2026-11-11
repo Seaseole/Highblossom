@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Jobs\WarmSystemOverviewProbe;
+use App\Services\NudgeService;
 use App\Support\SystemOverview\ProbeCost;
 use App\Support\SystemOverview\ProbeRegistry;
 use App\Support\SystemOverview\ProbeRunner;
@@ -23,6 +24,7 @@ final class SystemOverviewController
         private readonly ProbeRunner $probes,
         private readonly ProbeRegistry $registry,
         private readonly SystemOverviewExport $export,
+        private readonly NudgeService $nudges,
     ) {}
 
     /**
@@ -36,6 +38,7 @@ final class SystemOverviewController
         return view('admin.system-overview.index', [
             'sections' => $this->probes->runAll(),
             'heavyProbes' => $this->registry->keysByCost(ProbeCost::Heavy),
+            'nudges' => config('ai.enabled') ? $this->nudges->visible() : collect(),
         ]);
     }
 

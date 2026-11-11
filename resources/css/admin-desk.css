@@ -925,6 +925,113 @@
     color: var(--dash-ink);
 }
 
+/* --- nudges -------------------------------------------------------------- */
+
+/* A nudge row is a queue row with two small forms beside the link, so the
+   link never wraps a button. The message may wrap: it is a sentence, not a
+   title, and truncating it would hide the reason to act. */
+.hb-nudge-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-inline: -0.5rem;
+    padding: 0.65rem 0.5rem 0.65rem 0.75rem;
+}
+
+.hb-nudge-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    min-width: 0;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.hb-nudge-message {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.011em;
+    color: var(--dash-ink);
+}
+
+.hb-tone--late .hb-nudge-message {
+    color: var(--dash-wait);
+}
+
+.hb-nudge-action {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dash-muted);
+    transition: color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-nudge-link:hover .hb-nudge-action {
+    color: var(--dash-ink);
+}
+
+.hb-nudge-link:hover .hb-queue-go {
+    border-color: var(--dash-ink);
+    transform: rotate(-45deg) translate(1px, 1px);
+}
+
+.hb-nudge-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+.hb-nudge-actions form {
+    margin: 0;
+}
+
+.hb-nudge-btn {
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--dash-line);
+    border-radius: 999px;
+    background: transparent;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--dash-muted);
+    cursor: pointer;
+    transition:
+        color var(--dash-fast) var(--dash-ease),
+        border-color var(--dash-fast) var(--dash-ease);
+}
+
+.hb-nudge-btn:hover {
+    color: var(--dash-ink);
+    border-color: var(--dash-faint);
+}
+
+.hb-nudge-btn:focus-visible {
+    outline: 2px solid var(--dash-ink);
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .hb-nudge-main {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.4rem;
+    }
+
+    .hb-nudge-link {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .hb-nudge-actions {
+        justify-content: flex-end;
+    }
+}
+
 /* --- pipeline ----------------------------------------------------------- */
 
 .hb-stack {

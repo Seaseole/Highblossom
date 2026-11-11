@@ -37,6 +37,15 @@
     >
         <label class="{{ $labelCls }}">Content</label>
         <textarea :id="editorId" x-model="{{ $b }}.attributes.content" class="{{ $inputCls }}"></textarea>
+
+        <x-admin.copy-suggestions
+            endpoint="admin.posts.block-suggestions"
+            :block="$b"
+            :block-fields="['content']"
+            label="Suggest paragraph with AI"
+            busy-label="Weaving paragraphs…"
+            list-label="Suggested paragraphs"
+        />
     </div>
 </template>
 
@@ -54,6 +63,15 @@
                 @endfor
             </select>
         </div>
+
+        <x-admin.copy-suggestions
+            endpoint="admin.posts.block-suggestions"
+            :block="$b"
+            :block-fields="['content']"
+            label="Suggest headings with AI"
+            busy-label="Weaving headings…"
+            list-label="Suggested headings"
+        />
     </div>
 </template>
 
@@ -185,6 +203,15 @@
                 <input type="text" x-model="{{ $b }}.attributes.button_url" class="{{ $inputCls }}" />
             </div>
         </div>
+
+        <x-admin.copy-suggestions
+            endpoint="admin.posts.block-suggestions"
+            :block="$b"
+            :block-fields="['title', 'description', 'button_text']"
+            label="Suggest with AI"
+            busy-label="Weaving copy…"
+            list-label="Suggested copy"
+        />
     </div>
 </template>
 
@@ -303,6 +330,15 @@
         <input type="text" x-model="{{ $b }}.attributes.title" class="{{ $inputCls }}" placeholder="Title" />
         <textarea x-model="{{ $b }}.attributes.content" class="{{ $inputCls }}" placeholder="Message"></textarea>
         <x-ui.checkbox x-model="{{ $b }}.attributes.dismissible" label="Dismissible" />
+
+        <x-admin.copy-suggestions
+            endpoint="admin.posts.block-suggestions"
+            :block="$b"
+            :block-fields="['title', 'content']"
+            label="Suggest with AI"
+            busy-label="Weaving copy…"
+            list-label="Suggested copy"
+        />
     </div>
 </template>
 

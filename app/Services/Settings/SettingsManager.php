@@ -96,6 +96,7 @@ final class SettingsManager
             'enable_registration' => false,
             'session_idle_timeout_minutes' => 0,
             'admin_nav_layout' => 'sidebar',
+            'ai_tone' => 'professional',
             'announcements' => [],
             'gallery_metrics' => [],
             'quote_notification_emails' => '',

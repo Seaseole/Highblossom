@@ -1,0 +1,21 @@
+{
+  "excludes": [
+    ".aww-shots/**",
+    ".bench-shots/**",
+    ".qoder/**",
+    ".workbuddy-ai/**",
+    "public/vendor/**",
+    "lang/vendor/**",
+    "storage/**",
+    "resources/brand-icons/**",
+    "*.txt",
+    "*.html",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.ico",
+    "*.webp",
+    "public/favicon.svg"
+  ]
+}

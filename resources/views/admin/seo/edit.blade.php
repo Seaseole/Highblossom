@@ -34,6 +34,17 @@
                                 maxlength="70"
                                 class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                             />
+
+                            <x-admin.copy-suggestions
+                                endpoint="admin.seo.meta-suggestions"
+                                target="[name='meta_title']"
+                                field="meta_title"
+                                :seo-route-id="$route->id"
+                                :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                                label="Suggest meta titles with AI"
+                                busy-label="Weaving titles…"
+                                list-label="Suggested meta titles"
+                            />
                         </div>
                         <div>
                             <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Meta Keywords</label>
@@ -52,6 +63,17 @@
                                 maxlength="300"
                                 class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:focus:ring-white"
                             >{{ old('meta_description', $route->meta_description) }}</textarea>
+
+                            <x-admin.copy-suggestions
+                                endpoint="admin.seo.meta-suggestions"
+                                target="[name='meta_description']"
+                                field="meta_description"
+                                :seo-route-id="$route->id"
+                                :fields="['meta_title', 'meta_description', 'meta_keywords']"
+                                label="Suggest meta descriptions with AI"
+                                busy-label="Weaving descriptions…"
+                                list-label="Suggested meta descriptions"
+                            />
                         </div>
                     </div>
                 </div>

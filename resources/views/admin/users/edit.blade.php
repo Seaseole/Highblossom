@@ -52,6 +52,7 @@
                         <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ \App\Support\Username::formatHint() }}</p>
+                    <x-admin.username-suggestions :ignore-user-id="$user->id" />
                 </div>
 
                 <div>

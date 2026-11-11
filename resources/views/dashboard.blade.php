@@ -351,6 +351,8 @@
             </section>
         </div>
 
+        @include('admin.nudges.band', ['nudges' => $nudges])
+
         {{-- ============================================================
              SEVEN DAYS AHEAD. The same measure stretched across a week:
              a bar per day, the shop's own closed days marked.

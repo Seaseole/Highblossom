@@ -387,6 +387,33 @@
                             @enderror
                         </x-sheet.field>
                     </x-sheet.block>
+                    @if (config('ai.enabled'))
+                        <x-sheet.block title="AI Writing" note="The voice AI copy suggestions start with. Writers can still pick another voice on each suggestion panel.">
+                            <x-sheet.field
+                                label="Default suggestion voice"
+                                for="ai_tone"
+                                key="ai_tone"
+                                hint="Applies to excerpt, SEO meta, block and About Us suggestions. The text itself is always reviewed by a person before it is saved."
+                            >
+                                <select
+                                    id="ai_tone"
+                                    name="ai_tone"
+                                    class="hb-select"
+                                    style="max-width: 16rem"
+                                >
+                                    @foreach ((array) config('ai.tones', []) as $toneKey => $tone)
+                                        <option
+                                            value="{{ $toneKey }}"
+                                            {{ old('ai_tone', $settings['ai_tone']) === $toneKey ? 'selected' : '' }}
+                                        >{{ $tone['label'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('ai_tone')
+                                    <p class="hb-error">{{ $message }}</p>
+                                @enderror
+                            </x-sheet.field>
+                        </x-sheet.block>
+                    @endif
                 </div>
 
                 {{-- Business Hours Tab --}}

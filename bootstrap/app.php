@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureConsentRecorded;
 use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
 use App\Http\Middleware\EnsureRegistrationIsEnabled;
 use App\Http\Middleware\ShareThemePreference;
+use App\Http\Middleware\ThrottleAiSuggestions;
 use App\Http\Middleware\ThrottleUsernameAvailability;
 use App\Http\Middleware\TrackUserSession;
 use App\Support\AdminSidebar;
@@ -57,6 +58,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified.if_required' => EnsureEmailIsVerifiedWhenRequired::class,
             'consent.required' => EnsureConsentRecorded::class,
             'registration.enabled' => EnsureRegistrationIsEnabled::class,
+            'ai.throttle' => ThrottleAiSuggestions::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

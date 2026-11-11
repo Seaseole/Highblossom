@@ -1,5 +1,6 @@
 <?php
 
+use App\Providers\AiServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\FortifyServiceProvider;
@@ -14,4 +15,5 @@ return [
     EventServiceProvider::class,
     PasskeysServiceProvider::class,
     AppServiceProvider::class,
+    AiServiceProvider::class,
 ];

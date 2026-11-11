@@ -1,4 +1,4 @@
-name: linter
+name: quality
 
 on:
   push:
@@ -15,7 +15,7 @@ on:
       - workos
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   quality:
@@ -28,6 +28,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          coverage: none
+
+      # Vite 8 / Tailwind 4 need a current Node; ubuntu-latest's default is not pinned.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
@@ -35,16 +43,30 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm install
+          npm ci --no-audit --no-fund
 
-      - name: Run Pint
-        run: composer lint
+      # Composer was installed with --no-scripts, so package discovery and the
+      # application key have to be prepared explicitly before anything boots.
+      - name: Prepare Application
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+          php artisan package:discover --ansi
+          php artisan config:clear
 
-      # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v7
-      #   with:
-      #     commit_message: fix code style
-      #     commit_options: '--no-verify'
-      #     file_pattern: |
-      #       **/*
-      #       !.github/workflows/*
+      # `composer lint` used to *fix* files in CI, which could never fail a build.
+      - name: Check Code Style
+        run: composer lint:check
+
+      # This repository deliberately ignores /tests and /phpunit.xml ("tests are
+      # for local development only"), so a fresh checkout has no suite to run.
+      # `composer test` remains the local QA command; CI instead proves the app
+      # boots and every Blade template compiles. See AI-SUGGESTIONS.md section 9.
+      - name: Compile All Blade Views
+        run: php artisan view:cache
+        env:
+          AI_SUGGESTIONS_ENABLED: 'false'
+          AI_SUGGESTIONS_KEY: ''
+
+      - name: Build Frontend Assets
+        run: npm run build

@@ -83,6 +83,8 @@
             @endif
         </section>
 
+        @include('admin.nudges.band', ['nudges' => $nudges])
+
         @php $gridSections = collect($sections)->reject(fn ($section) => $section->key === 'packages'); @endphp
         <div class="hb-desk-grid" data-dash-reveal>
             @foreach ($gridSections as $section)

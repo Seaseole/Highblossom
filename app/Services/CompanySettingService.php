@@ -46,7 +46,7 @@ final class CompanySettingService
         'time_format_display', 'currency_symbol', 'google_maps_api_key', 'map_directions_link',
         'booking_lead_time_hours', 'booking_slot_interval_minutes', 'booking_capacity_workshop',
         'booking_capacity_mobile', 'require_email_verification', 'session_idle_timeout_minutes',
-        'admin_nav_layout',
+        'admin_nav_layout', 'ai_tone',
         'facebook_url', 'instagram_url', 'linkedin_url', 'quote_notification_emails',
         ...self::HOME_SIMPLE_FIELDS,
     ];

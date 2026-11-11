@@ -306,6 +306,18 @@
     overflow: hidden;
 }
 
+/* Visually-hidden form controls are `position: absolute` (Tailwind's .sr-only).
+   If their label is not a containing block, the hidden input's box belongs to the
+   initial containing block, so clicking the label focuses an element at the top of
+   the document and the browser scrolls the WINDOW - not .admin-main - to reveal it.
+   That pushes the viewport-tall shell up and exposes the body underneath it.
+   Anchoring every such label keeps focus at the control the person actually
+   clicked. Templates also set `relative` explicitly; this is the backstop so a
+   newly added chip cannot reintroduce the jump. */
+.admin-panel label:has(> .sr-only) {
+    position: relative;
+}
+
 .admin-nav-scroll {
     scrollbar-width: thin;
     scrollbar-color: rgba(113, 113, 122, 0.35) transparent;
@@ -1233,4 +1245,210 @@ html.admin-nav-top .admin-bar-context-page {
     flex-shrink: 0;
     border-radius: 9999px;
     background-color: var(--color-admin-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   AI title suggestions — one motion arc from "thinking" to individual results.
+
+   Scoped to .ai-title-suggestions so none of this leaks into the username
+   control or the taxonomy chips. admin.css is unlayered, so these declarations
+   win over Tailwind utilities on the same elements; every animation is also
+   switched off for people who ask for reduced motion.
+   --------------------------------------------------------------------------- */
+
+.ai-title-trigger.is-loading {
+    border-color: transparent;
+    color: #ffffff;
+    opacity: 1;
+    background: linear-gradient(110deg, #6d28d9, #db2777, #f59e0b, #0ea5e9, #6d28d9);
+    background-size: 300% 100%;
+    animation: ai-gradient-pan 2.4s linear infinite;
+}
+
+.ai-title-trigger.is-loading .ai-title-trigger-spark {
+    animation: ai-spark-spin 1.8s ease-in-out infinite;
+}
+
+.ai-title-trigger-busy {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.ai-title-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.ai-title-dots i {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: #ffffff;
+    animation: ai-dot-bounce 900ms ease-in-out infinite;
+}
+
+.ai-title-dots i:nth-child(1) {
+    background: #fde68a;
+    animation-delay: 0ms;
+}
+
+.ai-title-dots i:nth-child(2) {
+    background: #f9a8d4;
+    animation-delay: 120ms;
+}
+
+.ai-title-dots i:nth-child(3) {
+    background: #a5b4fc;
+    animation-delay: 240ms;
+}
+
+.ai-title-loading-track {
+    position: relative;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: rgba(148, 163, 184, 0.25);
+}
+
+.ai-title-loading-sweep {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #7c3aed, #ec4899, #f59e0b, #06b6d4, #7c3aed);
+    animation: ai-loading-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.ai-title-loading-copy {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: transparent;
+    background: linear-gradient(90deg, #7c3aed, #db2777, #0891b2, #7c3aed);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: ai-gradient-pan 2.4s linear infinite;
+}
+
+.ai-title-option {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid hsl(var(--ai-hue, 250) 72% 82% / 0.7);
+    background: linear-gradient(135deg, hsl(var(--ai-hue, 250) 90% 97% / 0.95), #ffffff 70%);
+    color: #1f2937;
+    animation: ai-title-option-in 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--ai-index, 0) * 85ms);
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease;
+}
+
+.ai-title-option::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: hsl(var(--ai-hue, 250) 78% 58%);
+    opacity: 0.85;
+}
+
+.ai-title-option:hover {
+    transform: translateY(-2px);
+    border-color: hsl(var(--ai-hue, 250) 78% 55%);
+    box-shadow: 0 8px 22px -12px hsl(var(--ai-hue, 250) 78% 45% / 0.65);
+}
+
+.dark .ai-title-option {
+    border-color: hsl(var(--ai-hue, 250) 60% 42% / 0.55);
+    background: linear-gradient(135deg, hsl(var(--ai-hue, 250) 45% 18% / 0.9), rgba(255, 255, 255, 0.04) 70%);
+    color: #e5e7eb;
+}
+
+.dark .ai-title-option:hover {
+    border-color: hsl(var(--ai-hue, 250) 75% 65%);
+    box-shadow: 0 8px 22px -12px hsl(var(--ai-hue, 250) 80% 60% / 0.55);
+}
+
+@keyframes ai-gradient-pan {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes ai-loading-sweep {
+    from {
+        transform: translateX(-120%);
+    }
+
+    to {
+        transform: translateX(320%);
+    }
+}
+
+@keyframes ai-spark-spin {
+    0%,
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(24deg) scale(1.12);
+    }
+}
+
+@keyframes ai-dot-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.65;
+    }
+
+    50% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+@keyframes ai-title-option-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+        filter: saturate(0.4);
+    }
+
+    60% {
+        filter: saturate(1.25);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: saturate(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-title-trigger.is-loading,
+    .ai-title-trigger.is-loading .ai-title-trigger-spark,
+    .ai-title-loading-sweep,
+    .ai-title-loading-copy,
+    .ai-title-dots i,
+    .ai-title-option {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .ai-title-option {
+        animation-delay: 0ms !important;
+    }
 }

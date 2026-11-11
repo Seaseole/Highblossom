@@ -77,6 +77,7 @@ trait CompanyValidationRules
             // Nullable so an absent key leaves the stored default alone, which is what
             // `saveSimpleFields()`'s array_key_exists guard expects; the select always sends one.
             'admin_nav_layout' => ['nullable', Rule::enum(AdminNavLayout::class)],
+            'ai_tone' => ['nullable', Rule::in(array_keys((array) config('ai.tones', [])))],
             'announcement_active' => ['nullable', 'boolean'],
             'announcements' => ['nullable', 'array'],
             'announcements.*.text' => ['required', 'string', 'max:500'],

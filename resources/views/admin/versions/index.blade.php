@@ -239,7 +239,7 @@
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">What kind of change is this?</span>
                         <div class="grid grid-cols-3 gap-2">
                             @foreach (['patch' => 'Fix', 'minor' => 'Feature', 'major' => 'Breaking'] as $type => $caption)
-                                <label class="cursor-pointer">
+                                <label class="relative cursor-pointer">
                                     <input type="radio" name="bump_choice" value="{{ $type }}" x-model="bump" @change="pickBump('{{ $type }}')" class="peer sr-only" />
                                     <span class="block rounded-xl border-2 border-gray-100 p-3 text-center transition-all peer-checked:border-gray-900 peer-checked:bg-gray-50 dark:border-white/5 dark:peer-checked:border-white dark:peer-checked:bg-white/5">
                                         <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $type }}</span>

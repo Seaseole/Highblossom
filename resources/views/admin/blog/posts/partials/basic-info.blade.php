@@ -39,6 +39,8 @@
         @error('title')
             <p class="mt-2 text-sm font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
         @enderror
+
+        @include('admin.blog.posts.partials.title-suggestions')
     </div>
 
     <div x-data="charCount({{ $excerptMax }})">
@@ -65,5 +67,15 @@
         @enderror
 
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Required to publish. Also used as the meta description.</p>
+
+        <x-admin.copy-suggestions
+            endpoint="admin.posts.excerpt-suggestions"
+            target="#excerpt"
+            result-key="excerpts"
+            :fields="['title', 'excerpt', 'content']"
+            label="Suggest excerpts with AI"
+            busy-label="Weaving excerpts…"
+            list-label="Suggested excerpts"
+        />
     </div>
 </div>
