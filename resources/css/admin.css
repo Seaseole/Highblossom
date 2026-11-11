@@ -306,6 +306,40 @@
     overflow: hidden;
 }
 
+/* The content scroller wears the rail's thin, palette-matched scrollbar rather than the
+   browser default, and reserves foot room so a field focused near the bottom of a phone
+   screen is not hidden behind that page's sticky save bar. */
+.admin-main {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(113, 113, 122, 0.35) transparent;
+    scroll-padding-bottom: 5rem;
+}
+
+.dark .admin-main {
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.admin-main::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-main::-webkit-scrollbar-thumb {
+    background: rgba(113, 113, 122, 0.35);
+    border-radius: 9999px;
+}
+
+.admin-main::-webkit-scrollbar-thumb:hover {
+    background: rgba(113, 113, 122, 0.6);
+}
+
+.dark .admin-main::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+}
+
 /* Visually-hidden form controls are `position: absolute` (Tailwind's .sr-only).
    If their label is not a containing block, the hidden input's box belongs to the
    initial containing block, so clicking the label focuses an element at the top of

@@ -67,7 +67,7 @@
                     x-model="tone"
                     aria-label="Suggestion voice"
                     title="Suggestion voice"
-                    class="rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:focus:ring-white"
+                    class="min-h-[44px] rounded-full border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:ring-1 focus:ring-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:focus:ring-white"
                 >
                     @foreach ($tones as $toneKey => $tone)
                         <option value="{{ $toneKey }}" @selected($toneKey === $defaultTone)>{{ $tone['label'] }}</option>
@@ -80,7 +80,7 @@
                 x-on:click="suggest({{ $block ?? 'null' }})"
                 :disabled="loading"
                 :class="{ 'is-loading': loading }"
-                class="ai-title-trigger inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-gray-900 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white"
+                class="ai-title-trigger inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:border-gray-900 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white"
             >
                 <svg class="ai-title-trigger-spark h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" />
@@ -127,7 +127,7 @@
                     x-on:click="apply(suggestion, {{ $block ?? 'null' }})"
                     x-text="suggestion"
                     :style="'--ai-index:' + index + ';--ai-hue:' + ((index * 34 + 250) % 360)"
-                    class="ai-title-option block w-full rounded-xl px-4 py-2 text-left text-sm"
+                    class="ai-title-option flex min-h-[44px] w-full items-center rounded-xl px-4 py-2.5 text-left text-sm"
                 ></button>
             </template>
         </div>

@@ -32,8 +32,38 @@
         @endif
     </button>
 
+    {{-- The bell is rarely the right-most thing in the bar on a phone, so a fixed 16rem panel pinned
+         to its right edge can run off either side of the screen. The nested scope below measures the
+         bell when the panel opens and slides the panel back inside a 12px gutter, narrowing it on
+         screens too small for 16rem. It inherits open/close from the popover scope above. --}}
     <div
         id="notifications-menu"
+        x-data="{
+            width: 256,
+            right: 0,
+            place() {
+                const gutter = 12;
+                const bell = this.$el.parentElement.getBoundingClientRect();
+                const viewport = document.documentElement.clientWidth;
+
+                this.width = Math.min(256, viewport - gutter * 2);
+
+                // 'right' is how far the panel's right edge sits left of the bell's right edge.
+                let right = Math.max(bell.right - (viewport - gutter), 0);
+
+                // If that pushes the left edge past the gutter, slide the panel back to the right.
+                const left = bell.right - right - this.width;
+                if (left < gutter) {
+                    right -= gutter - left;
+                }
+
+                this.right = right;
+            }
+        }"
+        x-init="$watch('open', (isOpen) => isOpen && place())"
+        @resize.window.debounce.100ms="open && place()"
+        @orientationchange.window="open && $nextTick(() => place())"
+        :style="{ width: width + 'px', right: right + 'px', minWidth: '0px' }"
         x-cloak
         x-show="open"
         x-transition:enter="transition ease-out duration-150"
@@ -48,7 +78,7 @@
         x-on:livewire:navigated.document="close(false)"
         role="menu"
         aria-label="Waiting queues"
-        class="admin-nav-pop admin-bar-pop absolute right-0 top-full z-40 mt-2 w-64 space-y-1"
+        class="admin-nav-pop admin-bar-pop absolute top-full z-40 mt-2 max-h-[calc(100dvh-5rem)] w-64 space-y-1 overflow-y-auto overscroll-contain"
     >
         @foreach ($rows as $row)
             <a
@@ -58,7 +88,7 @@
                 role="menuitem"
                 class="admin-nav-item"
             >
-                <span class="flex-1">{{ $row['label'] }}</span>
+                <span class="min-w-0 flex-1 truncate">{{ $row['label'] }}</span>
                 <span class="admin-nav-badge" aria-hidden="true">{{ $row['count'] > 99 ? '99+' : $row['count'] }}</span>
                 <span class="sr-only">({{ $row['count'] }} waiting)</span>
             </a>
